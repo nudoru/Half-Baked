@@ -1,0 +1,98 @@
+$control-font: $font-content
+//------------------------------------------------------------------------------
+//  Spacing
+//------------------------------------------------------------------------------
+
+$control-padding: $base-line-height
+$control-padding-small: $half-base-line-height
+$control-margin: $base-line-height
+
+$control-form-element-height: 33px
+$control-button-height: $control-form-element-height
+
+$control-border: 1px solid $color-white-grey-line
+
+$control-border-radius: 3px
+$control-border-radius-large: 10px
+$control-border-radius-small: 2px
+
+$control-panel-border-radius: $control-border-radius
+$control-button-border-radius: 5px
+
+//------------------------------------------------------------------------------
+//  Colors
+//------------------------------------------------------------------------------
+
+$control-primary-color: $light-blue
+$control-primary-color-dark: $dark-blue
+$control-container-color: rgb(255,255,255)
+$control-header-color: $color-white-grey-fill
+$control-footer-color: $color-white-grey-fill
+
+$control-success-color: rgba(76, 175, 80, 1.0)
+$control-success-color-dark: scale-lightness($control-success-color, -20%)
+$control-warning-color: rgba(255, 193, 7, 1.0)
+$control-warning-color-dark: scale-lightness($control-warning-color, -20%)
+$control-danger-color: rgba(255, 61, 0, 1.0)
+$control-danger-color-dark: scale-lightness($control-danger-color, -20%)
+$control-info-color: $light-blue
+$control-info-color-dark: scale-lightness($control-info-color, -20%)
+$control-neutral-color: $light-warm-grey
+$control-neutral-color-dark: scale-lightness($control-neutral-color, -20%)
+
+$control-font-color: rgb(100,100,100)
+$control-font-neg-color: rgb(255,255,255)
+$control-table-zebra-color: rgb(240,240,240)
+
+//------------------------------------------------------------------------------
+//  Properties
+//------------------------------------------------------------------------------
+
+$control-font-text-shadow: 0 1px 0 rgba(0,0,0,.25)
+$control-font-neg-text-shadow: 0 1px 0 rgba(0,0,0,.45)
+$control-shadow: 0 5px 5px -4px rgba(0,0,0,.25)
+
+//------------------------------------------------------------------------------
+//  General Mixins
+//------------------------------------------------------------------------------
+
+=control-emboss-shadow
+  text-shadow: -1px -1px 0 rgba(0,0,0,.15), 1px 1px 0 rgba(255,255,255,.1)
+
+=control-disabled
+  background-color: $color-shaded
+  color: $color-base-dark
+  border: none
+  box-shadow: none
+  text-shadow: none
+  cursor: default
+
+//------------------------------------------------------------------------------
+//  Basics
+//------------------------------------------------------------------------------
+
+.icon-left
+  i.fa
+    margin-right: $base-line-height
+
+.icon-right
+  i.fa
+    margin-left: $base-line-height
+
+.well
+  margin-top: $half-base-line-height
+  margin-bottom: $half-base-line-height
+  padding: $base-line-height
+  border-radius: $control-border-radius-large
+  border: $control-border
+  background-color: $color-white-grey-fill
+
+.well-dark
+  @extend .well
+  background-color: rgba(0,0,0,.05)
+
+@import "labels"
+@import "panels"
+@import "buttons"
+@import "forms"
+@import "tables"

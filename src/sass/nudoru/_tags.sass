@@ -1,0 +1,126 @@
+*, *:after, *:before
+  -moz-box-sizing: border-box
+  -webkit-box-sizing: border-box
+  box-sizing: border-box
+
+html
+  -webkit-text-size-adjust: 100%
+  -ms-text-size-adjust: 100%
+  heigth: 100%
+
+body
+  margin: 0
+  padding: 0
+  font-size: 100%
+  min-height: 100%
+  //font-size: 62.5%; // easier to reference em'partials as pixel equiviants - 1em = 10px
+  // prevent Safari from adjusting for readability
+  -webkit-text-size-adjust: none
+  font-family: $font-content
+  color: $color-text
+
+h1
+  @extend %header-1
+
+h2
+  @extend %header-2
+
+h3
+  @extend %header-3
+
+h4
+  @extend %header-4
+
+h5
+  @extend %header-5
+
+h6
+  @extend %header-6
+
+p, a, ul, ol, li, blockquote, pre, td, th, dl, dd, dt
+  @extend %body-text
+
+strong
+  font-weight: 700
+
+em
+  font-style: italic
+
+blockquote
+  margin-left: $double-base-line-height
+  margin-right: $double-base-line-height
+  padding: $base-line-height
+  background-color: $color-shaded
+  font-family: $font-header
+  font-size: 1.4rem
+  font-weight: 300
+  line-height: $triple-base-line-height
+
+pre
+  +force-break-all-words
+  padding: $base-line-height
+  background-color: $color-shaded
+
+a
+  +transition-all
+  color: $color-link
+  outline: none
+  &:active, &:hover
+    color: $color-link-active
+  &:focus
+    outline: thin-dotted
+
+a.custom
+  +transition-all
+  color: $color-link
+  outline: none
+  text-decoration: none
+  +breaking-underline
+  +underline
+  @media (-webkit-min-device-pixel-ratio: 1.5), (min-resolution: 144dppx)
+    +underline($color-link, 0.5)
+  &:active, &:hover
+    color: $color-link-active
+    +underline($color-link-active)
+    outline: none
+    @media (-webkit-min-device-pixel-ratio: 1.5), (min-resolution: 144dppx)
+      +underline($color-link-active, 0.5)
+  &:focus
+    outline: thin-dotted
+
+ul
+  list-style: disc inside
+
+ol
+  list-style: decimal inside
+
+li
+  margin-left: $base-line-height
+  margin-bottom: 0rem
+
+ul ul, ol ol, ul ol, ol ul
+  margin: 0 0 0 $double-base-line-height
+
+ol ol
+  list-style: lower-alpha
+
+ol ol ol
+  list-style: lower-roman
+
+ul ul
+  list-style: circle
+
+svg:not(:root)
+  overflow: hidden
+
+img
+  vertical-align: middle
+
+input:focus, textarea:focus, button:focus
+  outline: 0
+
+hr
+  margin: $double-base-line-height 0
+  padding: 0
+  border: none
+  border-top: 1px solid rgba(0,0,0,.1)

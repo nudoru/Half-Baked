@@ -1,0 +1,23 @@
+#modal__cover
+  @extend %full-background-coverage
+  z-index: $z-index-modal-cover
+
+.modal__background
+  @extend %full-background-coverage
+  background-color: rgba(0,0,0,.5)
+
+.modal__close-button
+  position: absolute
+  bottom: $base-line-height
+  left: 50%
+  margin-left: -20px
+  width: 40px
+  height: 40px
+  font-size: 2rem
+  color: rgba(255,255,255,.75)
+  cursor: pointer
+  text-shadow: 0 0 10px rgba(0,0,0,.5)
+  &:hover
+    color: rgba(255,255,255,1)
+  //+respond-to(max-width, $tablet-mobile-break)
+  //  left: $base-line-height

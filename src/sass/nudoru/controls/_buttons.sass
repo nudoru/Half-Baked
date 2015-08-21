@@ -1,0 +1,124 @@
+%button
+  +transition-all()
+  +control-emboss-shadow
+  @extend .label
+  font-family: $font-header
+  height: $control-button-height
+  padding: 0 $double-base-line-height
+  margin: $half-base-line-height
+  background-color: $control-primary-color
+  border-radius: $control-button-border-radius
+  border: none
+  line-height: 0 //$control-button-height
+  text-align: center
+  color: #fff
+  cursor: pointer
+  border: 1px solid rgba(0,0,0,.15)
+  box-shadow: 1px 2px 2px rgba(0,0,0,.15), inset 1px 1px 0 rgba(255,255,255,.3)
+  white-space: nowrap
+  i.fa
+    position: relative
+    font-weight: 400
+    top: -1px
+  &:focus
+    border: 1px solid rgba(0,0,0,.5)
+  &:hover, &:active
+    background-color: $control-primary-color-dark
+
+button
+  @extend %button
+
+.button-block
+  display: block
+  width: 100%
+  margin-left: 0
+  margin-right: 0
+
+.button-small
+  font-size: .7rem
+  padding: 0 $base-line-height
+  height: 25px
+  line-height: 22px
+  margin-left: 2px
+  margin-right: 2px
+  i.fa
+    top: 1px
+
+.button-round
+  padding: 0
+  width: $control-button-height
+
+.button__icon-left
+  padding-left: $base-line-height
+  i.fa
+    margin-right: $base-line-height
+
+.button__icon-right
+  padding-right: $base-line-height
+  i.fa
+    margin-left: $base-line-height
+
+.button-important
+  @extend %button
+  font-size: 1rem
+  padding: 0 $triple-base-line-height
+
+.button-no-border
+  border: 1px solid $color-nocolor
+  background-color: rgba(0,0,0,.02)
+  box-shadow: none
+  text-shadow: none
+  padding-left: $base-line-height
+  padding-right: $base-line-height
+  color: $control-primary-color-dark
+  &:hover, &:active
+    border: 1px solid rgba(0,0,0,.1)
+    background-color: $color-nocolor
+    color: $control-primary-color
+
+.button-success
+  background-color: $control-success-color
+  &:hover, &:active
+    background-color: $control-success-color-dark
+  
+.button-warning
+  background-color: $control-warning-color
+  &:hover, &:active
+    background-color: $control-warning-color-dark
+    
+.button-danger
+  background-color: $control-danger-color
+  &:hover, &:active
+    background-color: $control-danger-color-dark
+
+.button-neutral
+  color: #fff
+  background-color: $color-base-light
+  &:hover, &:active
+    background-color: $color-base-dark
+
+.button-neutral-light
+  @extend .button-neutral
+  background-color: rgba(255,255,255,.2)
+  color: $color-base-dark
+  border: 1px solid $color-base-light
+  box-shadow: none
+  text-shadow: none
+  &:hover, &:active
+    color: $control-primary-color
+    border: 1px solid $control-primary-color
+    background-color: rgba(0,0,0,.05)
+
+.button-neutral-light-negative
+  @extend .button-neutral-light
+  color: #fff
+  &:hover, &:active
+    color: #fff
+    border: 1px solid #fff
+    background-color: rgba(255, 255, 255, .1)
+
+.button-disabled
+  @extend .button-neutral-light-negative
+  +control-disabled
+  &:focus, &:hover, &:active
+    +control-disabled
