@@ -119,9 +119,29 @@ define('app/model/AppModel',
       /**
        * Set or load any necessary data and then broadcast a initialized event.
        */
-      modelReady: function() {
+      modelReady: function () {
         this.setState({greeting: 'Hello world!'});
         _noriEvents.applicationModelInitialized();
+      },
+
+
+      createUserObject: function (id, type, name, appearance, behaviors) {
+        return {
+          id        : id,
+          type      : type,
+          name      : name,
+          health    : health || 6,
+          appearance: appearance,
+          behaviors : behaviors || []
+        };
+      },
+
+      createQuestionObject: function (prompt, distractors, pointValue) {
+        return {
+          prompt     : prompt,
+          distractors: distractors,
+          pointVaule : pointValue
+        };
       },
 
       /**
@@ -181,13 +201,17 @@ define('app/view/AppView',
 
         var screenTitle = require('app/view/Screen.Title'),
             screenPlayerSelect = require('app/view/Screen.PlayerSelect'),
-            screenMainGame = require('app/view/Screen.MainGame');
+            screenWaitingOnPlayer = require('app/view/Screen.WaitingOnPlayer'),
+            screenMainGame = require('app/view/Screen.MainGame'),
+            screenGameOver = require('app/view/Screen.GameOver');
 
         this.setRouteViewMountPoint('#contents');
 
         this.mapRouteToViewComponent('/', 'title', screenTitle);
         this.mapRouteToViewComponent('/playerselect', 'playerselect', screenPlayerSelect);
+        this.mapRouteToViewComponent('/waiting', 'waitingonplayer', screenWaitingOnPlayer);
         this.mapRouteToViewComponent('/game', 'game', screenMainGame);
+        this.mapRouteToViewComponent('/gameover', 'gameover', screenGameOver);
 
         _noriEvents.applicationViewInitialized();
       },
@@ -379,6 +403,65 @@ define('app/view/DebugControlsTestingSubView',
 
   });
 
+define('app/view/Screen.GameOver',
+  function (require, module, exports) {
+
+    var _noriEvents = require('nori/events/EventCreator'),
+        _appEvents = require('app/events/EventConstants');
+
+    /**
+     * Module for a dynamic application view for a route or a persistent view
+     */
+    var Component = Nori.view().createComponentView({
+
+      /**
+       * Initialize and bind, called once on first render. Parent component is
+       * initialized from app view
+       * @param configProps
+       */
+      initialize: function (configProps) {
+        //
+      },
+
+      /**
+       * Set initial state properties. Call once on first render
+       */
+      getInitialState: function () {
+        return APP.model().getState();
+      },
+
+      /**
+       * State change on bound models (map, etc.) Return nextState object
+       */
+      componentWillUpdate: function () {
+        var nextState = APP.model().getState();
+        nextState.greeting += ' (updated)';
+        return nextState;
+      },
+
+      /**
+       * Component HTML was attached to the DOM
+       */
+      componentDidMount: function () {
+        //this.setEvents({
+        //'click #button-id': handleButton
+        //});
+        //_this.delegateEvents();
+      },
+
+      /**
+       * Component will be removed from the DOM
+       */
+      componentWillUnmount: function () {
+        //
+      }
+
+    });
+
+    module.exports = Component;
+
+  });
+
 define('app/view/Screen.MainGame',
   function (require, module, exports) {
 
@@ -498,6 +581,65 @@ define('app/view/Screen.PlayerSelect',
   });
 
 define('app/view/Screen.Title',
+  function (require, module, exports) {
+
+    var _noriEvents = require('nori/events/EventCreator'),
+        _appEvents = require('app/events/EventConstants');
+
+    /**
+     * Module for a dynamic application view for a route or a persistent view
+     */
+    var Component = Nori.view().createComponentView({
+
+      /**
+       * Initialize and bind, called once on first render. Parent component is
+       * initialized from app view
+       * @param configProps
+       */
+      initialize: function (configProps) {
+        //
+      },
+
+      /**
+       * Set initial state properties. Call once on first render
+       */
+      getInitialState: function () {
+        return APP.model().getState();
+      },
+
+      /**
+       * State change on bound models (map, etc.) Return nextState object
+       */
+      componentWillUpdate: function () {
+        var nextState = APP.model().getState();
+        nextState.greeting += ' (updated)';
+        return nextState;
+      },
+
+      /**
+       * Component HTML was attached to the DOM
+       */
+      componentDidMount: function () {
+        //this.setEvents({
+        //'click #button-id': handleButton
+        //});
+        //_this.delegateEvents();
+      },
+
+      /**
+       * Component will be removed from the DOM
+       */
+      componentWillUnmount: function () {
+        //
+      }
+
+    });
+
+    module.exports = Component;
+
+  });
+
+define('app/view/Screen.WaitingOnPlayer',
   function (require, module, exports) {
 
     var _noriEvents = require('nori/events/EventCreator'),

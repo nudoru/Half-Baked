@@ -25,9 +25,29 @@ define('app/model/AppModel',
       /**
        * Set or load any necessary data and then broadcast a initialized event.
        */
-      modelReady: function() {
+      modelReady: function () {
         this.setState({greeting: 'Hello world!'});
         _noriEvents.applicationModelInitialized();
+      },
+
+
+      createUserObject: function (id, type, name, appearance, behaviors) {
+        return {
+          id        : id,
+          type      : type,
+          name      : name,
+          health    : health || 6,
+          appearance: appearance,
+          behaviors : behaviors || []
+        };
+      },
+
+      createQuestionObject: function (prompt, distractors, pointValue) {
+        return {
+          prompt     : prompt,
+          distractors: distractors,
+          pointVaule : pointValue
+        };
       },
 
       /**

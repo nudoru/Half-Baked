@@ -17,13 +17,17 @@ define('app/view/AppView',
 
         var screenTitle = require('app/view/Screen.Title'),
             screenPlayerSelect = require('app/view/Screen.PlayerSelect'),
-            screenMainGame = require('app/view/Screen.MainGame');
+            screenWaitingOnPlayer = require('app/view/Screen.WaitingOnPlayer'),
+            screenMainGame = require('app/view/Screen.MainGame'),
+            screenGameOver = require('app/view/Screen.GameOver');
 
         this.setRouteViewMountPoint('#contents');
 
         this.mapRouteToViewComponent('/', 'title', screenTitle);
         this.mapRouteToViewComponent('/playerselect', 'playerselect', screenPlayerSelect);
+        this.mapRouteToViewComponent('/waiting', 'waitingonplayer', screenWaitingOnPlayer);
         this.mapRouteToViewComponent('/game', 'game', screenMainGame);
+        this.mapRouteToViewComponent('/gameover', 'gameover', screenGameOver);
 
         _noriEvents.applicationViewInitialized();
       },
