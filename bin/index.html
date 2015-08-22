@@ -3,11 +3,11 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Application</title>
+    <title>Half Baked</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link href="http://fonts.googleapis.com/css?family=Roboto:400,300,500,700|Roboto+Condensed:400,300,700" rel="stylesheet" type="text/css">
+    <link href="http://fonts.googleapis.com/css?family=Varela+Round|Fredoka+One" rel="stylesheet" type="text/css">
     <link rel="stylesheet" type="text/css" href="css/app.css"><!--
 BEGIN Templates for Components
 -->
@@ -69,10 +69,25 @@ END Templates for Components
 BEGIN Templates for Sub Views
 -->
 
-<script id="template__default" type="text/template">
-    <div class="padded">
-        <h1>{{ greeting }}</h1>
-        <p>Default subview template.</p>
+<script id="template__title" type="text/template">
+    <div>
+        <h1>Half-Baked!</h1>
+        <p>Quiz game!</p>
+        <button class="button-success">Start!</button>
+    </div>
+</script>
+
+<script id="template__playerselect" type="text/template">
+    <div>
+        <h1>Choose your player</h1>
+        <p>Pick</p>
+        <button class="button-success">GO!</button>
+    </div>
+</script>
+
+<script id="template__game" type="text/template">
+    <div>
+        <h1>PLAY!!!!</h1>
     </div>
 </script>
 
@@ -87,21 +102,8 @@ BEGIN Templates for Application Structure
 <script id="template__applicationscaffold" type="text/template">
     <div id="app__container">
         <div id="app__contents">
-            <header class="app__header">
-                <div class="app__column">
-                    <div class="app__header-logo"><i class="fa fa-cogs"></i></div>
-                    <h1>Appliation</h1>
-                </div>
-            </header>
-            <section class="app__hero">
-                <div class="app__column">
-                    <h2>App starting template.</h2>
-                </div>
-            </section>
             <section class="app__content">
-                <div class="app__column">
-                    <section id="contents"></section>
-                </div>
+                <section id="contents"></section>
             </section>
         </div>
     </div>

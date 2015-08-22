@@ -179,14 +179,15 @@ define('app/view/AppView',
 
         this.configureApplicationViewEvents();
 
-        var defaultViewComponent = require('app/view/TemplateViewComponent');
+        var screenTitle = require('app/view/Screen.Title'),
+            screenPlayerSelect = require('app/view/Screen.PlayerSelect'),
+            screenMainGame = require('app/view/Screen.MainGame');
 
-        this.setRouteViewMountPoint('#contents'); // Container for routed views
+        this.setRouteViewMountPoint('#contents');
 
-        this.mapRouteToViewComponent('/', 'default', defaultViewComponent);
-        this.mapRouteToViewComponent('/styles', 'debug-styletest', 'app/view/TemplateViewComponentFactory');
-        this.mapRouteToViewComponent('/controls', 'debug-controls', 'app/view/TemplateViewComponentFactory');
-        this.mapRouteToViewComponent('/comps', 'debug-components', 'app/view/DebugControlsTestingSubView');
+        this.mapRouteToViewComponent('/', 'title', screenTitle);
+        this.mapRouteToViewComponent('/playerselect', 'playerselect', screenPlayerSelect);
+        this.mapRouteToViewComponent('/game', 'game', screenMainGame);
 
         _noriEvents.applicationViewInitialized();
       },
@@ -375,6 +376,183 @@ define('app/view/DebugControlsTestingSubView',
 
     module.exports = DebugComponent;
 
+
+  });
+
+define('app/view/Screen.MainGame',
+  function (require, module, exports) {
+
+    var _noriEvents = require('nori/events/EventCreator'),
+        _appEvents = require('app/events/EventConstants');
+
+    /**
+     * Module for a dynamic application view for a route or a persistent view
+     */
+    var Component = Nori.view().createComponentView({
+
+      /**
+       * Initialize and bind, called once on first render. Parent component is
+       * initialized from app view
+       * @param configProps
+       */
+      initialize: function (configProps) {
+        //
+      },
+
+      /**
+       * Set initial state properties. Call once on first render
+       */
+      getInitialState: function () {
+        return APP.model().getState();
+      },
+
+      /**
+       * State change on bound models (map, etc.) Return nextState object
+       */
+      componentWillUpdate: function () {
+        var nextState = APP.model().getState();
+        nextState.greeting += ' (updated)';
+        return nextState;
+      },
+
+      /**
+       * Component HTML was attached to the DOM
+       */
+      componentDidMount: function () {
+         //this.setEvents({
+         //'click #button-id': handleButton
+         //});
+         //_this.delegateEvents();
+      },
+
+      /**
+       * Component will be removed from the DOM
+       */
+      componentWillUnmount: function () {
+        //
+      }
+
+    });
+
+    module.exports = Component;
+
+  });
+
+define('app/view/Screen.PlayerSelect',
+  function (require, module, exports) {
+
+    var _noriEvents = require('nori/events/EventCreator'),
+        _appEvents = require('app/events/EventConstants');
+
+    /**
+     * Module for a dynamic application view for a route or a persistent view
+     */
+    var Component = Nori.view().createComponentView({
+
+      /**
+       * Initialize and bind, called once on first render. Parent component is
+       * initialized from app view
+       * @param configProps
+       */
+      initialize: function (configProps) {
+        //
+      },
+
+      /**
+       * Set initial state properties. Call once on first render
+       */
+      getInitialState: function () {
+        return APP.model().getState();
+      },
+
+      /**
+       * State change on bound models (map, etc.) Return nextState object
+       */
+      componentWillUpdate: function () {
+        var nextState = APP.model().getState();
+        nextState.greeting += ' (updated)';
+        return nextState;
+      },
+
+      /**
+       * Component HTML was attached to the DOM
+       */
+      componentDidMount: function () {
+        //this.setEvents({
+        //'click #button-id': handleButton
+        //});
+        //_this.delegateEvents();
+      },
+
+      /**
+       * Component will be removed from the DOM
+       */
+      componentWillUnmount: function () {
+        //
+      }
+
+    });
+
+    module.exports = Component;
+
+  });
+
+define('app/view/Screen.Title',
+  function (require, module, exports) {
+
+    var _noriEvents = require('nori/events/EventCreator'),
+        _appEvents = require('app/events/EventConstants');
+
+    /**
+     * Module for a dynamic application view for a route or a persistent view
+     */
+    var Component = Nori.view().createComponentView({
+
+      /**
+       * Initialize and bind, called once on first render. Parent component is
+       * initialized from app view
+       * @param configProps
+       */
+      initialize: function (configProps) {
+        //
+      },
+
+      /**
+       * Set initial state properties. Call once on first render
+       */
+      getInitialState: function () {
+        return APP.model().getState();
+      },
+
+      /**
+       * State change on bound models (map, etc.) Return nextState object
+       */
+      componentWillUpdate: function () {
+        var nextState = APP.model().getState();
+        nextState.greeting += ' (updated)';
+        return nextState;
+      },
+
+      /**
+       * Component HTML was attached to the DOM
+       */
+      componentDidMount: function () {
+        //this.setEvents({
+        //'click #button-id': handleButton
+        //});
+        //_this.delegateEvents();
+      },
+
+      /**
+       * Component will be removed from the DOM
+       */
+      componentWillUnmount: function () {
+        //
+      }
+
+    });
+
+    module.exports = Component;
 
   });
 

@@ -15,14 +15,15 @@ define('app/view/AppView',
 
         this.configureApplicationViewEvents();
 
-        var defaultViewComponent = require('app/view/TemplateViewComponent');
+        var screenTitle = require('app/view/Screen.Title'),
+            screenPlayerSelect = require('app/view/Screen.PlayerSelect'),
+            screenMainGame = require('app/view/Screen.MainGame');
 
-        this.setRouteViewMountPoint('#contents'); // Container for routed views
+        this.setRouteViewMountPoint('#contents');
 
-        this.mapRouteToViewComponent('/', 'default', defaultViewComponent);
-        this.mapRouteToViewComponent('/styles', 'debug-styletest', 'app/view/TemplateViewComponentFactory');
-        this.mapRouteToViewComponent('/controls', 'debug-controls', 'app/view/TemplateViewComponentFactory');
-        this.mapRouteToViewComponent('/comps', 'debug-components', 'app/view/DebugControlsTestingSubView');
+        this.mapRouteToViewComponent('/', 'title', screenTitle);
+        this.mapRouteToViewComponent('/playerselect', 'playerselect', screenPlayerSelect);
+        this.mapRouteToViewComponent('/game', 'game', screenMainGame);
 
         _noriEvents.applicationViewInitialized();
       },

@@ -2354,7 +2354,7 @@ h1 {
   margin: 0;
   padding: 0;
   margin-bottom: 1.854rem;
-  font-family: "Roboto Condensed", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: "Fredoka One", "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-size: 3.344rem;
   font-weight: 400;
   line-height: 1.854rem;
@@ -2366,7 +2366,7 @@ h2 {
   margin: 0;
   padding: 0;
   margin-bottom: 1.854rem;
-  font-family: "Roboto Condensed", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: "Fredoka One", "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-size: 2.618rem;
   font-weight: 400;
   line-height: 1.854rem;
@@ -2378,7 +2378,7 @@ h2 {
   margin: 0;
   padding: 0;
   margin-bottom: 1.854rem;
-  font-family: "Roboto Condensed", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: "Fredoka One", "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-size: 2.067rem;
   font-weight: 400;
   line-height: 1.854rem;
@@ -2390,7 +2390,7 @@ h2 {
   margin: 0;
   padding: 0;
   margin-bottom: 1.236rem;
-  font-family: "Roboto Condensed", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: "Fredoka One", "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-size: 1.618rem;
   font-weight: 400;
   line-height: 1.236rem;
@@ -2402,7 +2402,7 @@ h2 {
   margin: 0;
   padding: 0;
   margin-bottom: 1.236rem;
-  font-family: "Roboto Condensed", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: "Fredoka One", "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-size: 1.277rem;
   font-weight: 400;
   line-height: 1.236rem;
@@ -2414,7 +2414,7 @@ h2 {
   margin: 0;
   padding: 0;
   margin-bottom: 1.236rem;
-  font-family: "Roboto Condensed", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: "Fredoka One", "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-size: 1rem;
   font-weight: 400;
   line-height: 1.236rem;
@@ -2438,7 +2438,7 @@ input[type=tel],
 input[type=color],
 input[type=file],
 select, textarea, select.spaced {
-  font-family: "Roboto", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: "Varela Round", "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-size: 1rem;
   line-height: 1.545rem;
   font-weight: 400;
@@ -2447,7 +2447,7 @@ select, textarea, select.spaced {
 }
 
 .label-small {
-  font-family: "Roboto", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: "Varela Round", "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-size: 0.618rem;
   line-height: 1.854rem;
   font-weight: 400;
@@ -2456,7 +2456,7 @@ select, textarea, select.spaced {
 }
 
 .label-big, .initialization__message {
-  font-family: "Roboto", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: "Varela Round", "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-size: 1.618rem;
   line-height: 1.854rem;
   font-weight: 400;
@@ -2465,7 +2465,7 @@ select, textarea, select.spaced {
 }
 
 .h1-alternate, .h2-alternate, .h3-alternate, .h4-alternate, .h5-alternate, tr.row-header-inline td, .tooltip__coachmark .tooltip__item-content h1, .tooltip__coachmark .tooltip__item-content p, .h6-alternate {
-  font-family: "Roboto", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: "Varela Round", "Helvetica Neue", Helvetica, Arial, sans-serif;
   margin-bottom: 1.236rem;
   padding-bottom: 0;
   padding-top: 0.309rem;
@@ -2519,7 +2519,7 @@ body {
   font-size: 100%;
   min-height: 100%;
   -webkit-text-size-adjust: none;
-  font-family: "Roboto", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: "Varela Round", "Helvetica Neue", Helvetica, Arial, sans-serif;
   color: #6e6259;
 }
 
@@ -2536,7 +2536,7 @@ blockquote {
   margin-right: 1.236rem;
   padding: 0.618rem;
   background-color: #efeeec;
-  font-family: "Roboto Condensed", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: "Fredoka One", "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-size: 1.4rem;
   font-weight: 300;
   line-height: 1.854rem;
@@ -2649,13 +2649,13 @@ hr {
   border-top: 1px solid rgba(0, 0, 0, 0.1);
 }
 
-.list-plain, .list-plain-horizontal, .list-comma-separated, .app__header-nav {
+.list-plain, .list-plain-horizontal, .list-comma-separated {
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
-.list-plain-horizontal li, .list-comma-separated li, .app__header-nav li {
+.list-plain-horizontal li, .list-comma-separated li {
   display: inline;
 }
 
@@ -3018,7 +3018,7 @@ hr {
   padding: 0;
   margin: 0;
   line-height: 1.236rem;
-  font-family: "Roboto", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: "Varela Round", "Helvetica Neue", Helvetica, Arial, sans-serif;
   color: #646464;
   white-space: nowrap;
 }
@@ -3141,7 +3141,7 @@ button, .button-important {
   -ms-transition: all 0.25s ease-out;
   transition: all 0.25s ease-out;
   text-shadow: -1px -1px 0 rgba(0, 0, 0, 0.15), 1px 1px 0 rgba(255, 255, 255, 0.1);
-  font-family: "Roboto Condensed", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: "Fredoka One", "Helvetica Neue", Helvetica, Arial, sans-serif;
   height: 33px;
   padding: 0 1.236rem;
   margin: 0.309rem;
@@ -3523,7 +3523,7 @@ select:focus, textarea:focus {
   vertical-align: middle;
 }
 .table thead th, .table tfoot th, .table tbody th {
-  font-family: "Roboto Condensed", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: "Fredoka One", "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-size: 0.8rem;
   font-weight: 700;
   color: #00a9e0;
@@ -3542,7 +3542,7 @@ select:focus, textarea:focus {
   border-bottom: none;
   border-top: 1px solid #00a9e0;
   vertical-align: top;
-  font-family: "Roboto", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: "Varela Round", "Helvetica Neue", Helvetica, Arial, sans-serif;
   color: #6e6259;
 }
 .table tbody th {
@@ -3874,7 +3874,7 @@ tr.row-header-inline td {
   padding: 0;
   margin: 0;
   line-height: 0.927rem;
-  font-family: "Roboto", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: "Varela Round", "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-size: 0.8rem;
   color: #005eb8;
 }
@@ -3980,7 +3980,7 @@ tr.row-header-inline td {
   padding: 0;
   margin: 0;
   line-height: 0.927rem;
-  font-family: "Roboto", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: "Varela Round", "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-size: 0.8rem;
   color: #005eb8;
 }
@@ -4117,7 +4117,11 @@ tr.row-header-inline td {
 
 body {
   overflow: hidden;
-  background: url("../img/light_toast.png");
+  background: url("../img/bg.png") no-repeat center center fixed;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
 }
 
 #app__container {
@@ -4169,74 +4173,22 @@ body {
   height: 25px;
 }
 
-.app__column {
-  display: block;
-  width: 90%;
-  margin: 0 auto;
-  padding: 1.236rem;
-}
-
-.app__header {
-  display: block;
-  width: 100%;
-  overflow: hidden;
-  background-color: #fff;
-  box-shadow: 0 0 6px rgba(153, 153, 153, 0.29);
-}
-.app__header h1 {
-  margin: 0;
-  padding: 0;
-  font-size: 1.277rem;
-  line-height: 1.277rem;
-}
-
-.app__header-logo {
-  float: left;
-  margin-right: 0.618rem;
-}
-.app__header-logo i.fa {
-  color: #968c83;
-  font-size: 1.277rem;
-  line-height: 1.277rem;
-}
-
-.app__header-nav {
-  float: right;
-}
-.app__header-nav li {
-  margin-right: 1.236rem;
-}
-.app__header-nav li:last-of-type {
-  margin-right: 0;
-}
-.app__header-nav li a {
-  font-family: "Roboto Condensed", "Helvetica Neue", Helvetica, Arial, sans-serif;
-  text-decoration: none;
-}
-
-.app__hero {
-  background: url("../img/shattered-island.gif");
-  display: block;
-  width: 100%;
-  overflow: hidden;
-  padding-top: 1.854rem;
-  padding-bottom: 1.854rem;
-}
-.app__hero h1, .app__hero h2, .app__hero h3, .app__hero h4, .app__hero h5 h6, .app__hero p, .app__hero li {
-  color: #fff;
-  text-align: center;
-  text-shadow: 0 2px 0 #000;
-}
-.app__hero h1 {
-  margin: 0;
-  padding: 0;
-}
-
 .app__content {
-  margin-top: -0.618rem;
-  margin-bottom: 1.854rem;
+  background-color: #00a9e0;
+  position: relative;
+  display: block;
+  width: 975px;
+  height: 650px;
+  margin: 1.236rem auto 0;
+  overflow: hidden;
+  border-radius: 0.618rem;
+  padding: 1.236rem;
+  box-shadow: 0px 20px 30px rgba(0, 0, 0, 0.2);
 }
-.app__content .app__column {
-  background-color: #fff;
-  box-shadow: 0 0 6px rgba(153, 153, 153, 0.29);
+.app__content h1, .app__content h2, .app__content h3, .app__content h4, .app__content h5, .app__content h6 {
+  color: #fff;
+  text-shadow: 2px 5px 0 #005eb8, 2px 5px 5px rgba(0, 0, 0, 0.2);
+}
+.app__content p {
+  color: #fff;
 }
