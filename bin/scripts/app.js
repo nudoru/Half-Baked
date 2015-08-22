@@ -59,7 +59,16 @@ define('app/events/EventConstants',
      */
 
     _.merge(module.exports, objUtils.keyMirror({
-      SOMETHING_HAPPENED: null
+      CHANGE_GAME_STATE: null,
+      LOCAL_PLAYER_CONNECT: null,
+      SELECT_PLAYER: null,
+      REMOTE_PLAYER_CONNECT: null,
+      GAME_START: null,
+      LOCAL_QUESTION: null,
+      REMOTE_QUESTION: null,
+      LOCAL_PLAYER_HEALTH_CHANGE: null,
+      REMOTE_PLAYER_HEALTH_CHAGE: null,
+      GAME_OVER: null
     }));
   });
 
@@ -122,7 +131,12 @@ define('app/model/AppModel',
        * Set or load any necessary data and then broadcast a initialized event.
        */
       modelReady: function () {
-        this.setState({greeting: 'Hello world!'});
+        this.setState({
+          currentState: this.gameStates[0],
+          localPlayer : {},
+          remotePlayer: {},
+          questionBank: []
+        });
         _noriEvents.applicationModelInitialized();
       },
 

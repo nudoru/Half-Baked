@@ -28,7 +28,12 @@ define('app/model/AppModel',
        * Set or load any necessary data and then broadcast a initialized event.
        */
       modelReady: function () {
-        this.setState({greeting: 'Hello world!'});
+        this.setState({
+          currentState: this.gameStates[0],
+          localPlayer : {},
+          remotePlayer: {},
+          questionBank: []
+        });
         _noriEvents.applicationModelInitialized();
       },
 
