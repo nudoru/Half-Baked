@@ -38,10 +38,12 @@ define('app/view/Screen.WaitingOnPlayer',
        * Component HTML was attached to the DOM
        */
       componentDidMount: function () {
-        //this.setEvents({
-        //'click #button-id': handleButton
-        //});
-        //_this.delegateEvents();
+        this.setEvents({
+          'click #waiting__button-skip': function() {
+            _noriEvents.changeRoute('/game');
+          }
+        });
+        this.delegateEvents();
       },
 
       /**

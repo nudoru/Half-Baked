@@ -38,10 +38,12 @@ define('app/view/Screen.Title',
        * Component HTML was attached to the DOM
        */
       componentDidMount: function () {
-        //this.setEvents({
-        //'click #button-id': handleButton
-        //});
-        //_this.delegateEvents();
+        this.setEvents({
+        'click #title__button-start': function() {
+          _noriEvents.changeRoute('/playerselect');
+        }
+        });
+        this.delegateEvents();
       },
 
       /**

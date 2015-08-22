@@ -16,6 +16,8 @@ define('app/model/AppModel',
      */
     var AppModel = Nori.createApplicationModel({
 
+      gameStates: ['TITLE', 'PLAYER_SELECT', 'WAITING_ON_PLAYER', 'MAIN_GAME', 'GAME_OVER'],
+
       initialize: function () {
         this.addReducer(this.defaultReducerFunction);
         this.initializeReducerModel();

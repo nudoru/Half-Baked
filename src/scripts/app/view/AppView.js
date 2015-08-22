@@ -23,6 +23,7 @@ define('app/view/AppView',
 
         this.setRouteViewMountPoint('#contents');
 
+
         this.mapRouteToViewComponent('/', 'title', screenTitle);
         this.mapRouteToViewComponent('/playerselect', 'playerselect', screenPlayerSelect);
         this.mapRouteToViewComponent('/waiting', 'waitingonplayer', screenWaitingOnPlayer);

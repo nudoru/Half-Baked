@@ -110,6 +110,8 @@ define('app/model/AppModel',
      */
     var AppModel = Nori.createApplicationModel({
 
+      gameStates: ['TITLE', 'PLAYER_SELECT', 'WAITING_ON_PLAYER', 'MAIN_GAME', 'GAME_OVER'],
+
       initialize: function () {
         this.addReducer(this.defaultReducerFunction);
         this.initializeReducerModel();
@@ -206,6 +208,7 @@ define('app/view/AppView',
             screenGameOver = require('app/view/Screen.GameOver');
 
         this.setRouteViewMountPoint('#contents');
+
 
         this.mapRouteToViewComponent('/', 'title', screenTitle);
         this.mapRouteToViewComponent('/playerselect', 'playerselect', screenPlayerSelect);
@@ -443,10 +446,12 @@ define('app/view/Screen.GameOver',
        * Component HTML was attached to the DOM
        */
       componentDidMount: function () {
-        //this.setEvents({
-        //'click #button-id': handleButton
-        //});
-        //_this.delegateEvents();
+        this.setEvents({
+          'click #gameover__button-replay': function() {
+            _noriEvents.changeRoute('/playerselect');
+          }
+        });
+        this.delegateEvents();
       },
 
       /**
@@ -502,10 +507,12 @@ define('app/view/Screen.MainGame',
        * Component HTML was attached to the DOM
        */
       componentDidMount: function () {
-         //this.setEvents({
-         //'click #button-id': handleButton
-         //});
-         //_this.delegateEvents();
+        this.setEvents({
+          'click #game__button-skip': function() {
+            _noriEvents.changeRoute('/gameover');
+          }
+        });
+        this.delegateEvents();
       },
 
       /**
@@ -561,10 +568,12 @@ define('app/view/Screen.PlayerSelect',
        * Component HTML was attached to the DOM
        */
       componentDidMount: function () {
-        //this.setEvents({
-        //'click #button-id': handleButton
-        //});
-        //_this.delegateEvents();
+        this.setEvents({
+          'click #select__button-go': function() {
+            _noriEvents.changeRoute('/waiting');
+          }
+        });
+        this.delegateEvents();
       },
 
       /**
@@ -620,10 +629,12 @@ define('app/view/Screen.Title',
        * Component HTML was attached to the DOM
        */
       componentDidMount: function () {
-        //this.setEvents({
-        //'click #button-id': handleButton
-        //});
-        //_this.delegateEvents();
+        this.setEvents({
+        'click #title__button-start': function() {
+          _noriEvents.changeRoute('/playerselect');
+        }
+        });
+        this.delegateEvents();
       },
 
       /**
@@ -679,10 +690,12 @@ define('app/view/Screen.WaitingOnPlayer',
        * Component HTML was attached to the DOM
        */
       componentDidMount: function () {
-        //this.setEvents({
-        //'click #button-id': handleButton
-        //});
-        //_this.delegateEvents();
+        this.setEvents({
+          'click #waiting__button-skip': function() {
+            _noriEvents.changeRoute('/game');
+          }
+        });
+        this.delegateEvents();
       },
 
       /**

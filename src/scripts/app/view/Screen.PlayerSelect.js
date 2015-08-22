@@ -38,10 +38,12 @@ define('app/view/Screen.PlayerSelect',
        * Component HTML was attached to the DOM
        */
       componentDidMount: function () {
-        //this.setEvents({
-        //'click #button-id': handleButton
-        //});
-        //_this.delegateEvents();
+        this.setEvents({
+          'click #select__button-go': function() {
+            _noriEvents.changeRoute('/waiting');
+          }
+        });
+        this.delegateEvents();
       },
 
       /**
