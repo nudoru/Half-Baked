@@ -10,6 +10,8 @@ define('app/App',
      */
     var App = Nori.createApplication({
 
+      mixins: [],
+
       /**
        * Create the main Nori App model and view.
        */
@@ -105,7 +107,10 @@ define('app/model/AppModel',
   function (require, module, exports) {
 
     var _noriEvents         = require('nori/events/EventCreator'),
-        _noriEventConstants = require('nori/events/EventConstants');
+        _noriEventConstants = require('nori/events/EventConstants'),
+        _mixinMapFactory = require('nori/model/MixinMapFactory'),
+        _mixinObservableSubject = require('nori/utils/MixinObservableSubject'),
+        _mixinReducerModel  = require('nori/model/MixinReducerModel');
 
     /**
      * This application model contains "reducer model" functionality based on Redux.
@@ -118,6 +123,12 @@ define('app/model/AppModel',
      * Events => handleApplicationEvents => applyReducers => handleStateMutation => Notify
      */
     var AppModel = Nori.createApplicationModel({
+
+      mixins: [
+        _mixinMapFactory,
+        _mixinReducerModel,
+        _mixinObservableSubject()
+      ],
 
       gameStates: ['TITLE', 'PLAYER_SELECT', 'WAITING_ON_PLAYER', 'MAIN_GAME', 'GAME_OVER'],
 
@@ -201,8 +212,12 @@ define('app/model/AppModel',
 define('app/view/AppView',
   function (require, module, exports) {
 
-    var _noriEvents         = require('nori/events/EventCreator'),
-        _noriEventConstants = require('nori/events/EventConstants');
+    var _noriEvents           = require('nori/events/EventCreator'),
+        _noriEventConstants   = require('nori/events/EventConstants'),
+        _mixinApplicationView = require('nori/view/ApplicationView'),
+        _mixinNudoruControls  = require('nori/view/MixinNudoruControls'),
+        _mixinComponentViews  = require('nori/view/MixinComponentViews'),
+        _mixinEventDelegator  = require('nori/view/MixinEventDelegator');
 
     /**
      * View for an application.
@@ -210,16 +225,23 @@ define('app/view/AppView',
 
     var AppView = Nori.createApplicationView({
 
+      mixins: [
+        _mixinApplicationView,
+        _mixinNudoruControls,
+        _mixinComponentViews,
+        _mixinEventDelegator()
+      ],
+
       initialize: function () {
         this.initializeApplicationView(['applicationscaffold', 'applicationcomponentsscaffold']);
 
         this.configureApplicationViewEvents();
 
-        var screenTitle = require('app/view/Screen.Title'),
-            screenPlayerSelect = require('app/view/Screen.PlayerSelect'),
+        var screenTitle           = require('app/view/Screen.Title'),
+            screenPlayerSelect    = require('app/view/Screen.PlayerSelect'),
             screenWaitingOnPlayer = require('app/view/Screen.WaitingOnPlayer'),
-            screenMainGame = require('app/view/Screen.MainGame'),
-            screenGameOver = require('app/view/Screen.GameOver');
+            screenMainGame        = require('app/view/Screen.MainGame'),
+            screenGameOver        = require('app/view/Screen.GameOver');
 
         this.setRouteViewMountPoint('#contents');
 

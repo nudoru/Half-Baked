@@ -1,8 +1,12 @@
 define('app/view/AppView',
   function (require, module, exports) {
 
-    var _noriEvents         = require('nori/events/EventCreator'),
-        _noriEventConstants = require('nori/events/EventConstants');
+    var _noriEvents           = require('nori/events/EventCreator'),
+        _noriEventConstants   = require('nori/events/EventConstants'),
+        _mixinApplicationView = require('nori/view/ApplicationView'),
+        _mixinNudoruControls  = require('nori/view/MixinNudoruControls'),
+        _mixinComponentViews  = require('nori/view/MixinComponentViews'),
+        _mixinEventDelegator  = require('nori/view/MixinEventDelegator');
 
     /**
      * View for an application.
@@ -10,16 +14,23 @@ define('app/view/AppView',
 
     var AppView = Nori.createApplicationView({
 
+      mixins: [
+        _mixinApplicationView,
+        _mixinNudoruControls,
+        _mixinComponentViews,
+        _mixinEventDelegator()
+      ],
+
       initialize: function () {
         this.initializeApplicationView(['applicationscaffold', 'applicationcomponentsscaffold']);
 
         this.configureApplicationViewEvents();
 
-        var screenTitle = require('app/view/Screen.Title'),
-            screenPlayerSelect = require('app/view/Screen.PlayerSelect'),
+        var screenTitle           = require('app/view/Screen.Title'),
+            screenPlayerSelect    = require('app/view/Screen.PlayerSelect'),
             screenWaitingOnPlayer = require('app/view/Screen.WaitingOnPlayer'),
-            screenMainGame = require('app/view/Screen.MainGame'),
-            screenGameOver = require('app/view/Screen.GameOver');
+            screenMainGame        = require('app/view/Screen.MainGame'),
+            screenGameOver        = require('app/view/Screen.GameOver');
 
         this.setRouteViewMountPoint('#contents');
 
