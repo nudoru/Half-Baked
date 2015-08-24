@@ -2441,10 +2441,10 @@ define('nori/view/MixinComponentViews',
        *
        * @param componentID
        * @param componentIDorObj
-       * @param isRoute is the view connected to a route?
+       * @param isConditional is the view connected to a route?
        * @param mountPoint
        */
-      function mapViewComponent(componentID, componentIDorObj, mountPoint, isRoute) {
+      function mapViewComponent(componentID, componentIDorObj, mountPoint) {
         var componentObj;
 
         if (typeof componentIDorObj === 'string') {
@@ -2457,7 +2457,6 @@ define('nori/view/MixinComponentViews',
         _componentViewMap[componentID] = {
           htmlTemplate: _template.getTemplate(_componentHTMLTemplatePrefix + componentID),
           controller  : componentObj,
-          isRouteView : isRoute,
           mountPoint  : mountPoint
         };
       }
