@@ -47,8 +47,6 @@ var Nori = (function () {
   function initializeApplication(initObj) {
     _router.initialize();
 
-    console.log('Initializing Nori, model? ' + (_model ? 'Yes' : 'No') + ', view? ' + (_view ? 'Yes' : 'No'));
-
     _view  = _view || createApplicationView({});
     _model = _model || createApplicationModel({});
   }

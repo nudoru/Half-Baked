@@ -6,6 +6,7 @@ define('app/view/AppView',
         _mixinApplicationView = require('nori/view/ApplicationView'),
         _mixinNudoruControls  = require('nori/view/MixinNudoruControls'),
         _mixinComponentViews  = require('nori/view/MixinComponentViews'),
+        _mixinRouteViews      = require('nori/view/MixinRouteViews'),
         _mixinEventDelegator  = require('nori/view/MixinEventDelegator');
 
     /**
@@ -18,11 +19,14 @@ define('app/view/AppView',
         _mixinApplicationView,
         _mixinNudoruControls,
         _mixinComponentViews,
+        _mixinRouteViews,
         _mixinEventDelegator()
       ],
 
       initialize: function () {
         this.initializeApplicationView(['applicationscaffold', 'applicationcomponentsscaffold']);
+        this.initializeRouteViews();
+        this.initializeNudoruControls();
 
         this.configureApplicationViewEvents();
 
