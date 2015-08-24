@@ -46,7 +46,6 @@ define('app/model/AppModel',
         _noriEvents.applicationModelInitialized();
       },
 
-
       createUserObject: function (id, type, name, appearance, behaviors) {
         return {
           id        : id,
@@ -94,7 +93,7 @@ define('app/model/AppModel',
        */
       handleStateMutation: function () {
         //_noriEvents.modelStateChanged(); // Eventbus
-        this.notifySubscribers();
+        this.notifySubscribers(this.getState());
       }
 
     });

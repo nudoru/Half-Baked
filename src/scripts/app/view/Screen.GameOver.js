@@ -40,7 +40,7 @@ define('app/view/Screen.GameOver',
       componentDidMount: function () {
         this.setEvents({
           'click #gameover__button-replay': function() {
-            _noriEvents.changeRoute('/playerselect');
+            _noriEvents.changeModelState('',{currentState:Nori.model().gameStates[1]});
           }
         });
         this.delegateEvents();

@@ -40,7 +40,7 @@ define('app/view/Screen.MainGame',
       componentDidMount: function () {
         this.setEvents({
           'click #game__button-skip': function() {
-            _noriEvents.changeRoute('/gameover');
+            _noriEvents.changeModelState('',{currentState:Nori.model().gameStates[4]});
           }
         });
         this.delegateEvents();

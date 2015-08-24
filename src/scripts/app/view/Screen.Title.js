@@ -40,7 +40,7 @@ define('app/view/Screen.Title',
       componentDidMount: function () {
         this.setEvents({
         'click #title__button-start': function() {
-          _noriEvents.changeRoute('/playerselect');
+          _noriEvents.changeModelState('',{currentState:Nori.model().gameStates[1]});
         }
         });
         this.delegateEvents();

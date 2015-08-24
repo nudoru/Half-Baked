@@ -6,7 +6,7 @@ define('app/view/AppView',
         _mixinApplicationView = require('nori/view/ApplicationView'),
         _mixinNudoruControls  = require('nori/view/MixinNudoruControls'),
         _mixinComponentViews  = require('nori/view/MixinComponentViews'),
-        _mixinRouteViews      = require('nori/view/MixinRouteViews'),
+        _mixinModelStateViews = require('nori/view/MixinModelStateViews'),
         _mixinEventDelegator  = require('nori/view/MixinEventDelegator');
 
     /**
@@ -19,33 +19,36 @@ define('app/view/AppView',
         _mixinApplicationView,
         _mixinNudoruControls,
         _mixinComponentViews,
-        _mixinRouteViews,
+        _mixinModelStateViews,
         _mixinEventDelegator()
       ],
 
       initialize: function () {
         this.initializeApplicationView(['applicationscaffold', 'applicationcomponentsscaffold']);
-        this.initializeRouteViews();
+        this.initializeStateViews();
         this.initializeNudoruControls();
 
         this.configureApplicationViewEvents();
+        this.configureViews();
 
+        _noriEvents.applicationViewInitialized();
+      },
+
+      configureViews: function () {
         var screenTitle           = require('app/view/Screen.Title'),
             screenPlayerSelect    = require('app/view/Screen.PlayerSelect'),
             screenWaitingOnPlayer = require('app/view/Screen.WaitingOnPlayer'),
             screenMainGame        = require('app/view/Screen.MainGame'),
-            screenGameOver        = require('app/view/Screen.GameOver');
+            screenGameOver        = require('app/view/Screen.GameOver'),
+            gameStates            = Nori.model().gameStates;
 
-        this.setRouteViewMountPoint('#contents');
+        this.setViewMountPoint('#contents');
 
-
-        this.mapRouteToViewComponent('/', 'title', screenTitle);
-        this.mapRouteToViewComponent('/playerselect', 'playerselect', screenPlayerSelect);
-        this.mapRouteToViewComponent('/waiting', 'waitingonplayer', screenWaitingOnPlayer);
-        this.mapRouteToViewComponent('/game', 'game', screenMainGame);
-        this.mapRouteToViewComponent('/gameover', 'gameover', screenGameOver);
-
-        _noriEvents.applicationViewInitialized();
+        this.mapStateToViewComponent(gameStates[0], 'title', screenTitle);
+        this.mapStateToViewComponent(gameStates[1], 'playerselect', screenPlayerSelect);
+        this.mapStateToViewComponent(gameStates[2], 'waitingonplayer', screenWaitingOnPlayer);
+        this.mapStateToViewComponent(gameStates[3], 'game', screenMainGame);
+        this.mapStateToViewComponent(gameStates[4], 'gameover', screenGameOver);
       },
 
       /**

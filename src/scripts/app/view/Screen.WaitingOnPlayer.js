@@ -40,7 +40,7 @@ define('app/view/Screen.WaitingOnPlayer',
       componentDidMount: function () {
         this.setEvents({
           'click #waiting__button-skip': function() {
-            _noriEvents.changeRoute('/game');
+            _noriEvents.changeModelState('',{currentState:Nori.model().gameStates[3]});
           }
         });
         this.delegateEvents();

@@ -40,7 +40,7 @@ define('app/view/Screen.PlayerSelect',
       componentDidMount: function () {
         this.setEvents({
           'click #select__button-go': function() {
-            _noriEvents.changeRoute('/waiting');
+            _noriEvents.changeModelState('',{currentState:Nori.model().gameStates[2]});
           }
         });
         this.delegateEvents();
