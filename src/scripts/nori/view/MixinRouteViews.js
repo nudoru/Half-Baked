@@ -17,7 +17,7 @@ define('nori/view/MixinRouteViews',
        * Set up listeners
        */
       function initializeRouteViews() {
-        _this = this;
+        _this = this; // mitigation, Due to events, scope may be set to the window object
         Nori.router().subscribe(function onRouteChange(payload) {
           handleRouteChange(payload.routeObj);
         });
@@ -64,9 +64,8 @@ define('nori/view/MixinRouteViews',
        */
       function mapRouteToViewComponent(route, templateID, componentIDorObj) {
         _routeViewIDMap[route] = templateID;
-        this.mapViewComponent(templateID, componentIDorObj, _routeViewMountPoint, true);
+        this.mapViewComponent(templateID, componentIDorObj, _routeViewMountPoint);
       }
-
 
       /**
        * Show a view (in response to a route change)

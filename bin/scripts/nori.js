@@ -2435,13 +2435,12 @@ define('nori/view/MixinComponentViews',
       }
 
       /**
-       * Map a component to a route path and mounting point. If a string is passed,
+       * Map a component to a mounting point. If a string is passed,
        * the correct object will be created from the factory method, otherwise,
        * the passed component object is used.
        *
        * @param componentID
        * @param componentIDorObj
-       * @param isConditional is the view connected to a route?
        * @param mountPoint
        */
       function mapViewComponent(componentID, componentIDorObj, mountPoint) {
@@ -2500,7 +2499,7 @@ define('nori/view/MixinComponentViews',
        * @param componentID
        * @param dataObj
        */
-      function showViewComponent(componentID) {
+      function showViewComponent(componentID, mountPoint) {
         var componentView = _componentViewMap[componentID];
         if (!componentView) {
           console.warn('No componentView mapped for id: ' + componentID);
@@ -2508,10 +2507,11 @@ define('nori/view/MixinComponentViews',
         }
 
         if (!componentView.controller.isInitialized()) {
+          mountPoint = mountPoint || componentView.mountPoint;
           componentView.controller.initialize({
             id        : componentID,
             template  : componentView.htmlTemplate,
-            mountPoint: componentView.mountPoint
+            mountPoint: mountPoint
           });
         } else {
           componentView.controller.update();
@@ -2534,11 +2534,11 @@ define('nori/view/MixinComponentViews',
       //----------------------------------------------------------------------------
 
       return {
-        template                : getTemplate,
-        mapViewComponent        : mapViewComponent,
-        createComponentView     : createComponentView,
-        showViewComponent       : showViewComponent,
-        getComponentViewMap     : getComponentViewMap
+        template           : getTemplate,
+        mapViewComponent   : mapViewComponent,
+        createComponentView: createComponentView,
+        showViewComponent  : showViewComponent,
+        getComponentViewMap: getComponentViewMap
       };
 
     };
@@ -2705,7 +2705,7 @@ define('nori/view/MixinRouteViews',
        * Set up listeners
        */
       function initializeRouteViews() {
-        _this = this;
+        _this = this; // mitigation, Due to events, scope may be set to the window object
         Nori.router().subscribe(function onRouteChange(payload) {
           handleRouteChange(payload.routeObj);
         });
@@ -2752,9 +2752,8 @@ define('nori/view/MixinRouteViews',
        */
       function mapRouteToViewComponent(route, templateID, componentIDorObj) {
         _routeViewIDMap[route] = templateID;
-        this.mapViewComponent(templateID, componentIDorObj, _routeViewMountPoint, true);
+        this.mapViewComponent(templateID, componentIDorObj, _routeViewMountPoint);
       }
-
 
       /**
        * Show a view (in response to a route change)
