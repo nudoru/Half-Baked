@@ -1269,7 +1269,7 @@ define('nori/service/Rest',
 
   });
 
-define('app/service/SocketIO',
+define('nori/service/SocketIO',
   function (require, module, exports) {
 
     var SocketIOConnector = function () {

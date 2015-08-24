@@ -17,6 +17,7 @@ define('app/App',
        */
       appModel: require('app/model/AppModel'),
       appView : require('app/view/AppView'),
+      socket  : require('nori/service/SocketIO'),
 
       /**
        * Intialize the appilcation, view and model
@@ -34,13 +35,16 @@ define('app/App',
        * After the model data is ready
        */
       onModelInitialized: function () {
+
+        //
+
         this.runApplication();
       },
 
       /**
        * Remove the "Please wait" cover and start the app
        */
-      runApplication: function() {
+      runApplication: function () {
         this.view().removeLoadingMessage();
         this.view().render();
         //this.view().showViewFromURLHash(true); // Start with the route in the current URL
