@@ -9,6 +9,10 @@ var socketIO         = require('socket.io'),
     connectionsCount = 0,
     maxConnections   = 2;
 
+//----------------------------------------------------------------------------
+//  Server
+//----------------------------------------------------------------------------
+
 module.exports = {
   connect: function (server) {
     io = socketIO(server);
@@ -27,25 +31,58 @@ function onConnect(socket) {
   currentSocket.on('disconnect', onDisconnect);
 
   emitClientNotification(eventConstants.CONNECT, getConnectionsMapForID(currentID).name);
+  broadcastClientNotification(eventConstants.USER_CONNECTED, getConnectionsMapForID(currentID).name);
 }
 
 function onNotifyServer(payload) {
-  console.log('FROM client: ',payload.payload);
-}
-
-function createRoomID() {
-  return ( Math.random() * 100000 ) | 0;
+  handleSocketMessage(payload)
 }
 
 function onDisconnect() {
   console.log('disconnect');
   connectionsCount--;
-  broadcastClientNotification(eventConstants.DISCONNECT);
+  broadcastClientNotification(eventConstants.USER_DISCONNECTED);
 }
 
-function prettyNow() {
-  return moment().format('h:mm:ss a');
+function handleSocketMessage(payload) {
+  if (!payload) {
+    return;
+  }
+
+  console.log("from client", payload);
+
+  switch (payload.type) {
+    case (eventConstants.CONNECT):
+      console.log("Connected!");
+      return;
+    case (eventConstants.CREATE_ROOM):
+      console.log("create room");
+      return;
+    case (eventConstants.JOIN_ROOM):
+      console.log("join room");
+      return;
+    case (eventConstants.LEAVE_ROOM):
+      console.log("leave room");
+      return;
+    default:
+      console.warn("Unhandled SocketIO message type", payload);
+      return;
+  }
 }
+
+//----------------------------------------------------------------------------
+//  Room
+//----------------------------------------------------------------------------
+
+function createRoomID() {
+  return ( Math.random() * 100000 ) | 0;
+}
+
+
+
+//----------------------------------------------------------------------------
+//  Connections map
+//----------------------------------------------------------------------------
 
 function addConnectionToMap(id) {
   connectionsMap[id] = {
@@ -60,11 +97,19 @@ function getConnectionsMapForID(id) {
   return _.assign({}, connectionsMap[id]);
 }
 
+//----------------------------------------------------------------------------
+//  Communication to client
+//----------------------------------------------------------------------------
+
+function formattedDate() {
+  return moment().format('h:mm:ss a');
+}
+
 function emitClientNotification(type, payload) {
   currentSocket.emit(eventConstants.NOTIFY_CLIENT, {
     type   : type,
     id     : currentID,
-    time   : prettyNow(),
+    time   : formattedDate(),
     payload: payload
   });
 }
@@ -73,7 +118,7 @@ function broadcastClientNotification(type, payload) {
   io.emit(eventConstants.NOTIFY_CLIENT, {
     type   : type,
     id     : currentID,
-    time   : prettyNow(),
+    time   : formattedDate(),
     payload: payload
   });
 }

@@ -69,10 +69,10 @@ define('app/view/AppView',
       configureApplicationViewEvents: function () {
         Nori.dispatcher().subscribe(_noriEventConstants.NOTIFY_USER, function onNotiftUser(payload) {
           this.notify(payload.payload.message, payload.payload.title, payload.payload.type);
-        });
+        }.bind(this));
         Nori.dispatcher().subscribe(_noriEventConstants.ALERT_USER, function onAlertUser(payload) {
           this.alert(payload.payload.message, payload.payload.title);
-        });
+        }.bind(this));
       }
 
     });

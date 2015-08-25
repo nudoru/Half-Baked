@@ -1277,16 +1277,19 @@ define('nori/service/SocketIO',
       var _subject  = new Rx.BehaviorSubject(),
           _socketIO = io(),
           _events   = {
-            NOTIFY_CLIENT  : 'notify_client',
-            NOTIFY_SERVER  : 'notify_server',
-            CONNECT        : 'connect',
-            DROPPED        : 'dropped',
-            DISCONNECT     : 'disconnect',
-            MAX_CONNECTIONS: 'max_connections',
-            EMIT           : 'emit',
-            BROADCAST      : 'broadcast',
-            SYSTEM_MESSAGE : 'system_message',
-            MESSAGE        : 'message'
+            NOTIFY_CLIENT    : 'notify_client',
+            NOTIFY_SERVER    : 'notify_server',
+            CONNECT          : 'connect',
+            DROPPED          : 'dropped',
+            USER_CONNECTED   : 'user_connected',
+            USER_DISCONNECTED: 'user_disconnected',
+            EMIT             : 'emit',
+            BROADCAST        : 'broadcast',
+            SYSTEM_MESSAGE   : 'system_message',
+            MESSAGE          : 'message',
+            CREATE_ROOM      : 'create_room',
+            JOIN_ROOM        : 'join_room',
+            LEAVE_ROOM       : 'leave_room'
           };
 
 
@@ -1299,7 +1302,6 @@ define('nori/service/SocketIO',
        * @param payload {type, id, time, payload}
        */
       function onNotifyClient(payload) {
-        console.log('onNotifyClient', payload.type);
         notifySubscribers(payload);
         //notifyServer(_events.CONNECT,'hi!');
       }

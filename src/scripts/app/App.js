@@ -48,7 +48,9 @@ define('app/App',
       runApplication: function () {
         this.view().removeLoadingMessage();
         this.view().render();
+
         // View will show based on the current model state
+        this.model().setState({currentState:'PLAYER_SELECT'});
       },
 
       /**
@@ -60,13 +62,17 @@ define('app/App',
           return;
         }
 
-        console.log("Socket.io Message: ", payload);
+        console.log("from Socket.IO server", payload);
 
         switch (payload.type) {
           case (this.socket.events().CONNECT):
             console.log("Connected!");
+            this.model().setState({socketIOID: payload.id});
             return;
-          case (this.socket.events().DISCONNECT):
+          case (this.socket.events().USER_CONNECTED):
+            console.log("Another client connected");
+            return;
+          case (this.socket.events().USER_DISCONNECTED):
             console.log("Another client disconnected");
             return;
           case (this.socket.events().DROPPED):
@@ -74,6 +80,15 @@ define('app/App',
             return;
           case (this.socket.events().SYSTEM_MESSAGE):
             console.log("System message", payload.payload);
+            return;
+          case (this.socket.events().CREATE_ROOM):
+            console.log("create room");
+            return;
+          case (this.socket.events().JOIN_ROOM):
+            console.log("join room");
+            return;
+          case (this.socket.events().LEAVE_ROOM):
+            console.log("leave room");
             return;
           default:
             console.warn("Unhandled SocketIO message type", payload);

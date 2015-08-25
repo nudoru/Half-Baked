@@ -4189,6 +4189,6 @@ body {
   color: #fff;
   text-shadow: 2px 5px 0 #005eb8, 2px 5px 5px rgba(0, 0, 0, 0.2);
 }
-.app__content p {
+.app__content p, .app__content label {
   color: #fff;
 }

@@ -48,7 +48,9 @@ define('app/App',
       runApplication: function () {
         this.view().removeLoadingMessage();
         this.view().render();
+
         // View will show based on the current model state
+        this.model().setState({currentState:'PLAYER_SELECT'});
       },
 
       /**
@@ -60,13 +62,17 @@ define('app/App',
           return;
         }
 
-        console.log("Socket.io Message: ", payload);
+        console.log("from Socket.IO server", payload);
 
         switch (payload.type) {
           case (this.socket.events().CONNECT):
             console.log("Connected!");
+            this.model().setState({socketIOID: payload.id});
             return;
-          case (this.socket.events().DISCONNECT):
+          case (this.socket.events().USER_CONNECTED):
+            console.log("Another client connected");
+            return;
+          case (this.socket.events().USER_DISCONNECTED):
             console.log("Another client disconnected");
             return;
           case (this.socket.events().DROPPED):
@@ -74,6 +80,15 @@ define('app/App',
             return;
           case (this.socket.events().SYSTEM_MESSAGE):
             console.log("System message", payload.payload);
+            return;
+          case (this.socket.events().CREATE_ROOM):
+            console.log("create room");
+            return;
+          case (this.socket.events().JOIN_ROOM):
+            console.log("join room");
+            return;
+          case (this.socket.events().LEAVE_ROOM):
+            console.log("leave room");
             return;
           default:
             console.warn("Unhandled SocketIO message type", payload);
@@ -314,10 +329,10 @@ define('app/view/AppView',
       configureApplicationViewEvents: function () {
         Nori.dispatcher().subscribe(_noriEventConstants.NOTIFY_USER, function onNotiftUser(payload) {
           this.notify(payload.payload.message, payload.payload.title, payload.payload.type);
-        });
+        }.bind(this));
         Nori.dispatcher().subscribe(_noriEventConstants.ALERT_USER, function onAlertUser(payload) {
           this.alert(payload.payload.message, payload.payload.title);
-        });
+        }.bind(this));
       }
 
     });
@@ -609,7 +624,7 @@ define('app/view/Screen.PlayerSelect',
   function (require, module, exports) {
 
     var _noriEvents = require('nori/events/EventCreator'),
-        _appEvents = require('app/events/EventConstants');
+        _appEvents  = require('app/events/EventConstants');
 
     /**
      * Module for a dynamic application view for a route or a persistent view
@@ -646,11 +661,42 @@ define('app/view/Screen.PlayerSelect',
        */
       componentDidMount: function () {
         this.setEvents({
-          'click #select__button-go': function() {
-            _noriEvents.changeModelState('',{currentState:Nori.model().gameStates[2]});
+          'click #select__button-joinroom'  : this.onJoinRoom.bind(this),
+          'click #select__button-createroom': this.onCreateRoom.bind(this),
+          'click #select__button-go'        : function () {
+            _noriEvents.changeModelState('', {currentState: Nori.model().gameStates[2]});
           }
         });
         this.delegateEvents();
+      },
+
+      onJoinRoom: function () {
+        var roomID = document.querySelector('#select__roomid').value;
+        console.log('Join room '+roomID);
+        if(this.validateRoomID(roomID)) {
+          console.log('Room ID OK');
+          _noriEvents.notifyUser('','Room ID ok!');
+        } else {
+          _noriEvents.alertUser('Bad Room ID','The room ID is not correct. Must be a 5 digit number.');
+        }
+      },
+
+      /**
+       * Room ID must be an integer and 5 digits
+       * @param roomID
+       * @returns {boolean}
+       */
+      validateRoomID: function(roomID) {
+        if(isNaN(parseInt(roomID))) {
+          return false;
+        } else if(roomID.length !== 5) {
+          return false;
+        }
+        return true;
+      },
+
+      onCreateRoom: function () {
+        console.log('create room');
       },
 
       /**

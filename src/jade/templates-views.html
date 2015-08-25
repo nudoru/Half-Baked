@@ -13,22 +13,42 @@ BEGIN Templates for Sub Views
 <script id="template__playerselect" type="text/template">
     <div>
         <h1>Choose your player</h1>
-        <p>Pick</p>
-        <button id="select__button-go" class="button-success">GO!</button>
+        <p>Enter your name and select the appearance of your avatar.</p>
+        <label for="select__playername">Your name
+            <input id="select__playername" type="text" placeholder="Type here">
+        </label>
+        <label for="select__playertype">Apperance
+            <select id="select__playertype">
+                <option value="red">Red</option>
+                <option value="yellow">Yellow</option>
+                <option value="green">Green</option>
+            </select>
+        </label>
+        <hr/>
+        <p>To join an existing game session, enter the room id provided to the room creator.</p>
+        <label for="select__roomid">Room ID
+            <input id="select__roomid" type="text" placeholder="Type here">
+        </label>
+        <button id="select__button-joinroom" class="button-success">Join Room</button>
+        <hr/>
+        <p>Start a new game. You'll have to give the room ID to your opponent.</p>
+        <button id="select__button-createroom" class="button-success">Create Room</button>
+        <hr/>
+        <button id="select__button-go">Skip and GO!</button>
     </div>
 </script>
 
 <script id="template__waitingonplayer" type="text/template">
     <div>
         <h1>Waiting on other player ...</h1>
-        <button id="waiting__button-skip" class="button-success">Skip ...</button>
+        <button id="waiting__button-skip">Skip ...</button>
     </div>
 </script>
 
 <script id="template__game" type="text/template">
     <div>
         <h1>PLAY!!!!</h1>
-        <button id="game__button-skip" class="button-success">Done ...</button>
+        <button id="game__button-skip">Done ...</button>
     </div>
 </script>
 
