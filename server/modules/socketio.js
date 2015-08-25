@@ -1,11 +1,47 @@
-var socket_io        = require('socket.io'),
+var socketIO         = require('socket.io'),
+    _                = require('lodash-node'),
     moment           = require('moment'),
     eventConstants   = require('./socketioevents'),
     io,
+    currentSocket,
+    currentID,
     connectionsMap   = Object.create(null),
     connectionsCount = 0,
     maxConnections   = 2;
 
+module.exports = {
+  connect: function (server) {
+    io = socketIO(server);
+    io.on('connection', onConnect);
+  }
+};
+
+function onConnect(socket) {
+  currentSocket = socket;
+  currentID     = socket.id;
+  connectionsCount++;
+  console.log('Client connected', currentID);
+  addConnectionToMap(currentID);
+
+  currentSocket.on(eventConstants.NOTIFY_SERVER, onNotifyServer);
+  currentSocket.on('disconnect', onDisconnect);
+
+  emitClientNotification(eventConstants.CONNECT, getConnectionsMapForID(currentID).name);
+}
+
+function onNotifyServer(payload) {
+  console.log('FROM client: ',payload.payload);
+}
+
+function createRoomID() {
+  return ( Math.random() * 100000 ) | 0;
+}
+
+function onDisconnect() {
+  console.log('disconnect');
+  connectionsCount--;
+  broadcastClientNotification(eventConstants.DISCONNECT);
+}
 
 function prettyNow() {
   return moment().format('h:mm:ss a');
@@ -13,7 +49,7 @@ function prettyNow() {
 
 function addConnectionToMap(id) {
   connectionsMap[id] = {
-    name     : 'Anonymous' + connectionsCount++,
+    name     : 'Connection' + connectionsCount,
     id       : id,
     connected: true,
     status   : null
@@ -21,64 +57,25 @@ function addConnectionToMap(id) {
 }
 
 function getConnectionsMapForID(id) {
-  return connectionsMap[id];
+  return _.assign({}, connectionsMap[id]);
 }
 
-module.exports = {
-  io: {},
+function emitClientNotification(type, payload) {
+  currentSocket.emit(eventConstants.NOTIFY_CLIENT, {
+    type   : type,
+    id     : currentID,
+    time   : prettyNow(),
+    payload: payload
+  });
+}
 
-  connect: function (server) {
-    io = socket_io(server);
+function broadcastClientNotification(type, payload) {
+  io.emit(eventConstants.NOTIFY_CLIENT, {
+    type   : type,
+    id     : currentID,
+    time   : prettyNow(),
+    payload: payload
+  });
+}
 
-    io.on('connection', function (socket) {
-      var id = socket.id,
-          ip = socket.request.connection.remoteAddress;
-
-      var clientIp = socket.request.connection.remoteAddress;
-      //https://github.com/socketio/socket.io/issues/1387
-
-      console.log('Client connected', ip, id);
-
-      addConnectionToMap(id);
-
-      sendSystemAnnouncement(getConnectionsMapForID(id).name + ' has joined.');
-
-      function sendSystemAnnouncement(message) {
-        io.emit('message', {
-          time    : prettyNow(),
-          username: 'System',
-          message : message
-        });
-      }
-
-      //socket.on('message', function (message) {
-      //  socket.broadcast.emit('message', {
-      //    username: getConnectionsMapForID(id).nick,
-      //    message : message.message
-      //  });
-      //});
-
-      //socket.on('nickchange', function (nick) {
-      //  var oldnick                     = getConnectionsMapForID(id).nick;
-      //  getConnectionsMapForID(id).nick = nick;
-      //  sendUpdatedUsersList();
-      //  sendSystemAnnouncement(oldnick + ' changed nick to ' + nick + '.');
-      //});
-
-      //socket.on('disconnect', function () {
-      //  console.log('disconnect');
-      //  getConnectionsMapForID(id).connected = false;
-      //  sendSystemAnnouncement(getConnectionsMapForID(id).nick + ' has left.');
-      //  sendUpdatedUsersList();
-      //  io.emit('user disconnected');
-      //});
-
-      //function sendUpdatedUsersList() {
-      //  io.emit('userupdate', getActiveUsersList());
-      //}
-
-    });
-
-  }
-};
 

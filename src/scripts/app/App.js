@@ -26,7 +26,14 @@ define('app/App',
         // listen for the model loaded event
         Nori.dispatcher().subscribe(_noriEventConstants.APP_MODEL_INITIALIZED, this.onModelInitialized.bind(this), true);
 
+        this.socket.initialize();
+
+        //this.socket.on(this.socket.events().SYSTEM_MESSAGE, function (payload) {
+        //  console.log('aap sys message:', payload);
+        //});
+
         this.initializeApplication(); // validates setup
+
         this.view().initialize();
         this.model().initialize(); // model will acquire data dispatch event when complete
       },

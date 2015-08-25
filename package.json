@@ -37,6 +37,7 @@
   "dependencies": {
     "body-parser": "^1.13.3",
     "express": "^4.13.1",
+    "lodash-node": "^3.10.1",
     "moment": "^2.10.6",
     "morgan": "^1.6.1",
     "path": "^0.11.14",

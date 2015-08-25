@@ -2,17 +2,14 @@
  * Starting point for an Express/CRUD app
  */
 
-var express          = require('express'),
-    http             = require('http'),
-    logger           = require('morgan'),
-    path             = require('path'),
-
-    app              = express(),
-    crudRoutes       = require('./modules/crud'),
-    io               = require('./modules/socketio'),
-    server,
-
-server = http.Server(app);
+var express    = require('express'),
+    http       = require('http'),
+    logger     = require('morgan'),
+    path       = require('path'),
+    app        = express(),
+    crudRoutes = require('./modules/crud'),
+    io         = require('./modules/socketio'),
+    server     = http.Server(app);
 
 app.use(logger('dev'));
 app.use(express.static('bin'));

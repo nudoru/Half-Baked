@@ -3,18 +3,46 @@ define('nori/service/SocketIO',
 
     var SocketIOConnector = function () {
 
-      var _subject = new Rx.BehaviorSubject(),
-          _socketIO = io();
+      var _subject  = new Rx.BehaviorSubject(),
+          _socketIO = io(),
+          _events   = {
+            NOTIFY_CLIENT  : 'notify_client',
+            NOTIFY_SERVER  : 'notify_server',
+            CONNECT        : 'connect',
+            DROPPED        : 'dropped',
+            DISCONNECT     : 'disconnect',
+            MAX_CONNECTIONS: 'max_connections',
+            EMIT           : 'emit',
+            BROADCAST      : 'broadcast',
+            SYSTEM_MESSAGE : 'system_message',
+            MESSAGE        : 'message'
+          };
 
-      //_socketIO.on('message', handleMessageReceived);
+
+      function initialize() {
+        _socketIO.on(_events.NOTIFY_CLIENT, onNotifyClient);
+      }
+
+      function onNotifyClient(payload) {
+        console.log('onNotifyClient', payload);
+        //notifyServer(_events.CONNECT,'hi!');
+      }
+
+      function notifyServer(type, payload) {
+        _socketIO.emit(_events.NOTIFY_SERVER,{
+          type: type,
+          payload: payload
+        })
+      }
 
       function emit(message, payload) {
+        message = message || _events.MESSAGE;
         payload = payload || {};
         _socketIO.emit(message, payload);
       }
 
-      function messageReceived() {
-
+      function on(event, handler) {
+        _socketIO.on(event, handler);
       }
 
       /**
@@ -42,9 +70,15 @@ define('nori/service/SocketIO',
         return _subject.getValue();
       }
 
+      function getEventConstants() {
+        return _.assign({}, _events);
+      }
+
       return {
+        events             : getEventConstants,
+        initialize         : initialize,
+        on                 : on,
         emit               : emit,
-        messageReceived    : messageReceived,
         subscribe          : subscribe,
         notifySubscribers  : notifySubscribers,
         getLastNotification: getLastNotification
