@@ -27,10 +27,7 @@ define('app/App',
         Nori.dispatcher().subscribe(_noriEventConstants.APP_MODEL_INITIALIZED, this.onModelInitialized.bind(this), true);
 
         this.socket.initialize();
-
-        //this.socket.on(this.socket.events().SYSTEM_MESSAGE, function (payload) {
-        //  console.log('aap sys message:', payload);
-        //});
+        this.socket.subscribe(this.handleSocketMessage.bind(this));
 
         this.initializeApplication(); // validates setup
 
@@ -42,9 +39,6 @@ define('app/App',
        * After the model data is ready
        */
       onModelInitialized: function () {
-
-        //
-
         this.runApplication();
       },
 
@@ -54,7 +48,37 @@ define('app/App',
       runApplication: function () {
         this.view().removeLoadingMessage();
         this.view().render();
-        //this.view().showViewFromURLHash(true); // Start with the route in the current URL
+        // View will show based on the current model state
+      },
+
+      /**
+       * All messages from the Socket.IO server will be forwarded here
+       * @param payload
+       */
+      handleSocketMessage: function (payload) {
+        if (!payload) {
+          return;
+        }
+
+        console.log("Socket.io Message: ", payload);
+
+        switch (payload.type) {
+          case (this.socket.events().CONNECT):
+            console.log("Connected!");
+            return;
+          case (this.socket.events().DISCONNECT):
+            console.log("Another client disconnected");
+            return;
+          case (this.socket.events().DROPPED):
+            console.log("You were dropped!", payload.payload);
+            return;
+          case (this.socket.events().SYSTEM_MESSAGE):
+            console.log("System message", payload.payload);
+            return;
+          default:
+            console.warn("Unhandled SocketIO message type", payload);
+            return;
+        }
       }
 
     });

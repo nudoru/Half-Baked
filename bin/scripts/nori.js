@@ -1294,27 +1294,37 @@ define('nori/service/SocketIO',
         _socketIO.on(_events.NOTIFY_CLIENT, onNotifyClient);
       }
 
+      /**
+       * All notifications from Socket.io come here
+       * @param payload {type, id, time, payload}
+       */
       function onNotifyClient(payload) {
-        console.log('onNotifyClient', payload);
+        console.log('onNotifyClient', payload.type);
+        notifySubscribers(payload);
         //notifyServer(_events.CONNECT,'hi!');
       }
 
+      /**
+       * All communications to the server should go through here
+       * @param type
+       * @param payload
+       */
       function notifyServer(type, payload) {
-        _socketIO.emit(_events.NOTIFY_SERVER,{
-          type: type,
+        _socketIO.emit(_events.NOTIFY_SERVER, {
+          type   : type,
           payload: payload
-        })
+        });
       }
 
-      function emit(message, payload) {
-        message = message || _events.MESSAGE;
-        payload = payload || {};
-        _socketIO.emit(message, payload);
-      }
-
-      function on(event, handler) {
-        _socketIO.on(event, handler);
-      }
+      //function emit(message, payload) {
+      //  message = message || _events.MESSAGE;
+      //  payload = payload || {};
+      //  _socketIO.emit(message, payload);
+      //}
+      //
+      //function on(event, handler) {
+      //  _socketIO.on(event, handler);
+      //}
 
       /**
        * Subscribe handler to updates
@@ -1348,8 +1358,9 @@ define('nori/service/SocketIO',
       return {
         events             : getEventConstants,
         initialize         : initialize,
-        on                 : on,
-        emit               : emit,
+        //on                 : on,
+        //emit               : emit,
+        notifyServer       : notifyServer,
         subscribe          : subscribe,
         notifySubscribers  : notifySubscribers,
         getLastNotification: getLastNotification
