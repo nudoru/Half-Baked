@@ -19,6 +19,18 @@ define('app/view/Screen.GameOver',
       },
 
       /**
+       * Create an object to be used to define events on DOM elements
+       * @returns {}
+       */
+      defineEvents: function() {
+        return {
+          'click #gameover__button-replay': function() {
+            _noriEvents.changeModelState('',{currentState:Nori.model().gameStates[1]});
+          }
+        };
+      },
+
+      /**
        * Set initial state properties. Call once on first render
        */
       getInitialState: function () {
@@ -38,12 +50,7 @@ define('app/view/Screen.GameOver',
        * Component HTML was attached to the DOM
        */
       componentDidMount: function () {
-        this.setEvents({
-          'click #gameover__button-replay': function() {
-            _noriEvents.changeModelState('',{currentState:Nori.model().gameStates[1]});
-          }
-        });
-        this.delegateEvents();
+        //
       },
 
       /**

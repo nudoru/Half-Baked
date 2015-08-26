@@ -76,6 +76,7 @@ define('nori/model/MixinReducerModel',
           throw new Error('ReducerModel, must set a reducer before initialization');
         }
 
+        // Set initial state from empty event
         applyReducers({});
       }
 
@@ -114,6 +115,7 @@ define('nori/model/MixinReducerModel',
        */
       function applyReducersToState(state, event) {
         state = state || {};
+        // TODO should this actually use array.reduce()?
         _stateReducers.forEach(function applyStateReducerFunction(reducerFunc) {
           state = reducerFunc(state, event);
         });

@@ -185,6 +185,7 @@ define('app/model/AppModel',
       initialize: function () {
         this.addReducer(this.defaultReducerFunction);
         this.initializeReducerModel();
+        this.setState(Nori.config());
         this.modelReady();
       },
 
@@ -198,6 +199,7 @@ define('app/model/AppModel',
           remotePlayer: {},
           questionBank: []
         });
+
         _noriEvents.applicationModelInitialized();
       },
 
@@ -261,14 +263,14 @@ define('app/model/AppModel',
 define('app/view/AppView',
   function (require, module, exports) {
 
-    var _noriEvents           = require('nori/events/EventCreator'),
-        _noriEventConstants   = require('nori/events/EventConstants'),
-        _mixinApplicationView = require('nori/view/ApplicationView'),
-        _mixinNudoruControls  = require('nori/view/MixinNudoruControls'),
-        _mixinComponentViews  = require('nori/view/MixinComponentViews'),
-        _mixinModelStateViews = require('nori/view/MixinModelStateViews'),
-        _mixinEventDelegator  = require('nori/view/MixinEventDelegator'),
-        _mixinObservableSubject      = require('nori/utils/MixinObservableSubject');
+    var _noriEvents             = require('nori/events/EventCreator'),
+        _noriEventConstants     = require('nori/events/EventConstants'),
+        _mixinApplicationView   = require('nori/view/ApplicationView'),
+        _mixinNudoruControls    = require('nori/view/MixinNudoruControls'),
+        _mixinComponentViews    = require('nori/view/MixinComponentViews'),
+        _mixinModelStateViews   = require('nori/view/MixinModelStateViews'),
+        _mixinEventDelegator    = require('nori/view/MixinEventDelegator'),
+        _mixinObservableSubject = require('nori/utils/MixinObservableSubject');
 
     /**
      * View for an application.
@@ -521,6 +523,18 @@ define('app/view/Screen.GameOver',
       },
 
       /**
+       * Create an object to be used to define events on DOM elements
+       * @returns {}
+       */
+      defineEvents: function() {
+        return {
+          'click #gameover__button-replay': function() {
+            _noriEvents.changeModelState('',{currentState:Nori.model().gameStates[1]});
+          }
+        };
+      },
+
+      /**
        * Set initial state properties. Call once on first render
        */
       getInitialState: function () {
@@ -540,12 +554,7 @@ define('app/view/Screen.GameOver',
        * Component HTML was attached to the DOM
        */
       componentDidMount: function () {
-        this.setEvents({
-          'click #gameover__button-replay': function() {
-            _noriEvents.changeModelState('',{currentState:Nori.model().gameStates[1]});
-          }
-        });
-        this.delegateEvents();
+        //
       },
 
       /**
@@ -582,6 +591,18 @@ define('app/view/Screen.MainGame',
       },
 
       /**
+       * Create an object to be used to define events on DOM elements
+       * @returns {}
+       */
+      defineEvents: function() {
+        return {
+          'click #game__button-skip': function() {
+            _noriEvents.changeModelState('',{currentState:Nori.model().gameStates[4]});
+          }
+        };
+      },
+
+      /**
        * Set initial state properties. Call once on first render
        */
       getInitialState: function () {
@@ -601,12 +622,7 @@ define('app/view/Screen.MainGame',
        * Component HTML was attached to the DOM
        */
       componentDidMount: function () {
-        this.setEvents({
-          'click #game__button-skip': function() {
-            _noriEvents.changeModelState('',{currentState:Nori.model().gameStates[4]});
-          }
-        });
-        this.delegateEvents();
+
       },
 
       /**
@@ -643,6 +659,20 @@ define('app/view/Screen.PlayerSelect',
       },
 
       /**
+       * Create an object to be used to define events on DOM elements
+       * @returns {}
+       */
+      defineEvents: function() {
+        return {
+          'click #select__button-joinroom'  : this.onJoinRoom.bind(this),
+          'click #select__button-createroom': this.onCreateRoom.bind(this),
+          'click #select__button-go'        : function () {
+            _noriEvents.changeModelState('', {currentState: Nori.model().gameStates[2]});
+          }
+        };
+      },
+
+      /**
        * Set initial state properties. Call once on first render
        */
       getInitialState: function () {
@@ -662,14 +692,7 @@ define('app/view/Screen.PlayerSelect',
        * Component HTML was attached to the DOM
        */
       componentDidMount: function () {
-        this.setEvents({
-          'click #select__button-joinroom'  : this.onJoinRoom.bind(this),
-          'click #select__button-createroom': this.onCreateRoom.bind(this),
-          'click #select__button-go'        : function () {
-            _noriEvents.changeModelState('', {currentState: Nori.model().gameStates[2]});
-          }
-        });
-        this.delegateEvents();
+
       },
 
       onJoinRoom: function () {
@@ -735,6 +758,18 @@ define('app/view/Screen.Title',
       },
 
       /**
+       * Create an object to be used to define events on DOM elements
+       * @returns {}
+       */
+      defineEvents: function() {
+        return {
+          'click #title__button-start': function() {
+            _noriEvents.changeModelState('',{currentState:Nori.model().gameStates[1]});
+          }
+        };
+      },
+
+      /**
        * Set initial state properties. Call once on first render
        */
       getInitialState: function () {
@@ -754,12 +789,7 @@ define('app/view/Screen.Title',
        * Component HTML was attached to the DOM
        */
       componentDidMount: function () {
-        this.setEvents({
-        'click #title__button-start': function() {
-          _noriEvents.changeModelState('',{currentState:Nori.model().gameStates[1]});
-        }
-        });
-        this.delegateEvents();
+        //
       },
 
       /**
@@ -796,6 +826,18 @@ define('app/view/Screen.WaitingOnPlayer',
       },
 
       /**
+       * Create an object to be used to define events on DOM elements
+       * @returns {}
+       */
+      defineEvents: function() {
+        return {
+          'click #waiting__button-skip': function() {
+            _noriEvents.changeModelState('',{currentState:Nori.model().gameStates[3]});
+          }
+        };
+      },
+
+      /**
        * Set initial state properties. Call once on first render
        */
       getInitialState: function () {
@@ -815,12 +857,7 @@ define('app/view/Screen.WaitingOnPlayer',
        * Component HTML was attached to the DOM
        */
       componentDidMount: function () {
-        this.setEvents({
-          'click #waiting__button-skip': function() {
-            _noriEvents.changeModelState('',{currentState:Nori.model().gameStates[3]});
-          }
-        });
-        this.delegateEvents();
+        //
       },
 
       /**
@@ -870,6 +907,16 @@ define('app/view/TemplateViewComponent',
       },
 
       /**
+       * Create an object to be used to define events on DOM elements
+       * @returns {}
+       */
+      //defineEvents: function() {
+      //  return {
+      //    'click #button-id': handleButton
+      //  };
+      //},
+
+      /**
        * Set initial state properties. Call once on first render
        */
       getInitialState: function () {
@@ -906,12 +953,7 @@ define('app/view/TemplateViewComponent',
        * Component HTML was attached to the DOM
        */
       componentDidMount: function () {
-        /* Sample event delegator syntax
-         this.setEvents({
-         'click #button-id': handleButton
-         });
-         _this.delegateEvents();
-         */
+       //
       },
 
       /**

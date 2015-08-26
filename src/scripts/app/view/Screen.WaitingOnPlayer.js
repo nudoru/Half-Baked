@@ -19,6 +19,18 @@ define('app/view/Screen.WaitingOnPlayer',
       },
 
       /**
+       * Create an object to be used to define events on DOM elements
+       * @returns {}
+       */
+      defineEvents: function() {
+        return {
+          'click #waiting__button-skip': function() {
+            _noriEvents.changeModelState('',{currentState:Nori.model().gameStates[3]});
+          }
+        };
+      },
+
+      /**
        * Set initial state properties. Call once on first render
        */
       getInitialState: function () {
@@ -38,12 +50,7 @@ define('app/view/Screen.WaitingOnPlayer',
        * Component HTML was attached to the DOM
        */
       componentDidMount: function () {
-        this.setEvents({
-          'click #waiting__button-skip': function() {
-            _noriEvents.changeModelState('',{currentState:Nori.model().gameStates[3]});
-          }
-        });
-        this.delegateEvents();
+        //
       },
 
       /**

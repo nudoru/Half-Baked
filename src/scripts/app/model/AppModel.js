@@ -30,6 +30,7 @@ define('app/model/AppModel',
       initialize: function () {
         this.addReducer(this.defaultReducerFunction);
         this.initializeReducerModel();
+        this.setState(Nori.config());
         this.modelReady();
       },
 
@@ -43,6 +44,7 @@ define('app/model/AppModel',
           remotePlayer: {},
           questionBank: []
         });
+
         _noriEvents.applicationModelInitialized();
       },
 

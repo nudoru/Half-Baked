@@ -2149,6 +2149,7 @@ define('nori/model/MixinReducerModel',
           throw new Error('ReducerModel, must set a reducer before initialization');
         }
 
+        // Set initial state from empty event
         applyReducers({});
       }
 
@@ -2187,6 +2188,7 @@ define('nori/model/MixinReducerModel',
        */
       function applyReducersToState(state, event) {
         state = state || {};
+        // TODO should this actually use array.reduce()?
         _stateReducers.forEach(function applyStateReducerFunction(reducerFunc) {
           state = reducerFunc(state, event);
         });
@@ -2650,7 +2652,13 @@ define('nori/view/MixinEventDelegator',
         for (var evtStrings in _eventsMap) {
           if (_eventsMap.hasOwnProperty(evtStrings)) {
 
-            var mappings = evtStrings.split(',');
+            var mappings    = evtStrings.split(','),
+                eventHander = _eventsMap[evtStrings];
+
+            if (!isFunction(eventHander)) {
+              console.warn('EventDelegator, handler for ' + evtStrings + ' is not a function');
+              return;
+            }
 
             mappings.forEach(function (evtMap) {
               evtMap = evtMap.trim();
@@ -2662,7 +2670,7 @@ define('nori/view/MixinEventDelegator',
               if (!element) {
                 console.log('Cannot add event to invalid DOM element: ' + selector);
               } else {
-                _eventSubscribers[evtStrings] = Rx.Observable.fromEvent(element, eventStr).subscribe(_eventsMap[evtStrings]);
+                _eventSubscribers[evtStrings] = Rx.Observable.fromEvent(element, eventStr).subscribe(eventHander);
               }
 
             });
@@ -3013,8 +3021,13 @@ define('nori/view/ViewComponent',
         _mountPoint  = configProps.mountPoint;
 
         this.setState(this.getInitialState());
+        this.setEvents(this.defineEvents());
 
         _isInitialized = true;
+      }
+
+      function defineEvents() {
+        return undefined;
       }
 
       /**
@@ -3078,7 +3091,7 @@ define('nori/view/ViewComponent',
       function componentUpdate() {
         // make a copy of last state
         var currentState = this.getState();
-        var nextState = this.componentWillUpdate();
+        var nextState    = this.componentWillUpdate();
 
         if (this.shouldComponentUpdate(nextState)) {
           this.setState(nextState);
@@ -3293,18 +3306,18 @@ define('nori/view/ViewComponent',
 
       return {
         initializeComponent: initializeComponent,
-
-        isInitialized  : isInitialized,
-        getConfigProps : getConfigProps,
-        getInitialState: getInitialState,
-        getID          : getID,
-        getTemplate    : getTemplate,
-        setTemplate    : setTemplate,
-        getHTML        : getHTML,
-        setHTML        : setHTML,
-        getDOMNode     : getDOMNode,
-        setDOMNode     : setDOMNode,
-        isMounted      : isMounted,
+        defineEvents       : defineEvents,
+        isInitialized      : isInitialized,
+        getConfigProps     : getConfigProps,
+        getInitialState    : getInitialState,
+        getID              : getID,
+        getTemplate        : getTemplate,
+        setTemplate        : setTemplate,
+        getHTML            : getHTML,
+        setHTML            : setHTML,
+        getDOMNode         : getDOMNode,
+        setDOMNode         : setDOMNode,
+        isMounted          : isMounted,
 
         bindMap              : bindMap,
         componentWillUpdate  : componentWillUpdate,

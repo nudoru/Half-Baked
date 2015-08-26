@@ -19,6 +19,18 @@ define('app/view/Screen.Title',
       },
 
       /**
+       * Create an object to be used to define events on DOM elements
+       * @returns {}
+       */
+      defineEvents: function() {
+        return {
+          'click #title__button-start': function() {
+            _noriEvents.changeModelState('',{currentState:Nori.model().gameStates[1]});
+          }
+        };
+      },
+
+      /**
        * Set initial state properties. Call once on first render
        */
       getInitialState: function () {
@@ -38,12 +50,7 @@ define('app/view/Screen.Title',
        * Component HTML was attached to the DOM
        */
       componentDidMount: function () {
-        this.setEvents({
-        'click #title__button-start': function() {
-          _noriEvents.changeModelState('',{currentState:Nori.model().gameStates[1]});
-        }
-        });
-        this.delegateEvents();
+        //
       },
 
       /**

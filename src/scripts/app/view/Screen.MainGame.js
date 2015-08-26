@@ -19,6 +19,18 @@ define('app/view/Screen.MainGame',
       },
 
       /**
+       * Create an object to be used to define events on DOM elements
+       * @returns {}
+       */
+      defineEvents: function() {
+        return {
+          'click #game__button-skip': function() {
+            _noriEvents.changeModelState('',{currentState:Nori.model().gameStates[4]});
+          }
+        };
+      },
+
+      /**
        * Set initial state properties. Call once on first render
        */
       getInitialState: function () {
@@ -38,12 +50,7 @@ define('app/view/Screen.MainGame',
        * Component HTML was attached to the DOM
        */
       componentDidMount: function () {
-        this.setEvents({
-          'click #game__button-skip': function() {
-            _noriEvents.changeModelState('',{currentState:Nori.model().gameStates[4]});
-          }
-        });
-        this.delegateEvents();
+
       },
 
       /**

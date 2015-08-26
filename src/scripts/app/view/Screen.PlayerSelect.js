@@ -19,6 +19,20 @@ define('app/view/Screen.PlayerSelect',
       },
 
       /**
+       * Create an object to be used to define events on DOM elements
+       * @returns {}
+       */
+      defineEvents: function() {
+        return {
+          'click #select__button-joinroom'  : this.onJoinRoom.bind(this),
+          'click #select__button-createroom': this.onCreateRoom.bind(this),
+          'click #select__button-go'        : function () {
+            _noriEvents.changeModelState('', {currentState: Nori.model().gameStates[2]});
+          }
+        };
+      },
+
+      /**
        * Set initial state properties. Call once on first render
        */
       getInitialState: function () {
@@ -38,14 +52,7 @@ define('app/view/Screen.PlayerSelect',
        * Component HTML was attached to the DOM
        */
       componentDidMount: function () {
-        this.setEvents({
-          'click #select__button-joinroom'  : this.onJoinRoom.bind(this),
-          'click #select__button-createroom': this.onCreateRoom.bind(this),
-          'click #select__button-go'        : function () {
-            _noriEvents.changeModelState('', {currentState: Nori.model().gameStates[2]});
-          }
-        });
-        this.delegateEvents();
+
       },
 
       onJoinRoom: function () {
