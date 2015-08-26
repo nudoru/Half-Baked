@@ -156,11 +156,11 @@ define('app/events/EventCreator',
 define('app/model/AppModel',
   function (require, module, exports) {
 
-    var _noriEvents         = require('nori/events/EventCreator'),
-        _noriEventConstants = require('nori/events/EventConstants'),
-        _mixinMapFactory = require('nori/model/MixinMapFactory'),
+    var _noriEvents             = require('nori/events/EventCreator'),
+        _noriEventConstants     = require('nori/events/EventConstants'),
+        _mixinMapFactory        = require('nori/model/MixinMapFactory'),
         _mixinObservableSubject = require('nori/utils/MixinObservableSubject'),
-        _mixinReducerModel  = require('nori/model/MixinReducerModel');
+        _mixinReducerModel      = require('nori/model/MixinReducerModel');
 
     /**
      * This application model contains "reducer model" functionality based on Redux.
@@ -267,7 +267,8 @@ define('app/view/AppView',
         _mixinNudoruControls  = require('nori/view/MixinNudoruControls'),
         _mixinComponentViews  = require('nori/view/MixinComponentViews'),
         _mixinModelStateViews = require('nori/view/MixinModelStateViews'),
-        _mixinEventDelegator  = require('nori/view/MixinEventDelegator');
+        _mixinEventDelegator  = require('nori/view/MixinEventDelegator'),
+        _mixinObservableSubject      = require('nori/utils/MixinObservableSubject');
 
     /**
      * View for an application.
@@ -280,7 +281,8 @@ define('app/view/AppView',
         _mixinNudoruControls,
         _mixinComponentViews,
         _mixinModelStateViews,
-        _mixinEventDelegator()
+        _mixinEventDelegator(),
+        _mixinObservableSubject()
       ],
 
       initialize: function () {

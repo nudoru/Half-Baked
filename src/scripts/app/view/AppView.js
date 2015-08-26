@@ -1,13 +1,14 @@
 define('app/view/AppView',
   function (require, module, exports) {
 
-    var _noriEvents           = require('nori/events/EventCreator'),
-        _noriEventConstants   = require('nori/events/EventConstants'),
-        _mixinApplicationView = require('nori/view/ApplicationView'),
-        _mixinNudoruControls  = require('nori/view/MixinNudoruControls'),
-        _mixinComponentViews  = require('nori/view/MixinComponentViews'),
-        _mixinModelStateViews = require('nori/view/MixinModelStateViews'),
-        _mixinEventDelegator  = require('nori/view/MixinEventDelegator');
+    var _noriEvents             = require('nori/events/EventCreator'),
+        _noriEventConstants     = require('nori/events/EventConstants'),
+        _mixinApplicationView   = require('nori/view/ApplicationView'),
+        _mixinNudoruControls    = require('nori/view/MixinNudoruControls'),
+        _mixinComponentViews    = require('nori/view/MixinComponentViews'),
+        _mixinModelStateViews   = require('nori/view/MixinModelStateViews'),
+        _mixinEventDelegator    = require('nori/view/MixinEventDelegator'),
+        _mixinObservableSubject = require('nori/utils/MixinObservableSubject');
 
     /**
      * View for an application.
@@ -20,7 +21,8 @@ define('app/view/AppView',
         _mixinNudoruControls,
         _mixinComponentViews,
         _mixinModelStateViews,
-        _mixinEventDelegator()
+        _mixinEventDelegator(),
+        _mixinObservableSubject()
       ],
 
       initialize: function () {

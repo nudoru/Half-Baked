@@ -1,11 +1,11 @@
 define('app/model/AppModel',
   function (require, module, exports) {
 
-    var _noriEvents         = require('nori/events/EventCreator'),
-        _noriEventConstants = require('nori/events/EventConstants'),
-        _mixinMapFactory = require('nori/model/MixinMapFactory'),
+    var _noriEvents             = require('nori/events/EventCreator'),
+        _noriEventConstants     = require('nori/events/EventConstants'),
+        _mixinMapFactory        = require('nori/model/MixinMapFactory'),
         _mixinObservableSubject = require('nori/utils/MixinObservableSubject'),
-        _mixinReducerModel  = require('nori/model/MixinReducerModel');
+        _mixinReducerModel      = require('nori/model/MixinReducerModel');
 
     /**
      * This application model contains "reducer model" functionality based on Redux.
