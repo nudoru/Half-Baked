@@ -17,7 +17,7 @@ define('app/App',
        */
       appModel: require('app/model/AppModel'),
       appView : require('app/view/AppView'),
-      socket  : require('nori/service/SocketIO'),
+      //socket  : require('nori/service/SocketIO'),
 
       /**
        * Intialize the appilcation, view and model
@@ -26,8 +26,8 @@ define('app/App',
         // listen for the model loaded event
         Nori.dispatcher().subscribe(_noriEventConstants.APP_MODEL_INITIALIZED, this.onModelInitialized.bind(this), true);
 
-        this.socket.initialize();
-        this.socket.subscribe(this.handleSocketMessage.bind(this));
+        //this.socket.initialize();
+        //this.socket.subscribe(this.handleSocketMessage.bind(this));
 
         this.initializeApplication(); // validates setup
 

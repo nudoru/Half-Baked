@@ -17,7 +17,7 @@ define('app/App',
        */
       appModel: require('app/model/AppModel'),
       appView : require('app/view/AppView'),
-      socket  : require('nori/service/SocketIO'),
+      //socket  : require('nori/service/SocketIO'),
 
       /**
        * Intialize the appilcation, view and model
@@ -26,8 +26,8 @@ define('app/App',
         // listen for the model loaded event
         Nori.dispatcher().subscribe(_noriEventConstants.APP_MODEL_INITIALIZED, this.onModelInitialized.bind(this), true);
 
-        this.socket.initialize();
-        this.socket.subscribe(this.handleSocketMessage.bind(this));
+        //this.socket.initialize();
+        //this.socket.subscribe(this.handleSocketMessage.bind(this));
 
         this.initializeApplication(); // validates setup
 
@@ -299,11 +299,11 @@ define('app/view/AppView',
       },
 
       configureViews: function () {
-        var screenTitle           = require('app/view/Screen.Title'),
-            screenPlayerSelect    = require('app/view/Screen.PlayerSelect'),
-            screenWaitingOnPlayer = require('app/view/Screen.WaitingOnPlayer'),
-            screenMainGame        = require('app/view/Screen.MainGame'),
-            screenGameOver        = require('app/view/Screen.GameOver'),
+        var screenTitle           = require('app/view/Screen.Title')(),
+            screenPlayerSelect    = require('app/view/Screen.PlayerSelect')(),
+            screenWaitingOnPlayer = require('app/view/Screen.WaitingOnPlayer')(),
+            screenMainGame        = require('app/view/Screen.MainGame')(),
+            screenGameOver        = require('app/view/Screen.GameOver')(),
             gameStates            = Nori.model().gameStates;
 
         this.setViewMountPoint('#contents');
@@ -313,6 +313,10 @@ define('app/view/AppView',
         this.mapStateToViewComponent(gameStates[2], 'waitingonplayer', screenWaitingOnPlayer);
         this.mapStateToViewComponent(gameStates[3], 'game', screenMainGame);
         this.mapStateToViewComponent(gameStates[4], 'gameover', screenGameOver);
+
+        var test = require('app/view/Screen.Title')();
+        console.log(test === screenTitle);
+
       },
 
       /**

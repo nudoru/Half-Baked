@@ -37,11 +37,11 @@ define('app/view/AppView',
       },
 
       configureViews: function () {
-        var screenTitle           = require('app/view/Screen.Title'),
-            screenPlayerSelect    = require('app/view/Screen.PlayerSelect'),
-            screenWaitingOnPlayer = require('app/view/Screen.WaitingOnPlayer'),
-            screenMainGame        = require('app/view/Screen.MainGame'),
-            screenGameOver        = require('app/view/Screen.GameOver'),
+        var screenTitle           = require('app/view/Screen.Title')(),
+            screenPlayerSelect    = require('app/view/Screen.PlayerSelect')(),
+            screenWaitingOnPlayer = require('app/view/Screen.WaitingOnPlayer')(),
+            screenMainGame        = require('app/view/Screen.MainGame')(),
+            screenGameOver        = require('app/view/Screen.GameOver')(),
             gameStates            = Nori.model().gameStates;
 
         this.setViewMountPoint('#contents');
@@ -51,6 +51,10 @@ define('app/view/AppView',
         this.mapStateToViewComponent(gameStates[2], 'waitingonplayer', screenWaitingOnPlayer);
         this.mapStateToViewComponent(gameStates[3], 'game', screenMainGame);
         this.mapStateToViewComponent(gameStates[4], 'gameover', screenGameOver);
+
+        var test = require('app/view/Screen.Title')();
+        console.log(test === screenTitle);
+
       },
 
       /**
