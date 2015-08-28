@@ -17,7 +17,7 @@ define('nori/view/ViewComponent',
           _mountPoint,
           _children      = [],
           _isMounted     = false,
-          _noriEvents    = require('nori/events/EventCreator');
+          _renderer      = require('nori/utils/Renderer');
 
       /**
        * Initialization
@@ -31,6 +31,10 @@ define('nori/view/ViewComponent',
 
         this.setState(this.getInitialState());
         this.setEvents(this.defineEvents());
+
+        this.createSubject('update');
+        this.createSubject('mount');
+        this.createSubject('unmount');
 
         _isInitialized = true;
       }
@@ -46,18 +50,18 @@ define('nori/view/ViewComponent',
       function bindMap(mapIDorObj) {
         var map;
 
-        if (isObject(mapIDorObj)) {
+        if (is.object(mapIDorObj)) {
           map = mapIDorObj;
         } else {
           map = Nori.model().getMap(mapIDorObj) || Nori.model().getMapCollection(mapIDorObj);
         }
 
         if (!map) {
-          throw new Error('ViewComponent bindMap, map or mapcollection not found: ' + mapIDorObj);
+          console.warn('ViewComponent bindMap, map or mapcollection not found: ' + mapIDorObj);
         }
 
-        if (!isFunction(map.subscribe)) {
-          throw new Error('ViewComponent bindMap, map or mapcollection must be observable: ' + mapIDorObj);
+        if (!is.function(map.subscribe)) {
+          console.warn('ViewComponent bindMap, map or mapcollection must be observable: ' + mapIDorObj);
         }
 
         map.subscribe(this.update.bind(this));
@@ -118,10 +122,11 @@ define('nori/view/ViewComponent',
 
           this.componentDidUpdate();
         }
+        this.notifySubscribersOf('update', this.getID());
       }
 
       function shouldComponentUpdate(nextState) {
-        return existy(nextState);
+        return is.existy(nextState);
       }
 
       /**
@@ -198,15 +203,11 @@ define('nori/view/ViewComponent',
         _isMounted = true;
 
         // Go out to the standard render function. DOM element is returned in callback
-        _noriEvents.renderView(_mountPoint, _html, _id, onViewRendered.bind(this));
-      }
+        setDOMNode(_renderer.render({
+          target: _mountPoint,
+          html  : _html
+        }));
 
-      /**
-       * Handler for the renderer module
-       * @param domEl
-       */
-      function onViewRendered(domEl) {
-        setDOMNode(domEl);
         // from the ViewMixinEventDelegator
         if (this.delegateEvents) {
           this.delegateEvents();
@@ -215,6 +216,8 @@ define('nori/view/ViewComponent',
         if (this.componentDidMount) {
           this.componentDidMount();
         }
+
+        this.notifySubscribersOf('mount', this.getID());
       }
 
       /**
@@ -234,15 +237,20 @@ define('nori/view/ViewComponent',
       function unmount() {
         this.componentWillUnmount();
         _isMounted = false;
-        _noriEvents.renderView(_mountPoint, '', _id);
 
         // from the ViewMixinEventDelegator
         if (this.undelegateEvents) {
           this.undelegateEvents();
         }
 
+        _renderer.render({
+          target: _mountPoint,
+          html  : ''
+        });
+
         setDOMNode(null);
         this.componentDidUnmount();
+        this.notifySubscribersOf('unmount', this.getID());
       }
 
       function componentDidUnmount() {

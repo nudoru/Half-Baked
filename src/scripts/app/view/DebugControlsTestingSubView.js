@@ -12,7 +12,7 @@ define('app/view/DebugControlsTestingSubView',
 
       var _lIpsum             = require('nudoru/browser/Lorem'),
           _toolTip            = require('nudoru/component/ToolTipView'),
-          _noriEventConstants = require('nori/events/EventConstants'),
+          _noriActionConstants = require('nori/action/ActionConstants'),
           _actionOneEl,
           _actionTwoEl,
           _actionThreeEl,
@@ -130,7 +130,7 @@ define('app/view/DebugControlsTestingSubView',
 
         _actionFiveEl.addEventListener('click', function actFour(e) {
           Nori.dispatcher().publish({
-            type   : _noriEventConstants.CHANGE_ROUTE,
+            type   : _noriActionConstants.CHANGE_ROUTE,
             payload: {
               route: '/one',
               data : {prop: 'some data', moar: '25'}
@@ -140,7 +140,7 @@ define('app/view/DebugControlsTestingSubView',
 
         _actionSixEl.addEventListener('click', function actFour(e) {
           Nori.dispatcher().publish({
-            type   : _noriEventConstants.CHANGE_ROUTE,
+            type   : _noriActionConstants.CHANGE_ROUTE,
             payload: {route: '/styles', data: 'test'}
           });
         });

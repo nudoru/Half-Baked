@@ -11,14 +11,16 @@ define('nori/view/MixinModelStateViews',
           _currentViewID,
           _currentModelState,
           _stateViewMountPoint,
-          _stateViewIDMap = Object.create(null),
-          _noriEvents     = require('nori/events/EventCreator');
+          _stateViewIDMap = Object.create(null);
 
       /**
        * Set up listeners
        */
       function initializeStateViews() {
         _this = this; // mitigation, Due to events, scope may be set to the window object
+
+        this.createSubject('viewChange');
+
         Nori.model().subscribe(function onStateChange() {
           handleStateChange();
         });
@@ -85,7 +87,7 @@ define('nori/view/MixinModelStateViews',
         TweenLite.set(_stateViewMountPoint, {alpha: 0});
         TweenLite.to(_stateViewMountPoint, 0.25, {alpha: 1, ease: Quad.easeIn});
 
-        _noriEvents.viewChanged(_currentViewID);
+        this.notifySubscribersOf('viewChange', componentID);
       }
 
       /**

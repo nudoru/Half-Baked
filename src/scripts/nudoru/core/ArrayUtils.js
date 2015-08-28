@@ -5,11 +5,7 @@ define('nudoru/core/ArrayUtils',
 
     module.exports = {
 
-      isArray: function (test) {
-        return Object.prototype.toString.call(test) === "[object Array]";
-      },
-
-      // Reference: http://jhusain.github.appSocket/learnrx/index.html
+      // Reference: http://jhusain.github.io/learnrx/index.html
       mergeAll: function () {
         var results = [];
 

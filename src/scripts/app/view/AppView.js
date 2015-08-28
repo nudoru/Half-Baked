@@ -1,8 +1,8 @@
 define('app/view/AppView',
   function (require, module, exports) {
 
-    var _noriEvents             = require('nori/events/EventCreator'),
-        _noriEventConstants     = require('nori/events/EventConstants'),
+    var _noriActions             = require('nori/action/ActionCreator'),
+        _noriActionConstants     = require('nori/action/ActionConstants'),
         _mixinApplicationView   = require('nori/view/ApplicationView'),
         _mixinNudoruControls    = require('nori/view/MixinNudoruControls'),
         _mixinComponentViews    = require('nori/view/MixinComponentViews'),
@@ -30,10 +30,7 @@ define('app/view/AppView',
         this.initializeStateViews();
         this.initializeNudoruControls();
 
-        this.configureApplicationViewEvents();
         this.configureViews();
-
-        _noriEvents.applicationViewInitialized();
       },
 
       configureViews: function () {
@@ -52,9 +49,6 @@ define('app/view/AppView',
         this.mapStateToViewComponent(gameStates[3], 'game', screenMainGame);
         this.mapStateToViewComponent(gameStates[4], 'gameover', screenGameOver);
 
-        var test = require('app/view/Screen.Title')();
-        console.log(test === screenTitle);
-
       },
 
       /**
@@ -68,18 +62,6 @@ define('app/view/AppView',
          this.delegateEvents();
          */
       },
-
-      /**
-       * Listen for notification and alert events and show to user
-       */
-      configureApplicationViewEvents: function () {
-        Nori.dispatcher().subscribe(_noriEventConstants.NOTIFY_USER, function onNotiftUser(payload) {
-          this.notify(payload.payload.message, payload.payload.title, payload.payload.type);
-        }.bind(this));
-        Nori.dispatcher().subscribe(_noriEventConstants.ALERT_USER, function onAlertUser(payload) {
-          this.alert(payload.payload.message, payload.payload.title);
-        }.bind(this));
-      }
 
     });
 

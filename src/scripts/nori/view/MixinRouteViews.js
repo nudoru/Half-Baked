@@ -10,14 +10,16 @@ define('nori/view/MixinRouteViews',
       var _this,
           _currentRouteViewID,
           _routeViewMountPoint,
-          _routeViewIDMap = Object.create(null),
-          _noriEvents     = require('nori/events/EventCreator');
+          _routeViewIDMap = Object.create(null);
 
       /**
        * Set up listeners
        */
       function initializeRouteViews() {
         _this = this; // mitigation, Due to events, scope may be set to the window object
+
+        this.createSubject('viewChange');
+
         Nori.router().subscribe(function onRouteChange(payload) {
           handleRouteChange(payload.routeObj);
         });
@@ -49,11 +51,11 @@ define('nori/view/MixinRouteViews',
        * be removed prior
        * @param elID
        */
-      function setRouteViewMountPoint(elID) {
+      function setViewMountPoint(elID) {
         _routeViewMountPoint = elID;
       }
 
-      function getRouteViewMountPoint() {
+      function getViewMountPoint() {
         return _routeViewMountPoint;
       }
 
@@ -87,7 +89,7 @@ define('nori/view/MixinRouteViews',
         TweenLite.set(_routeViewMountPoint, {alpha: 0});
         TweenLite.to(_routeViewMountPoint, 0.25, {alpha: 1, ease: Quad.easeIn});
 
-        _noriEvents.viewChanged(_currentRouteViewID);
+        this.notifySubscribersOf('viewChange', componentID);
       }
 
       /**
@@ -104,8 +106,8 @@ define('nori/view/MixinRouteViews',
         initializeRouteViews   : initializeRouteViews,
         showViewFromURLHash    : showViewFromURLHash,
         showRouteViewComponent : showRouteViewComponent,
-        setRouteViewMountPoint : setRouteViewMountPoint,
-        getRouteViewMountPoint : getRouteViewMountPoint,
+        setViewMountPoint : setViewMountPoint,
+        getViewMountPoint : getViewMountPoint,
         mapRouteToViewComponent: mapRouteToViewComponent
       };
 

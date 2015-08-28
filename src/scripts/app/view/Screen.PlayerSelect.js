@@ -1,8 +1,8 @@
 define('app/view/Screen.PlayerSelect',
   function (require, module, exports) {
 
-    var _noriEvents = require('nori/events/EventCreator'),
-        _appEvents  = require('app/events/EventConstants');
+    var _noriActions = require('nori/action/ActionCreator'),
+        _appEvents  = require('app/action/ActionConstants');
 
     /**
      * Module for a dynamic application view for a route or a persistent view
@@ -27,7 +27,7 @@ define('app/view/Screen.PlayerSelect',
           'click #select__button-joinroom'  : this.onJoinRoom.bind(this),
           'click #select__button-createroom': this.onCreateRoom.bind(this),
           'click #select__button-go'        : function () {
-            _noriEvents.changeModelState('', {currentState: Nori.model().gameStates[2]});
+            APP.model().apply(_noriActions.changeModelState({currentState:Nori.model().gameStates[2]}));
           }
         };
       },
@@ -60,9 +60,9 @@ define('app/view/Screen.PlayerSelect',
         console.log('Join room '+roomID);
         if(this.validateRoomID(roomID)) {
           console.log('Room ID OK');
-          _noriEvents.notifyUser('','Room ID ok!');
+          _noriActions.notifyUser('','Room ID ok!');
         } else {
-          _noriEvents.alertUser('Bad Room ID','The room ID is not correct. Must be a 5 digit number.');
+          _noriActions.alertUser('Bad Room ID','The room ID is not correct. Must be a 5 digit number.');
         }
       },
 

@@ -1,7 +1,7 @@
 define('app/App',
   function (require, module, exports) {
 
-    var _noriEventConstants = require('nori/events/EventConstants');
+    var _noriActionConstants = require('nori/action/ActionConstants');
 
     /**
      * "Controller" for a Nori application. The controller is responsible for
@@ -23,22 +23,19 @@ define('app/App',
        * Intialize the appilcation, view and model
        */
       initialize: function () {
-        // listen for the model loaded event
-        Nori.dispatcher().subscribe(_noriEventConstants.APP_MODEL_INITIALIZED, this.onModelInitialized.bind(this), true);
-
-        //this.socket.initialize();
-        //this.socket.subscribe(this.handleSocketMessage.bind(this));
-
         this.initializeApplication(); // validates setup
 
         this.view().initialize();
+
         this.model().initialize(); // model will acquire data dispatch event when complete
+        this.model().subscribe('storeInitialized', this.onStoreInitialized.bind(this));
+        this.model().loadStore();
       },
 
       /**
        * After the model data is ready
        */
-      onModelInitialized: function () {
+      onStoreInitialized: function () {
         this.runApplication();
       },
 
@@ -102,7 +99,7 @@ define('app/App',
 
   });
 
-define('app/events/EventConstants',
+define('app/action/ActionConstants',
   function (require, module, exports) {
     var objUtils = require('nudoru/core/ObjectUtils');
 
@@ -119,45 +116,44 @@ define('app/events/EventConstants',
       LOCAL_QUESTION: null,
       REMOTE_QUESTION: null,
       LOCAL_PLAYER_HEALTH_CHANGE: null,
-      REMOTE_PLAYER_HEALTH_CHAGE: null,
+      REMOTE_PLAYER_HEALTH_CHANGE: null,
       GAME_OVER: null
     }));
   });
 
-define('app/events/EventCreator',
+define('app/Action/ActionCreator',
   function (require, module, exports) {
 
-    var _eventConstants = require('app/events/EventConstants');
+    var _actionConstants = require('app/action/ActionConstants');
 
     /**
      * Purely for convenience, an Event ("action") Creator ala Flux spec. Follow
      * guidelines for creating actions: https://github.com/acdlite/flux-standard-action
      */
-    var EventCreator = {
+    var ActionCreator = {
 
-      someEvent: function (data) {
-        var evtObj = {
-          type   : _eventConstants.SOMETHING_HAPPENED,
+      mutateSomeData: function (data) {
+        var actionObj = {
+          type   : _actionConstants.MUTATION_TYPE,
           payload: {
-            theData: data
+            data: data
           }
         };
 
-        Nori.dispatcher().publish(evtObj);
-        return evtObj;
+        return actionObj;
       }
 
     };
 
-    module.exports = EventCreator;
+    module.exports = ActionCreator;
 
   });
 
 define('app/model/AppModel',
   function (require, module, exports) {
 
-    var _noriEvents             = require('nori/events/EventCreator'),
-        _noriEventConstants     = require('nori/events/EventConstants'),
+    var _noriActions             = require('nori/action/ActionCreator'),
+        _noriActionConstants     = require('nori/action/ActionConstants'),
         _mixinMapFactory        = require('nori/model/MixinMapFactory'),
         _mixinObservableSubject = require('nori/utils/MixinObservableSubject'),
         _mixinReducerModel      = require('nori/model/MixinReducerModel');
@@ -186,13 +182,13 @@ define('app/model/AppModel',
         this.addReducer(this.defaultReducerFunction);
         this.initializeReducerModel();
         this.setState(Nori.config());
-        this.modelReady();
+        this.createSubject('storeInitialized');
       },
 
       /**
        * Set or load any necessary data and then broadcast a initialized event.
        */
-      modelReady: function () {
+      loadStore: function () {
         this.setState({
           currentState: this.gameStates[0],
           localPlayer : {},
@@ -200,7 +196,7 @@ define('app/model/AppModel',
           questionBank: []
         });
 
-        _noriEvents.applicationModelInitialized();
+        this.notifySubscribersOf('storeInitialized');
       },
 
       createUserObject: function (id, type, name, appearance, behaviors) {
@@ -236,7 +232,7 @@ define('app/model/AppModel',
 
         switch (event.type) {
 
-          case _noriEventConstants.CHANGE_MODEL_STATE:
+          case _noriActionConstants.CHANGE_MODEL_STATE:
             return _.assign({}, state, event.payload.data);
 
           default:
@@ -249,7 +245,7 @@ define('app/model/AppModel',
        * not check to see if the state was actually updated.
        */
       handleStateMutation: function () {
-        //_noriEvents.modelStateChanged(); // Eventbus
+        //_noriActions.modelStateChanged(); // Eventbus
         this.notifySubscribers(this.getState());
       }
 
@@ -263,8 +259,8 @@ define('app/model/AppModel',
 define('app/view/AppView',
   function (require, module, exports) {
 
-    var _noriEvents             = require('nori/events/EventCreator'),
-        _noriEventConstants     = require('nori/events/EventConstants'),
+    var _noriActions             = require('nori/action/ActionCreator'),
+        _noriActionConstants     = require('nori/action/ActionConstants'),
         _mixinApplicationView   = require('nori/view/ApplicationView'),
         _mixinNudoruControls    = require('nori/view/MixinNudoruControls'),
         _mixinComponentViews    = require('nori/view/MixinComponentViews'),
@@ -292,10 +288,7 @@ define('app/view/AppView',
         this.initializeStateViews();
         this.initializeNudoruControls();
 
-        this.configureApplicationViewEvents();
         this.configureViews();
-
-        _noriEvents.applicationViewInitialized();
       },
 
       configureViews: function () {
@@ -314,9 +307,6 @@ define('app/view/AppView',
         this.mapStateToViewComponent(gameStates[3], 'game', screenMainGame);
         this.mapStateToViewComponent(gameStates[4], 'gameover', screenGameOver);
 
-        var test = require('app/view/Screen.Title')();
-        console.log(test === screenTitle);
-
       },
 
       /**
@@ -330,18 +320,6 @@ define('app/view/AppView',
          this.delegateEvents();
          */
       },
-
-      /**
-       * Listen for notification and alert events and show to user
-       */
-      configureApplicationViewEvents: function () {
-        Nori.dispatcher().subscribe(_noriEventConstants.NOTIFY_USER, function onNotiftUser(payload) {
-          this.notify(payload.payload.message, payload.payload.title, payload.payload.type);
-        }.bind(this));
-        Nori.dispatcher().subscribe(_noriEventConstants.ALERT_USER, function onAlertUser(payload) {
-          this.alert(payload.payload.message, payload.payload.title);
-        }.bind(this));
-      }
 
     });
 
@@ -359,7 +337,7 @@ define('app/view/DebugControlsTestingSubView',
 
       var _lIpsum             = require('nudoru/browser/Lorem'),
           _toolTip            = require('nudoru/component/ToolTipView'),
-          _noriEventConstants = require('nori/events/EventConstants'),
+          _noriActionConstants = require('nori/action/ActionConstants'),
           _actionOneEl,
           _actionTwoEl,
           _actionThreeEl,
@@ -477,7 +455,7 @@ define('app/view/DebugControlsTestingSubView',
 
         _actionFiveEl.addEventListener('click', function actFour(e) {
           Nori.dispatcher().publish({
-            type   : _noriEventConstants.CHANGE_ROUTE,
+            type   : _noriActionConstants.CHANGE_ROUTE,
             payload: {
               route: '/one',
               data : {prop: 'some data', moar: '25'}
@@ -487,7 +465,7 @@ define('app/view/DebugControlsTestingSubView',
 
         _actionSixEl.addEventListener('click', function actFour(e) {
           Nori.dispatcher().publish({
-            type   : _noriEventConstants.CHANGE_ROUTE,
+            type   : _noriActionConstants.CHANGE_ROUTE,
             payload: {route: '/styles', data: 'test'}
           });
         });
@@ -509,8 +487,8 @@ define('app/view/DebugControlsTestingSubView',
 define('app/view/Screen.GameOver',
   function (require, module, exports) {
 
-    var _noriEvents = require('nori/events/EventCreator'),
-        _appEvents = require('app/events/EventConstants');
+    var _noriActions = require('nori/action/ActionCreator'),
+        _appEvents = require('app/action/ActionConstants');
 
     /**
      * Module for a dynamic application view for a route or a persistent view
@@ -533,7 +511,7 @@ define('app/view/Screen.GameOver',
       defineEvents: function() {
         return {
           'click #gameover__button-replay': function() {
-            _noriEvents.changeModelState('',{currentState:Nori.model().gameStates[1]});
+            APP.model().apply(_noriActions.changeModelState({currentState:Nori.model().gameStates[1]}));
           }
         };
       },
@@ -577,8 +555,8 @@ define('app/view/Screen.GameOver',
 define('app/view/Screen.MainGame',
   function (require, module, exports) {
 
-    var _noriEvents = require('nori/events/EventCreator'),
-        _appEvents = require('app/events/EventConstants');
+    var _noriActions = require('nori/action/ActionCreator'),
+        _appEvents = require('app/action/ActionConstants');
 
     /**
      * Module for a dynamic application view for a route or a persistent view
@@ -601,7 +579,7 @@ define('app/view/Screen.MainGame',
       defineEvents: function() {
         return {
           'click #game__button-skip': function() {
-            _noriEvents.changeModelState('',{currentState:Nori.model().gameStates[4]});
+            APP.model().apply(_noriActions.changeModelState({currentState:Nori.model().gameStates[4]}));
           }
         };
       },
@@ -645,8 +623,8 @@ define('app/view/Screen.MainGame',
 define('app/view/Screen.PlayerSelect',
   function (require, module, exports) {
 
-    var _noriEvents = require('nori/events/EventCreator'),
-        _appEvents  = require('app/events/EventConstants');
+    var _noriActions = require('nori/action/ActionCreator'),
+        _appEvents  = require('app/action/ActionConstants');
 
     /**
      * Module for a dynamic application view for a route or a persistent view
@@ -671,7 +649,7 @@ define('app/view/Screen.PlayerSelect',
           'click #select__button-joinroom'  : this.onJoinRoom.bind(this),
           'click #select__button-createroom': this.onCreateRoom.bind(this),
           'click #select__button-go'        : function () {
-            _noriEvents.changeModelState('', {currentState: Nori.model().gameStates[2]});
+            APP.model().apply(_noriActions.changeModelState({currentState:Nori.model().gameStates[2]}));
           }
         };
       },
@@ -704,9 +682,9 @@ define('app/view/Screen.PlayerSelect',
         console.log('Join room '+roomID);
         if(this.validateRoomID(roomID)) {
           console.log('Room ID OK');
-          _noriEvents.notifyUser('','Room ID ok!');
+          _noriActions.notifyUser('','Room ID ok!');
         } else {
-          _noriEvents.alertUser('Bad Room ID','The room ID is not correct. Must be a 5 digit number.');
+          _noriActions.alertUser('Bad Room ID','The room ID is not correct. Must be a 5 digit number.');
         }
       },
 
@@ -744,8 +722,8 @@ define('app/view/Screen.PlayerSelect',
 define('app/view/Screen.Title',
   function (require, module, exports) {
 
-    var _noriEvents = require('nori/events/EventCreator'),
-        _appEvents = require('app/events/EventConstants');
+    var _noriActions = require('nori/action/ActionCreator'),
+        _appEvents = require('app/action/ActionConstants');
 
     /**
      * Module for a dynamic application view for a route or a persistent view
@@ -768,7 +746,7 @@ define('app/view/Screen.Title',
       defineEvents: function() {
         return {
           'click #title__button-start': function() {
-            _noriEvents.changeModelState('',{currentState:Nori.model().gameStates[1]});
+            APP.model().apply(_noriActions.changeModelState({currentState:Nori.model().gameStates[1]}));
           }
         };
       },
@@ -812,8 +790,8 @@ define('app/view/Screen.Title',
 define('app/view/Screen.WaitingOnPlayer',
   function (require, module, exports) {
 
-    var _noriEvents = require('nori/events/EventCreator'),
-        _appEvents = require('app/events/EventConstants');
+    var _noriActions = require('nori/action/ActionCreator'),
+        _appEvents = require('app/action/ActionConstants');
 
     /**
      * Module for a dynamic application view for a route or a persistent view
@@ -836,7 +814,7 @@ define('app/view/Screen.WaitingOnPlayer',
       defineEvents: function() {
         return {
           'click #waiting__button-skip': function() {
-            _noriEvents.changeModelState('',{currentState:Nori.model().gameStates[3]});
+            APP.model().apply(_noriActions.changeModelState({currentState:Nori.model().gameStates[3]}));
           }
         };
       },

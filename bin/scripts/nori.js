@@ -74,12 +74,12 @@ define('nori/utils/Dispatcher',
 
         //console.log('dispatcher subscribe', evtStr, handler, onceOrContext, once);
 
-        if (falsey(evtStr)) {
-          throw new Error('Fasley event string passed for handler', handler);
+        if (is.falsey(evtStr)) {
+          console.warn('Dispatcher: Fasley event string passed for handler', handler);
         }
 
-        if (falsey(handler)) {
-          throw new Error('Fasley handler passed for event string', evtStr);
+        if (is.falsey(handler)) {
+          console.warn('Dispatcher: Fasley handler passed for event string', evtStr);
         }
 
         if (onceOrContext || onceOrContext === false) {
@@ -126,7 +126,6 @@ define('nori/utils/Dispatcher',
       function processNextEvent() {
         var evt = _queue.shift();
         if (evt) {
-          //console.log('Procesing event: ',evt);
           dispatchToReceivers(evt);
           dispatchToSubscribers(evt);
         } else {
@@ -229,8 +228,8 @@ define('nori/utils/Dispatcher',
        * Usage:
        *
        * _dispatcher.registerReceiver(function (payload) {
-     *    console.log('receiving, ',payload);
-     * });
+       *    console.log('receiving, ',payload);
+       * });
        *
        * @param handler
        * @returns {string}
@@ -521,20 +520,38 @@ define('nori/utils/MixinObservableSubject',
   function (require, module, exports) {
 
     var MixinObservableSubject = function () {
-      //https://github.com/Reactive-Extensions/RxJS/blob/master/doc/api/subjects/behaviorsubject.md
-      var _subject = new Rx.BehaviorSubject();
+
+      var _subject    = new Rx.Subject(),
+          _subjectMap = {};
 
       /**
-       * Subscribe handler to updates
-       * @param handler
+       * Create a new subject
+       * @param name
        * @returns {*}
        */
-      function subscribe(handler) {
-        return _subject.subscribe(handler);
+      function createSubject(name) {
+        if (!_subjectMap.hasOwnProperty(name)) {
+          _subjectMap[name] = new Rx.Subject();
+        }
+        return _subjectMap[name];
       }
 
       /**
-       * Called from update or whatever function to dispatch to subscribers
+       * Subscribe handler to updates. If the handler is a string, the new subject
+       * will be created.
+       * @param handler
+       * @returns {*}
+       */
+      function subscribe(handlerOrName, optHandler) {
+        if (is.string(handlerOrName)) {
+          return createSubject(handlerOrName).subscribe(optHandler);
+        } else {
+          return _subject.subscribe(handlerOrName);
+        }
+      }
+
+      /**
+       * Dispatch updated to subscribers
        * @param payload
        */
       function notifySubscribers(payload) {
@@ -542,17 +559,23 @@ define('nori/utils/MixinObservableSubject',
       }
 
       /**
-       * Gets the last payload that was dispatched to subscribers
-       * @returns {*}
+       * Dispatch updated to named subscribers
+       * @param name
+       * @param payload
        */
-      function getLastNotification() {
-        return _subject.getValue();
+      function notifySubscribersOf(name, payload) {
+        if (_subjectMap.hasOwnProperty(name)) {
+          _subjectMap[name].onNext(payload);
+        } else {
+          console.warn('MixinObservableSubject, no subscribers of ' + name);
+        }
       }
 
       return {
-        subscribe          : subscribe,
-        notifySubscribers  : notifySubscribers,
-        getLastNotification: getLastNotification
+        subscribe            : subscribe,
+        createSubject        : createSubject,
+        notifySubscribers    : notifySubscribers,
+        notifySubscribersOf  : notifySubscribersOf
       };
 
     };
@@ -565,20 +588,14 @@ define('nori/utils/Renderer',
   function (require, module, exports) {
 
     var Renderer = function () {
-      var _noriEvents         = require('nori/events/EventCreator'),
-          _noriEventConstants = require('nori/events/EventConstants'),
-          _domUtils           = require('nudoru/browser/DOMUtils');
-
-      function initialize() {
-        Nori.dispatcher().subscribe(_noriEventConstants.RENDER_VIEW, render);
-      }
+      var _domUtils           = require('nudoru/browser/DOMUtils');
 
       function render(payload) {
-        var targetSelector = payload.payload.target,
-            html           = payload.payload.html,
+        var targetSelector = payload.target,
+            html           = payload.html,
             domEl,
             mountPoint     = document.querySelector(targetSelector),
-            cb             = payload.payload.callback;
+            cb             = payload.callback;
 
         mountPoint.innerHTML = '';
 
@@ -587,16 +604,15 @@ define('nori/utils/Renderer',
           mountPoint.appendChild(domEl);
         }
 
-        // Send the created DOM element back to the caller
         if (cb) {
           cb(domEl);
         }
 
-        _noriEvents.viewRendered(targetSelector, payload.payload.id);
+        return domEl;
       }
 
       return {
-        initialize: initialize
+        render: render
       };
 
     };
@@ -610,24 +626,15 @@ define('nori/utils/Router',
 
     var Router = function () {
 
-      var _subject            = new Rx.Subject(),
-          _objUtils           = require('nudoru/core/ObjectUtils'),
-          _noriEventConstants = require('nori/events/EventConstants');
+      var _subject  = new Rx.Subject(),
+          _hashChangeObservable,
+          _objUtils = require('nudoru/core/ObjectUtils');
 
       /**
        * Set event handlers
        */
       function initialize() {
-        window.addEventListener('hashchange', notifySubscribers, false);
-        Nori.dispatcher().subscribe(_noriEventConstants.CHANGE_ROUTE, handleAppRouteChangeRequests);
-      }
-
-      /**
-       * Handle application route change requests
-       * @param payload
-       */
-      function handleAppRouteChangeRequests(payload) {
-        set(payload.payload.route, payload.payload.data);
+        _hashChangeObservable = Rx.Observable.fromEvent(window, 'hashchange').subscribe(notifySubscribers);
       }
 
       /**
@@ -905,289 +912,38 @@ define('nori/utils/Templating',
   });
 
 
-define('nori/events/EventConstants',
+define('nori/action/ActionConstants',
   function (require, module, exports) {
     var objUtils = require('nudoru/core/ObjectUtils');
 
     _.merge(module.exports, objUtils.keyMirror({
-      APP_WARNING            : null,
-      APP_ERROR              : null,
-      APP_INITIALIZED        : null,
-      APP_MODEL_INITIALIZED  : null,
-      APP_VIEW_INITIALIZED   : null,
-      ALERT_USER             : null,
-      WARN_USER              : null,
-      NOTIFY_USER            : null,
-      MODEL_DATA_WAITING     : null,
-      MODEL_DATA_READY       : null,
-      MODEL_DATA_CHANGED     : null,
-      MODEL_DATA_SAVED       : null,
-      MODEL_DATA_DESTROYED   : null,
-      MODEL_STATE_CHANGED    : null,
-      CHANGE_MODEL_STATE      : null,
-      RESUME_FROM_MODEL_STATE: null,
-      VIEW_INITIALIZED       : null,
-      VIEW_RENDERED          : null,
-      VIEW_CHANGED           : null,
-      VIEW_CHANGE_TO_MOBILE  : null,
-      VIEW_CHANGE_TO_DESKTOP : null,
-      ROUTE_CHANGED          : null,
-      CHANGE_ROUTE           : null,
-      RENDER_VIEW            : null
+      CHANGE_MODEL_STATE     : null
     }));
 
   });
 
-define('nori/events/EventCreator',
+define('nori/action/ActionCreator',
   function (require, module, exports) {
 
-    var _noriEventConstants    = require('nori/events/EventConstants'),
-        _browserEventConstants = require('nudoru/browser/EventConstants');
+    var _noriActionConstants = require('nori/action/ActionConstants');
 
-    var NoriEventCreator = {
+    var NoriActionCreator = {
 
-      applicationWarning: function (message) {
-        var evtObj = {
-          type   : _noriEventConstants.APP_WARNING,
-          error  : false,
+      changeModelState: function (data, id) {
+        var action = {
+          type   : _noriActionConstants.CHANGE_MODEL_STATE,
           payload: {
-            message: message
-          }
-        };
-
-        Nori.dispatcher().publish(evtObj);
-        return evtObj;
-      },
-
-      applicationError: function (message) {
-        var evtObj = {
-          type   : _noriEventConstants.APP_ERROR,
-          error  : true,
-          payload: new Error(message)
-        };
-
-        Nori.dispatcher().publish(evtObj);
-        return evtObj;
-      },
-
-      applicationInitialized: function (payload) {
-        var evtObj = {
-          type   : _noriEventConstants.APP_INITIALIZED,
-          payload: payload
-        };
-
-        Nori.dispatcher().publish(evtObj);
-        return evtObj;
-      },
-
-      notifyUser: function (title, message, type) {
-        var evtObj = {
-          type   : _noriEventConstants.NOTIFY_USER,
-          payload: {
-            title  : title,
-            message: message,
-            type   : type || 'default'
-          }
-        };
-
-        Nori.dispatcher().publish(evtObj);
-        return evtObj;
-      },
-
-      alertUser: function (title, message, type) {
-        var evtObj = {
-          type   : _noriEventConstants.ALERT_USER,
-          payload: {
-            title  : title,
-            message: message,
-            type   : type || 'default'
-          }
-        };
-
-        Nori.dispatcher().publish(evtObj);
-        return evtObj;
-      },
-
-      warnUser: function (title, message, type) {
-        var evtObj = {
-          type   : _noriEventConstants.WARN_USER,
-          payload: {
-            title  : title,
-            message: message,
-            type   : type || 'danger'
-          }
-        };
-
-        Nori.dispatcher().publish(evtObj);
-        return evtObj;
-      },
-
-      applicationModelInitialized: function (payload) {
-        var evtObj = {
-          type   : _noriEventConstants.APP_MODEL_INITIALIZED,
-          payload: payload
-        };
-
-        Nori.dispatcher().publish(evtObj);
-        return evtObj;
-      },
-
-      applicationViewInitialized: function (payload) {
-        var evtObj = {
-          type   : _noriEventConstants.APP_VIEW_INITIALIZED,
-          payload: payload
-        };
-
-        Nori.dispatcher().publish(evtObj);
-        return evtObj;
-      },
-
-      urlHashChanged: function (payload) {
-        var evtObj = {
-          type   : _browserEventConstants.URL_HASH_CHANGED,
-          payload: payload
-        };
-
-        Nori.dispatcher().publish(evtObj);
-        return evtObj;
-      },
-
-      viewChanged: function (payload) {
-        var evtObj = {
-          type   : _noriEventConstants.VIEW_CHANGED,
-          payload: payload
-        };
-
-        Nori.dispatcher().publish(evtObj);
-        return evtObj;
-      },
-
-      changeRoute: function (route, data) {
-        var evtObj = {
-          type   : _noriEventConstants.CHANGE_ROUTE,
-          payload: {
-            route: route,
-            data : data
-          }
-        };
-
-        Nori.dispatcher().publish(evtObj);
-        return evtObj;
-      },
-
-      routeChanged: function (payload) {
-        var evtObj = {
-          type   : _noriEventConstants.ROUTE_CHANGED,
-          payload: payload
-        };
-
-        Nori.dispatcher().publish(evtObj);
-        return evtObj;
-      },
-
-      changeModelState: function (modelID, data) {
-        var evtObj = {
-          type   : _noriEventConstants.CHANGE_MODEL_STATE,
-          payload: {
-            id  : modelID,
+            id  : id,
             data: data
           }
         };
 
-        Nori.dispatcher().publish(evtObj);
-        return evtObj;
-      },
+        return action;
+      }
 
-      modelChanged: function (payload) {
-        var evtObj = {
-          type   : _noriEventConstants.MODEL_DATA_CHANGED,
-          payload: payload
-        };
-
-        Nori.dispatcher().publish(evtObj);
-        return evtObj;
-      },
-
-      modelStateChanged: function (payload) {
-        var evtObj = {
-          type   : _noriEventConstants.MODEL_STATE_CHANGED,
-          payload: payload
-        };
-
-        Nori.dispatcher().publish(evtObj);
-        return evtObj;
-      },
-
-      renderView: function (targetSelector, htmlStr, id, callback) {
-        var evtObj = {
-          type   : _noriEventConstants.RENDER_VIEW,
-          payload: {
-            target  : targetSelector,
-            html    : htmlStr,
-            id      : id,
-            callback: callback
-          }
-        };
-
-        Nori.dispatcher().publish(evtObj);
-        return evtObj;
-      },
-
-      viewRendered: function (targetSelector, id) {
-        var evtObj = {
-          type   : _noriEventConstants.VIEW_RENDERED,
-          payload: {
-            target: targetSelector,
-            id    : id
-          }
-        };
-
-        Nori.dispatcher().publish(evtObj);
-        return evtObj;
-      },
-
-      viewChangedToMobile: function (payload) {
-        var evtObj = {
-          type   : _noriEventConstants.VIEW_CHANGE_TO_MOBILE,
-          payload: payload
-        };
-
-        Nori.dispatcher().publish(evtObj);
-        return evtObj;
-      },
-
-      viewChangedToDesktop: function (payload) {
-        var evtObj = {
-          type   : _noriEventConstants.VIEW_CHANGE_TO_DESKTOP,
-          payload: payload
-        };
-
-        Nori.dispatcher().publish(evtObj);
-        return evtObj;
-      },
-
-      browserScrolled: function (payload) {
-        var evtObj = {
-          type   : _browserEventConstants.BROWSER_SCROLLED,
-          payload: payload
-        };
-
-        Nori.dispatcher().publish(evtObj);
-        return evtObj;
-      },
-
-      browserResized: function (payload) {
-        var evtObj = {
-          type   : _browserEventConstants.BROWSER_RESIZED,
-          payload: payload
-        };
-
-        Nori.dispatcher().publish(evtObj);
-        return evtObj;
-      },
     };
 
-    module.exports = NoriEventCreator;
+    module.exports = NoriActionCreator;
 
   });
 
@@ -2088,9 +1844,8 @@ define('nori/model/MixinReducerModel',
     var MixinReducerModel = function () {
       var _this,
           _state,
-          _stateReducers      = [],
-          _ignoredEventTypes = [],
-          _noriEventConstants = require('nori/events/EventConstants');
+          _stateReducers       = [],
+          _noriActionConstants = require('nori/action/ActionConstants');
 
       //----------------------------------------------------------------------------
       //  Accessors
@@ -2129,21 +1884,14 @@ define('nori/model/MixinReducerModel',
        * Set up event listener/receiver
        */
       function initializeReducerModel() {
+        if (!this.createSubject) {
+          console.warn('nori/model/MixinReducerModel needs nori/utils/MixinObservableSubject to notify');
+        }
+
         var simpleStoreFactory = require('nori/model/SimpleStore');
 
         _this  = this;
         _state = simpleStoreFactory();
-
-        // Ignore these common lifecycle events
-        _ignoredEventTypes = [
-          _noriEventConstants.MODEL_STATE_CHANGED,
-          _noriEventConstants.MODEL_DATA_CHANGED,
-          _noriEventConstants.VIEW_CHANGED,
-          _noriEventConstants.RENDER_VIEW,
-          _noriEventConstants.VIEW_RENDERED
-        ];
-
-        Nori.dispatcher().registerReceiver(handleApplicationEvents);
 
         if (!_stateReducers) {
           throw new Error('ReducerModel, must set a reducer before initialization');
@@ -2154,20 +1902,17 @@ define('nori/model/MixinReducerModel',
       }
 
       /**
-       * Will receive "firehose" of all events that occur in the application. These
+       * Apply the action object to the reducers to change state
        * are sent to all reducers to update the state
-       * @param eventObject
+       * @param actionObject
        */
-      function handleApplicationEvents(eventObject) {
-        //console.log('ReducerModel Event occurred: ', eventObject);
-        if (_ignoredEventTypes.indexOf(eventObject.type) >= 0) {
-          return;
-        }
-        applyReducers(eventObject);
+      function apply(actionObject) {
+        console.log('ReducerModel Apply: ', actionObject.type, actionObject.payload);
+        applyReducers(actionObject);
       }
 
-      function applyReducers(eventObject) {
-        var nextState = applyReducersToState(getState(), eventObject);
+      function applyReducers(actionObject) {
+        var nextState = applyReducersToState(getState(), actionObject);
         setState(nextState);
         _this.handleStateMutation();
       }
@@ -2180,17 +1925,17 @@ define('nori/model/MixinReducerModel',
       }
 
       /**
-       * Creates a new state from the combined reduces and event object
+       * Creates a new state from the combined reduces and action object
        * Model state isn't modified, current state is passed in and mutated state returned
        * @param state
-       * @param event
+       * @param action
        * @returns {*|{}}
        */
-      function applyReducersToState(state, event) {
+      function applyReducersToState(state, action) {
         state = state || {};
         // TODO should this actually use array.reduce()?
         _stateReducers.forEach(function applyStateReducerFunction(reducerFunc) {
-          state = reducerFunc(state, event);
+          state = reducerFunc(state, action);
         });
         return state;
       }
@@ -2198,33 +1943,34 @@ define('nori/model/MixinReducerModel',
       /**
        * Template reducer function
        * Model state isn't modified, current state is passed in and mutated state returned
+
+       function templateReducerFunction(state, event) {
+        state = state || {};
+        switch (event.type) {
+          case _noriActionConstants.MODEL_DATA_CHANGED:
+            // can compose other reducers
+            // return _.assign({}, state, otherStateTransformer(state));
+            return _.assign({}, state, {prop: event.payload.value});
+          default:
+            return state;
+        }
+      }
        */
-      //function templateReducerFunction(state, event) {
-      //  state = state || {};
-      //  switch (event.type) {
-      //    case _noriEventConstants.MODEL_DATA_CHANGED:
-      //      // can compose other reducers
-      //      // return _.assign({}, state, otherStateTransformer(state));
-      //      return _.assign({}, state, {prop: event.payload.value});
-      //    default:
-      //      return state;
-      //  }
-      //}
 
       //----------------------------------------------------------------------------
       //  API
       //----------------------------------------------------------------------------
 
       return {
-        initializeReducerModel : initializeReducerModel,
-        getState               : getState,
-        setState               : setState,
-        handleApplicationEvents: handleApplicationEvents,
-        setReducers            : setReducers,
-        addReducer             : addReducer,
-        applyReducers          : applyReducers,
-        applyReducersToState   : applyReducersToState,
-        handleStateMutation    : handleStateMutation
+        initializeReducerModel: initializeReducerModel,
+        getState              : getState,
+        setState              : setState,
+        apply                 : apply,
+        setReducers           : setReducers,
+        addReducer            : addReducer,
+        applyReducers         : applyReducers,
+        applyReducersToState  : applyReducersToState,
+        handleStateMutation   : handleStateMutation
       };
 
     };
@@ -2237,37 +1983,25 @@ define('nori/model/SimpleStore',
   function (require, module, exports) {
 
     var SimpleStore = function () {
-      var _state   = Object.create(null),
-          _subject = new Rx.Subject();
-
-      /**
-       * subscribe a handler for changes
-       * @param handler
-       * @returns {*}
-       */
-      function subscribe(handler) {
-        return _subject.subscribe(handler);
-      }
+      var _internalState   = Object.create(null);
 
       /**
        * Return a copy of the state
        * @returns {void|*}
        */
       function getState() {
-        return _.assign({}, _state);
+        return _.assign({}, _internalState);
       }
 
       /**
        * Sets the state
-       * @param state
+       * @param nextState
        */
-      function setState(state) {
-        _state = _.assign(_state, state);
-        _subject.onNext();
+      function setState(nextState) {
+        _internalState = _.assign(_internalState, nextState);
       }
 
       return {
-        subscribe: subscribe,
         getState : getState,
         setState : setState
       };
@@ -2284,7 +2018,6 @@ define('nori/view/ApplicationView',
     var ApplicationView = function () {
 
       var _this,
-          _renderer = require('nori/utils/Renderer'),
           _domUtils = require('nudoru/browser/DOMUtils');
 
       //----------------------------------------------------------------------------
@@ -2297,7 +2030,6 @@ define('nori/view/ApplicationView',
        */
       function initializeApplicationView(scaffoldTemplates) {
         _this = this;
-        _renderer.initialize();
 
         attachApplicationScaffolding(scaffoldTemplates);
       }
@@ -2358,97 +2090,61 @@ define('nori/view/MixinBrowserEvents',
 
     var MixinBrowserEvents = function () {
 
-      var _currentViewPortSize,
-          _currentViewPortScroll,
-          _uiUpdateLayoutStream,
+      var _scrollableAppContainer,
           _browserScrollStream,
-          _browserResizeStream,
-          _positionUIElementsOnChangeCB,
-          _noriEvents = require('nori/events/EventCreator');
+          _browserResizeStream;
 
       //----------------------------------------------------------------------------
       //  Initialization
       //----------------------------------------------------------------------------
 
-      function initializeBrowserWindowEventStreams() {
-        setCurrentViewPortSize();
-        setCurrentViewPortScroll();
-        configureUIStreams();
-      }
+      function initializeBrowserEvents(scrollcontainer) {
+        if(!this.createSubject) {
+          console.warn('nori/view/MixinBrowserEvents needs nori/utils/MixinObservableSubject to notify');
+        }
 
-      function setPositionUIElementsOnChangeCB(cb) {
-        _positionUIElementsOnChangeCB = cb;
+        if(scrollcontainer) {
+          setMainScrollingView(scrollcontainer);
+        } else {
+          _scrollableAppContainer = document;
+        }
+
+        createBrowserEventStreams.bind(this)();
+
+        this.createSubject('browserScroll');
+        this.createSubject('browserResize');
       }
 
       /**
        * Set up RxJS streams for events
        */
-      function configureUIStreams() {
-        var uiresizestream = Rx.Observable.fromEvent(window, 'resize'),
-            uiscrollscream = Rx.Observable.fromEvent(_mainScrollEl, 'scroll');
-
-        // UI layout happens immediately, while resize and scroll is throttled
-        _uiUpdateLayoutStream = Rx.Observable.merge(uiresizestream, uiscrollscream)
-          .subscribe(function () {
-            positionUIElementsOnChange();
-          });
-
+      function createBrowserEventStreams() {
         _browserResizeStream = Rx.Observable.fromEvent(window, 'resize')
           .throttle(100)
-          .subscribe(function () {
-            handleViewPortResize();
-          });
+          .subscribe(handleViewPortResize.bind(this));
 
-        _browserScrollStream = Rx.Observable.fromEvent(_mainScrollEl, 'scroll')
+        _browserScrollStream = Rx.Observable.fromEvent(_scrollableAppContainer, 'scroll')
           .throttle(100)
-          .subscribe(function () {
-            handleViewPortScroll();
-          });
+          .subscribe(handleViewPortScroll.bind(this));
       }
-
-      function getMainScrollingView() {
-        return _mainScrollEl;
-      }
-
-      function setMainScrollingView(elID) {
-        _mainScrollEl = document.getElementById(elID);
-      }
-
-      //----------------------------------------------------------------------------
-      //  Viewport and UI elements
-      //----------------------------------------------------------------------------
 
       function handleViewPortResize() {
-        _noriEvents.browserResized(_currentViewPortSize);
+        this.notifySubscribersOf('browserResize', getCurrentViewPortSize());
       }
 
       function handleViewPortScroll() {
-        _noriEvents.browserScrolled(_currentViewPortScroll);
+        this.notifySubscribersOf('browserScroll', getCurrentViewPortScroll());
       }
 
       function getCurrentViewPortSize() {
-        return _currentViewPortSize;
-      }
-
-      /**
-       * Cache the current view port size in a var
-       */
-      function setCurrentViewPortSize() {
-        _currentViewPortSize = {
+        return {
           width : window.innerWidth,
           height: window.innerHeight
         };
       }
 
       function getCurrentViewPortScroll() {
-        return _currentViewPortScroll;
-      }
-
-      /**
-       * Cache the current view port scroll in a var
-       */
-      function setCurrentViewPortScroll() {
-        var scrollEL = _mainScrollEl ? _mainScrollEl : document.body;
+        var scrollEL = _scrollableAppContainer ? _scrollableAppContainer : document.body;
 
         var left = scrollEL.scrollLeft,
             top  = scrollEL.scrollTop;
@@ -2456,17 +2152,15 @@ define('nori/view/MixinBrowserEvents',
         left = left ? left : 0;
         top  = top ? top : 0;
 
-        _currentViewPortScroll = {left: left, top: top};
+        return {left: left, top: top};
       }
 
-      /**
-       * Reposition the UI elements on a UI change, scroll, resize, etc.
-       */
-      function positionUIElementsOnChange() {
-        setCurrentViewPortScroll();
-        setCurrentViewPortSize();
+      function getMainScrollingView() {
+        return _scrollableAppContainer;
+      }
 
-        _positionUIElementsOnChangeCB.call(this, _currentViewPortSize, _currentViewPortScroll);
+      function setMainScrollingView(elID) {
+        _scrollableAppContainer = document.querySelector(elID);
       }
 
       //----------------------------------------------------------------------------
@@ -2474,12 +2168,11 @@ define('nori/view/MixinBrowserEvents',
       //----------------------------------------------------------------------------
 
       return {
-        initializeBrowserWindowEventStreams: initializeBrowserWindowEventStreams,
-        setPositionUIElementsOnChangeCB    : setPositionUIElementsOnChangeCB,
-        getMainScrollingView               : getMainScrollingView,
-        setMainScrollingView               : setMainScrollingView,
-        getCurrentViewPortSize             : getCurrentViewPortSize,
-        getCurrentViewPortScroll           : getCurrentViewPortScroll
+        initializeBrowserEvents : initializeBrowserEvents,
+        getMainScrollingView    : getMainScrollingView,
+        setMainScrollingView    : setMainScrollingView,
+        getCurrentViewPortSize  : getCurrentViewPortSize,
+        getCurrentViewPortScroll: getCurrentViewPortScroll
       };
 
     };
@@ -2520,7 +2213,7 @@ define('nori/view/MixinComponentViews',
 
         if (typeof componentIDorObj === 'string') {
           var componentFactory = require(componentIDorObj);
-          componentObj         = createComponentView(componentFactory());
+          componentObj         = createComponentView(componentFactory())();
         } else {
           componentObj = componentIDorObj;
         }
@@ -2538,35 +2231,35 @@ define('nori/view/MixinComponentViews',
        * @returns {*}
        */
       function createComponentView(componentSource) {
-        var componentViewFactory  = require('nori/view/ViewComponent'),
-            eventDelegatorFactory = require('nori/view/MixinEventDelegator'),
-            observableFactory     = require('nori/utils/MixinObservableSubject'),
-            simpleStoreFactory    = require('nori/model/SimpleStore'),
-            componentAssembly, component, previousInitialize;
+        return function () {
+          var componentViewFactory  = require('nori/view/ViewComponent'),
+              eventDelegatorFactory = require('nori/view/MixinEventDelegator'),
+              observableFactory     = require('nori/utils/MixinObservableSubject'),
+              simpleStoreFactory    = require('nori/model/SimpleStore'),
+              componentAssembly, finalComponent, previousInitialize;
 
-        componentAssembly = [
-          componentViewFactory(),
-          eventDelegatorFactory(),
-          observableFactory(),
-          simpleStoreFactory(),
-          componentSource
-        ];
+          componentAssembly = [
+            componentViewFactory(),
+            eventDelegatorFactory(),
+            observableFactory(),
+            simpleStoreFactory(),
+            componentSource
+          ];
 
-        if (componentSource.mixins) {
-          componentAssembly = componentAssembly.concat(componentSource.mixins);
-        }
+          if (componentSource.mixins) {
+            componentAssembly = componentAssembly.concat(componentSource.mixins);
+          }
 
-        component = Nori.assignArray({}, componentAssembly);
+          finalComponent = Nori.assignArray({}, componentAssembly);
 
-        // Compose a new initialize function by inserting call to component super module
-        previousInitialize   = component.initialize;
-        component.initialize = function initialize(initObj) {
-          component.initializeComponent(initObj);
-          previousInitialize.call(component, initObj);
-        };
+          // Compose a new initialize function by inserting call to component super module
+          previousInitialize        = finalComponent.initialize;
+          finalComponent.initialize = function initialize(initObj) {
+            finalComponent.initializeComponent(initObj);
+            previousInitialize.call(finalComponent, initObj);
+          };
 
-        return function createComponentInstance() {
-          return _.assign({}, component)
+          return _.assign({}, finalComponent);
         };
       }
 
@@ -2657,7 +2350,7 @@ define('nori/view/MixinEventDelegator',
             var mappings    = evtStrings.split(','),
                 eventHander = _eventsMap[evtStrings];
 
-            if (!isFunction(eventHander)) {
+            if (!is.function(eventHander)) {
               console.warn('EventDelegator, handler for ' + evtStrings + ' is not a function');
               return;
             }
@@ -2719,14 +2412,16 @@ define('nori/view/MixinModelStateViews',
           _currentViewID,
           _currentModelState,
           _stateViewMountPoint,
-          _stateViewIDMap = Object.create(null),
-          _noriEvents     = require('nori/events/EventCreator');
+          _stateViewIDMap = Object.create(null);
 
       /**
        * Set up listeners
        */
       function initializeStateViews() {
         _this = this; // mitigation, Due to events, scope may be set to the window object
+
+        this.createSubject('viewChange');
+
         Nori.model().subscribe(function onStateChange() {
           handleStateChange();
         });
@@ -2793,7 +2488,7 @@ define('nori/view/MixinModelStateViews',
         TweenLite.set(_stateViewMountPoint, {alpha: 0});
         TweenLite.to(_stateViewMountPoint, 0.25, {alpha: 1, ease: Quad.easeIn});
 
-        _noriEvents.viewChanged(_currentViewID);
+        this.notifySubscribersOf('viewChange', componentID);
       }
 
       /**
@@ -2891,14 +2586,16 @@ define('nori/view/MixinRouteViews',
       var _this,
           _currentRouteViewID,
           _routeViewMountPoint,
-          _routeViewIDMap = Object.create(null),
-          _noriEvents     = require('nori/events/EventCreator');
+          _routeViewIDMap = Object.create(null);
 
       /**
        * Set up listeners
        */
       function initializeRouteViews() {
         _this = this; // mitigation, Due to events, scope may be set to the window object
+
+        this.createSubject('viewChange');
+
         Nori.router().subscribe(function onRouteChange(payload) {
           handleRouteChange(payload.routeObj);
         });
@@ -2930,11 +2627,11 @@ define('nori/view/MixinRouteViews',
        * be removed prior
        * @param elID
        */
-      function setRouteViewMountPoint(elID) {
+      function setViewMountPoint(elID) {
         _routeViewMountPoint = elID;
       }
 
-      function getRouteViewMountPoint() {
+      function getViewMountPoint() {
         return _routeViewMountPoint;
       }
 
@@ -2968,7 +2665,7 @@ define('nori/view/MixinRouteViews',
         TweenLite.set(_routeViewMountPoint, {alpha: 0});
         TweenLite.to(_routeViewMountPoint, 0.25, {alpha: 1, ease: Quad.easeIn});
 
-        _noriEvents.viewChanged(_currentRouteViewID);
+        this.notifySubscribersOf('viewChange', componentID);
       }
 
       /**
@@ -2985,8 +2682,8 @@ define('nori/view/MixinRouteViews',
         initializeRouteViews   : initializeRouteViews,
         showViewFromURLHash    : showViewFromURLHash,
         showRouteViewComponent : showRouteViewComponent,
-        setRouteViewMountPoint : setRouteViewMountPoint,
-        getRouteViewMountPoint : getRouteViewMountPoint,
+        setViewMountPoint : setViewMountPoint,
+        getViewMountPoint : getViewMountPoint,
         mapRouteToViewComponent: mapRouteToViewComponent
       };
 
@@ -3010,7 +2707,7 @@ define('nori/view/ViewComponent',
           _mountPoint,
           _children      = [],
           _isMounted     = false,
-          _noriEvents    = require('nori/events/EventCreator');
+          _renderer      = require('nori/utils/Renderer');
 
       /**
        * Initialization
@@ -3024,6 +2721,10 @@ define('nori/view/ViewComponent',
 
         this.setState(this.getInitialState());
         this.setEvents(this.defineEvents());
+
+        this.createSubject('update');
+        this.createSubject('mount');
+        this.createSubject('unmount');
 
         _isInitialized = true;
       }
@@ -3039,18 +2740,18 @@ define('nori/view/ViewComponent',
       function bindMap(mapIDorObj) {
         var map;
 
-        if (isObject(mapIDorObj)) {
+        if (is.object(mapIDorObj)) {
           map = mapIDorObj;
         } else {
           map = Nori.model().getMap(mapIDorObj) || Nori.model().getMapCollection(mapIDorObj);
         }
 
         if (!map) {
-          throw new Error('ViewComponent bindMap, map or mapcollection not found: ' + mapIDorObj);
+          console.warn('ViewComponent bindMap, map or mapcollection not found: ' + mapIDorObj);
         }
 
-        if (!isFunction(map.subscribe)) {
-          throw new Error('ViewComponent bindMap, map or mapcollection must be observable: ' + mapIDorObj);
+        if (!is.function(map.subscribe)) {
+          console.warn('ViewComponent bindMap, map or mapcollection must be observable: ' + mapIDorObj);
         }
 
         map.subscribe(this.update.bind(this));
@@ -3111,10 +2812,11 @@ define('nori/view/ViewComponent',
 
           this.componentDidUpdate();
         }
+        this.notifySubscribersOf('update', this.getID());
       }
 
       function shouldComponentUpdate(nextState) {
-        return existy(nextState);
+        return is.existy(nextState);
       }
 
       /**
@@ -3191,15 +2893,11 @@ define('nori/view/ViewComponent',
         _isMounted = true;
 
         // Go out to the standard render function. DOM element is returned in callback
-        _noriEvents.renderView(_mountPoint, _html, _id, onViewRendered.bind(this));
-      }
+        setDOMNode(_renderer.render({
+          target: _mountPoint,
+          html  : _html
+        }));
 
-      /**
-       * Handler for the renderer module
-       * @param domEl
-       */
-      function onViewRendered(domEl) {
-        setDOMNode(domEl);
         // from the ViewMixinEventDelegator
         if (this.delegateEvents) {
           this.delegateEvents();
@@ -3208,6 +2906,8 @@ define('nori/view/ViewComponent',
         if (this.componentDidMount) {
           this.componentDidMount();
         }
+
+        this.notifySubscribersOf('mount', this.getID());
       }
 
       /**
@@ -3227,15 +2927,20 @@ define('nori/view/ViewComponent',
       function unmount() {
         this.componentWillUnmount();
         _isMounted = false;
-        _noriEvents.renderView(_mountPoint, '', _id);
 
         // from the ViewMixinEventDelegator
         if (this.undelegateEvents) {
           this.undelegateEvents();
         }
 
+        _renderer.render({
+          target: _mountPoint,
+          html  : ''
+        });
+
         setDOMNode(null);
         this.componentDidUnmount();
+        this.notifySubscribersOf('unmount', this.getID());
       }
 
       function componentDidUnmount() {

@@ -1,8 +1,8 @@
 define('app/view/Screen.Title',
   function (require, module, exports) {
 
-    var _noriEvents = require('nori/events/EventCreator'),
-        _appEvents = require('app/events/EventConstants');
+    var _noriActions = require('nori/action/ActionCreator'),
+        _appEvents = require('app/action/ActionConstants');
 
     /**
      * Module for a dynamic application view for a route or a persistent view
@@ -25,7 +25,7 @@ define('app/view/Screen.Title',
       defineEvents: function() {
         return {
           'click #title__button-start': function() {
-            _noriEvents.changeModelState('',{currentState:Nori.model().gameStates[1]});
+            APP.model().apply(_noriActions.changeModelState({currentState:Nori.model().gameStates[1]}));
           }
         };
       },

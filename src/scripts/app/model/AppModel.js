@@ -1,8 +1,8 @@
 define('app/model/AppModel',
   function (require, module, exports) {
 
-    var _noriEvents             = require('nori/events/EventCreator'),
-        _noriEventConstants     = require('nori/events/EventConstants'),
+    var _noriActions             = require('nori/action/ActionCreator'),
+        _noriActionConstants     = require('nori/action/ActionConstants'),
         _mixinMapFactory        = require('nori/model/MixinMapFactory'),
         _mixinObservableSubject = require('nori/utils/MixinObservableSubject'),
         _mixinReducerModel      = require('nori/model/MixinReducerModel');
@@ -31,13 +31,13 @@ define('app/model/AppModel',
         this.addReducer(this.defaultReducerFunction);
         this.initializeReducerModel();
         this.setState(Nori.config());
-        this.modelReady();
+        this.createSubject('storeInitialized');
       },
 
       /**
        * Set or load any necessary data and then broadcast a initialized event.
        */
-      modelReady: function () {
+      loadStore: function () {
         this.setState({
           currentState: this.gameStates[0],
           localPlayer : {},
@@ -45,7 +45,7 @@ define('app/model/AppModel',
           questionBank: []
         });
 
-        _noriEvents.applicationModelInitialized();
+        this.notifySubscribersOf('storeInitialized');
       },
 
       createUserObject: function (id, type, name, appearance, behaviors) {
@@ -81,7 +81,7 @@ define('app/model/AppModel',
 
         switch (event.type) {
 
-          case _noriEventConstants.CHANGE_MODEL_STATE:
+          case _noriActionConstants.CHANGE_MODEL_STATE:
             return _.assign({}, state, event.payload.data);
 
           default:
@@ -94,7 +94,7 @@ define('app/model/AppModel',
        * not check to see if the state was actually updated.
        */
       handleStateMutation: function () {
-        //_noriEvents.modelStateChanged(); // Eventbus
+        //_noriActions.modelStateChanged(); // Eventbus
         this.notifySubscribers(this.getState());
       }
 

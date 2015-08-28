@@ -1,4 +1,4 @@
-define('app/events/EventConstants',
+define('app/action/ActionConstants',
   function (require, module, exports) {
     var objUtils = require('nudoru/core/ObjectUtils');
 
@@ -15,7 +15,7 @@ define('app/events/EventConstants',
       LOCAL_QUESTION: null,
       REMOTE_QUESTION: null,
       LOCAL_PLAYER_HEALTH_CHANGE: null,
-      REMOTE_PLAYER_HEALTH_CHAGE: null,
+      REMOTE_PLAYER_HEALTH_CHANGE: null,
       GAME_OVER: null
     }));
   });

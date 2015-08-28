@@ -33,7 +33,7 @@ define('nori/view/MixinComponentViews',
 
         if (typeof componentIDorObj === 'string') {
           var componentFactory = require(componentIDorObj);
-          componentObj         = createComponentView(componentFactory());
+          componentObj         = createComponentView(componentFactory())();
         } else {
           componentObj = componentIDorObj;
         }
@@ -51,35 +51,35 @@ define('nori/view/MixinComponentViews',
        * @returns {*}
        */
       function createComponentView(componentSource) {
-        var componentViewFactory  = require('nori/view/ViewComponent'),
-            eventDelegatorFactory = require('nori/view/MixinEventDelegator'),
-            observableFactory     = require('nori/utils/MixinObservableSubject'),
-            simpleStoreFactory    = require('nori/model/SimpleStore'),
-            componentAssembly, component, previousInitialize;
+        return function () {
+          var componentViewFactory  = require('nori/view/ViewComponent'),
+              eventDelegatorFactory = require('nori/view/MixinEventDelegator'),
+              observableFactory     = require('nori/utils/MixinObservableSubject'),
+              simpleStoreFactory    = require('nori/model/SimpleStore'),
+              componentAssembly, finalComponent, previousInitialize;
 
-        componentAssembly = [
-          componentViewFactory(),
-          eventDelegatorFactory(),
-          observableFactory(),
-          simpleStoreFactory(),
-          componentSource
-        ];
+          componentAssembly = [
+            componentViewFactory(),
+            eventDelegatorFactory(),
+            observableFactory(),
+            simpleStoreFactory(),
+            componentSource
+          ];
 
-        if (componentSource.mixins) {
-          componentAssembly = componentAssembly.concat(componentSource.mixins);
-        }
+          if (componentSource.mixins) {
+            componentAssembly = componentAssembly.concat(componentSource.mixins);
+          }
 
-        component = Nori.assignArray({}, componentAssembly);
+          finalComponent = Nori.assignArray({}, componentAssembly);
 
-        // Compose a new initialize function by inserting call to component super module
-        previousInitialize   = component.initialize;
-        component.initialize = function initialize(initObj) {
-          component.initializeComponent(initObj);
-          previousInitialize.call(component, initObj);
-        };
+          // Compose a new initialize function by inserting call to component super module
+          previousInitialize        = finalComponent.initialize;
+          finalComponent.initialize = function initialize(initObj) {
+            finalComponent.initializeComponent(initObj);
+            previousInitialize.call(finalComponent, initObj);
+          };
 
-        return function createComponentInstance() {
-          return _.assign({}, component)
+          return _.assign({}, finalComponent);
         };
       }
 

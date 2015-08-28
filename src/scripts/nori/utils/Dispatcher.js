@@ -1,7 +1,5 @@
 /*
  Matt Perkins, 6/12/15
- Based on
- https://github.com/Reactive-Extensions/RxJS/blob/master/doc/howdoi/eventemitter.md
 
  publish payload object
 
@@ -41,12 +39,12 @@ define('nori/utils/Dispatcher',
 
         //console.log('dispatcher subscribe', evtStr, handler, onceOrContext, once);
 
-        if (falsey(evtStr)) {
-          throw new Error('Fasley event string passed for handler', handler);
+        if (is.falsey(evtStr)) {
+          console.warn('Dispatcher: Fasley event string passed for handler', handler);
         }
 
-        if (falsey(handler)) {
-          throw new Error('Fasley handler passed for event string', evtStr);
+        if (is.falsey(handler)) {
+          console.warn('Dispatcher: Fasley handler passed for event string', evtStr);
         }
 
         if (onceOrContext || onceOrContext === false) {
@@ -93,7 +91,6 @@ define('nori/utils/Dispatcher',
       function processNextEvent() {
         var evt = _queue.shift();
         if (evt) {
-          //console.log('Procesing event: ',evt);
           dispatchToReceivers(evt);
           dispatchToSubscribers(evt);
         } else {
@@ -196,8 +193,8 @@ define('nori/utils/Dispatcher',
        * Usage:
        *
        * _dispatcher.registerReceiver(function (payload) {
-     *    console.log('receiving, ',payload);
-     * });
+       *    console.log('receiving, ',payload);
+       * });
        *
        * @param handler
        * @returns {string}

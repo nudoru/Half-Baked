@@ -8,24 +8,15 @@ define('nori/utils/Router',
 
     var Router = function () {
 
-      var _subject            = new Rx.Subject(),
-          _objUtils           = require('nudoru/core/ObjectUtils'),
-          _noriEventConstants = require('nori/events/EventConstants');
+      var _subject  = new Rx.Subject(),
+          _hashChangeObservable,
+          _objUtils = require('nudoru/core/ObjectUtils');
 
       /**
        * Set event handlers
        */
       function initialize() {
-        window.addEventListener('hashchange', notifySubscribers, false);
-        Nori.dispatcher().subscribe(_noriEventConstants.CHANGE_ROUTE, handleAppRouteChangeRequests);
-      }
-
-      /**
-       * Handle application route change requests
-       * @param payload
-       */
-      function handleAppRouteChangeRequests(payload) {
-        set(payload.payload.route, payload.payload.data);
+        _hashChangeObservable = Rx.Observable.fromEvent(window, 'hashchange').subscribe(notifySubscribers);
       }
 
       /**
