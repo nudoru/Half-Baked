@@ -52,6 +52,12 @@ function handleSocketMessage(payload) {
   console.log("from client", payload);
 
   switch (payload.type) {
+    case (eventConstants.PING):
+      emitClientNotification(eventConstants.PONG, {});
+      return;
+    case (eventConstants.PONG):
+      console.log('CLINT PING!');
+      return;
     case (eventConstants.CONNECT):
       console.log("Connected!");
       return;
@@ -65,7 +71,7 @@ function handleSocketMessage(payload) {
       console.log("leave room");
       return;
     default:
-      console.warn("Unhandled SocketIO message type", payload);
+      //console.warn("Unhandled SocketIO message type", payload);
       return;
   }
 }

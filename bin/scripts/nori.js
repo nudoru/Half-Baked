@@ -747,6 +747,29 @@ define('nori/utils/Router',
 
   });
 
+define('nori/utils/Rx',
+  function (require, module, exports) {
+
+    module.exports = {
+      dom: function(element, event) {
+        return Rx.Observable.fromEvent(document.querySelector(element), event);
+      },
+
+      from: function(ittr) {
+        return Rx.Observable.from(ittr);
+      },
+
+      interval: function(ms) {
+        return Rx.Observable.interval(ms);
+      },
+
+      just: function(value) {
+        return Rx.Observable.just(value);
+      }
+    };
+
+  });
+
 define('nori/utils/Templating',
   function (require, module, exports) {
 
@@ -1033,6 +1056,8 @@ define('nori/service/SocketIO',
       var _subject  = new Rx.BehaviorSubject(),
           _socketIO = io(),
           _events   = {
+            PING             : 'ping',
+            PONG             : 'pong',
             NOTIFY_CLIENT    : 'notify_client',
             NOTIFY_SERVER    : 'notify_server',
             CONNECT          : 'connect',
@@ -1058,8 +1083,16 @@ define('nori/service/SocketIO',
        * @param payload {type, id, time, payload}
        */
       function onNotifyClient(payload) {
+        if (payload.type === _events.PING) {
+          notifyServer(_events.PONG, {});
+        } else if (payload.type === _events.PONG) {
+          console.log('SOCKET.IO PONG!');
+        }
         notifySubscribers(payload);
-        //notifyServer(_events.CONNECT,'hi!');
+      }
+
+      function ping() {
+        notifyServer(_events.PING, {});
       }
 
       /**
@@ -1116,8 +1149,7 @@ define('nori/service/SocketIO',
       return {
         events             : getEventConstants,
         initialize         : initialize,
-        //on                 : on,
-        //emit               : emit,
+        ping               : ping,
         notifyServer       : notifyServer,
         subscribe          : subscribe,
         notifySubscribers  : notifySubscribers,

@@ -1,4 +1,6 @@
 module.exports = {
+  PING             : 'ping',
+  PONG             : 'pong',
   NOTIFY_CLIENT    : 'notify_client',
   NOTIFY_SERVER    : 'notify_server',
   CONNECT          : 'connect',

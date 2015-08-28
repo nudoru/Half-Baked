@@ -1,7 +1,7 @@
 define('app/App',
   function (require, module, exports) {
 
-    var _noriActionConstants = require('nori/action/ActionConstants');
+    var _rx = require('nori/utils/Rx');
 
     /**
      * "Controller" for a Nori application. The controller is responsible for
@@ -17,13 +17,15 @@ define('app/App',
        */
       appModel: require('app/model/AppModel'),
       appView : require('app/view/AppView'),
-      //socket  : require('nori/service/SocketIO'),
+      socket  : require('nori/service/SocketIO'),
 
       /**
        * Intialize the appilcation, view and model
        */
       initialize: function () {
         this.initializeApplication(); // validates setup
+
+        this.socket.initialize();
 
         this.view().initialize();
 
@@ -48,6 +50,10 @@ define('app/App',
 
         // View will show based on the current model state
         this.model().setState({currentState:'PLAYER_SELECT'});
+
+        _rx.interval(500).take(5).subscribe(function() {
+          this.socket.ping();
+        }.bind(this));
       },
 
       /**
