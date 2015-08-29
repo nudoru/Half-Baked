@@ -768,6 +768,10 @@ define('nori/utils/Rx',
         return Rx.Observable.interval(ms);
       },
 
+      doEvery: function(ms, handler) {
+        return this.interval(ms).subscribe(handler);
+      },
+
       just: function (value) {
         return Rx.Observable.just(value);
       },
@@ -2737,7 +2741,7 @@ define('nori/view/ViewComponent',
           _id,
           _templateObj,
           _html,
-          _DOMNode,
+          _DOMElement,
           _mountPoint,
           _children      = [],
           _isMounted     = false,
@@ -2816,7 +2820,7 @@ define('nori/view/ViewComponent',
        * Returns nextState of component
        */
       function componentWillUpdate() {
-        return undefined;
+        return this.getState();
       }
 
       function update() {
@@ -2882,7 +2886,7 @@ define('nori/view/ViewComponent',
 
         _isMounted = true;
 
-        _DOMNode = (_renderer.render({
+        _DOMElement = (_renderer.render({
           target: _mountPoint,
           html  : _html
         }));
@@ -2925,8 +2929,8 @@ define('nori/view/ViewComponent',
           html  : ''
         });
 
-        _html    = '';
-        _DOMNode = null;
+        _html       = '';
+        _DOMElement = null;
         this.notifySubscribersOf('unmount', this.getID());
       }
 
@@ -2952,6 +2956,10 @@ define('nori/view/ViewComponent',
 
       function getID() {
         return _id;
+      }
+
+      function getDOMElement() {
+        return _DOMElement;
       }
 
       function getTemplate() {
@@ -2980,16 +2988,17 @@ define('nori/view/ViewComponent',
         getID              : getID,
         getTemplate        : getTemplate,
         setTemplate        : setTemplate,
+        getDOMElement      : getDOMElement,
         isMounted          : isMounted,
 
-        bindMap              : bindMap,
+        bindMap: bindMap,
 
         componentWillUpdate  : componentWillUpdate,
         shouldComponentUpdate: shouldComponentUpdate,
         update               : update,
 
-        componentRender      : componentRender,
-        render               : render,
+        componentRender: componentRender,
+        render         : render,
 
         mount            : mount,
         componentDidMount: componentDidMount,

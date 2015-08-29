@@ -19,6 +19,10 @@ define('nori/utils/Rx',
         return Rx.Observable.interval(ms);
       },
 
+      doEvery: function(ms, handler) {
+        return this.interval(ms).subscribe(handler);
+      },
+
       just: function (value) {
         return Rx.Observable.just(value);
       },
