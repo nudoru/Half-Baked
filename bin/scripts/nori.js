@@ -588,7 +588,7 @@ define('nori/utils/Renderer',
   function (require, module, exports) {
 
     var Renderer = function () {
-      var _domUtils           = require('nudoru/browser/DOMUtils');
+      var _domUtils = require('nudoru/browser/DOMUtils');
 
       function render(payload) {
         var targetSelector = payload.target,
@@ -751,21 +751,31 @@ define('nori/utils/Rx',
   function (require, module, exports) {
 
     module.exports = {
-      dom: function(element, event) {
-        return Rx.Observable.fromEvent(document.querySelector(element), event);
+      dom: function (selector, event) {
+        var el = document.querySelector(selector);
+        if (!el) {
+          console.warn('nori/utils/Rx, dom, invalid DOM selector: ' + selector);
+          return;
+        }
+        return Rx.Observable.fromEvent(el, event.trim());
       },
 
-      from: function(ittr) {
+      from: function (ittr) {
         return Rx.Observable.from(ittr);
       },
 
-      interval: function(ms) {
+      interval: function (ms) {
         return Rx.Observable.interval(ms);
       },
 
-      just: function(value) {
+      just: function (value) {
         return Rx.Observable.just(value);
+      },
+
+      empty: function() {
+        return Rx.Observable.empty();
       }
+
     };
 
   });
@@ -2354,7 +2364,8 @@ define('nori/view/MixinEventDelegator',
     var MixinEventDelegator = function () {
 
       var _eventsMap,
-          _eventSubscribers;
+          _eventSubscribers,
+          _rx = require('nori/utils/Rx');
 
       function setEvents(evtObj) {
         _eventsMap = evtObj;
@@ -2389,19 +2400,10 @@ define('nori/view/MixinEventDelegator',
 
             mappings.forEach(function (evtMap) {
               evtMap = evtMap.trim();
-
               var eventStr = evtMap.split(' ')[0].trim(),
-                  selector = evtMap.split(' ')[1].trim(),
-                  element  = document.querySelector(selector);
-
-              if (!element) {
-                console.log('Cannot add event to invalid DOM element: ' + selector);
-              } else {
-                _eventSubscribers[evtStrings] = Rx.Observable.fromEvent(element, eventStr).subscribe(eventHander);
-              }
-
+                  selector = evtMap.split(' ')[1].trim();
+              _eventSubscribers[evtStrings] = _rx.dom(selector, eventStr).subscribe(eventHander);
             });
-
           }
         }
       }
@@ -2780,10 +2782,12 @@ define('nori/view/ViewComponent',
 
         if (!map) {
           console.warn('ViewComponent bindMap, map or mapcollection not found: ' + mapIDorObj);
+          return;
         }
 
         if (!is.function(map.subscribe)) {
           console.warn('ViewComponent bindMap, map or mapcollection must be observable: ' + mapIDorObj);
+          return;
         }
 
         map.subscribe(this.update.bind(this));
@@ -2924,13 +2928,11 @@ define('nori/view/ViewComponent',
 
         _isMounted = true;
 
-        // Go out to the standard render function. DOM element is returned in callback
         setDOMNode(_renderer.render({
           target: _mountPoint,
           html  : _html
         }));
 
-        // from the ViewMixinEventDelegator
         if (this.delegateEvents) {
           this.delegateEvents();
         }
@@ -2960,7 +2962,6 @@ define('nori/view/ViewComponent',
         this.componentWillUnmount();
         _isMounted = false;
 
-        // from the ViewMixinEventDelegator
         if (this.undelegateEvents) {
           this.undelegateEvents();
         }
@@ -2970,6 +2971,7 @@ define('nori/view/ViewComponent',
           html  : ''
         });
 
+        setHTML('');
         setDOMNode(null);
         this.componentDidUnmount();
         this.notifySubscribersOf('unmount', this.getID());

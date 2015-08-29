@@ -1,9 +1,7 @@
 define('app/view/AppView',
   function (require, module, exports) {
 
-    var _noriActions             = require('nori/action/ActionCreator'),
-        _noriActionConstants     = require('nori/action/ActionConstants'),
-        _mixinApplicationView   = require('nori/view/ApplicationView'),
+    var _mixinApplicationView   = require('nori/view/ApplicationView'),
         _mixinNudoruControls    = require('nori/view/MixinNudoruControls'),
         _mixinComponentViews    = require('nori/view/MixinComponentViews'),
         _mixinModelStateViews   = require('nori/view/MixinModelStateViews'),
@@ -55,12 +53,7 @@ define('app/view/AppView',
        * Draw and UI to the DOM and set events
        */
       render: function () {
-        /* Sample event delegator syntax
-         this.setEvents({
-         'click #button-id': handleButton
-         });
-         this.delegateEvents();
-         */
+        //
       },
 
     });

@@ -58,10 +58,12 @@ define('nori/view/ViewComponent',
 
         if (!map) {
           console.warn('ViewComponent bindMap, map or mapcollection not found: ' + mapIDorObj);
+          return;
         }
 
         if (!is.function(map.subscribe)) {
           console.warn('ViewComponent bindMap, map or mapcollection must be observable: ' + mapIDorObj);
+          return;
         }
 
         map.subscribe(this.update.bind(this));
@@ -202,13 +204,11 @@ define('nori/view/ViewComponent',
 
         _isMounted = true;
 
-        // Go out to the standard render function. DOM element is returned in callback
         setDOMNode(_renderer.render({
           target: _mountPoint,
           html  : _html
         }));
 
-        // from the ViewMixinEventDelegator
         if (this.delegateEvents) {
           this.delegateEvents();
         }
@@ -238,7 +238,6 @@ define('nori/view/ViewComponent',
         this.componentWillUnmount();
         _isMounted = false;
 
-        // from the ViewMixinEventDelegator
         if (this.undelegateEvents) {
           this.undelegateEvents();
         }
@@ -248,6 +247,7 @@ define('nori/view/ViewComponent',
           html  : ''
         });
 
+        setHTML('');
         setDOMNode(null);
         this.componentDidUnmount();
         this.notifySubscribersOf('unmount', this.getID());

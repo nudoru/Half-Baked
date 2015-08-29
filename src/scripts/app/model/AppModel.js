@@ -1,8 +1,7 @@
 define('app/model/AppModel',
   function (require, module, exports) {
 
-    var _noriActions             = require('nori/action/ActionCreator'),
-        _noriActionConstants     = require('nori/action/ActionConstants'),
+    var _noriActionConstants     = require('nori/action/ActionConstants'),
         _mixinMapFactory        = require('nori/model/MixinMapFactory'),
         _mixinObservableSubject = require('nori/utils/MixinObservableSubject'),
         _mixinReducerModel      = require('nori/model/MixinReducerModel');
@@ -63,7 +62,7 @@ define('app/model/AppModel',
         return {
           prompt     : prompt,
           distractors: distractors,
-          pointVaule : pointValue
+          pointValue : pointValue
         };
       },
 
@@ -94,7 +93,6 @@ define('app/model/AppModel',
        * not check to see if the state was actually updated.
        */
       handleStateMutation: function () {
-        //_noriActions.modelStateChanged(); // Eventbus
         this.notifySubscribers(this.getState());
       }
 
