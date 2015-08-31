@@ -326,6 +326,10 @@ define('app/view/AppView',
 
   });
 
+/**
+ * A template for a subview/route controller
+ */
+
 define('app/view/DebugControlsTestingSubView',
   function (require, module, exports) {
 
@@ -796,7 +800,6 @@ define('app/view/Screen.WaitingOnPlayer',
     var _noriActions = require('nori/action/ActionCreator'),
         _appView         = require('app/view/AppView'),
         _appStore        = require('app/store/AppStore');
-    ;
 
     /**
      * Module for a dynamic application view for a route or a persistent view
@@ -958,6 +961,10 @@ define('app/view/TemplateViewComponent',
 
   });
 
+/**
+ * Initial file for the Application
+ */
+
 (function () {
 
   var _browserInfo = require('nudoru/browser/BrowserInfo');
@@ -976,7 +983,7 @@ define('app/view/TemplateViewComponent',
      */
     window.onload = function() {
       window.APP = require('app/App');
-      APP.initialize()
+      APP.initialize();
     };
 
   }

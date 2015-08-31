@@ -4,7 +4,6 @@ define('app/view/Screen.WaitingOnPlayer',
     var _noriActions = require('nori/action/ActionCreator'),
         _appView         = require('app/view/AppView'),
         _appStore        = require('app/store/AppStore');
-    ;
 
     /**
      * Module for a dynamic application view for a route or a persistent view

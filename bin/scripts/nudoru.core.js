@@ -1,3 +1,13 @@
+/*******************************************************************************
+ * Module management. Inspired by CommonJS and AMD
+ *
+ * Based on
+ * http://eloquentjavascript.net/10_modules.html
+ * http://benclinkinbeard.com/posts/how-browserify-works/
+ * https://github.com/substack/browser-pack/blob/d29fddc8a9207d5f967664935073b50971aff708/prelude.js
+ *
+ ******************************************************************************/
+
 /**
  * This establishes a object map and look up system.
  *
@@ -83,7 +93,7 @@ var noop = function () {
 
 var is = {
   existy     : function (x) {
-    return x != null;
+    return x !== null;
   },
   truthy     : function (x) {
     return (x !== false) && this.existy(x);
@@ -297,7 +307,7 @@ define('nudoru/core/NumberUtils',
       },
 
       inRange: function (val, min, max) {
-        return val > min && val < max
+        return val > min && val < max;
       },
 
       distanceTL: function (point1, point2) {

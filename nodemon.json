@@ -4,6 +4,8 @@
     "src/*",
     "bin/*",
     ".git/*",
-    ".idea/*"
+    ".idea/*",
+    "gulpfile.js",
+    "Gruntfile.js"
   ]
 }

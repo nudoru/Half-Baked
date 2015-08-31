@@ -47,6 +47,20 @@ define('nori/utils/Cookie',
 
   });
 
+/*
+ Matt Perkins, 6/12/15
+
+ publish payload object
+
+ {
+ type: EVT_TYPE,
+ payload: {
+ key: value
+ }
+ }
+
+ */
+
 define('nori/utils/Dispatcher',
   function (require, module, exports) {
 
@@ -90,7 +104,9 @@ define('nori/utils/Dispatcher',
           }
         }
 
-        _subjectMap[evtStr] || (_subjectMap[evtStr] = []);
+        if(!_subjectMap[evtStr]) {
+          _subjectMap[evtStr] = [];
+        }
 
         var subject = new Rx.Subject();
 
@@ -515,6 +531,13 @@ define('nori/utils/Keyboard',
   });
 
 
+/**
+ * Add RxJS Subject to a module.
+ *
+ * Add one simple observable subject or more complex ability to create others for
+ * more complex eventing needs.
+ */
+
 define('nori/utils/MixinObservableSubject',
 
   function (require, module, exports) {
@@ -584,6 +607,10 @@ define('nori/utils/MixinObservableSubject',
 
   });
 
+/**
+ * Utility to handle all view DOM attachment tasks
+ */
+
 define('nori/utils/Renderer',
   function (require, module, exports) {
 
@@ -620,6 +647,11 @@ define('nori/utils/Renderer',
     module.exports = Renderer();
 
   });
+
+/**
+ * Simple router
+ * Supporting IE9 so using hashes instead of the history API for now
+ */
 
 define('nori/utils/Router',
   function (require, module, exports) {
@@ -787,6 +819,11 @@ define('nori/utils/Rx',
 
   });
 
+/*
+ Simple wrapper for Underscore / HTML templates
+ Matt Perkins
+ 4/7/15
+ */
 define('nori/utils/Templating',
   function (require, module, exports) {
 
@@ -962,6 +999,12 @@ define('nori/action/ActionConstants',
 
   });
 
+/**
+ * Action Creator
+ * Based on Flux Actions
+ * For more information and guidelines: https://github.com/acdlite/flux-standard-action
+ */
+
 define('nori/action/ActionCreator',
   function (require, module, exports) {
 
@@ -986,6 +1029,66 @@ define('nori/action/ActionCreator',
     module.exports = NoriActionCreator;
 
   });
+
+/**
+ * Ajax / Rest module.
+ * Returns an RxJS Obervable
+ *
+ * Usage:
+ *
+ var request = require('nori/service/Rest');
+
+ var getSub = request.request({
+        method: 'GET',
+        url   : '/items',
+        json  : true
+      }).subscribe(
+ function success(data) {
+          console.log('ok', data);
+        },
+ function error(data) {
+          console.log('err', data);
+        });
+
+ var postSub = request.request({
+        method: 'POST',
+        url   : '/items',
+        data  : JSON.stringify({key: 'value'}),
+        json  : true
+      }).subscribe(
+ function success(data) {
+          console.log('ok', data);
+        },
+ function error(data) {
+          console.log('err', data);
+        });
+
+ var putSub = request.request({
+        method: 'PUT',
+        url   : '/items/42',
+        data  : JSON.stringify({key: 'value'}),
+        json  : true
+      }).subscribe(
+ function success(data) {
+          console.log('ok', data);
+        },
+ function error(data) {
+          console.log('err', data);
+        });
+
+ var delSub = request.request({
+        method: 'DELETE',
+        url   : '/items/42',
+        json  : true
+      }).subscribe(
+ function success(data) {
+          console.log('ok', data);
+        },
+ function error(data) {
+          console.log('err', data);
+        });
+ *
+ */
 
 define('nori/service/Rest',
   function (require, module, exports) {
@@ -1178,6 +1281,11 @@ define('nori/service/SocketIO',
     module.exports = SocketIOConnector();
 
   });
+
+/**
+ * Map data type
+ */
+
 
 define('nori/store/Map',
   function (require, module, exports) {
@@ -1485,6 +1593,10 @@ define('nori/store/Map',
     module.exports = Map;
 
   });
+
+/**
+ * Map Collection - an array of maps
+ */
 
 define('nori/store/MapCollection',
   function (require, module, exports) {
@@ -1887,6 +1999,17 @@ define('nori/store/MixinMapFactory',
 
   });
 
+/**
+ * Mixin for Nori stores to add functionality similar to Redux' Reducer and single
+ * object state tree concept. Mixin should be composed to nori/store/ApplicationStore
+ * during creation of main AppStore
+ *
+ * https://gaearon.github.io/redux/docs/api/Store.html
+ * https://gaearon.github.io/redux/docs/basics/Reducers.html
+ *
+ * Created 8/13/15
+ */
+
 define('nori/store/MixinReducerStore',
   function (require, module, exports) {
 
@@ -2231,6 +2354,10 @@ define('nori/view/MixinBrowserEvents',
 
   });
 
+/**
+ * Mixin view that allows for component views
+ */
+
 define('nori/view/MixinComponentViews',
   function (require, module, exports) {
 
@@ -2365,6 +2492,21 @@ define('nori/view/MixinComponentViews',
 
   });
 
+/**
+ * Convenience mixin that makes events easier for views
+ *
+ * Based on Backbone
+ * Review this http://blog.marionettejs.com/2015/02/12/understanding-the-event-hash/index.html
+ *
+ * Example:
+ * this.setEvents({
+ *        'click #btn_main_projects': handleProjectsButton,
+ *        'click #btn_foo, click #btn_bar': handleFooBarButtons
+ *      });
+ * this.delegateEvents();
+ *
+ */
+
 define('nori/view/MixinEventDelegator',
   function (require, module, exports) {
 
@@ -2398,21 +2540,28 @@ define('nori/view/MixinEventDelegator',
           if (_eventsMap.hasOwnProperty(evtStrings)) {
 
             var mappings    = evtStrings.split(','),
-                eventHander = _eventsMap[evtStrings];
+                eventHandler = _eventsMap[evtStrings];
 
-            if (!is.function(eventHander)) {
+            if (!is.function(eventHandler)) {
               console.warn('EventDelegator, handler for ' + evtStrings + ' is not a function');
               return;
             }
 
+            /* jshint -W083 */
+            // https://jslinterrors.com/dont-make-functions-within-a-loop
             mappings.forEach(function (evtMap) {
               evtMap = evtMap.trim();
               var eventStr = evtMap.split(' ')[0].trim(),
                   selector = evtMap.split(' ')[1].trim();
-              _eventSubscribers[evtStrings] = _rx.dom(selector, eventStr).subscribe(eventHander);
+              _eventSubscribers[evtStrings] = createHandler(selector, eventStr, eventHandler);
             });
+            /* jshint +W083 */
           }
         }
+      }
+
+      function createHandler(selector, eventStr, eventHandler) {
+        return _rx.dom(selector, eventStr).subscribe(eventHandler);
       }
 
       /**
@@ -2443,6 +2592,10 @@ define('nori/view/MixinEventDelegator',
     module.exports = MixinEventDelegator;
 
   });
+
+/**
+ * Mixin view that allows for component views to be display on store state changes
+ */
 
 define('nori/view/MixinStoreStateViews',
   function (require, module, exports) {
@@ -2621,6 +2774,10 @@ define('nori/view/MixinNudoruControls',
 
   });
 
+/**
+ * Mixin view that allows for component views to be display on routing changes
+ */
+
 define('nori/view/MixinRouteViews',
   function (require, module, exports) {
 
@@ -2735,6 +2892,11 @@ define('nori/view/MixinRouteViews',
     module.exports = MixinRouteViews();
 
   });
+
+/**
+ * Base module for components
+ * Must be extended with custom modules
+ */
 
 define('nori/view/ViewComponent',
   function (require, module, exports) {

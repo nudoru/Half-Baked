@@ -35,7 +35,7 @@ define('nudoru/component/MessageBoxCreator',
               onClick: cb
             }
           ]
-        })
+        });
       }
 
       function confirm(title, message, okCB, modal) {
@@ -126,13 +126,19 @@ define('nudoru/component/MessageBoxCreator',
         confirm: confirm,
         prompt : prompt,
         choice : choice
-      }
+      };
 
     };
 
     module.exports = MessageBoxCreator();
 
   });
+
+/**
+ * Simple popup message box module
+ *
+ * Created by matt on 5/5/15
+ */
 
 define('nudoru/component/MessageBoxView',
   function (require, module, exports) {
@@ -432,6 +438,11 @@ define('nudoru/component/MessageBoxView',
 
   });
 
+/**
+ * Created 2/?/15
+ * Last updated 7/9/15
+ */
+
 define('nudoru/component/ModalCoverView',
   function (require, module, exports) {
 
@@ -572,6 +583,11 @@ define('nudoru/component/ModalCoverView',
     module.exports = ModalCoverView();
 
   });
+
+/**
+ * Created by matt on 12/1/14
+ * last updated 5/5/15
+ */
 
 define('nudoru/component/ToastView',
   function (require, module, exports) {
@@ -730,6 +746,11 @@ define('nudoru/component/ToastView',
     module.exports = ToastView();
 
   });
+
+/**
+ * Created by matt on 5/21/15
+ * last updated 7/9/15
+ */
 
 define('nudoru/component/ToolTipView',
   function (require, module, exports) {
