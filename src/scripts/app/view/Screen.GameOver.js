@@ -1,9 +1,9 @@
-define('app/view/Screen.GameOver',
-  function (require, module, exports) {
+ndefine('app/view/Screen.GameOver',
+  function (nrequire, module, exports) {
 
-    var _noriActions = require('nori/action/ActionCreator'),
-        _appView         = require('app/view/AppView'),
-        _appStore        = require('app/store/AppStore');
+    var _noriActions = nrequire('nori/action/ActionCreator'),
+        _appView         = nrequire('app/view/AppView'),
+        _appStore        = nrequire('app/store/AppStore');
 
     /**
      * Module for a dynamic application view for a route or a persistent view

@@ -35,7 +35,7 @@ function onConnect(socket) {
 }
 
 function onNotifyServer(payload) {
-  handleSocketMessage(payload)
+  handleSocketMessage(payload);
 }
 
 function onDisconnect() {

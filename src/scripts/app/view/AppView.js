@@ -1,13 +1,13 @@
-define('app/view/AppView',
-  function (require, module, exports) {
+ndefine('app/view/AppView',
+  function (nrequire, module, exports) {
 
-    var _appStore               = require('app/store/AppStore'),
-        _mixinApplicationView   = require('nori/view/ApplicationView'),
-        _mixinNudoruControls    = require('nori/view/MixinNudoruControls'),
-        _mixinComponentViews    = require('nori/view/MixinComponentViews'),
-        _mixinStoreStateViews   = require('nori/view/MixinStoreStateViews'),
-        _mixinEventDelegator    = require('nori/view/MixinEventDelegator'),
-        _mixinObservableSubject = require('nori/utils/MixinObservableSubject');
+    var _appStore               = nrequire('app/store/AppStore'),
+        _mixinApplicationView   = nrequire('nori/view/ApplicationView'),
+        _mixinNudoruControls    = nrequire('nori/view/MixinNudoruControls'),
+        _mixinComponentViews    = nrequire('nori/view/MixinComponentViews'),
+        _mixinStoreStateViews   = nrequire('nori/view/MixinStoreStateViews'),
+        _mixinEventDelegator    = nrequire('nori/view/MixinEventDelegator'),
+        _mixinObservableSubject = nrequire('nori/utils/MixinObservableSubject');
 
     /**
      * View for an application.
@@ -33,11 +33,11 @@ define('app/view/AppView',
       },
 
       configureViews: function () {
-        var screenTitle           = require('app/view/Screen.Title')(),
-            screenPlayerSelect    = require('app/view/Screen.PlayerSelect')(),
-            screenWaitingOnPlayer = require('app/view/Screen.WaitingOnPlayer')(),
-            screenMainGame        = require('app/view/Screen.MainGame')(),
-            screenGameOver        = require('app/view/Screen.GameOver')(),
+        var screenTitle           = nrequire('app/view/Screen.Title')(),
+            screenPlayerSelect    = nrequire('app/view/Screen.PlayerSelect')(),
+            screenWaitingOnPlayer = nrequire('app/view/Screen.WaitingOnPlayer')(),
+            screenMainGame        = nrequire('app/view/Screen.MainGame')(),
+            screenGameOver        = nrequire('app/view/Screen.GameOver')(),
             gameStates            = _appStore.gameStates;
 
         this.setViewMountPoint('#contents');

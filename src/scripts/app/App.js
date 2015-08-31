@@ -1,7 +1,7 @@
-define('app/App',
-  function (require, module, exports) {
+ndefine('app/App',
+  function (nrequire, module, exports) {
 
-    var _rx = require('nori/utils/Rx');
+    var _rx = nrequire('nori/utils/Rx');
 
     /**
      * "Controller" for a Nori application. The controller is responsible for
@@ -15,9 +15,9 @@ define('app/App',
       /**
        * Create the main Nori App store and view.
        */
-      store: require('app/store/AppStore'),
-      view : require('app/view/AppView'),
-      socket  : require('nori/service/SocketIO'),
+      store: nrequire('app/store/AppStore'),
+      view : nrequire('app/view/AppView'),
+      socket  : nrequire('nori/service/SocketIO'),
 
       /**
        * Intialize the appilcation, view and store

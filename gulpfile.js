@@ -1,11 +1,24 @@
+/*
+ TODO
+ 1. Write non-minified file first then write minitied file
+ http://ponyfoo.com/articles/my-first-gulp-adventure
+ .pipe(rename(pkg.name + '.min.js'))
+ .pipe(uglify())
+ .pipe(gulp.dest('./dist'));
+
+ 2. mocha testing
+ */
+
 var gulp        = require('gulp'),
     del         = require('del'),
     compass     = require('gulp-compass'),
     minifyCSS   = require('gulp-minify-css'),
     jade        = require('gulp-jade'),
     concat      = require('gulp-concat'),
+    babel       = require('gulp-babel'),
     uglify      = require('gulp-uglify'),
     sourcemaps  = require('gulp-sourcemaps'),
+    rename      = require('gulp-rename'),
     jshint      = require('gulp-jshint'),
     stylish     = require('jshint-stylish'),
     runSequence = require('run-sequence'),
@@ -49,7 +62,9 @@ gulp.task('compass', function () {
       image: 'bin/img',
       style: 'expanded'
     }))
-    //.pipe(minifyCSS())
+    .pipe(gulp.dest('bin/css'))
+    .pipe(rename('app.min.css'))
+    .pipe(minifyCSS())
     .pipe(gulp.dest('bin/css'))
     .pipe(livereload());
 });
@@ -73,7 +88,6 @@ gulp.task('scripts:vendor', function () {
     'src/scripts/vendor/rxjs/rx.lite.compat.min.js'
   ])
     .pipe(sourcemaps.init())
-    //.pipe(uglify({mangle: false, compress: false}))
     .pipe(concat('libs.min.js', {newLine: '\n\n'}))
     .pipe(sourcemaps.write('maps/libs.map', {addComment: false}))
     .pipe(gulp.dest('bin/scripts'));
@@ -88,6 +102,7 @@ gulp.task('scripts:nudorucore', function () {
     .pipe(sourcemaps.init())
     .pipe(jshint())
     .pipe(jshint.reporter(stylish))
+    .pipe(babel())
     //.pipe(uglify({mangle: false, compress: false}))
     .pipe(concat('nudoru.core.js', {newLine: '\n\n'}))
     .pipe(sourcemaps.write('maps/nudoru.core.map', {addComment: false}))
@@ -100,6 +115,7 @@ gulp.task('scripts:nudorubrowser', function () {
     .pipe(sourcemaps.init())
     .pipe(jshint())
     .pipe(jshint.reporter(stylish))
+    .pipe(babel())
     //.pipe(uglify({mangle: false, compress: false}))
     .pipe(concat('nudoru.browser.js', {newLine: '\n\n'}))
     .pipe(sourcemaps.write('maps/nudoru.browser.map', {addComment: false}))
@@ -112,6 +128,7 @@ gulp.task('scripts:nudorucomponents', function () {
     .pipe(sourcemaps.init())
     .pipe(jshint())
     .pipe(jshint.reporter(stylish))
+    .pipe(babel())
     //.pipe(uglify({mangle: false, compress: false}))
     .pipe(concat('nudoru.components.js', {newLine: '\n\n'}))
     .pipe(sourcemaps.write('maps/nudoru.components.map', {addComment: false}))
@@ -131,6 +148,7 @@ gulp.task('scripts:nori', function () {
     .pipe(sourcemaps.init())
     .pipe(jshint())
     .pipe(jshint.reporter(stylish))
+    .pipe(babel())
     //.pipe(uglify({mangle: false, compress: false}))
     .pipe(concat('nori.js', {newLine: '\n\n'}))
     .pipe(sourcemaps.write('maps/nori.map', {addComment: false}))
@@ -146,6 +164,7 @@ gulp.task('scripts:app', function () {
     .pipe(sourcemaps.init())
     .pipe(jshint())
     .pipe(jshint.reporter(stylish))
+    .pipe(babel())
     //.pipe(uglify({mangle: false, compress: false}))
     .pipe(concat('app.js', {newLine: '\n\n'}))
     .pipe(sourcemaps.write('maps/app.map', {addComment: false}))
@@ -167,12 +186,7 @@ gulp.task('watch', function () {
 
 gulp.task('default', function () {
     runSequence(
-      'clean',
-      ['jade', 'compass'],
-      ['scripts:vendor', 'scripts:nudorucore', 'scripts:nudorubrowser', 'scripts:nudorucomponents', 'scripts:nori', 'scripts:app'],
-      'fonts',
-      'images',
-      'copyconfig',
+      ['jade', 'compass', 'scripts:vendor', 'scripts:nudorucore', 'scripts:nudorubrowser', 'scripts:nudorucomponents', 'scripts:nori', 'scripts:app', 'fonts', 'images', 'copyconfig'],
       'watch'
     );
   }
