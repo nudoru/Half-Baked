@@ -2,12 +2,13 @@ define('app/view/Screen.PlayerSelect',
   function (require, module, exports) {
 
     var _noriActions = require('nori/action/ActionCreator'),
-        _appEvents  = require('app/action/ActionConstants');
+        _appView         = require('app/view/AppView'),
+        _appStore        = require('app/store/AppStore');
 
     /**
      * Module for a dynamic application view for a route or a persistent view
      */
-    var Component = Nori.view().createComponentView({
+    var Component = _appView.createComponentView({
 
       /**
        * Initialize and bind, called once on first render. Parent component is
@@ -22,12 +23,12 @@ define('app/view/Screen.PlayerSelect',
        * Create an object to be used to define events on DOM elements
        * @returns {}
        */
-      defineEvents: function() {
+      defineEvents: function () {
         return {
           'click #select__button-joinroom'  : this.onJoinRoom.bind(this),
           'click #select__button-createroom': this.onCreateRoom.bind(this),
           'click #select__button-go'        : function () {
-            APP.model().apply(_noriActions.changeModelState({currentState:Nori.model().gameStates[2]}));
+            _appStore.apply(_noriActions.changeStoreState({currentState: _appStore.gameStates[2]}));
           }
         };
       },
@@ -36,14 +37,14 @@ define('app/view/Screen.PlayerSelect',
        * Set initial state properties. Call once on first render
        */
       getInitialState: function () {
-        return APP.model().getState();
+        return _appStore.getState();
       },
 
       /**
-       * State change on bound models (map, etc.) Return nextState object
+       * State change on bound stores (map, etc.) Return nextState object
        */
       componentWillUpdate: function () {
-        var nextState = APP.model().getState();
+        var nextState = _appStore.getState();
         nextState.greeting += ' (updated)';
         return nextState;
       },
@@ -57,12 +58,12 @@ define('app/view/Screen.PlayerSelect',
 
       onJoinRoom: function () {
         var roomID = document.querySelector('#select__roomid').value;
-        console.log('Join room '+roomID);
-        if(this.validateRoomID(roomID)) {
+        console.log('Join room ' + roomID);
+        if (this.validateRoomID(roomID)) {
           console.log('Room ID OK');
-          _noriActions.notifyUser('','Room ID ok!');
+          _appView.notify('', 'Room ID ok!');
         } else {
-          _noriActions.alertUser('Bad Room ID','The room ID is not correct. Must be a 5 digit number.');
+          _appView.alert('Bad Room ID', 'The room ID is not correct. Must be a 5 digit number.');
         }
       },
 
@@ -71,10 +72,10 @@ define('app/view/Screen.PlayerSelect',
        * @param roomID
        * @returns {boolean}
        */
-      validateRoomID: function(roomID) {
-        if(isNaN(parseInt(roomID))) {
+      validateRoomID: function (roomID) {
+        if (isNaN(parseInt(roomID))) {
           return false;
-        } else if(roomID.length !== 5) {
+        } else if (roomID.length !== 5) {
           return false;
         }
         return true;

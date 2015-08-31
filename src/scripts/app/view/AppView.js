@@ -1,10 +1,11 @@
 define('app/view/AppView',
   function (require, module, exports) {
 
-    var _mixinApplicationView   = require('nori/view/ApplicationView'),
+    var _appStore               = require('app/store/AppStore'),
+        _mixinApplicationView   = require('nori/view/ApplicationView'),
         _mixinNudoruControls    = require('nori/view/MixinNudoruControls'),
         _mixinComponentViews    = require('nori/view/MixinComponentViews'),
-        _mixinModelStateViews   = require('nori/view/MixinModelStateViews'),
+        _mixinStoreStateViews   = require('nori/view/MixinStoreStateViews'),
         _mixinEventDelegator    = require('nori/view/MixinEventDelegator'),
         _mixinObservableSubject = require('nori/utils/MixinObservableSubject');
 
@@ -12,20 +13,20 @@ define('app/view/AppView',
      * View for an application.
      */
 
-    var AppView = Nori.createApplicationView({
+    var AppView = Nori.createView({
 
       mixins: [
         _mixinApplicationView,
         _mixinNudoruControls,
         _mixinComponentViews,
-        _mixinModelStateViews,
+        _mixinStoreStateViews,
         _mixinEventDelegator(),
         _mixinObservableSubject()
       ],
 
       initialize: function () {
         this.initializeApplicationView(['applicationscaffold', 'applicationcomponentsscaffold']);
-        this.initializeStateViews();
+        this.initializeStateViews(_appStore);
         this.initializeNudoruControls();
 
         this.configureViews();
@@ -37,7 +38,7 @@ define('app/view/AppView',
             screenWaitingOnPlayer = require('app/view/Screen.WaitingOnPlayer')(),
             screenMainGame        = require('app/view/Screen.MainGame')(),
             screenGameOver        = require('app/view/Screen.GameOver')(),
-            gameStates            = Nori.model().gameStates;
+            gameStates            = _appStore.gameStates;
 
         this.setViewMountPoint('#contents');
 
@@ -58,6 +59,6 @@ define('app/view/AppView',
 
     });
 
-    module.exports = AppView;
+    module.exports = AppView();
 
   });

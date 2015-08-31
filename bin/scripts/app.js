@@ -13,29 +13,27 @@ define('app/App',
       mixins: [],
 
       /**
-       * Create the main Nori App model and view.
+       * Create the main Nori App store and view.
        */
-      appModel: require('app/model/AppModel'),
-      appView : require('app/view/AppView'),
+      store: require('app/store/AppStore'),
+      view : require('app/view/AppView'),
       socket  : require('nori/service/SocketIO'),
 
       /**
-       * Intialize the appilcation, view and model
+       * Intialize the appilcation, view and store
        */
       initialize: function () {
-        this.initializeApplication(); // validates setup
-
         this.socket.initialize();
 
-        this.view().initialize();
+        this.view.initialize();
 
-        this.model().initialize(); // model will acquire data dispatch event when complete
-        this.model().subscribe('storeInitialized', this.onStoreInitialized.bind(this));
-        this.model().loadStore();
+        this.store.initialize(); // store will acquire data dispatch event when complete
+        this.store.subscribe('storeInitialized', this.onStoreInitialized.bind(this));
+        this.store.loadStore();
       },
 
       /**
-       * After the model data is ready
+       * After the store data is ready
        */
       onStoreInitialized: function () {
         this.runApplication();
@@ -45,11 +43,11 @@ define('app/App',
        * Remove the "Please wait" cover and start the app
        */
       runApplication: function () {
-        this.view().removeLoadingMessage();
-        this.view().render();
+        this.view.removeLoadingMessage();
+        this.view.render();
 
-        // View will show based on the current model state
-        this.model().setState({currentState:'PLAYER_SELECT'});
+        // View will show based on the current store state
+        this.store.setState({currentState:'PLAYER_SELECT'});
 
         //_rx.interval(500).take(5).subscribe(function() {
         //  this.socket.ping();
@@ -73,7 +71,7 @@ define('app/App',
         switch (payload.type) {
           case (this.socket.events().CONNECT):
             console.log("Connected!");
-            this.model().setState({socketIOID: payload.id});
+            this.store.setState({socketIOID: payload.id});
             return;
           case (this.socket.events().USER_CONNECTED):
             console.log("Another client connected");
@@ -158,29 +156,29 @@ define('app/Action/ActionCreator',
 
   });
 
-define('app/model/AppModel',
+define('app/store/AppStore',
   function (require, module, exports) {
 
     var _noriActionConstants     = require('nori/action/ActionConstants'),
-        _mixinMapFactory        = require('nori/model/MixinMapFactory'),
+        _mixinMapFactory        = require('nori/store/MixinMapFactory'),
         _mixinObservableSubject = require('nori/utils/MixinObservableSubject'),
-        _mixinReducerModel      = require('nori/model/MixinReducerModel');
+        _mixinReducerStore      = require('nori/store/MixinReducerStore');
 
     /**
-     * This application model contains "reducer model" functionality based on Redux.
-     * The model state may only be changed from events as applied in reducer functions.
-     * The model received all events from the event bus and forwards them to all
+     * This application store contains "reducer store" functionality based on Redux.
+     * The store state may only be changed from events as applied in reducer functions.
+     * The store received all events from the event bus and forwards them to all
      * reducer functions to modify state as needed. Once they have run, the
      * handleStateMutation function is called to dispatch an event to the bus, or
      * notify subscribers via an observable.
      *
      * Events => handleApplicationEvents => applyReducers => handleStateMutation => Notify
      */
-    var AppModel = Nori.createApplicationModel({
+    var AppStore = Nori.createStore({
 
       mixins: [
         _mixinMapFactory,
-        _mixinReducerModel,
+        _mixinReducerStore,
         _mixinObservableSubject()
       ],
 
@@ -188,7 +186,7 @@ define('app/model/AppModel',
 
       initialize: function () {
         this.addReducer(this.defaultReducerFunction);
-        this.initializeReducerModel();
+        this.initializeReducerStore();
         this.setState(Nori.config());
         this.createSubject('storeInitialized');
       },
@@ -240,7 +238,7 @@ define('app/model/AppModel',
 
         switch (event.type) {
 
-          case _noriActionConstants.CHANGE_MODEL_STATE:
+          case _noriActionConstants.CHANGE_STORE_STATE:
             return _.assign({}, state, event.payload.data);
 
           default:
@@ -258,7 +256,7 @@ define('app/model/AppModel',
 
     });
 
-    module.exports = AppModel;
+    module.exports = AppStore();
 
   });
 
@@ -266,10 +264,11 @@ define('app/model/AppModel',
 define('app/view/AppView',
   function (require, module, exports) {
 
-    var _mixinApplicationView   = require('nori/view/ApplicationView'),
+    var _appStore               = require('app/store/AppStore'),
+        _mixinApplicationView   = require('nori/view/ApplicationView'),
         _mixinNudoruControls    = require('nori/view/MixinNudoruControls'),
         _mixinComponentViews    = require('nori/view/MixinComponentViews'),
-        _mixinModelStateViews   = require('nori/view/MixinModelStateViews'),
+        _mixinStoreStateViews   = require('nori/view/MixinStoreStateViews'),
         _mixinEventDelegator    = require('nori/view/MixinEventDelegator'),
         _mixinObservableSubject = require('nori/utils/MixinObservableSubject');
 
@@ -277,20 +276,20 @@ define('app/view/AppView',
      * View for an application.
      */
 
-    var AppView = Nori.createApplicationView({
+    var AppView = Nori.createView({
 
       mixins: [
         _mixinApplicationView,
         _mixinNudoruControls,
         _mixinComponentViews,
-        _mixinModelStateViews,
+        _mixinStoreStateViews,
         _mixinEventDelegator(),
         _mixinObservableSubject()
       ],
 
       initialize: function () {
         this.initializeApplicationView(['applicationscaffold', 'applicationcomponentsscaffold']);
-        this.initializeStateViews();
+        this.initializeStateViews(_appStore);
         this.initializeNudoruControls();
 
         this.configureViews();
@@ -302,7 +301,7 @@ define('app/view/AppView',
             screenWaitingOnPlayer = require('app/view/Screen.WaitingOnPlayer')(),
             screenMainGame        = require('app/view/Screen.MainGame')(),
             screenGameOver        = require('app/view/Screen.GameOver')(),
-            gameStates            = Nori.model().gameStates;
+            gameStates            = _appStore.gameStates;
 
         this.setViewMountPoint('#contents');
 
@@ -323,7 +322,7 @@ define('app/view/AppView',
 
     });
 
-    module.exports = AppView;
+    module.exports = AppView();
 
   });
 
@@ -488,12 +487,13 @@ define('app/view/Screen.GameOver',
   function (require, module, exports) {
 
     var _noriActions = require('nori/action/ActionCreator'),
-        _appEvents = require('app/action/ActionConstants');
+        _appView         = require('app/view/AppView'),
+        _appStore        = require('app/store/AppStore');
 
     /**
      * Module for a dynamic application view for a route or a persistent view
      */
-    var Component = Nori.view().createComponentView({
+    var Component = _appView.createComponentView({
 
       /**
        * Initialize and bind, called once on first render. Parent component is
@@ -508,10 +508,10 @@ define('app/view/Screen.GameOver',
        * Create an object to be used to define events on DOM elements
        * @returns {}
        */
-      defineEvents: function() {
+      defineEvents: function () {
         return {
-          'click #gameover__button-replay': function() {
-            APP.model().apply(_noriActions.changeModelState({currentState:Nori.model().gameStates[1]}));
+          'click #gameover__button-replay': function () {
+            _appStore.apply(_noriActions.changeStoreState({currentState: _appStore.gameStates[1]}));
           }
         };
       },
@@ -520,14 +520,14 @@ define('app/view/Screen.GameOver',
        * Set initial state properties. Call once on first render
        */
       getInitialState: function () {
-        return APP.model().getState();
+        return _appStore.getState();
       },
 
       /**
-       * State change on bound models (map, etc.) Return nextState object
+       * State change on bound stores (map, etc.) Return nextState object
        */
       componentWillUpdate: function () {
-        var nextState = APP.model().getState();
+        var nextState = _appStore.getState();
         nextState.greeting += ' (updated)';
         return nextState;
       },
@@ -556,12 +556,13 @@ define('app/view/Screen.MainGame',
   function (require, module, exports) {
 
     var _noriActions = require('nori/action/ActionCreator'),
-        _appEvents = require('app/action/ActionConstants');
+        _appView         = require('app/view/AppView'),
+        _appStore        = require('app/store/AppStore');
 
     /**
      * Module for a dynamic application view for a route or a persistent view
      */
-    var Component = Nori.view().createComponentView({
+    var Component = _appView.createComponentView({
 
       /**
        * Initialize and bind, called once on first render. Parent component is
@@ -576,10 +577,10 @@ define('app/view/Screen.MainGame',
        * Create an object to be used to define events on DOM elements
        * @returns {}
        */
-      defineEvents: function() {
+      defineEvents: function () {
         return {
-          'click #game__button-skip': function() {
-            APP.model().apply(_noriActions.changeModelState({currentState:Nori.model().gameStates[4]}));
+          'click #game__button-skip': function () {
+            _appStore.apply(_noriActions.changeStoreState({currentState: _appStore.gameStates[4]}));
           }
         };
       },
@@ -588,14 +589,14 @@ define('app/view/Screen.MainGame',
        * Set initial state properties. Call once on first render
        */
       getInitialState: function () {
-        return APP.model().getState();
+        return _appStore.getState();
       },
 
       /**
-       * State change on bound models (map, etc.) Return nextState object
+       * State change on bound stores (map, etc.) Return nextState object
        */
       componentWillUpdate: function () {
-        var nextState = APP.model().getState();
+        var nextState = _appStore.getState();
         nextState.greeting += ' (updated)';
         return nextState;
       },
@@ -624,12 +625,13 @@ define('app/view/Screen.PlayerSelect',
   function (require, module, exports) {
 
     var _noriActions = require('nori/action/ActionCreator'),
-        _appEvents  = require('app/action/ActionConstants');
+        _appView         = require('app/view/AppView'),
+        _appStore        = require('app/store/AppStore');
 
     /**
      * Module for a dynamic application view for a route or a persistent view
      */
-    var Component = Nori.view().createComponentView({
+    var Component = _appView.createComponentView({
 
       /**
        * Initialize and bind, called once on first render. Parent component is
@@ -644,12 +646,12 @@ define('app/view/Screen.PlayerSelect',
        * Create an object to be used to define events on DOM elements
        * @returns {}
        */
-      defineEvents: function() {
+      defineEvents: function () {
         return {
           'click #select__button-joinroom'  : this.onJoinRoom.bind(this),
           'click #select__button-createroom': this.onCreateRoom.bind(this),
           'click #select__button-go'        : function () {
-            APP.model().apply(_noriActions.changeModelState({currentState:Nori.model().gameStates[2]}));
+            _appStore.apply(_noriActions.changeStoreState({currentState: _appStore.gameStates[2]}));
           }
         };
       },
@@ -658,14 +660,14 @@ define('app/view/Screen.PlayerSelect',
        * Set initial state properties. Call once on first render
        */
       getInitialState: function () {
-        return APP.model().getState();
+        return _appStore.getState();
       },
 
       /**
-       * State change on bound models (map, etc.) Return nextState object
+       * State change on bound stores (map, etc.) Return nextState object
        */
       componentWillUpdate: function () {
-        var nextState = APP.model().getState();
+        var nextState = _appStore.getState();
         nextState.greeting += ' (updated)';
         return nextState;
       },
@@ -679,12 +681,12 @@ define('app/view/Screen.PlayerSelect',
 
       onJoinRoom: function () {
         var roomID = document.querySelector('#select__roomid').value;
-        console.log('Join room '+roomID);
-        if(this.validateRoomID(roomID)) {
+        console.log('Join room ' + roomID);
+        if (this.validateRoomID(roomID)) {
           console.log('Room ID OK');
-          _noriActions.notifyUser('','Room ID ok!');
+          _appView.notify('', 'Room ID ok!');
         } else {
-          _noriActions.alertUser('Bad Room ID','The room ID is not correct. Must be a 5 digit number.');
+          _appView.alert('Bad Room ID', 'The room ID is not correct. Must be a 5 digit number.');
         }
       },
 
@@ -693,10 +695,10 @@ define('app/view/Screen.PlayerSelect',
        * @param roomID
        * @returns {boolean}
        */
-      validateRoomID: function(roomID) {
-        if(isNaN(parseInt(roomID))) {
+      validateRoomID: function (roomID) {
+        if (isNaN(parseInt(roomID))) {
           return false;
-        } else if(roomID.length !== 5) {
+        } else if (roomID.length !== 5) {
           return false;
         }
         return true;
@@ -723,12 +725,13 @@ define('app/view/Screen.Title',
   function (require, module, exports) {
 
     var _noriActions = require('nori/action/ActionCreator'),
-        _appEvents = require('app/action/ActionConstants');
+        _appView         = require('app/view/AppView'),
+        _appStore        = require('app/store/AppStore');
 
     /**
      * Module for a dynamic application view for a route or a persistent view
      */
-    var Component = Nori.view().createComponentView({
+    var Component = _appView.createComponentView({
 
       /**
        * Initialize and bind, called once on first render. Parent component is
@@ -743,10 +746,10 @@ define('app/view/Screen.Title',
        * Create an object to be used to define events on DOM elements
        * @returns {}
        */
-      defineEvents: function() {
+      defineEvents: function () {
         return {
-          'click #title__button-start': function() {
-            APP.model().apply(_noriActions.changeModelState({currentState:Nori.model().gameStates[1]}));
+          'click #title__button-start': function () {
+            _appStore.apply(_noriActions.changeStoreState({currentState: _appStore.gameStates[1]}));
           }
         };
       },
@@ -755,14 +758,14 @@ define('app/view/Screen.Title',
        * Set initial state properties. Call once on first render
        */
       getInitialState: function () {
-        return APP.model().getState();
+        return _appStore.getState();
       },
 
       /**
-       * State change on bound models (map, etc.) Return nextState object
+       * State change on bound stores (map, etc.) Return nextState object
        */
       componentWillUpdate: function () {
-        var nextState = APP.model().getState();
+        var nextState = _appStore.getState();
         nextState.greeting += ' (updated)';
         return nextState;
       },
@@ -791,12 +794,14 @@ define('app/view/Screen.WaitingOnPlayer',
   function (require, module, exports) {
 
     var _noriActions = require('nori/action/ActionCreator'),
-        _appEvents = require('app/action/ActionConstants');
+        _appView         = require('app/view/AppView'),
+        _appStore        = require('app/store/AppStore');
+    ;
 
     /**
      * Module for a dynamic application view for a route or a persistent view
      */
-    var Component = Nori.view().createComponentView({
+    var Component = _appView.createComponentView({
 
       /**
        * Initialize and bind, called once on first render. Parent component is
@@ -811,10 +816,10 @@ define('app/view/Screen.WaitingOnPlayer',
        * Create an object to be used to define events on DOM elements
        * @returns {}
        */
-      defineEvents: function() {
+      defineEvents: function () {
         return {
-          'click #waiting__button-skip': function() {
-            APP.model().apply(_noriActions.changeModelState({currentState:Nori.model().gameStates[3]}));
+          'click #waiting__button-skip': function () {
+            _appStore.apply(_noriActions.changeStoreState({currentState: _appStore.gameStates[3]}));
           }
         };
       },
@@ -823,14 +828,14 @@ define('app/view/Screen.WaitingOnPlayer',
        * Set initial state properties. Call once on first render
        */
       getInitialState: function () {
-        return APP.model().getState();
+        return _appStore.getState();
       },
 
       /**
-       * State change on bound models (map, etc.) Return nextState object
+       * State change on bound stores (map, etc.) Return nextState object
        */
       componentWillUpdate: function () {
-        var nextState = APP.model().getState();
+        var nextState = _appStore.getState();
         nextState.greeting += ' (updated)';
         return nextState;
       },
@@ -858,11 +863,13 @@ define('app/view/Screen.WaitingOnPlayer',
 define('app/view/TemplateViewComponent',
   function (require, module, exports) {
 
+    var view = require('app/view/AppView');
+
     /**
      * Module for a dynamic application view for a route or a persistent view
      */
 
-    var Component = Nori.view().createComponentView({
+    var Component = view.createComponentView({
       /**
        * Mixins are other modules/objects that multiple components share, provides
        * common functionality between then.
@@ -883,7 +890,7 @@ define('app/view/TemplateViewComponent',
       initialize: function (configProps) {
         //Bind to a map, update will be called on changes to the map
         //this.bindMap(map id string or map object);
-        //this.bindMap(APP.model());
+        //this.bindMap(APP.store());
         //custom init below here
         //this.setTemplate('<h1>{{ greeting }}</h1>'); // set custom HTML template
       },
@@ -902,14 +909,14 @@ define('app/view/TemplateViewComponent',
        * Set initial state properties. Call once on first render
        */
       getInitialState: function () {
-        return APP.model().getState();
+        return APP.store().getState();
       },
 
       /**
-       * State change on bound models (map, etc.) Return nextState object
+       * State change on bound stores (map, etc.) Return nextState object
        */
       componentWillUpdate: function () {
-        var nextState = APP.model().getState();
+        var nextState = APP.store().getState();
         nextState.greeting += ' (updated)';
         return nextState;
       },
@@ -946,65 +953,6 @@ define('app/view/TemplateViewComponent',
       }
 
     });
-
-    module.exports = Component;
-
-  });
-
-define('app/view/TemplateViewComponentFactory',
-  function (require, module, exports) {
-
-    /**
-     * Module for a dynamic application view for a route or a persistent view
-     * implemented as a factory module.
-     */
-    var Component = function () {
-
-      /**
-       * Initialize subview
-       * @param configProps {id, template, mountPoint}
-       */
-      function initialize(configProps) {
-        //this.bindMap(map id string or map object);
-        // custom init below here
-      }
-
-      /**
-       * State change on bound models (map, etc.) Update the component state
-       */
-      function componentWillUpdate() {
-        var obj = Object.create(null);
-        // Update state from stores
-        this.setState(obj);
-      }
-
-      /**
-       * Component HTML was attached to the DOM
-       */
-      function componentDidMount() {
-        /*
-         this.setEvents({
-         'click #button-id': handleButton
-         });
-         this.delegateEvents();
-         */
-      }
-
-      /**
-       * Component will be removed from the DOM
-       */
-      function componentWillUnmount() {
-        // cleanup
-      }
-
-      return {
-        initialize          : initialize,
-        componentWillUpdate : componentWillUpdate,
-        componentDidMount   : componentDidMount,
-        componentWillUnmount: componentWillUnmount
-      };
-
-    };
 
     module.exports = Component;
 

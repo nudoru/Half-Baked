@@ -1,27 +1,29 @@
 /**
- * Mixin view that allows for component views to be display on model state changes
+ * Mixin view that allows for component views to be display on store state changes
  */
 
-define('nori/view/MixinModelStateViews',
+define('nori/view/MixinStoreStateViews',
   function (require, module, exports) {
 
-    var MixinModelStateViews = function () {
+    var MixinStoreStateViews = function () {
 
       var _this,
+          _watchedStore,
           _currentViewID,
-          _currentModelState,
+          _currentStoreState,
           _stateViewMountPoint,
           _stateViewIDMap = Object.create(null);
 
       /**
        * Set up listeners
        */
-      function initializeStateViews() {
+      function initializeStateViews(store) {
         _this = this; // mitigation, Due to events, scope may be set to the window object
+        _watchedStore = store;
 
         this.createSubject('viewChange');
 
-        Nori.model().subscribe(function onStateChange() {
+        _watchedStore.subscribe(function onStateChange() {
           handleStateChange();
         });
       }
@@ -31,15 +33,15 @@ define('nori/view/MixinModelStateViews',
        * @param routeObj
        */
       function handleStateChange() {
-        showViewForCurrentModelState();
+        showViewForCurrentStoreState();
       }
 
-      function showViewForCurrentModelState() {
-        var state = Nori.model().getState().currentState;
+      function showViewForCurrentStoreState() {
+        var state = _watchedStore.getState().currentState;
         if (state) {
-          if (state !== _currentModelState) {
-            _currentModelState = state;
-            showStateViewComponent.bind(_this)(_currentModelState);
+          if (state !== _currentStoreState) {
+            _currentStoreState = state;
+            showStateViewComponent.bind(_this)(_currentStoreState);
           }
         }
       }
@@ -102,7 +104,7 @@ define('nori/view/MixinModelStateViews',
 
       return {
         initializeStateViews        : initializeStateViews,
-        showViewForCurrentModelState: showViewForCurrentModelState,
+        showViewForCurrentStoreState: showViewForCurrentStoreState,
         showStateViewComponent      : showStateViewComponent,
         setViewMountPoint           : setViewMountPoint,
         getViewMountPoint           : getViewMountPoint,
@@ -111,6 +113,6 @@ define('nori/view/MixinModelStateViews',
 
     };
 
-    module.exports = MixinModelStateViews();
+    module.exports = MixinStoreStateViews();
 
   });

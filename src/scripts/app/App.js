@@ -13,29 +13,27 @@ define('app/App',
       mixins: [],
 
       /**
-       * Create the main Nori App model and view.
+       * Create the main Nori App store and view.
        */
-      appModel: require('app/model/AppModel'),
-      appView : require('app/view/AppView'),
+      store: require('app/store/AppStore'),
+      view : require('app/view/AppView'),
       socket  : require('nori/service/SocketIO'),
 
       /**
-       * Intialize the appilcation, view and model
+       * Intialize the appilcation, view and store
        */
       initialize: function () {
-        this.initializeApplication(); // validates setup
-
         this.socket.initialize();
 
-        this.view().initialize();
+        this.view.initialize();
 
-        this.model().initialize(); // model will acquire data dispatch event when complete
-        this.model().subscribe('storeInitialized', this.onStoreInitialized.bind(this));
-        this.model().loadStore();
+        this.store.initialize(); // store will acquire data dispatch event when complete
+        this.store.subscribe('storeInitialized', this.onStoreInitialized.bind(this));
+        this.store.loadStore();
       },
 
       /**
-       * After the model data is ready
+       * After the store data is ready
        */
       onStoreInitialized: function () {
         this.runApplication();
@@ -45,11 +43,11 @@ define('app/App',
        * Remove the "Please wait" cover and start the app
        */
       runApplication: function () {
-        this.view().removeLoadingMessage();
-        this.view().render();
+        this.view.removeLoadingMessage();
+        this.view.render();
 
-        // View will show based on the current model state
-        this.model().setState({currentState:'PLAYER_SELECT'});
+        // View will show based on the current store state
+        this.store.setState({currentState:'PLAYER_SELECT'});
 
         //_rx.interval(500).take(5).subscribe(function() {
         //  this.socket.ping();
@@ -73,7 +71,7 @@ define('app/App',
         switch (payload.type) {
           case (this.socket.events().CONNECT):
             console.log("Connected!");
-            this.model().setState({socketIOID: payload.id});
+            this.store.setState({socketIOID: payload.id});
             return;
           case (this.socket.events().USER_CONNECTED):
             console.log("Another client connected");

@@ -11,9 +11,9 @@ define('nori/action/ActionCreator',
 
     var NoriActionCreator = {
 
-      changeModelState: function (data, id) {
+      changeStoreState: function (data, id) {
         var action = {
-          type   : _noriActionConstants.CHANGE_MODEL_STATE,
+          type   : _noriActionConstants.CHANGE_STORE_STATE,
           payload: {
             id  : id,
             data: data

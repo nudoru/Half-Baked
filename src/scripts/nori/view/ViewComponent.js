@@ -45,7 +45,7 @@ define('nori/view/ViewComponent',
 
       /**
        * Bind updates to the map ID to this view's update
-       * @param mapIDorObj Object to subscribe to or ID. Should implement nori/model/MixinObservableModel
+       * @param mapIDorObj Object to subscribe to or ID. Should implement nori/store/MixinObservableStore
        */
       function bindMap(mapIDorObj) {
         var map;
@@ -53,7 +53,7 @@ define('nori/view/ViewComponent',
         if (is.object(mapIDorObj)) {
           map = mapIDorObj;
         } else {
-          map = Nori.model().getMap(mapIDorObj) || Nori.model().getMapCollection(mapIDorObj);
+          map = Nori.store().getMap(mapIDorObj) || Nori.store().getMapCollection(mapIDorObj);
         }
 
         if (!map) {

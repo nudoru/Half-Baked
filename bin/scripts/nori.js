@@ -743,7 +743,10 @@ define('nori/utils/Router',
 
     };
 
-    module.exports = Router();
+    var r = Router();
+    r.initialize();
+
+    module.exports = r;
 
   });
 
@@ -954,7 +957,7 @@ define('nori/action/ActionConstants',
     var objUtils = require('nudoru/core/ObjectUtils');
 
     _.merge(module.exports, objUtils.keyMirror({
-      CHANGE_MODEL_STATE     : null
+      CHANGE_STORE_STATE     : null
     }));
 
   });
@@ -966,9 +969,9 @@ define('nori/action/ActionCreator',
 
     var NoriActionCreator = {
 
-      changeModelState: function (data, id) {
+      changeStoreState: function (data, id) {
         var action = {
-          type   : _noriActionConstants.CHANGE_MODEL_STATE,
+          type   : _noriActionConstants.CHANGE_STORE_STATE,
           payload: {
             id  : id,
             data: data
@@ -1176,7 +1179,7 @@ define('nori/service/SocketIO',
 
   });
 
-define('nori/model/Map',
+define('nori/store/Map',
   function (require, module, exports) {
 
     var Map = function () {
@@ -1193,7 +1196,7 @@ define('nori/model/Map',
 
       function initialize(initObj) {
         if (!initObj.id) {
-          throw new Error('Model must be init\'d with an id');
+          throw new Error('Store must be init\'d with an id');
         }
 
         _this = this;
@@ -1420,7 +1423,7 @@ define('nori/model/Map',
       function dispatchChange(type) {
         var payload = {
           id     : _id,
-          mapType: 'model'
+          mapType: 'store'
         };
 
         _this.notifySubscribers(payload);
@@ -1483,7 +1486,7 @@ define('nori/model/Map',
 
   });
 
-define('nori/model/MapCollection',
+define('nori/store/MapCollection',
   function (require, module, exports) {
 
     var MapCollection = function () {
@@ -1499,15 +1502,15 @@ define('nori/model/MapCollection',
 
       function initialize(initObj) {
         if (!initObj.id) {
-          throw new Error('ModelCollection must be init\'d with an id');
+          throw new Error('StoreCollection must be init\'d with an id');
         }
 
         _this = this;
         _id   = initObj.id;
 
         // TODO test
-        if (initObj.models) {
-          addMapsFromArray.call(_this, initObj.models);
+        if (initObj.stores) {
+          addMapsFromArray.call(_this, initObj.stores);
         }
       }
 
@@ -1560,7 +1563,7 @@ define('nori/model/MapCollection',
       }
 
       /**
-       * Add an array of Model instances
+       * Add an array of Store instances
        * @param sArry
        */
       function addMapsFromArray(sArry) {
@@ -1570,9 +1573,9 @@ define('nori/model/MapCollection',
       }
 
       /**
-       * Create an add child Model stores from an array of objects
+       * Create an add child Store stores from an array of objects
        * @param array Array of objects
-       * @param idKey Key on each object to use for the ID of that Model store
+       * @param idKey Key on each object to use for the ID of that Store store
        */
       function addFromObjArray(oArry, idKey) {
         oArry.forEach(function (obj) {
@@ -1585,7 +1588,7 @@ define('nori/model/MapCollection',
             id = _id + 'child' + _children.length;
           }
 
-          add(Nori.model().createMap({id: id, store: obj}));
+          add(Nori.store().createMap({id: id, store: obj}));
         });
         dispatchChange(_id, 'add_map');
       }
@@ -1607,7 +1610,7 @@ define('nori/model/MapCollection',
             id = _id + 'child' + _children.length;
           }
 
-          add(Nori.model().createMap({id: id, store: obj}));
+          add(Nori.store().createMap({id: id, store: obj}));
         });
         dispatchChange(_id, 'add_map');
       }
@@ -1642,7 +1645,7 @@ define('nori/model/MapCollection',
           _children.splice(currIdx, 1);
           dispatchChange(_id, 'remove_map');
         } else {
-          console.log(_id + ' remove, model not in collection: ' + storeID);
+          console.log(_id + ' remove, store not in collection: ' + storeID);
         }
       }
 
@@ -1659,7 +1662,7 @@ define('nori/model/MapCollection',
       }
 
       /**
-       * Gets the Model by ID
+       * Gets the Store by ID
        * @param storeID
        * @returns {T}
        */
@@ -1670,7 +1673,7 @@ define('nori/model/MapCollection',
       }
 
       /**
-       * Get the index in _children array by Model's ID
+       * Get the index in _children array by Store's ID
        * @param storeID
        * @returns {number}
        */
@@ -1817,19 +1820,19 @@ define('nori/model/MapCollection',
 
   });
 
-define('nori/model/MixinMapFactory',
+define('nori/store/MixinMapFactory',
   function (require, module, exports) {
 
     var MixinMapFactory = function () {
 
       var _mapCollectionList = Object.create(null),
           _mapList           = Object.create(null),
-          _mapCollectionFactory = require('nori/model/MapCollection'),
-          _mapFactory = require('nori/model/Map'),
+          _mapCollectionFactory = require('nori/store/MapCollection'),
+          _mapFactory = require('nori/store/Map'),
           _observableFactory = require('nori/utils/MixinObservableSubject');
 
       /**
-       * Create a new model collection and initalize
+       * Create a new store collection and initalize
        * @param initObj
        * @param extras
        * @returns {*}
@@ -1841,7 +1844,7 @@ define('nori/model/MixinMapFactory',
       }
 
       /**
-       * Create a new model and initialize
+       * Create a new store and initialize
        * @param initObj
        * @param extras
        * @returns {*}
@@ -1853,7 +1856,7 @@ define('nori/model/MixinMapFactory',
       }
 
       /**
-       * Get a model from the application collection
+       * Get a store from the application collection
        * @param storeID
        * @returns {void|*}
        */
@@ -1862,7 +1865,7 @@ define('nori/model/MixinMapFactory',
       }
 
       /**
-       * Get a model collection from the application collection
+       * Get a store collection from the application collection
        * @param storeID
        * @returns {void|*}
        */
@@ -1884,10 +1887,10 @@ define('nori/model/MixinMapFactory',
 
   });
 
-define('nori/model/MixinReducerModel',
+define('nori/store/MixinReducerStore',
   function (require, module, exports) {
 
-    var MixinReducerModel = function () {
+    var MixinReducerStore = function () {
       var _this,
           _state,
           _stateReducers       = [],
@@ -1898,7 +1901,7 @@ define('nori/model/MixinReducerModel',
       //----------------------------------------------------------------------------
 
       /**
-       * _state might not exist if subscribers are added before this model is initialized
+       * _state might not exist if subscribers are added before this store is initialized
        */
       function getState() {
         if (_state) {
@@ -1929,18 +1932,18 @@ define('nori/model/MixinReducerModel',
       /**
        * Set up event listener/receiver
        */
-      function initializeReducerModel() {
+      function initializeReducerStore() {
         if (!this.createSubject) {
-          console.warn('nori/model/MixinReducerModel needs nori/utils/MixinObservableSubject to notify');
+          console.warn('nori/store/MixinReducerStore needs nori/utils/MixinObservableSubject to notify');
         }
 
-        var simpleStoreFactory = require('nori/model/SimpleStore');
+        var simpleStoreFactory = require('nori/store/SimpleStore');
 
         _this  = this;
         _state = simpleStoreFactory();
 
         if (!_stateReducers) {
-          throw new Error('ReducerModel, must set a reducer before initialization');
+          throw new Error('ReducerStore, must set a reducer before initialization');
         }
 
         // Set initial state from empty event
@@ -1953,7 +1956,7 @@ define('nori/model/MixinReducerModel',
        * @param actionObject
        */
       function apply(actionObject) {
-        console.log('ReducerModel Apply: ', actionObject.type, actionObject.payload);
+        console.log('ReducerStore Apply: ', actionObject.type, actionObject.payload);
         applyReducers(actionObject);
       }
 
@@ -1972,7 +1975,7 @@ define('nori/model/MixinReducerModel',
 
       /**
        * Creates a new state from the combined reduces and action object
-       * Model state isn't modified, current state is passed in and mutated state returned
+       * Store state isn't modified, current state is passed in and mutated state returned
        * @param state
        * @param action
        * @returns {*|{}}
@@ -1988,7 +1991,7 @@ define('nori/model/MixinReducerModel',
 
       /**
        * Template reducer function
-       * Model state isn't modified, current state is passed in and mutated state returned
+       * Store state isn't modified, current state is passed in and mutated state returned
 
        function templateReducerFunction(state, event) {
         state = state || {};
@@ -2008,7 +2011,7 @@ define('nori/model/MixinReducerModel',
       //----------------------------------------------------------------------------
 
       return {
-        initializeReducerModel: initializeReducerModel,
+        initializeReducerStore: initializeReducerStore,
         getState              : getState,
         setState              : setState,
         apply                 : apply,
@@ -2021,11 +2024,11 @@ define('nori/model/MixinReducerModel',
 
     };
 
-    module.exports = MixinReducerModel();
+    module.exports = MixinReducerStore();
 
   });
 
-define('nori/model/SimpleStore',
+define('nori/store/SimpleStore',
   function (require, module, exports) {
 
     var SimpleStore = function () {
@@ -2281,7 +2284,7 @@ define('nori/view/MixinComponentViews',
           var componentViewFactory  = require('nori/view/ViewComponent'),
               eventDelegatorFactory = require('nori/view/MixinEventDelegator'),
               observableFactory     = require('nori/utils/MixinObservableSubject'),
-              simpleStoreFactory    = require('nori/model/SimpleStore'),
+              simpleStoreFactory    = require('nori/store/SimpleStore'),
               componentAssembly, finalComponent, previousInitialize;
 
           componentAssembly = [
@@ -2441,26 +2444,28 @@ define('nori/view/MixinEventDelegator',
 
   });
 
-define('nori/view/MixinModelStateViews',
+define('nori/view/MixinStoreStateViews',
   function (require, module, exports) {
 
-    var MixinModelStateViews = function () {
+    var MixinStoreStateViews = function () {
 
       var _this,
+          _watchedStore,
           _currentViewID,
-          _currentModelState,
+          _currentStoreState,
           _stateViewMountPoint,
           _stateViewIDMap = Object.create(null);
 
       /**
        * Set up listeners
        */
-      function initializeStateViews() {
+      function initializeStateViews(store) {
         _this = this; // mitigation, Due to events, scope may be set to the window object
+        _watchedStore = store;
 
         this.createSubject('viewChange');
 
-        Nori.model().subscribe(function onStateChange() {
+        _watchedStore.subscribe(function onStateChange() {
           handleStateChange();
         });
       }
@@ -2470,15 +2475,15 @@ define('nori/view/MixinModelStateViews',
        * @param routeObj
        */
       function handleStateChange() {
-        showViewForCurrentModelState();
+        showViewForCurrentStoreState();
       }
 
-      function showViewForCurrentModelState() {
-        var state = Nori.model().getState().currentState;
+      function showViewForCurrentStoreState() {
+        var state = _watchedStore.getState().currentState;
         if (state) {
-          if (state !== _currentModelState) {
-            _currentModelState = state;
-            showStateViewComponent.bind(_this)(_currentModelState);
+          if (state !== _currentStoreState) {
+            _currentStoreState = state;
+            showStateViewComponent.bind(_this)(_currentStoreState);
           }
         }
       }
@@ -2541,7 +2546,7 @@ define('nori/view/MixinModelStateViews',
 
       return {
         initializeStateViews        : initializeStateViews,
-        showViewForCurrentModelState: showViewForCurrentModelState,
+        showViewForCurrentStoreState: showViewForCurrentStoreState,
         showStateViewComponent      : showStateViewComponent,
         setViewMountPoint           : setViewMountPoint,
         getViewMountPoint           : getViewMountPoint,
@@ -2550,7 +2555,7 @@ define('nori/view/MixinModelStateViews',
 
     };
 
-    module.exports = MixinModelStateViews();
+    module.exports = MixinStoreStateViews();
 
   });
 
@@ -2773,7 +2778,7 @@ define('nori/view/ViewComponent',
 
       /**
        * Bind updates to the map ID to this view's update
-       * @param mapIDorObj Object to subscribe to or ID. Should implement nori/model/MixinObservableModel
+       * @param mapIDorObj Object to subscribe to or ID. Should implement nori/store/MixinObservableStore
        */
       function bindMap(mapIDorObj) {
         var map;
@@ -2781,7 +2786,7 @@ define('nori/view/ViewComponent',
         if (is.object(mapIDorObj)) {
           map = mapIDorObj;
         } else {
-          map = Nori.model().getMap(mapIDorObj) || Nori.model().getMapCollection(mapIDorObj);
+          map = Nori.store().getMap(mapIDorObj) || Nori.store().getMapCollection(mapIDorObj);
         }
 
         if (!map) {
@@ -3019,9 +3024,7 @@ define('nori/view/ViewComponent',
 
 var Nori = (function () {
 
-  var _model,
-      _view,
-      _dispatcher = require('nori/utils/Dispatcher'),
+  var _dispatcher = require('nori/utils/Dispatcher'),
       _router     = require('nori/utils/Router');
 
   // Switch Lodash to use Mustache style templates
@@ -3039,35 +3042,12 @@ var Nori = (function () {
     return _router;
   }
 
-  function getModel() {
-    return _model;
-  }
-
-  function getView() {
-    return _view;
-  }
-
   function getConfig() {
     return _.assign({}, (window.APP_CONFIG_DATA || {}));
   }
 
   function getCurrentRoute() {
     return _router.getCurrentRoute();
-  }
-
-  //----------------------------------------------------------------------------
-  //  Initialize
-  //----------------------------------------------------------------------------
-
-  /**
-   * Init the app and inject the model and view
-   * @param initObj view, model
-   */
-  function initializeApplication(initObj) {
-    _router.initialize();
-
-    _view  = _view || createApplicationView({});
-    _model = _model || createApplicationModel({});
   }
 
   //----------------------------------------------------------------------------
@@ -3098,13 +3078,14 @@ var Nori = (function () {
   }
 
   /**
-   * Creates main application model
+   * Creates main application store
    * @param custom
    * @returns {*}
    */
-  function createApplicationModel(custom) {
-    _model = buildFromMixins(custom);
-    return _model;
+  function createStore(custom) {
+    return function cs() {
+      return _.assign({}, buildFromMixins(custom));
+    };
   }
 
   /**
@@ -3112,9 +3093,10 @@ var Nori = (function () {
    * @param custom
    * @returns {*}
    */
-  function createApplicationView(custom) {
-    _view = buildFromMixins(custom);
-    return _view;
+  function createView(custom) {
+    return function cv() {
+      return _.assign({}, buildFromMixins(custom));
+    };
   }
 
   /**
@@ -3174,20 +3156,17 @@ var Nori = (function () {
   //----------------------------------------------------------------------------
 
   return {
-    initializeApplication : initializeApplication,
-    config                : getConfig,
-    dispatcher            : getDispatcher,
-    router                : getRouter,
-    model                 : getModel,
-    view                  : getView,
-    createApplication     : createApplication,
-    createApplicationModel: createApplicationModel,
-    createApplicationView : createApplicationView,
-    buildFromMixins       : buildFromMixins,
-    getCurrentRoute       : getCurrentRoute,
-    assignArray           : assignArray,
-    prop                  : prop,
-    withAttr              : withAttr
+    config           : getConfig,
+    dispatcher       : getDispatcher,
+    router           : getRouter,
+    createApplication: createApplication,
+    createStore      : createStore,
+    createView       : createView,
+    buildFromMixins  : buildFromMixins,
+    getCurrentRoute  : getCurrentRoute,
+    assignArray      : assignArray,
+    prop             : prop,
+    withAttr         : withAttr
   };
 
 }());

@@ -1,11 +1,13 @@
 define('app/view/TemplateViewComponent',
   function (require, module, exports) {
 
+    var view = require('app/view/AppView');
+
     /**
      * Module for a dynamic application view for a route or a persistent view
      */
 
-    var Component = Nori.view().createComponentView({
+    var Component = view.createComponentView({
       /**
        * Mixins are other modules/objects that multiple components share, provides
        * common functionality between then.
@@ -26,7 +28,7 @@ define('app/view/TemplateViewComponent',
       initialize: function (configProps) {
         //Bind to a map, update will be called on changes to the map
         //this.bindMap(map id string or map object);
-        //this.bindMap(APP.model());
+        //this.bindMap(APP.store());
         //custom init below here
         //this.setTemplate('<h1>{{ greeting }}</h1>'); // set custom HTML template
       },
@@ -45,14 +47,14 @@ define('app/view/TemplateViewComponent',
        * Set initial state properties. Call once on first render
        */
       getInitialState: function () {
-        return APP.model().getState();
+        return APP.store().getState();
       },
 
       /**
-       * State change on bound models (map, etc.) Return nextState object
+       * State change on bound stores (map, etc.) Return nextState object
        */
       componentWillUpdate: function () {
-        var nextState = APP.model().getState();
+        var nextState = APP.store().getState();
         nextState.greeting += ' (updated)';
         return nextState;
       },
