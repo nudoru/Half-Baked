@@ -1,5 +1,5 @@
 {
-  "name": "nori-app",
+  "name": "Half-Baked",
   "version": "0.0.1",
   "description": "Nori Application Framework",
   "author": "Matt Perkins <matt@nudoru.com>",
@@ -12,8 +12,6 @@
     "node": "0.10.36"
   },
   "devDependencies": {
-    "babelify": "^6.3.0",
-    "browserify": "^11.0.1",
     "chai": "^3.0.0",
     "del": "^2.0.0",
     "gulp": "^3.9.0",
@@ -30,8 +28,7 @@
     "jshint": "latest",
     "jshint-stylish": "^2.0.1",
     "mocha": "^2.2.5",
-    "run-sequence": "^1.1.2",
-    "vinyl-source-stream": "^1.1.0"
+    "run-sequence": "^1.1.2"
   },
   "scripts": {
     "start": "node server/server.js",

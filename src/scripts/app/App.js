@@ -1,107 +1,102 @@
-ndefine('app/App',
-  function (nrequire, module, exports) {
+var _rx = require('../nori/utils/Rx.js');
 
-    var _rx = nrequire('nori/utils/Rx');
+/**
+ * "Controller" for a Nori application. The controller is responsible for
+ * bootstrapping the app and possibly handling socket/server interaction.
+ * Any additional functionality should be handled in a specific module.
+ */
+var App = Nori.createApplication({
 
-    /**
-     * "Controller" for a Nori application. The controller is responsible for
-     * bootstrapping the app and possibly handling socket/server interaction.
-     * Any additional functionality should be handled in a specific module.
-     */
-    var App = Nori.createApplication({
+  mixins: [],
 
-      mixins: [],
+  /**
+   * Create the main Nori App store and view.
+   */
+  store : require('./store/AppStore.js'),
+  view  : require('./view/AppView.js'),
+  socket: require('../nori/service/SocketIO.js'),
 
-      /**
-       * Create the main Nori App store and view.
-       */
-      store: nrequire('app/store/AppStore'),
-      view : nrequire('app/view/AppView'),
-      socket  : nrequire('nori/service/SocketIO'),
+  /**
+   * Intialize the appilcation, view and store
+   */
+  initialize: function () {
+    this.socket.initialize();
 
-      /**
-       * Intialize the appilcation, view and store
-       */
-      initialize: function () {
-        this.socket.initialize();
+    this.view.initialize();
 
-        this.view.initialize();
+    this.store.initialize(); // store will acquire data dispatch event when complete
+    this.store.subscribe('storeInitialized', this.onStoreInitialized.bind(this));
+    this.store.loadStore();
+  },
 
-        this.store.initialize(); // store will acquire data dispatch event when complete
-        this.store.subscribe('storeInitialized', this.onStoreInitialized.bind(this));
-        this.store.loadStore();
-      },
+  /**
+   * After the store data is ready
+   */
+  onStoreInitialized: function () {
+    this.runApplication();
+  },
 
-      /**
-       * After the store data is ready
-       */
-      onStoreInitialized: function () {
-        this.runApplication();
-      },
+  /**
+   * Remove the "Please wait" cover and start the app
+   */
+  runApplication: function () {
+    this.view.removeLoadingMessage();
+    this.view.render();
 
-      /**
-       * Remove the "Please wait" cover and start the app
-       */
-      runApplication: function () {
-        this.view.removeLoadingMessage();
-        this.view.render();
+    // View will show based on the current store state
+    this.store.setState({currentState: 'PLAYER_SELECT'});
 
-        // View will show based on the current store state
-        this.store.setState({currentState:'PLAYER_SELECT'});
+    //_rx.interval(500).take(5).subscribe(function() {
+    //  this.socket.ping();
+    //}.bind(this));
+    //_rx.doEvery(1000, function() {
+    //  this.socket.ping();
+    //}.bind(this));
+  },
 
-        //_rx.interval(500).take(5).subscribe(function() {
-        //  this.socket.ping();
-        //}.bind(this));
-        //_rx.doEvery(1000, function() {
-        //  this.socket.ping();
-        //}.bind(this));
-      },
+  /**
+   * All messages from the Socket.IO server will be forwarded here
+   * @param payload
+   */
+  handleSocketMessage: function (payload) {
+    if (!payload) {
+      return;
+    }
 
-      /**
-       * All messages from the Socket.IO server will be forwarded here
-       * @param payload
-       */
-      handleSocketMessage: function (payload) {
-        if (!payload) {
-          return;
-        }
+    console.log("from Socket.IO server", payload);
 
-        console.log("from Socket.IO server", payload);
+    switch (payload.type) {
+      case (this.socket.events().CONNECT):
+        console.log("Connected!");
+        this.store.setState({socketIOID: payload.id});
+        return;
+      case (this.socket.events().USER_CONNECTED):
+        console.log("Another client connected");
+        return;
+      case (this.socket.events().USER_DISCONNECTED):
+        console.log("Another client disconnected");
+        return;
+      case (this.socket.events().DROPPED):
+        console.log("You were dropped!", payload.payload);
+        return;
+      case (this.socket.events().SYSTEM_MESSAGE):
+        console.log("System message", payload.payload);
+        return;
+      case (this.socket.events().CREATE_ROOM):
+        console.log("create room");
+        return;
+      case (this.socket.events().JOIN_ROOM):
+        console.log("join room");
+        return;
+      case (this.socket.events().LEAVE_ROOM):
+        console.log("leave room");
+        return;
+      default:
+        console.warn("Unhandled SocketIO message type", payload);
+        return;
+    }
+  }
 
-        switch (payload.type) {
-          case (this.socket.events().CONNECT):
-            console.log("Connected!");
-            this.store.setState({socketIOID: payload.id});
-            return;
-          case (this.socket.events().USER_CONNECTED):
-            console.log("Another client connected");
-            return;
-          case (this.socket.events().USER_DISCONNECTED):
-            console.log("Another client disconnected");
-            return;
-          case (this.socket.events().DROPPED):
-            console.log("You were dropped!", payload.payload);
-            return;
-          case (this.socket.events().SYSTEM_MESSAGE):
-            console.log("System message", payload.payload);
-            return;
-          case (this.socket.events().CREATE_ROOM):
-            console.log("create room");
-            return;
-          case (this.socket.events().JOIN_ROOM):
-            console.log("join room");
-            return;
-          case (this.socket.events().LEAVE_ROOM):
-            console.log("leave room");
-            return;
-          default:
-            console.warn("Unhandled SocketIO message type", payload);
-            return;
-        }
-      }
+});
 
-    });
-
-    module.exports = App;
-
-  });
+module.exports = App;

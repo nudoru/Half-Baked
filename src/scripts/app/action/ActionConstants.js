@@ -1,21 +1,12 @@
-ndefine('app/action/ActionConstants',
-  function (nrequire, module, exports) {
-    var objUtils = nrequire('nudoru/core/ObjectUtils');
-
-    /**
-     * Event name string constants
-     */
-
-    _.merge(module.exports, objUtils.keyMirror({
-      CHANGE_GAME_STATE: null,
-      LOCAL_PLAYER_CONNECT: null,
-      SELECT_PLAYER: null,
-      REMOTE_PLAYER_CONNECT: null,
-      GAME_START: null,
-      LOCAL_QUESTION: null,
-      REMOTE_QUESTION: null,
-      LOCAL_PLAYER_HEALTH_CHANGE: null,
-      REMOTE_PLAYER_HEALTH_CHANGE: null,
-      GAME_OVER: null
-    }));
-  });
+module.exports = {
+  CHANGE_GAME_STATE          : 'CHANGE_GAME_STATE',
+  LOCAL_PLAYER_CONNECT       : 'LOCAL_PLAYER_CONNECT',
+  SELECT_PLAYER              : 'SELECT_PLAYER',
+  REMOTE_PLAYER_CONNECT      : 'REMOTE_PLAYER_CONNECT',
+  GAME_START                 : 'GAME_START',
+  LOCAL_QUESTION             : 'LOCAL_QUESTION',
+  REMOTE_QUESTION            : 'REMOTE_QUESTION',
+  LOCAL_PLAYER_HEALTH_CHANGE : 'LOCAL_PLAYER_HEALTH_CHANGE',
+  REMOTE_PLAYER_HEALTH_CHANGE: 'REMOTE_PLAYER_HEALTH_CHANGE',
+  GAME_OVER                  : 'GAME_OVER'
+};
