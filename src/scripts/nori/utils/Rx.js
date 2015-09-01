@@ -21,8 +21,11 @@ module.exports = {
     return Rx.Observable.interval(ms);
   },
 
-  doEvery: function (ms, handler) {
-    return this.interval(ms).subscribe(handler);
+  doEvery: function (ms, ...args) {
+    if(is.function(args[0])) {
+      return this.interval(ms).subscribe(args[0]);
+    }
+    return this.interval(ms).take(args[0]).subscribe(args[1]);
   },
 
   just: function (value) {

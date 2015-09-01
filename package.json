@@ -49,19 +49,5 @@
     "morgan": "^1.6.1",
     "path": "^0.11.14",
     "socket.io": "^1.3.6"
-  },
-  "jshintConfig": {
-    "-W014": "true",
-    "-W030": "true",
-    "-W061": "true",
-    "-W069": "true",
-    "-W083": "true",
-    "force": "true",
-    "curly": "true",
-    "eqeqeq": "true",
-    "eqnull": "true",
-    "browser": "true",
-    "maxdepth": "4",
-    "maxcomplexity": "10"
   }
 }

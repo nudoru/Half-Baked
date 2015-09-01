@@ -114,9 +114,9 @@ gulp.task('browserify', function () {
     .bundle()
     .on('error', errorLog)
     .pipe(source('app.bundle.js'))
-    .pipe(buffer())
-    .pipe(uglify({mangle: false, compress: false}))
-    .on('error', errorLog)
+    //.pipe(buffer())
+    //.pipe(uglify({mangle: false, compress: false}))
+    //.on('error', errorLog)
     .pipe(gulp.dest('bin/scripts'))
     .pipe(livereload());
 });

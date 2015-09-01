@@ -46,12 +46,7 @@ var App = Nori.createApplication({
     // View will show based on the current store state
     this.store.setState({currentState: 'PLAYER_SELECT'});
 
-    //_rx.interval(500).take(5).subscribe(function() {
-    //  this.socket.ping();
-    //}.bind(this));
-    //_rx.doEvery(1000, function() {
-    //  this.socket.ping();
-    //}.bind(this));
+    _rx.doEvery(1000, 3, () => this.socket.ping());
   },
 
   /**

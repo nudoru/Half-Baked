@@ -33,7 +33,9 @@ var ModalCoverView = function () {
   }
 
   function onModalClick() {
-    if (_notDismissable) return;
+    if (_notDismissable) {
+      return;
+    }
     hide(true);
   }
 

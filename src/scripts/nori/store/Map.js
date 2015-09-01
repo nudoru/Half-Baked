@@ -2,7 +2,7 @@
  * Map data type
  */
 
-var Map = function () {
+var NMap = function () {
   var _this,
       _id,
       _parentCollection,
@@ -302,4 +302,4 @@ var Map = function () {
 
 };
 
-module.exports = Map;
+module.exports = NMap;
