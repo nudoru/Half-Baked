@@ -32,16 +32,14 @@ var Component = _appView.createComponentView({
    * Set initial state properties. Call once on first render
    */
   getInitialState: function () {
-    return _appStore.getState();
+    return {};
   },
 
   /**
    * State change on bound stores (map, etc.) Return nextState object
    */
   componentWillUpdate: function () {
-    var nextState = _appStore.getState();
-    nextState.greeting += ' (updated)';
-    return nextState;
+    return {};
   },
 
   /**

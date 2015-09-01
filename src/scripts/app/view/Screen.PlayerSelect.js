@@ -1,6 +1,7 @@
 var _noriActions = require('../../nori/action/ActionCreator'),
     _appView     = require('./AppView'),
-    _appStore    = require('../store/AppStore');
+    _appStore    = require('../store/AppStore'),
+    _socketIO    = require('../../nori/service/SocketIO.js');
 
 /**
  * Module for a dynamic application view for a route or a persistent view
@@ -34,16 +35,14 @@ var Component = _appView.createComponentView({
    * Set initial state properties. Call once on first render
    */
   getInitialState: function () {
-    return _appStore.getState();
+    return {};
   },
 
   /**
    * State change on bound stores (map, etc.) Return nextState object
    */
   componentWillUpdate: function () {
-    var nextState = _appStore.getState();
-    nextState.greeting += ' (updated)';
-    return nextState;
+    return {};
   },
 
   /**
@@ -59,6 +58,7 @@ var Component = _appView.createComponentView({
     if (this.validateRoomID(roomID)) {
       console.log('Room ID OK');
       _appView.notify('', 'Room ID ok!');
+      _socketIO.notifyServer(_socketIO.events().JOIN_ROOM, {id: roomID});
     } else {
       _appView.alert('Bad Room ID', 'The room ID is not correct. Must be a 5 digit number.');
     }
@@ -80,6 +80,7 @@ var Component = _appView.createComponentView({
 
   onCreateRoom: function () {
     console.log('create room');
+    _socketIO.notifyServer(_socketIO.events().CREATE_ROOM, {});
   },
 
   /**

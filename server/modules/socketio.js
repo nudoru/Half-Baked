@@ -1,13 +1,14 @@
-var socketIO         = require('socket.io'),
-    _                = require('lodash-node'),
-    moment           = require('moment'),
-    eventConstants   = require('./socketioevents'),
+var socketIO              = require('socket.io'),
+    _                     = require('lodash-node'),
+    moment                = require('moment'),
+    eventConstants        = require('./socketioevents'),
     io,
-    currentSocket,
-    currentID,
-    connectionsMap   = Object.create(null),
-    connectionsCount = 0,
-    maxConnections   = 2;
+    _currentSocket,
+    _currentID,
+    _connectionsMap        = {},
+    _roomMap               = {},
+    _connectionsCount      = 0,
+    _maxConnectionsPerRoom = 2;
 
 //----------------------------------------------------------------------------
 //  Server
@@ -21,17 +22,17 @@ module.exports = {
 };
 
 function onConnect(socket) {
-  currentSocket = socket;
-  currentID     = socket.id;
-  connectionsCount++;
-  console.log('Client connected', currentID);
-  addConnectionToMap(currentID);
+  _currentSocket = socket;
+  _currentID     = socket.id;
+  _connectionsCount++;
+  console.log('Client connected', _currentID);
+  addConnectionToMap(_currentID);
 
-  currentSocket.on(eventConstants.NOTIFY_SERVER, onNotifyServer);
-  currentSocket.on('disconnect', onDisconnect);
+  _currentSocket.on(eventConstants.NOTIFY_SERVER, onNotifyServer);
+  _currentSocket.on('disconnect', onDisconnect);
 
-  emitClientNotification(eventConstants.CONNECT, getConnectionsMapForID(currentID).name);
-  broadcastClientNotification(eventConstants.USER_CONNECTED, getConnectionsMapForID(currentID).name);
+  emitClientNotification(eventConstants.CONNECT, getConnectionsMapForID(_currentID).name);
+  broadcastClientNotification(eventConstants.USER_CONNECTED, getConnectionsMapForID(_currentID).name);
 }
 
 function onNotifyServer(payload) {
@@ -40,7 +41,7 @@ function onNotifyServer(payload) {
 
 function onDisconnect() {
   console.log('disconnect');
-  connectionsCount--;
+  _connectionsCount--;
   broadcastClientNotification(eventConstants.USER_DISCONNECTED);
 }
 
@@ -81,18 +82,77 @@ function handleSocketMessage(payload) {
 //----------------------------------------------------------------------------
 
 function createRoomID() {
-  return ( Math.random() * 100000 ) | 0;
+  return ( Math.random() * 100000 ) || 0;
 }
 
+function createRoom() {
+  var roomId      = createRoomID;
+  _roomMap[roomId] = [];
+  return roomId;
+}
 
+function createAndAddConnectionToRoom(connection) {
+  var roomID = createRoom;
+  return addConnectionToRoom(roomID, connection);
+}
+
+function isValidRoomID(roomID) {
+  return _roomMap.hasOwnProperty(roomID);
+}
+
+function getNumConnectionsInRoom(roomID) {
+  return _roomMap[roomID].length;
+}
+
+function deleteRoom(roomID) {
+  if (isValidRoomID(roomID)) {
+    console.log('Deleting room ' + roomID + ' with ' + _roomMap[roomID].length + 'connections');
+    // TODO disconnect? or at least notify
+    //roomMap[roomMap].forEach(function(connection) {
+    //  // tell 'em
+    //});
+    delete _roomMap[roomID];
+    return true;
+  } else {
+    console.log('No room to delete ' + roomID);
+  }
+  return false;
+}
+
+function addConnectionToRoom(roomID, connection) {
+  if (isValidRoomID(roomID)) {
+    console.log('Add connection to room ' + roomID);
+    if(getNumConnectionsInRoom(roomID) < _maxConnectionsPerRoom) {
+      _roomMap[roomID].push(connection);
+      return true;
+    } else {
+      console.log('Max connections in room ' + roomID);
+    }
+  } else {
+    console.log('Add to room, no room id ' + roomID);
+  }
+  return false;
+}
+
+function removeConnectionFromRoom(roomID, connection) {
+  if (isValidRoomID(roomID)) {
+    console.log('Add connection to room ' + roomID);
+    var idx = _roomMap[roomID].indexOf(connection);
+    _roomMap[roomID].splice(idx, 1);
+    return true;
+  } else {
+    console.log('Remove from room, no room id ' + roomID);
+    return false;
+  }
+}
 
 //----------------------------------------------------------------------------
 //  Connections map
 //----------------------------------------------------------------------------
 
 function addConnectionToMap(id) {
-  connectionsMap[id] = {
-    name     : 'Connection' + connectionsCount,
+  _connectionsMap[id] = {
+    name     : 'Connection' + _connectionsCount,
     id       : id,
     connected: true,
     status   : null
@@ -100,7 +160,7 @@ function addConnectionToMap(id) {
 }
 
 function getConnectionsMapForID(id) {
-  return _.assign({}, connectionsMap[id]);
+  return _.assign({}, _connectionsMap[id]);
 }
 
 //----------------------------------------------------------------------------
@@ -112,9 +172,9 @@ function formattedDate() {
 }
 
 function emitClientNotification(type, payload) {
-  currentSocket.emit(eventConstants.NOTIFY_CLIENT, {
+  _currentSocket.emit(eventConstants.NOTIFY_CLIENT, {
     type   : type,
-    id     : currentID,
+    id     : _currentID,
     time   : formattedDate(),
     payload: payload
   });
@@ -123,7 +183,7 @@ function emitClientNotification(type, payload) {
 function broadcastClientNotification(type, payload) {
   io.emit(eventConstants.NOTIFY_CLIENT, {
     type   : type,
-    id     : currentID,
+    id     : _currentID,
     time   : formattedDate(),
     payload: payload
   });
