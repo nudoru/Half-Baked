@@ -1,7 +1,7 @@
-var socketIO              = require('socket.io'),
-    _                     = require('lodash-node'),
-    moment                = require('moment'),
-    eventConstants        = require('./socketioevents'),
+var socketIO               = require('socket.io'),
+    _                      = require('lodash-node'),
+    moment                 = require('moment'),
+    eventConstants         = require('./socketioevents'),
     io,
     _currentSocket,
     _currentID,
@@ -64,9 +64,11 @@ function handleSocketMessage(payload) {
       return;
     case (eventConstants.CREATE_ROOM):
       console.log("create room");
+      createAndAddConnectionToRoom(_currentID);
       return;
     case (eventConstants.JOIN_ROOM):
       console.log("join room");
+      addConnectionToRoom(payload.payload.roomID, _currentID);
       return;
     case (eventConstants.LEAVE_ROOM):
       console.log("leave room");
@@ -82,18 +84,33 @@ function handleSocketMessage(payload) {
 //----------------------------------------------------------------------------
 
 function createRoomID() {
-  return ( Math.random() * 100000 ) || 0;
+  return Math.floor(Math.random() * (99999 - 10000 + 1)) + 10000;
 }
 
 function createRoom() {
-  var roomId      = createRoomID;
+  var roomId       = createRoomID();
   _roomMap[roomId] = [];
   return roomId;
 }
 
-function createAndAddConnectionToRoom(connection) {
-  var roomID = createRoom;
-  return addConnectionToRoom(roomID, connection);
+function checkForGameStart(roomID) {
+  if(_roomMap[roomID].length === 2) {
+    // TODO need to send over remote player data
+    emitClientNotification(eventConstants.GAME_START, {roomID: roomID});
+    return;
+  }
+  console.log('Not ready to start');
+}
+
+
+function createAndAddConnectionToRoom(socketID) {
+  var roomID  = createRoom(),
+      success = addConnectionToRoom(roomID, socketID);
+  if (success) {
+    emitClientNotification(eventConstants.JOIN_ROOM, {roomID: roomID});
+  } else {
+    emitClientNotification(eventConstants.MESSAGE, 'Error creating and adding to room.');
+  }
 }
 
 function isValidRoomID(roomID) {
@@ -119,17 +136,21 @@ function deleteRoom(roomID) {
   return false;
 }
 
-function addConnectionToRoom(roomID, connection) {
+function addConnectionToRoom(roomID, socketID) {
   if (isValidRoomID(roomID)) {
-    console.log('Add connection to room ' + roomID);
-    if(getNumConnectionsInRoom(roomID) < _maxConnectionsPerRoom) {
-      _roomMap[roomID].push(connection);
+    console.log('Add socketID to room ' + roomID);
+    if (getNumConnectionsInRoom(roomID) < _maxConnectionsPerRoom) {
+      _roomMap[roomID].push(socketID);
+      emitClientNotification(eventConstants.JOIN_ROOM, {roomID: roomID});
+      checkForGameStart(roomID);
       return true;
     } else {
       console.log('Max connections in room ' + roomID);
+      emitClientNotification(eventConstants.MESSAGE, 'Too many people are in that room.');
     }
   } else {
     console.log('Add to room, no room id ' + roomID);
+    emitClientNotification(eventConstants.MESSAGE, 'That room doesn\'t exist on the server');
   }
   return false;
 }

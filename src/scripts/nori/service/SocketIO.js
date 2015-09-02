@@ -2,6 +2,7 @@ var SocketIOConnector = function () {
 
   var _subject  = new Rx.BehaviorSubject(),
       _socketIO = io(),
+      _log = [],
       _events   = {
         PING             : 'ping',
         PONG             : 'pong',
@@ -17,7 +18,9 @@ var SocketIOConnector = function () {
         MESSAGE          : 'message',
         CREATE_ROOM      : 'create_room',
         JOIN_ROOM        : 'join_room',
-        LEAVE_ROOM       : 'leave_room'
+        LEAVE_ROOM       : 'leave_room',
+        GAME_START       : 'game_start',
+        GAME_END         : 'game_end'
       };
 
 
@@ -30,6 +33,8 @@ var SocketIOConnector = function () {
    * @param payload {type, id, time, payload}
    */
   function onNotifyClient(payload) {
+    _log.push(payload);
+
     if (payload.type === _events.PING) {
       notifyServer(_events.PONG, {});
     } else if (payload.type === _events.PONG) {

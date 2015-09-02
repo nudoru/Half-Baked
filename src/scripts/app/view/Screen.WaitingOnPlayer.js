@@ -32,7 +32,13 @@ var Component = _appView.createComponentView({
    * Set initial state properties. Call once on first render
    */
   getInitialState: function () {
-    return {};
+    var appState = _appStore.getState();
+    console.log(appState);
+    return {
+      name      : appState.localPlayer.name,
+      appearance: appState.localPlayer.appearance,
+      roomID    : appState.session.roomID,
+    };
   },
 
   /**

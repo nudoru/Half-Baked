@@ -115,9 +115,12 @@ var MixinReducerStore = function () {
         switch (event.type) {
           case _noriActionConstants.MODEL_DATA_CHANGED:
             // can compose other reducers
-            // return _.assign({}, state, otherStateTransformer(state));
-            return _.assign({}, state, {prop: event.payload.value});
+            // return _.merge({}, state, otherStateTransformer(state));
+            return _.merge({}, state, {prop: event.payload.value});
+          case undefined:
+            return state;
           default:
+            console.warn('Reducer store, unhandled event type: '+event.type);
             return state;
         }
       }

@@ -1,7 +1,8 @@
 var _noriActionConstants    = require('../../nori/action/ActionConstants.js'),
     _appActionConstants     = require('../action/ActionConstants.js'),
     _mixinObservableSubject = require('../../nori/utils/MixinObservableSubject.js'),
-    _mixinReducerStore      = require('../../nori/store/MixinReducerStore.js');
+    _mixinReducerStore      = require('../../nori/store/MixinReducerStore.js'),
+    _numUtils    = require('../../nudoru/core/NumberUtils.js');
 
 /**
  * This application store contains "reducer store" functionality based on Redux.
@@ -23,7 +24,7 @@ var AppStore = Nori.createStore({
   gameStates: ['TITLE', 'PLAYER_SELECT', 'WAITING_ON_PLAYER', 'MAIN_GAME', 'GAME_OVER'],
 
   initialize: function () {
-    this.addReducer(this.defaultReducerFunction);
+    this.addReducer(this.mainStateReducer);
     this.initializeReducerStore();
     this.setState(Nori.config());
     this.createSubject('storeInitialized');
@@ -41,9 +42,9 @@ var AppStore = Nori.createStore({
       localPlayer : {
         id        : '',
         type      : '',
-        name      : '',
+        name      : 'Mystery Player ' + _numUtils.rndNumber(100, 999),
         health    : 6,
-        appearance: '',
+        appearance: 'green',
         behaviors : []
       },
       remotePlayer: {
@@ -77,7 +78,7 @@ var AppStore = Nori.createStore({
    * @param event
    * @returns {*}
    */
-  defaultReducerFunction: function (state, event) {
+  mainStateReducer: function (state, event) {
     state = state || {};
 
     switch (event.type) {
@@ -86,9 +87,11 @@ var AppStore = Nori.createStore({
       case _appActionConstants.SET_LOCAL_PLAYER_PROPS:
       case _appActionConstants.SET_REMOTE_PLAYER_PROPS:
       case _appActionConstants.SET_SESSION_PROPS:
-        return _.assign({}, state, event.payload.data);
-
+        return _.merge({}, state, event.payload.data);
+      case undefined:
+        return state;
       default:
+        console.warn('Reducer store, unhandled event type: '+event.type);
         return state;
     }
   },
@@ -98,7 +101,6 @@ var AppStore = Nori.createStore({
    * not check to see if the state was actually updated.
    */
   handleStateMutation: function () {
-    console.log('New state:', this.getState());
     this.notifySubscribers(this.getState());
   }
 

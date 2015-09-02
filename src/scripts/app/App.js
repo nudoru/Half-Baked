@@ -1,4 +1,6 @@
-var _rx = require('../nori/utils/Rx.js');
+var _rx          = require('../nori/utils/Rx.js'),
+    _appActions  = require('./action/ActionCreator.js'),
+    _noriActions = require('../nori/action/ActionCreator.js');
 
 /**
  * "Controller" for a Nori application. The controller is responsible for
@@ -21,6 +23,7 @@ var App = Nori.createApplication({
    */
   initialize: function () {
     this.socket.initialize();
+    this.socket.subscribe(this.handleSocketMessage.bind(this));
 
     this.view.initialize();
 
@@ -60,7 +63,6 @@ var App = Nori.createApplication({
     }
 
     console.log("from Socket.IO server", payload);
-
     switch (payload.type) {
       case (this.socket.events().CONNECT):
         console.log("Connected!");
@@ -82,17 +84,50 @@ var App = Nori.createApplication({
         console.log("create room");
         return;
       case (this.socket.events().JOIN_ROOM):
-        console.log("join room");
+        console.log("join room", payload.payload);
+        this.handleJoinNewlyCreatedRoom(payload.payload.roomID);
         return;
       case (this.socket.events().LEAVE_ROOM):
         console.log("leave room");
+        return;
+      case (this.socket.events().GAME_START):
+        console.log("GAME STARTed");
+        this.handleGameStart();
+        return;
+      case (this.socket.events().GAME_END):
+        console.log("Game ended");
+        return;
+      case (this.socket.events().SYSTEM_MESSAGE):
+      case (this.socket.events().BROADCAST):
+      case (this.socket.events().MESSAGE):
+        this.view.alert(payload.payload, payload.type);
         return;
       default:
         console.warn("Unhandled SocketIO message type", payload);
         return;
     }
-  }
+  },
 
+  handleJoinNewlyCreatedRoom: function (roomID) {
+    var setRoom               = _appActions.setSessionProps({roomID: roomID}),
+        setWaitingScreenState = _noriActions.changeStoreState({currentState: this.store.gameStates[2]});
+
+    this.store.apply(setRoom);
+    this.store.apply(setWaitingScreenState);
+  },
+
+  handleGameStart: function (roomID) {
+    var appState = this.store.getState();
+    if(roomID === appState.session.roomID) {
+      console.log('Rooms match! Starting game');
+      var setGamePlayState = _noriActions.changeStoreState({currentState: this.store.gameStates[3]});
+      this.store.apply(setGamePlayState);
+    } else {
+      console.log('rooms don\'t match');
+    }
+
+  }
+  
 });
 
 module.exports = App;

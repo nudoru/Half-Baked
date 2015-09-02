@@ -13,5 +13,7 @@ module.exports = {
   MESSAGE          : 'message',
   CREATE_ROOM      : 'create_room',
   JOIN_ROOM        : 'join_room',
-  LEAVE_ROOM       : 'leave_room'
+  LEAVE_ROOM       : 'leave_room',
+  GAME_START       : 'game_start',
+  GAME_END         : 'game_end'
 };

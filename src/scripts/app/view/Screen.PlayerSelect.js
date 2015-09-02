@@ -1,7 +1,5 @@
 /*
  TODO
- [ ] Set appearance drop down on selected appearance state
-
 
  */
 
@@ -9,8 +7,7 @@ var _noriActions = require('../../nori/action/ActionCreator.js'),
     _appActions  = require('../action/ActionCreator.js'),
     _appView     = require('./AppView.js'),
     _appStore    = require('../store/AppStore.js'),
-    _socketIO    = require('../../nori/service/SocketIO.js'),
-    _numUtils    = require('../../nudoru/core/NumberUtils.js');
+    _socketIO    = require('../../nori/service/SocketIO.js');
 
 /**
  * Module for a dynamic application view for a route or a persistent view
@@ -43,7 +40,6 @@ var Component = _appView.createComponentView({
   },
 
   setPlayerName: function () {
-    //console.log('player name: ', document.querySelector('#select__playername').value);
     var action = _appActions.setLocalPlayerProps({
       name: document.querySelector('#select__playername').value
     });
@@ -51,7 +47,6 @@ var Component = _appView.createComponentView({
   },
 
   setPlayerAppearance: function () {
-    //console.log('player appearance: ', document.querySelector('#select__playertype').value);
     var action = _appActions.setLocalPlayerProps({
       appearance: document.querySelector('#select__playertype').value
     });
@@ -64,7 +59,7 @@ var Component = _appView.createComponentView({
   getInitialState: function () {
     var appState = _appStore.getState();
     return {
-      name      : appState.localPlayer.name || 'Mystery Player ' + _numUtils.rndNumber(100, 999),
+      name      : appState.localPlayer.name,
       appearance: appState.localPlayer.appearance
     };
   },
@@ -83,9 +78,9 @@ var Component = _appView.createComponentView({
   /**
    * Component HTML was attached to the DOM
    */
-  //componentDidMount: function () {
-  //  //
-  //},
+  componentDidMount: function () {
+    document.querySelector('#select__playertype').value = this.getState().appearance;
+  },
 
   onJoinRoom: function () {
     var roomID = document.querySelector('#select__roomid').value;
@@ -93,12 +88,23 @@ var Component = _appView.createComponentView({
     if (this.validateRoomID(roomID)) {
       console.log('Room ID OK');
       _socketIO.notifyServer(_socketIO.events().JOIN_ROOM, {
-        id        : roomID,
+        roomID    : roomID,
         playerName: this.getState().name
       });
     } else {
-      _appView.alert('Bad Room ID', 'The room ID is not correct. Must be a 5 digit number.');
+      _appView.alert('The room ID is not correct. Must be a 5 digit number.', 'Bad Room ID');
     }
+  },
+
+  validateUserDetailsInput: function () {
+    var name       = document.querySelector('#select__playername').value,
+        appearance = document.querySelector('#select__playertype').value;
+
+    if (!name.length || !appearance) {
+      _appView.alert('Make sure you\'ve typed a name for yourself and selected an appearance');
+      return false;
+    }
+    return true;
   },
 
   /**
@@ -117,7 +123,9 @@ var Component = _appView.createComponentView({
 
   onCreateRoom: function () {
     console.log('create room');
-    _socketIO.notifyServer(_socketIO.events().CREATE_ROOM, {playerName: this.getState().name});
+    if (this.validateUserDetailsInput()) {
+      _socketIO.notifyServer(_socketIO.events().CREATE_ROOM, {playerName: this.getState().name});
+    }
   },
 
   /**
