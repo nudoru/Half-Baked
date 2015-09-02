@@ -1,6 +1,6 @@
 /*
-TODO
-[ ] Set appearance drop down on selected appearance state
+ TODO
+ [ ] Set appearance drop down on selected appearance state
 
 
  */
@@ -9,7 +9,8 @@ var _noriActions = require('../../nori/action/ActionCreator.js'),
     _appActions  = require('../action/ActionCreator.js'),
     _appView     = require('./AppView.js'),
     _appStore    = require('../store/AppStore.js'),
-    _socketIO    = require('../../nori/service/SocketIO.js');
+    _socketIO    = require('../../nori/service/SocketIO.js'),
+    _numUtils    = require('../../nudoru/core/NumberUtils.js');
 
 /**
  * Module for a dynamic application view for a route or a persistent view
@@ -63,7 +64,7 @@ var Component = _appView.createComponentView({
   getInitialState: function () {
     var appState = _appStore.getState();
     return {
-      name: appState.localPlayer.name,
+      name      : appState.localPlayer.name || 'Mystery Player ' + _numUtils.rndNumber(100, 999),
       appearance: appState.localPlayer.appearance
     };
   },
@@ -74,7 +75,7 @@ var Component = _appView.createComponentView({
   componentWillUpdate: function () {
     var appState = _appStore.getState();
     return {
-      name: appState.localPlayer.name,
+      name      : appState.localPlayer.name,
       appearance: appState.localPlayer.appearance
     };
   },
@@ -91,8 +92,10 @@ var Component = _appView.createComponentView({
     console.log('Join room ' + roomID);
     if (this.validateRoomID(roomID)) {
       console.log('Room ID OK');
-      _appView.notify('', 'Room ID ok!');
-      _socketIO.notifyServer(_socketIO.events().JOIN_ROOM, {id: roomID});
+      _socketIO.notifyServer(_socketIO.events().JOIN_ROOM, {
+        id        : roomID,
+        playerName: this.getState().name
+      });
     } else {
       _appView.alert('Bad Room ID', 'The room ID is not correct. Must be a 5 digit number.');
     }
@@ -114,7 +117,7 @@ var Component = _appView.createComponentView({
 
   onCreateRoom: function () {
     console.log('create room');
-    _socketIO.notifyServer(_socketIO.events().CREATE_ROOM, {});
+    _socketIO.notifyServer(_socketIO.events().CREATE_ROOM, {playerName: this.getState().name});
   },
 
   /**
