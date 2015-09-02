@@ -1,5 +1,5 @@
 var _noriActionConstants    = require('../../nori/action/ActionConstants.js'),
-    _mixinMapFactory        = require('../../nori/store/MixinMapFactory.js'),
+    _appActionConstants     = require('../action/ActionConstants.js'),
     _mixinObservableSubject = require('../../nori/utils/MixinObservableSubject.js'),
     _mixinReducerStore      = require('../../nori/store/MixinReducerStore.js');
 
@@ -16,7 +16,6 @@ var _noriActionConstants    = require('../../nori/action/ActionConstants.js'),
 var AppStore = Nori.createStore({
 
   mixins: [
-    _mixinMapFactory,
     _mixinReducerStore,
     _mixinObservableSubject()
   ],
@@ -36,23 +35,29 @@ var AppStore = Nori.createStore({
   loadStore: function () {
     this.setState({
       currentState: this.gameStates[0],
-      localPlayer : {},
-      remotePlayer: {},
+      session     : {
+        roomID: ''
+      },
+      localPlayer : {
+        id        : '',
+        type      : '',
+        name      : '',
+        health    : 6,
+        appearance: '',
+        behaviors : []
+      },
+      remotePlayer: {
+        id        : '',
+        type      : '',
+        name      : '',
+        health    : 6,
+        appearance: '',
+        behaviors : []
+      },
       questionBank: []
     });
 
     this.notifySubscribersOf('storeInitialized');
-  },
-
-  createUserObject: function (id, type, name, appearance, behaviors) {
-    return {
-      id        : id,
-      type      : type,
-      name      : name,
-      health    : health || 6,
-      appearance: appearance,
-      behaviors : behaviors || []
-    };
   },
 
   createQuestionObject: function (prompt, distractors, pointValue) {
@@ -78,6 +83,9 @@ var AppStore = Nori.createStore({
     switch (event.type) {
 
       case _noriActionConstants.CHANGE_STORE_STATE:
+      case _appActionConstants.SET_LOCAL_PLAYER_PROPS:
+      case _appActionConstants.SET_REMOTE_PLAYER_PROPS:
+      case _appActionConstants.SET_SESSION_PROPS:
         return _.assign({}, state, event.payload.data);
 
       default:
@@ -90,6 +98,7 @@ var AppStore = Nori.createStore({
    * not check to see if the state was actually updated.
    */
   handleStateMutation: function () {
+    console.log('New state:', this.getState());
     this.notifySubscribers(this.getState());
   }
 

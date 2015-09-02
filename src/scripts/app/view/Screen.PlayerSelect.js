@@ -1,6 +1,14 @@
-var _noriActions = require('../../nori/action/ActionCreator'),
-    _appView     = require('./AppView'),
-    _appStore    = require('../store/AppStore'),
+/*
+TODO
+[ ] Set appearance drop down on selected appearance state
+
+
+ */
+
+var _noriActions = require('../../nori/action/ActionCreator.js'),
+    _appActions  = require('../action/ActionCreator.js'),
+    _appView     = require('./AppView.js'),
+    _appStore    = require('../store/AppStore.js'),
     _socketIO    = require('../../nori/service/SocketIO.js');
 
 /**
@@ -23,6 +31,8 @@ var Component = _appView.createComponentView({
    */
   defineEvents: function () {
     return {
+      'blur #select__playername'        : this.setPlayerName.bind(this),
+      'change #select__playertype'      : this.setPlayerAppearance.bind(this),
       'click #select__button-joinroom'  : this.onJoinRoom.bind(this),
       'click #select__button-createroom': this.onCreateRoom.bind(this),
       'click #select__button-go'        : function () {
@@ -31,26 +41,50 @@ var Component = _appView.createComponentView({
     };
   },
 
+  setPlayerName: function () {
+    //console.log('player name: ', document.querySelector('#select__playername').value);
+    var action = _appActions.setLocalPlayerProps({
+      name: document.querySelector('#select__playername').value
+    });
+    _appStore.apply(action);
+  },
+
+  setPlayerAppearance: function () {
+    //console.log('player appearance: ', document.querySelector('#select__playertype').value);
+    var action = _appActions.setLocalPlayerProps({
+      appearance: document.querySelector('#select__playertype').value
+    });
+    _appStore.apply(action);
+  },
+
   /**
    * Set initial state properties. Call once on first render
    */
   getInitialState: function () {
-    return {};
+    var appState = _appStore.getState();
+    return {
+      name: appState.localPlayer.name,
+      appearance: appState.localPlayer.appearance
+    };
   },
 
   /**
    * State change on bound stores (map, etc.) Return nextState object
    */
   componentWillUpdate: function () {
-    return {};
+    var appState = _appStore.getState();
+    return {
+      name: appState.localPlayer.name,
+      appearance: appState.localPlayer.appearance
+    };
   },
 
   /**
    * Component HTML was attached to the DOM
    */
-  componentDidMount: function () {
-
-  },
+  //componentDidMount: function () {
+  //  //
+  //},
 
   onJoinRoom: function () {
     var roomID = document.querySelector('#select__roomid').value;

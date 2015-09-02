@@ -6,11 +6,39 @@ var _actionConstants = require('./ActionConstants.js');
  */
 var ActionCreator = {
 
-  mutateSomeData: function (data) {
+  setLocalPlayerProps: function (data) {
     var actionObj = {
-      type   : _actionConstants.MUTATION_TYPE,
+      type   : _actionConstants.SET_LOCAL_PLAYER_PROPS,
       payload: {
-        data: data
+        data: {
+          localPlayer: data
+        }
+      }
+    };
+
+    return actionObj;
+  },
+
+  setRemotePlayerProps: function (data) {
+    var actionObj = {
+      type   : _actionConstants.SET_REMOTE_PLAYER_PROPS,
+      payload: {
+        data: {
+          remotePlayer: data
+        }
+      }
+    };
+
+    return actionObj;
+  },
+
+  setSessionProps: function (data) {
+    var actionObj = {
+      type   : _actionConstants.SET_REMOTE_PLAYER_PROPS,
+      payload: {
+        data: {
+          session: data
+        }
       }
     };
 
