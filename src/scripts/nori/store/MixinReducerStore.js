@@ -73,7 +73,6 @@ var MixinReducerStore = function () {
    * @param actionObject
    */
   function apply(actionObject) {
-    console.log('ReducerStore Apply: ', actionObject.type, actionObject.payload);
     applyReducers(actionObject);
   }
 

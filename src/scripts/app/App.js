@@ -1,6 +1,7 @@
 var _rx          = require('../nori/utils/Rx.js'),
     _appActions  = require('./action/ActionCreator.js'),
-    _noriActions = require('../nori/action/ActionCreator.js');
+    _noriActions = require('../nori/action/ActionCreator.js'),
+    _socketIOEvents = require('../nori/service/SocketIOEvents.js');
 
 /**
  * "Controller" for a Nori application. The controller is responsible for
@@ -64,42 +65,42 @@ var App = Nori.createApplication({
 
     console.log("from Socket.IO server", payload);
     switch (payload.type) {
-      case (this.socket.events().CONNECT):
-        console.log("Connected!");
+      case (_socketIOEvents.CONNECT):
+        //console.log("Connected!");
         this.store.setState({socketIOID: payload.id});
         return;
-      case (this.socket.events().USER_CONNECTED):
-        console.log("Another client connected");
+      case (_socketIOEvents.USER_CONNECTED):
+        //console.log("Another client connected");
         return;
-      case (this.socket.events().USER_DISCONNECTED):
-        console.log("Another client disconnected");
+      case (_socketIOEvents.USER_DISCONNECTED):
+        //console.log("Another client disconnected");
         return;
-      case (this.socket.events().DROPPED):
-        console.log("You were dropped!", payload.payload);
+      case (_socketIOEvents.DROPPED):
+        //console.log("You were dropped!", payload.payload);
         return;
-      case (this.socket.events().SYSTEM_MESSAGE):
+      case (_socketIOEvents.SYSTEM_MESSAGE):
         console.log("System message", payload.payload);
         return;
-      case (this.socket.events().CREATE_ROOM):
-        console.log("create room");
+      case (_socketIOEvents.CREATE_ROOM):
+        //console.log("create room");
         return;
-      case (this.socket.events().JOIN_ROOM):
-        console.log("join room", payload.payload);
+      case (_socketIOEvents.JOIN_ROOM):
+        //console.log("join room", payload.payload);
         this.handleJoinNewlyCreatedRoom(payload.payload.roomID);
         return;
-      case (this.socket.events().LEAVE_ROOM):
-        console.log("leave room");
+      case (_socketIOEvents.LEAVE_ROOM):
+        //console.log("leave room");
         return;
-      case (this.socket.events().GAME_START):
-        console.log("GAME STARTed");
+      case (_socketIOEvents.GAME_START):
+        console.log("GAME STARTED");
         this.handleGameStart();
         return;
-      case (this.socket.events().GAME_END):
-        console.log("Game ended");
+      case (_socketIOEvents.GAME_END):
+        //console.log("Game ended");
         return;
-      case (this.socket.events().SYSTEM_MESSAGE):
-      case (this.socket.events().BROADCAST):
-      case (this.socket.events().MESSAGE):
+      case (_socketIOEvents.SYSTEM_MESSAGE):
+      case (_socketIOEvents.BROADCAST):
+      case (_socketIOEvents.MESSAGE):
         this.view.alert(payload.payload, payload.type);
         return;
       default:
@@ -117,17 +118,11 @@ var App = Nori.createApplication({
   },
 
   handleGameStart: function (roomID) {
-    var appState = this.store.getState();
-    if(roomID === appState.session.roomID) {
-      console.log('Rooms match! Starting game');
-      var setGamePlayState = _noriActions.changeStoreState({currentState: this.store.gameStates[3]});
-      this.store.apply(setGamePlayState);
-    } else {
-      console.log('rooms don\'t match');
-    }
-
+    console.log('Starting game');
+    var setGamePlayState = _noriActions.changeStoreState({currentState: this.store.gameStates[3]});
+    this.store.apply(setGamePlayState);
   }
-  
+
 });
 
 module.exports = App;

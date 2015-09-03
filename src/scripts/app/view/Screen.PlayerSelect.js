@@ -84,9 +84,7 @@ var Component = _appView.createComponentView({
 
   onJoinRoom: function () {
     var roomID = document.querySelector('#select__roomid').value;
-    console.log('Join room ' + roomID);
     if (this.validateRoomID(roomID)) {
-      console.log('Room ID OK');
       _socketIO.notifyServer(_socketIO.events().JOIN_ROOM, {
         roomID    : roomID,
         playerName: this.getState().name
@@ -122,7 +120,6 @@ var Component = _appView.createComponentView({
   },
 
   onCreateRoom: function () {
-    console.log('create room');
     if (this.validateUserDetailsInput()) {
       _socketIO.notifyServer(_socketIO.events().CREATE_ROOM, {playerName: this.getState().name});
     }

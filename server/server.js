@@ -11,7 +11,7 @@ var express    = require('express'),
     io         = require('./modules/socketio'),
     server     = http.Server(app);
 
-app.use(logger('dev'));
+//app.use(logger('dev'));
 app.use(express.static('bin'));
 
 crudRoutes.create(app);

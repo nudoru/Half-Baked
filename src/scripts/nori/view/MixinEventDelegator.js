@@ -17,7 +17,8 @@ var MixinEventDelegator = function () {
 
   var _eventsMap,
       _eventSubscribers,
-      _rx = require('../utils/Rx');
+      _rx          = require('../utils/Rx'),
+      _browserInfo = require('../../nudoru/browser/BrowserInfo.js');
 
   function setEvents(evtObj) {
     _eventsMap = evtObj;
@@ -56,10 +57,30 @@ var MixinEventDelegator = function () {
           evtMap                        = evtMap.trim();
           var eventStr                  = evtMap.split(' ')[0].trim(),
               selector                  = evtMap.split(' ')[1].trim();
+
+          if(_browserInfo.mobile.any()) {
+            eventStr = convertMouseToTouchEventStr(eventStr);
+          }
+
           _eventSubscribers[evtStrings] = createHandler(selector, eventStr, eventHandler);
         });
         /* jshint +W083 */
       }
+    }
+  }
+
+  function convertMouseToTouchEventStr(eventStr) {
+    switch (eventStr) {
+      case('click'):
+        return 'touchend';
+      case('mousedown'):
+        return 'touchstart';
+      case('mouseup'):
+        return 'touchend';
+      case('mousemove'):
+        return 'touchmove';
+      default:
+        return eventStr;
     }
   }
 

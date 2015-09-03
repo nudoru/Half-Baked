@@ -29,7 +29,7 @@ var ApplicationView = function () {
     var bodyEl = document.querySelector('body');
 
     templates.forEach(function (templ) {
-      bodyEl.appendChild(_domUtils.HTMLStrToNode(_this.template().getSource('template__' + templ, {})));
+      bodyEl.appendChild(_domUtils.HTMLStrToNode(_this.template().getSource(templ, {})));
     });
   }
 

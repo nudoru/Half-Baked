@@ -5,7 +5,6 @@
 var MixinComponentViews = function () {
 
   var _componentViewMap            = Object.create(null),
-      _componentHTMLTemplatePrefix = 'template__',
       _template                    = require('../utils/Templating.js');
 
   /**
@@ -36,7 +35,7 @@ var MixinComponentViews = function () {
     }
 
     _componentViewMap[componentID] = {
-      htmlTemplate: _template.getTemplate(_componentHTMLTemplatePrefix + componentID),
+      htmlTemplate: _template.getTemplate(componentID),
       controller  : componentObj,
       mountPoint  : mountPoint
     };

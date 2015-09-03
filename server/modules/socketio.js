@@ -1,10 +1,10 @@
 var socketIO               = require('socket.io'),
     _                      = require('lodash-node'),
-    moment                 = require('moment'),
-    eventConstants         = require('./socketioevents'),
-    io,
-    _currentSocket,
-    _currentID,
+    _moment                = require('moment'),
+    _events                = require('./socketioevents'),
+    _io,
+    _lastConnectedSocket,
+    _lastConnectedSocketID,
     _connectionsMap        = {},
     _roomMap               = {},
     _connectionsCount      = 0,
@@ -16,33 +16,50 @@ var socketIO               = require('socket.io'),
 
 module.exports = {
   connect: function (server) {
-    io = socketIO(server);
-    io.on('connection', onConnect);
+    _io = socketIO(server);
+    _io.on('connection', onConnect);
   }
 };
 
 function onConnect(socket) {
-  _currentSocket = socket;
-  _currentID     = socket.id;
-  _connectionsCount++;
-  console.log('Client connected', _currentID);
-  addConnectionToMap(_currentID);
+  _lastConnectedSocket   = socket;
+  _lastConnectedSocketID = socket.id;
 
-  _currentSocket.on(eventConstants.NOTIFY_SERVER, onNotifyServer);
-  _currentSocket.on('disconnect', onDisconnect);
+  console.log('Client connected', _lastConnectedSocketID);
+  addConnectionToMap(socket.id, socket);
 
-  emitClientNotification(eventConstants.CONNECT, getConnectionsMapForID(_currentID).name);
-  broadcastClientNotification(eventConstants.USER_CONNECTED, getConnectionsMapForID(_currentID).name);
+  _lastConnectedSocket.on(_events.NOTIFY_SERVER, onNotifyServer);
+  _lastConnectedSocket.on('disconnect', onDisconnect);
+
+  emitClientNotification(_events.CONNECT, getConnectionsForID(_lastConnectedSocketID).name);
+  //broadcastClientNotification(_events.USER_CONNECTED, getConnectionsForID(_lastConnectedSocketID).name);
 }
+
+//----------------------------------------------------------------------------
+//  Connections map
+//----------------------------------------------------------------------------
+
+function addConnectionToMap(id, socket) {
+  _connectionsMap[id] = {
+    name         : 'Connection' + _connectionsCount++,
+    id           : id,
+    socket       : socket,
+    connected    : true,
+    status       : null,
+    playerDetails: {}
+  };
+}
+
+function getConnectionsForID(id) {
+  return _.assign({}, _connectionsMap[id]);
+}
+
+//----------------------------------------------------------------------------
+//  Events
+//----------------------------------------------------------------------------
 
 function onNotifyServer(payload) {
   handleSocketMessage(payload);
-}
-
-function onDisconnect() {
-  console.log('disconnect');
-  _connectionsCount--;
-  broadcastClientNotification(eventConstants.USER_DISCONNECTED);
 }
 
 function handleSocketMessage(payload) {
@@ -53,30 +70,38 @@ function handleSocketMessage(payload) {
   console.log("from client", payload);
 
   switch (payload.type) {
-    case (eventConstants.PING):
-      emitClientNotification(eventConstants.PONG, {});
+    case (_events.PING):
+      emitClientNotification(_events.PONG, {});
       return;
-    case (eventConstants.PONG):
+    case (_events.PONG):
       console.log('CLINT PING!');
       return;
-    case (eventConstants.CONNECT):
+    case (_events.CONNECT):
       console.log("Connected!");
       return;
-    case (eventConstants.CREATE_ROOM):
-      console.log("create room");
-      createAndAddConnectionToRoom(_currentID);
+    case (_events.CREATE_ROOM):
+      // TODO get and pass user details object
+      //console.log("create room");
+      createAndAddConnectionToRoom(payload.connectionID);
       return;
-    case (eventConstants.JOIN_ROOM):
-      console.log("join room");
-      addConnectionToRoom(payload.payload.roomID, _currentID);
+    case (_events.JOIN_ROOM):
+      // TODO get and pass user details object
+      //console.log("join room");
+      addConnectionToRoom(payload.payload.roomID, payload.connectionID);
       return;
-    case (eventConstants.LEAVE_ROOM):
+    case (_events.LEAVE_ROOM):
       console.log("leave room");
       return;
     default:
       //console.warn("Unhandled SocketIO message type", payload);
       return;
   }
+}
+
+function onDisconnect() {
+  console.log('disconnect');
+  _connectionsCount--;
+  broadcastClientNotification(_events.USER_DISCONNECTED);
 }
 
 //----------------------------------------------------------------------------
@@ -93,32 +118,77 @@ function createRoom() {
   return roomId;
 }
 
-function checkForGameStart(roomID) {
-  if(_roomMap[roomID].length === 2) {
-    // TODO need to send over remote player data
-    emitClientNotification(eventConstants.GAME_START, {roomID: roomID});
-    return;
-  }
-  console.log('Not ready to start');
-}
-
-
-function createAndAddConnectionToRoom(socketID) {
-  var roomID  = createRoom(),
-      success = addConnectionToRoom(roomID, socketID);
-  if (success) {
-    emitClientNotification(eventConstants.JOIN_ROOM, {roomID: roomID});
-  } else {
-    emitClientNotification(eventConstants.MESSAGE, 'Error creating and adding to room.');
-  }
-}
-
 function isValidRoomID(roomID) {
   return _roomMap.hasOwnProperty(roomID);
 }
 
 function getNumConnectionsInRoom(roomID) {
   return _roomMap[roomID].length;
+}
+
+//----------------------------------------------------------------------------
+//  Adding
+//----------------------------------------------------------------------------
+
+function createAndAddConnectionToRoom(socketID) {
+  var roomID  = createRoom(),
+      success = addConnectionToRoom(roomID, socketID);
+  if (success) {
+    emitClientNotificationToConnection(socketID,_events.JOIN_ROOM, {roomID: roomID});
+  } else {
+    emitClientNotificationToConnection(socketID,_events.MESSAGE, 'Error creating and adding to room.');
+  }
+}
+
+function addConnectionToRoom(roomID, socketID) {
+  if (isValidRoomID(roomID)) {
+    console.log('Add socketID to room ' + roomID);
+    if (getNumConnectionsInRoom(roomID) < _maxConnectionsPerRoom) {
+      _roomMap[roomID].push(socketID);
+      emitClientNotificationToConnection(socketID, _events.JOIN_ROOM, {roomID: roomID});
+      checkForGameStart(roomID);
+      return true;
+    } else {
+      console.log('Max connections in room ' + roomID);
+      emitClientNotificationToConnection(socketID, _events.MESSAGE, 'Too many people are in that room.');
+    }
+  } else {
+    console.log('Add to room, no room id ' + roomID);
+    emitClientNotificationToConnection(socketID, _events.MESSAGE, 'That room doesn\'t exist on the server');
+  }
+  return false;
+}
+
+function checkForGameStart(roomID) {
+  if (_roomMap[roomID].length === 2) {
+    // TODO need to send over remote player data
+    console.log('STARTING ...')
+    _roomMap[roomID].forEach(function (socketID) {
+      emitClientNotificationToConnection(socketID, _events.GAME_START, {roomID: roomID});
+    });
+    //_roomMap[roomID].forEach(function (connection) {
+    //  console.log('Starting game for: ', connection);
+    //emitClientNotificationToRoom(roomID, _events.GAME_START, {roomID: roomID});
+    //});
+    return;
+  }
+  console.log('Not ready to start');
+}
+
+//----------------------------------------------------------------------------
+//  Removal / delete
+//----------------------------------------------------------------------------
+
+function removeConnectionFromRoom(roomID, connection) {
+  if (isValidRoomID(roomID)) {
+    console.log('Add connection to room ' + roomID);
+    var idx = _roomMap[roomID].indexOf(connection);
+    _roomMap[roomID].splice(idx, 1);
+    return true;
+  } else {
+    console.log('Remove from room, no room id ' + roomID);
+    return false;
+  }
 }
 
 function deleteRoom(roomID) {
@@ -136,78 +206,47 @@ function deleteRoom(roomID) {
   return false;
 }
 
-function addConnectionToRoom(roomID, socketID) {
-  if (isValidRoomID(roomID)) {
-    console.log('Add socketID to room ' + roomID);
-    if (getNumConnectionsInRoom(roomID) < _maxConnectionsPerRoom) {
-      _roomMap[roomID].push(socketID);
-      emitClientNotification(eventConstants.JOIN_ROOM, {roomID: roomID});
-      checkForGameStart(roomID);
-      return true;
-    } else {
-      console.log('Max connections in room ' + roomID);
-      emitClientNotification(eventConstants.MESSAGE, 'Too many people are in that room.');
-    }
-  } else {
-    console.log('Add to room, no room id ' + roomID);
-    emitClientNotification(eventConstants.MESSAGE, 'That room doesn\'t exist on the server');
-  }
-  return false;
-}
-
-function removeConnectionFromRoom(roomID, connection) {
-  if (isValidRoomID(roomID)) {
-    console.log('Add connection to room ' + roomID);
-    var idx = _roomMap[roomID].indexOf(connection);
-    _roomMap[roomID].splice(idx, 1);
-    return true;
-  } else {
-    console.log('Remove from room, no room id ' + roomID);
-    return false;
-  }
-}
-
-//----------------------------------------------------------------------------
-//  Connections map
-//----------------------------------------------------------------------------
-
-function addConnectionToMap(id) {
-  _connectionsMap[id] = {
-    name     : 'Connection' + _connectionsCount,
-    id       : id,
-    connected: true,
-    status   : null
-  };
-}
-
-function getConnectionsMapForID(id) {
-  return _.assign({}, _connectionsMap[id]);
-}
-
 //----------------------------------------------------------------------------
 //  Communication to client
 //----------------------------------------------------------------------------
 
 function formattedDate() {
-  return moment().format('h:mm:ss a');
+  return _moment().format('h:mm:ss a');
+}
+
+function emitClientNotificationToConnection(connectionID, type, payload) {
+  var socket = getConnectionsForID(connectionID).socket;
+  socket.emit(_events.NOTIFY_CLIENT, {
+    type   : type,
+    id     : _lastConnectedSocketID,
+    time   : formattedDate(),
+    payload: payload
+  });
 }
 
 function emitClientNotification(type, payload) {
-  _currentSocket.emit(eventConstants.NOTIFY_CLIENT, {
+  _lastConnectedSocket.emit(_events.NOTIFY_CLIENT, {
     type   : type,
-    id     : _currentID,
+    id     : _lastConnectedSocketID,
+    time   : formattedDate(),
+    payload: payload
+  });
+}
+
+function emitClientNotificationToRoom(roomID, type, payload) {
+  _lastConnectedSocket.to(roomID).emit(_events.NOTIFY_CLIENT, {
+    type   : type,
+    id     : _lastConnectedSocketID,
     time   : formattedDate(),
     payload: payload
   });
 }
 
 function broadcastClientNotification(type, payload) {
-  io.emit(eventConstants.NOTIFY_CLIENT, {
+  _io.emit(_events.NOTIFY_CLIENT, {
     type   : type,
-    id     : _currentID,
+    id     : _lastConnectedSocketID,
     time   : formattedDate(),
     payload: payload
   });
 }
-
-

@@ -33,11 +33,10 @@ var Component = _appView.createComponentView({
    */
   getInitialState: function () {
     var appState = _appStore.getState();
-    console.log(appState);
     return {
       name      : appState.localPlayer.name,
       appearance: appState.localPlayer.appearance,
-      roomID    : appState.session.roomID,
+      roomID    : appState.session.roomID
     };
   },
 

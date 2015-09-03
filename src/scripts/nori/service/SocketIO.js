@@ -2,26 +2,9 @@ var SocketIOConnector = function () {
 
   var _subject  = new Rx.BehaviorSubject(),
       _socketIO = io(),
-      _log = [],
-      _events   = {
-        PING             : 'ping',
-        PONG             : 'pong',
-        NOTIFY_CLIENT    : 'notify_client',
-        NOTIFY_SERVER    : 'notify_server',
-        CONNECT          : 'connect',
-        DROPPED          : 'dropped',
-        USER_CONNECTED   : 'user_connected',
-        USER_DISCONNECTED: 'user_disconnected',
-        EMIT             : 'emit',
-        BROADCAST        : 'broadcast',
-        SYSTEM_MESSAGE   : 'system_message',
-        MESSAGE          : 'message',
-        CREATE_ROOM      : 'create_room',
-        JOIN_ROOM        : 'join_room',
-        LEAVE_ROOM       : 'leave_room',
-        GAME_START       : 'game_start',
-        GAME_END         : 'game_end'
-      };
+      _log      = [],
+      _connectionID,
+      _events   = require('./SocketIOEvents.js');
 
 
   function initialize() {
@@ -39,6 +22,8 @@ var SocketIOConnector = function () {
       notifyServer(_events.PONG, {});
     } else if (payload.type === _events.PONG) {
       console.log('SOCKET.IO PONG!');
+    } else if (payload.type === _events.CONNECT) {
+      _connectionID = payload.id;
     }
     notifySubscribers(payload);
   }
@@ -54,8 +39,9 @@ var SocketIOConnector = function () {
    */
   function notifyServer(type, payload) {
     _socketIO.emit(_events.NOTIFY_SERVER, {
-      type   : type,
-      payload: payload
+      type        : type,
+      connectionID: _connectionID,
+      payload     : payload
     });
   }
 
