@@ -181,7 +181,8 @@ var ViewComponent = function () {
     }));
 
     if (this.delegateEvents) {
-      this.delegateEvents();
+      // Pass true to automatically pass form element handlers the elements value or other status
+      this.delegateEvents(true);
     }
 
     if (this.componentDidMount) {

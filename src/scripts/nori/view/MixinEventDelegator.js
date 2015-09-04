@@ -35,7 +35,7 @@ var MixinEventDelegator = function () {
    * 'evtStr selector':callback
    * 'evtStr selector, evtStr selector': sharedCallback
    */
-  function delegateEvents() {
+  function delegateEvents(autoForm) {
     if (!_eventsMap) {
       return;
     }
@@ -64,7 +64,7 @@ var MixinEventDelegator = function () {
             eventStr = convertMouseToTouchEventStr(eventStr);
           }
 
-          _eventSubscribers[evtStrings] = createHandler(selector, eventStr, eventHandler);
+          _eventSubscribers[evtStrings] = createHandler(selector, eventStr, eventHandler, autoForm);
         });
         /* jshint +W083 */
       }
@@ -91,24 +91,33 @@ var MixinEventDelegator = function () {
     }
   }
 
-  function createHandler(selector, eventStr, eventHandler) {
+  function createHandler(selector, eventStr, eventHandler, autoForm) {
     var observable = _rx.dom(selector, eventStr),
-        auto       = true,
         el         = document.querySelector(selector),
         tag        = el.tagName.toLowerCase(),
         type       = el.getAttribute('type');
 
-    if (auto) {
-      if (tag === 'input') {
-        if (eventStr === 'blur' || eventStr === 'focus') {
-          return observable
-            .map(evt => evt.target.value)
-            .subscribe(eventHandler);
-        } else if (eventStr === 'keyup' || eventStr === 'keydown') {
-          return observable
-            .throttle(100)
-            .map(evt => evt.target.value)
-            .subscribe(eventHandler);
+    if (autoForm) {
+      if (tag === 'input' || tag === 'textarea') {
+        if (!type || type === 'text') {
+          if (eventStr === 'blur' || eventStr === 'focus') {
+            return observable
+              .map(evt => evt.target.value)
+              .subscribe(eventHandler);
+          } else if (eventStr === 'keyup' || eventStr === 'keydown') {
+            return observable
+              .throttle(100)
+              .map(evt => evt.target.value)
+              .subscribe(eventHandler);
+          }
+        } else if (type === 'radio' || type === 'checkbox') {
+          if (eventStr === 'click') {
+            return observable
+              .map(function (evt) {
+                return evt.target.checked;
+              })
+              .subscribe(eventHandler);
+          }
         }
       } else if (tag === 'select') {
         if (eventStr === 'change') {
