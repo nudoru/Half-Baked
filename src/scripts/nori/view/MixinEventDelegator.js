@@ -119,8 +119,6 @@ var MixinEventDelegator = function () {
       }
     }
 
-    //console.log("adding ", eventStr, 'to element type', document.querySelector(selector).tagName, document.querySelector(selector).getAttribute('type'));
-
     return observable.subscribe(eventHandler);
   }
 
