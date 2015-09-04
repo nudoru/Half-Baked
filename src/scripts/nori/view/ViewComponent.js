@@ -224,6 +224,37 @@ var ViewComponent = function () {
   }
 
   //----------------------------------------------------------------------------
+  //  Utils
+  //----------------------------------------------------------------------------
+
+  /**
+   * http://mithril.js.org/mithril.withAttr.html
+   * This is an event handler factory. It returns a method that can be bound to a
+   * DOM element's event listener.
+   *
+   * This method is provided to decouple the browser's event model from the
+   * controller/logic model.
+   *
+   * You should use this method and implement similar ones when extracting values
+   * from a browser's Event object, instead of hard-coding the extraction code
+   * into controllers (or model methods).
+   * @param prop
+   * @param callback
+   * @param context
+   * @returns {Function}
+   */
+  function withAttr(prop, callback, context) {
+    return function (e) {
+      e = e || event;
+
+      var currentTarget = e.currentTarget || this,
+          cntx          = context || this;
+
+      callback.call(cntx, prop in currentTarget ? currentTarget[prop] : currentTarget.getAttribute(prop));
+    };
+  }
+
+  //----------------------------------------------------------------------------
   //  Accessors
   //----------------------------------------------------------------------------
 
@@ -283,7 +314,9 @@ var ViewComponent = function () {
     componentDidMount: componentDidMount,
 
     componentWillUnmount: componentWillUnmount,
-    unmount             : unmount
+    unmount             : unmount,
+
+    withAttr: withAttr
 
     //addChild   : addChild,
     //removeChild: removeChild,
