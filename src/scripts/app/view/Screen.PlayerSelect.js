@@ -7,7 +7,8 @@ var _noriActions = require('../../nori/action/ActionCreator.js'),
     _appActions  = require('../action/ActionCreator.js'),
     _appView     = require('./AppView.js'),
     _appStore    = require('../store/AppStore.js'),
-    _socketIO    = require('../../nori/service/SocketIO.js');
+    _socketIO    = require('../../nori/service/SocketIO.js'),
+    _template    = require('../../nori/utils/Templating.js');
 
 /**
  * Module for a dynamic application view for a route or a persistent view

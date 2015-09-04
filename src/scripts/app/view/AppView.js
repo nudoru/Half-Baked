@@ -2,7 +2,7 @@ var _appStore               = require('../store/AppStore.js'),
     _mixinApplicationView   = require('../../nori/view/ApplicationView.js'),
     _mixinNudoruControls    = require('../../nori/view/MixinNudoruControls.js'),
     _mixinComponentViews    = require('../../nori/view/MixinComponentViews.js'),
-    _mixinStoreStateViews        = require('../../nori/view/MixinStoreStateViews.js'),
+    _mixinStoreStateViews   = require('../../nori/view/MixinStoreStateViews.js'),
     _mixinEventDelegator    = require('../../nori/view/MixinEventDelegator.js'),
     _mixinObservableSubject = require('../../nori/utils/MixinObservableSubject.js');
 
@@ -44,7 +44,6 @@ var AppView = Nori.createView({
     this.mapStateToViewComponent(gameStates[2], 'waitingonplayer', screenWaitingOnPlayer);
     this.mapStateToViewComponent(gameStates[3], 'game', screenMainGame);
     this.mapStateToViewComponent(gameStates[4], 'gameover', screenGameOver);
-
   },
 
   /**

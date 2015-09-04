@@ -3,6 +3,7 @@
 var ApplicationView = function () {
 
   var _this,
+      _template = require('../utils/Templating.js'),
       _domUtils = require('../../nudoru/browser/DOMUtils.js');
 
   //----------------------------------------------------------------------------
@@ -31,7 +32,7 @@ var ApplicationView = function () {
     var bodyEl = document.querySelector('body');
 
     templates.forEach(function (templ) {
-      bodyEl.appendChild(_domUtils.HTMLStrToNode(_this.template().getSource(templ, {})));
+      bodyEl.appendChild(_domUtils.HTMLStrToNode(_template.getSource(templ, {})));
     });
   }
 

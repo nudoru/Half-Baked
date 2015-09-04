@@ -6,16 +6,7 @@
 
 var MixinComponentViews = function () {
 
-  var _componentViewMap            = Object.create(null),
-      _template                    = require('../utils/Templating.js');
-
-  /**
-   * Return the template object
-   * @returns {*}
-   */
-  function getTemplate() {
-    return _template;
-  }
+  var _componentViewMap = Object.create(null);
 
   /**
    * Map a component to a mounting point. If a string is passed,
@@ -37,9 +28,8 @@ var MixinComponentViews = function () {
     }
 
     _componentViewMap[componentID] = {
-      htmlTemplate: _template.getTemplate(componentID),
-      controller  : componentObj,
-      mountPoint  : mountPoint
+      controller: componentObj,
+      mountPoint: mountPoint
     };
   }
 
@@ -53,7 +43,7 @@ var MixinComponentViews = function () {
       var componentViewFactory  = require('./ViewComponent.js'),
           eventDelegatorFactory = require('./MixinEventDelegator.js'),
           observableFactory     = require('../utils/MixinObservableSubject.js'),
-          stateObjFactory    = require('../store/ImmutableMap.js'),
+          stateObjFactory       = require('../store/ImmutableMap.js'),
           componentAssembly, finalComponent, previousInitialize;
 
       componentAssembly = [
@@ -121,7 +111,6 @@ var MixinComponentViews = function () {
   //----------------------------------------------------------------------------
 
   return {
-    template           : getTemplate,
     mapViewComponent   : mapViewComponent,
     createComponentView: createComponentView,
     showViewComponent  : showViewComponent,

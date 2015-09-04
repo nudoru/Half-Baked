@@ -5,12 +5,14 @@
  * Must be extended with custom modules
  */
 
+var _template = require('../utils/Templating.js');
+
 var ViewComponent = function () {
 
   var _isInitialized = false,
       _configProps,
       _id,
-      _templateObj,
+      _templateObjCache,
       _html,
       _DOMElement,
       _mountPoint,
@@ -25,7 +27,6 @@ var ViewComponent = function () {
   function initializeComponent(configProps) {
     _configProps = configProps;
     _id          = configProps.id;
-    _templateObj = configProps.template;
     _mountPoint  = configProps.mountPoint;
 
     this.setState(this.getInitialState());
@@ -132,9 +133,26 @@ var ViewComponent = function () {
     //_children.forEach(function renderChild(child) {
     //  child.componentRender();
     //});
+    if (!_templateObjCache) {
+      _templateObjCache = this.template();
+    }
 
     _html = this.render(this.getState());
+  }
 
+  /**
+   * Returns a Lodash client side template function by getting the HTML source from
+   * the matching <script type='text/template'> tag in the document. OR you may
+   * specify the custom HTML to use here.
+   *
+   * The method is called only on the first render and cached to speed up renders
+   *
+   * @returns {Function}
+   */
+  function template() {
+    // assumes the template ID matches the component's ID as passed on initialize
+    var html = _template.getSource(this.getID());
+    return _.template(html);
   }
 
   /**
@@ -143,7 +161,7 @@ var ViewComponent = function () {
    * @returns {*}
    */
   function render(state) {
-    return _templateObj(state);
+    return _templateObjCache(state);
   }
 
   /**
@@ -233,18 +251,9 @@ var ViewComponent = function () {
     return _DOMElement;
   }
 
-  function getTemplate() {
-    return _templateObj;
-  }
-
-  function setTemplate(html) {
-    _templateObj = _.template(html);
-  }
-
   //function getChildren() {
   //  return _children.slice(0);
   //}
-
 
   //----------------------------------------------------------------------------
   //  API
@@ -257,8 +266,7 @@ var ViewComponent = function () {
     getConfigProps     : getConfigProps,
     getInitialState    : getInitialState,
     getID              : getID,
-    getTemplate        : getTemplate,
-    setTemplate        : setTemplate,
+    template           : template,
     getDOMElement      : getDOMElement,
     isMounted          : isMounted,
 
