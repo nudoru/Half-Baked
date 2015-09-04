@@ -1,4 +1,4 @@
-/* @flow */
+/* @flow weak */
 
 /**
  * Mixin view that allows for component views to be display on store state changes

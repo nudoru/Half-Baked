@@ -1,4 +1,4 @@
-/* @flow */
+/* @flow weak */
 
 /**
  * Simple router

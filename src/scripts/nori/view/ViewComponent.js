@@ -1,4 +1,4 @@
-/* @flow */
+/* @flow weak */
 
 /**
  * Base module for components

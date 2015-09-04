@@ -1,4 +1,4 @@
-/* @flow */
+/* @flow weak */
 
 /**
  * Utility to handle all view DOM attachment tasks

@@ -1,4 +1,4 @@
-/* @flow */
+/* @flow weak */
 
 /*
  Matt Perkins, 6/12/15

@@ -1,4 +1,4 @@
-/* @flow */
+/* @flow weak */
 
 /**
  * Add RxJS Subject to a module.

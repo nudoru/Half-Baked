@@ -1,4 +1,4 @@
-/* @flow */
+/* @flow weak */
 
 /**
  * Convenience mixin that makes events easier for views

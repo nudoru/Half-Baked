@@ -1,4 +1,4 @@
-/* @flow */
+/* @flow weak */
 
 /**
  * Mixin for Nori stores to add functionality similar to Redux' Reducer and single
