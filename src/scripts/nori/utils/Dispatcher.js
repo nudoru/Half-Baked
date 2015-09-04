@@ -1,3 +1,5 @@
+/* @flow */
+
 /*
  Matt Perkins, 6/12/15
 

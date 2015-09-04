@@ -1,3 +1,5 @@
+/* @flow */
+
 var MixinBrowserEvents = function () {
 
   var _scrollableAppContainer,

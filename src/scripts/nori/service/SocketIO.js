@@ -1,7 +1,10 @@
+/* @flow */
+
 var SocketIOConnector = function () {
 
   var _subject  = new Rx.BehaviorSubject(),
       _socketIO = io(),
+      _ = _;
       _log      = [],
       _connectionID,
       _events   = require('./SocketIOEvents.js');

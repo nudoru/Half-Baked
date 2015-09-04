@@ -1,3 +1,5 @@
+/* @flow */
+
 /**
  * Ajax / Rest module.
  * Returns an RxJS Obervable

@@ -1,3 +1,5 @@
+/* @flow */
+
 var ApplicationView = function () {
 
   var _this,

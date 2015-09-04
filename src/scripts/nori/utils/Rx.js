@@ -1,3 +1,5 @@
+/* @flow */
+
 /**
  * RxJS Helpers
  * @type {{dom: Function, from: Function, interval: Function, doEvery: Function, just: Function, empty: Function}}

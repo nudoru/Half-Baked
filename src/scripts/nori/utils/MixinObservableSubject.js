@@ -1,3 +1,5 @@
+/* @flow */
+
 /**
  * Add RxJS Subject to a module.
  *

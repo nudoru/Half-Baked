@@ -1,3 +1,5 @@
+/* @flow */
+
 /**
  * Mixin view that allows for component views
  */

@@ -1,3 +1,5 @@
+/* @flow */
+
 /**
  * Convenience mixin that makes events easier for views
  *

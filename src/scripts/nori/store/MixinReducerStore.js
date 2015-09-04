@@ -1,3 +1,5 @@
+/* @flow */
+
 /**
  * Mixin for Nori stores to add functionality similar to Redux' Reducer and single
  * object state tree concept. Mixin should be composed to nori/store/ApplicationStore

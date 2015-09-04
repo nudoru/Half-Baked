@@ -1,3 +1,5 @@
+/* @flow */
+
 /**
  * Base module for components
  * Must be extended with custom modules

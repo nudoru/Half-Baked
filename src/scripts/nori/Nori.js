@@ -1,3 +1,5 @@
+/* @flow */
+
 var Nori = function () {
 
   var _dispatcher = require('./utils/Dispatcher.js'),

@@ -1,3 +1,5 @@
+/* @flow */
+
 module.exports = {
   PING             : 'ping',
   PONG             : 'pong',

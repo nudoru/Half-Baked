@@ -1,3 +1,5 @@
+/* @flow */
+
 /**
  * Wraps Immutable.js's Map in the same syntax as the SimpleStore module
  *

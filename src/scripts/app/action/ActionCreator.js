@@ -7,7 +7,7 @@ var _actionConstants = require('./ActionConstants.js');
 var ActionCreator = {
 
   setLocalPlayerProps: function (data) {
-    var actionObj = {
+    return {
       type   : _actionConstants.SET_LOCAL_PLAYER_PROPS,
       payload: {
         data: {
@@ -15,12 +15,10 @@ var ActionCreator = {
         }
       }
     };
-
-    return actionObj;
   },
 
   setRemotePlayerProps: function (data) {
-    var actionObj = {
+    return {
       type   : _actionConstants.SET_REMOTE_PLAYER_PROPS,
       payload: {
         data: {
@@ -28,12 +26,10 @@ var ActionCreator = {
         }
       }
     };
-
-    return actionObj;
   },
 
   setSessionProps: function (data) {
-    var actionObj = {
+    return {
       type   : _actionConstants.SET_REMOTE_PLAYER_PROPS,
       payload: {
         data: {
@@ -41,8 +37,6 @@ var ActionCreator = {
         }
       }
     };
-
-    return actionObj;
   }
 
 };
