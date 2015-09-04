@@ -91,6 +91,7 @@ gulp.task('concatglobals', function () {
     'src/scripts/vendor/gsap/plugins/CSSPlugin.min.js',
     'src/scripts/vendor/lodash.min.js',
     'src/scripts/vendor/rxjs/rx.lite.compat.min.js',
+    'src/scripts/vendor/immutable.min.js',
     'src/scripts/nudoru/globals.js'
   ])
     //.pipe(sourcemaps.init())

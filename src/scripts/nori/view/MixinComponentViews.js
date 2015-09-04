@@ -51,14 +51,14 @@ var MixinComponentViews = function () {
       var componentViewFactory  = require('./ViewComponent.js'),
           eventDelegatorFactory = require('./MixinEventDelegator.js'),
           observableFactory     = require('../utils/MixinObservableSubject.js'),
-          simpleStoreFactory    = require('../store/SimpleStore.js'),
+          stateObjFactory    = require('../store/ImmutableMap.js'),
           componentAssembly, finalComponent, previousInitialize;
 
       componentAssembly = [
         componentViewFactory(),
         eventDelegatorFactory(),
         observableFactory(),
-        simpleStoreFactory(),
+        stateObjFactory(),
         componentSource
       ];
 

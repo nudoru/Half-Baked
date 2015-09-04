@@ -54,10 +54,8 @@ var MixinReducerStore = function () {
       console.warn('nori/store/MixinReducerStore needs nori/utils/MixinObservableSubject to notify');
     }
 
-    var simpleStoreFactory = require('./SimpleStore.js');
-
     _this  = this;
-    _state = simpleStoreFactory();
+    _state = require('./ImmutableMap.js')();
 
     if (!_stateReducers) {
       throw new Error('ReducerStore, must set a reducer before initialization');
