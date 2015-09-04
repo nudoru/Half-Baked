@@ -106,9 +106,7 @@ var Nori = function () {
     createView       : createView,
     buildFromMixins  : buildFromMixins,
     getCurrentRoute  : getCurrentRoute,
-    assignArray      : assignArray,
-    prop             : prop,
-    withAttr         : withAttr
+    assignArray      : assignArray
   };
 
 };

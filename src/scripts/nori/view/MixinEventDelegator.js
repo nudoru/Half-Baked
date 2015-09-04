@@ -56,11 +56,11 @@ var MixinEventDelegator = function () {
         /* jshint -W083 */
         // https://jslinterrors.com/dont-make-functions-within-a-loop
         mappings.forEach(function (evtMap) {
-          evtMap                        = evtMap.trim();
-          var eventStr                  = evtMap.split(' ')[0].trim(),
-              selector                  = evtMap.split(' ')[1].trim();
+          evtMap       = evtMap.trim();
+          var eventStr = evtMap.split(' ')[0].trim(),
+              selector = evtMap.split(' ')[1].trim();
 
-          if(_browserInfo.mobile.any()) {
+          if (_browserInfo.mobile.any()) {
             eventStr = convertMouseToTouchEventStr(eventStr);
           }
 
@@ -71,6 +71,11 @@ var MixinEventDelegator = function () {
     }
   }
 
+  /**
+   * Map common mouse events to touch equivalents
+   * @param eventStr
+   * @returns {*}
+   */
   function convertMouseToTouchEventStr(eventStr) {
     switch (eventStr) {
       case('click'):
@@ -87,7 +92,36 @@ var MixinEventDelegator = function () {
   }
 
   function createHandler(selector, eventStr, eventHandler) {
-    return _rx.dom(selector, eventStr).subscribe(eventHandler);
+    var observable = _rx.dom(selector, eventStr),
+        auto       = true,
+        el         = document.querySelector(selector),
+        tag        = el.tagName.toLowerCase(),
+        type       = el.getAttribute('type');
+
+    if (auto) {
+      if (tag === 'input') {
+        if (eventStr === 'blur' || eventStr === 'focus') {
+          return observable
+            .map(evt => evt.target.value)
+            .subscribe(eventHandler);
+        } else if (eventStr === 'keyup' || eventStr === 'keydown') {
+          return observable
+            .throttle(100)
+            .map(evt => evt.target.value)
+            .subscribe(eventHandler);
+        }
+      } else if (tag === 'select') {
+        if (eventStr === 'change') {
+          return observable
+            .map(evt => evt.target.value)
+            .subscribe(eventHandler);
+        }
+      }
+    }
+
+    //console.log("adding ", eventStr, 'to element type', document.querySelector(selector).tagName, document.querySelector(selector).getAttribute('type'));
+
+    return observable.subscribe(eventHandler);
   }
 
   /**

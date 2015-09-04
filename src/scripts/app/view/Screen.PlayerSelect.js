@@ -40,16 +40,16 @@ var Component = _appView.createComponentView({
     };
   },
 
-  setPlayerName: function () {
+  setPlayerName: function (value) {
     var action = _appActions.setLocalPlayerProps({
-      name: document.querySelector('#select__playername').value
+      name: value
     });
     _appStore.apply(action);
   },
 
-  setPlayerAppearance: function () {
+  setPlayerAppearance: function (value) {
     var action = _appActions.setLocalPlayerProps({
-      appearance: document.querySelector('#select__playertype').value
+      appearance: value
     });
     _appStore.apply(action);
   },
