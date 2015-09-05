@@ -2,7 +2,7 @@ var _noriActionConstants    = require('../../nori/action/ActionConstants.js'),
     _appActionConstants     = require('../action/ActionConstants.js'),
     _mixinObservableSubject = require('../../nori/utils/MixinObservableSubject.js'),
     _mixinReducerStore      = require('../../nori/store/MixinReducerStore.js'),
-    _numUtils    = require('../../nudoru/core/NumberUtils.js');
+    _numUtils               = require('../../nudoru/core/NumberUtils.js');
 
 /**
  * This application store contains "reducer store" functionality based on Redux.
@@ -39,26 +39,24 @@ var AppStore = Nori.createStore({
       session     : {
         roomID: ''
       },
-      localPlayer : {
-        id        : '',
-        type      : '',
-        name      : 'Mystery Player ' + _numUtils.rndNumber(100, 999),
-        health    : 6,
-        appearance: 'green',
-        behaviors : []
-      },
-      remotePlayer: {
-        id        : '',
-        type      : '',
-        name      : '',
-        health    : 6,
-        appearance: '',
-        behaviors : []
-      },
+      localPlayer : this.createBlankPlayerObject(),
+      remotePlayer: this.createBlankPlayerObject(),
       questionBank: []
     });
 
     this.notifySubscribersOf('storeInitialized');
+  },
+
+  createBlankPlayerObject: function () {
+    return {
+      id        : '',
+      type      : '',
+      name      : 'Mystery Player ' + _numUtils.rndNumber(100, 999),
+      health    : 6,
+      appearance: 'green',
+      behaviors : [],
+      score     : _numUtils.rndNumber(10, 20)
+    }
   },
 
   createQuestionObject: function (prompt, distractors, pointValue) {
@@ -91,7 +89,7 @@ var AppStore = Nori.createStore({
       case undefined:
         return state;
       default:
-        console.warn('Reducer store, unhandled event type: '+event.type);
+        console.warn('Reducer store, unhandled event type: ' + event.type);
         return state;
     }
   },

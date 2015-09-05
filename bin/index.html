@@ -123,8 +123,22 @@ BEGIN Templates for Sub Views
 
 <script id="gameover" type="text/template">
     <div>
-        <h1>Win or Lose?!</h1>
-        <button id="gameover__button-replay" class="button-success">Replay</button>
+        <div id="gameover__win">
+            <h1>You won!</h1>
+        </div>
+        <div id="gameover__tie">
+            <h1>Tie!</h1>
+        </div>
+        <div id="gameover__loose">
+            <h1>You lost!</h1>
+        </div>
+        <div id="gameover__score">
+            <ul class="list-plain">
+                <li><h4>Your score: <stong>{{ localScore }}</stong></h4></li>
+                <li><h4>Opponent's score: <stong>{{ remoteScore }}</stong></h4></li>
+            </ul>
+        </div>
+        <button id="gameover__button-replay" class="button-success">Play again?</button>
     </div>
 </script>
 

@@ -1,12 +1,17 @@
-var _noriActions = require('../../nori/action/ActionCreator'),
-    _appView     = require('./AppView'),
-    _appStore    = require('../store/AppStore'),
-    _template    = require('../../nori/utils/Templating.js');
+var _noriActions          = require('../../nori/action/ActionCreator'),
+    _appView              = require('./AppView'),
+    _appStore             = require('../store/AppStore'),
+    _template             = require('../../nori/utils/Templating.js'),
+    _mixinDOMManipulation = require('../../nori/view/MixinDOMManipulation.js');
 
 /**
  * Module for a dynamic application view for a route or a persistent view
  */
 var Component = _appView.createComponentView({
+
+  mixins: [
+    _mixinDOMManipulation
+  ],
 
   /**
    * Initialize and bind, called once on first render. Parent component is
@@ -33,7 +38,18 @@ var Component = _appView.createComponentView({
    * Set initial state properties. Call once on first render
    */
   getInitialState: function () {
-    return {};
+    var appState = _appStore.getState();
+    var state    = {
+      name       : appState.localPlayer.name,
+      appearance : appState.localPlayer.appearance,
+      localScore : appState.localPlayer.score,
+      remoteScore: appState.remotePlayer.score,
+      localWin   : appState.localPlayer.score > appState.remotePlayer.score,
+      remoteWin  : appState.localPlayer.score < appState.remotePlayer.score,
+      tieWin     : appState.localPlayer.score === appState.remotePlayer.score
+    };
+    console.log(state);
+    return state;
   },
 
   /**
@@ -47,7 +63,19 @@ var Component = _appView.createComponentView({
    * Component HTML was attached to the DOM
    */
   componentDidMount: function () {
-    //
+    var state = this.getState();
+
+    this.hideEl('#gameover__win');
+    this.hideEl('#gameover__tie');
+    this.hideEl('#gameover__loose');
+
+    if (state.localWin) {
+      this.showEl('#gameover__win');
+    } else if (state.remoteWin) {
+      this.showEl('#gameover__loose');
+    } else if (state.tieWin) {
+      this.showEl('#gameover__tie');
+    }
   },
 
   /**
