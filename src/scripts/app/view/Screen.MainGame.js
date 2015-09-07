@@ -1,7 +1,9 @@
-var _noriActions = require('../../nori/action/ActionCreator'),
-    _appView     = require('./AppView'),
-    _appStore    = require('../store/AppStore'),
-    _template    = require('../../nori/utils/Templating.js');
+var _noriActions      = require('../../nori/action/ActionCreator.js'),
+    _appActions       = require('../action/ActionCreator.js'),
+    _appView          = require('./AppView.js'),
+    _appStore         = require('../store/AppStore.js'),
+    _socketIO         = require('../../nori/service/SocketIO.js'),
+    _template         = require('../../nori/utils/Templating.js');
 
 /**
  * Module for a dynamic application view for a route or a persistent view
@@ -33,7 +35,12 @@ var Component = _appView.createComponentView({
    * Set initial state properties. Call once on first render
    */
   getInitialState: function () {
-    return {};
+    var appState = _appStore.getState();
+    console.log(appState);
+    return {
+      local: appState.localPlayer,
+      remote: appState.remotePlayer
+    };
   },
 
   /**

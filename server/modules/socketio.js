@@ -75,6 +75,8 @@ function pruneConnectionsMap() {
       if (socketList[id] === undefined) {
         status = false;
 
+        console.log('Disconnect ',id);
+
         for (var roomid in _roomMap) {
           if (_roomMap.hasOwnProperty(roomid)) {
             var idx = _roomMap[roomid].indexOf(id);
@@ -94,8 +96,6 @@ function pruneConnectionsMap() {
           deleteRoom(notifyRoom);
         }
 
-      } else {
-        console.log(id, ' OK');
       }
     }
   }
@@ -116,7 +116,7 @@ function handleSocketMessage(payload) {
     return;
   }
 
-  console.log("from client", payload);
+  //console.log("from client", payload);
 
   switch (payload.type) {
     case (_events.PING):
@@ -147,10 +147,8 @@ function handleSocketMessage(payload) {
 
 // Remove from room, end game
 function onDisconnect() {
-  console.log('disconnect');
   _connectionsCount--;
   pruneConnectionsMap();
-  //broadcastClientNotification(_events.USER_DISCONNECTED);
 }
 
 //----------------------------------------------------------------------------

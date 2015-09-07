@@ -70,10 +70,14 @@ var MixinReducerStore = function () {
   /**
    * Apply the action object to the reducers to change state
    * are sent to all reducers to update the state
-   * @param actionObject
+   * @param actionObjOrArry Array of actions or a single action to reduce from
    */
-  function apply(actionObject) {
-    applyReducers(actionObject);
+  function apply(actionObjOrArry) {
+    if(is.array(actionObjOrArry)) {
+      actionObjOrArry.forEach(actionObj => applyReducers(actionObj));
+    } else {
+      applyReducers(actionObjOrArry);
+    }
   }
 
   function applyReducers(actionObject) {

@@ -73,19 +73,19 @@ var ViewComponent = function () {
    * Add a child
    * @param child
    */
-  //function addChild(child) {
-  //  _children.push(child);
-  //}
+  function addChild(child) {
+    _children.push(child);
+  }
 
   /**
    * Remove a child
    * @param child
    */
-  //function removeChild(child) {
-  //  var idx = _children.indexOf(child);
-  //  _children[idx].unmount();
-  //  _children.splice(idx, 1);
-  //}
+  function removeChild(child) {
+    var idx = _children.indexOf(child);
+    _children[idx].unmount();
+    _children.splice(idx, 1);
+  }
 
   /**
    * Before the view updates and a rerender occurs
@@ -252,9 +252,9 @@ var ViewComponent = function () {
     return _DOMElement;
   }
 
-  //function getChildren() {
-  //  return _children.slice(0);
-  //}
+  function getChildren() {
+    return _children.slice(0);
+  }
 
   //----------------------------------------------------------------------------
   //  API
@@ -286,9 +286,9 @@ var ViewComponent = function () {
     componentWillUnmount: componentWillUnmount,
     unmount             : unmount,
 
-    //addChild   : addChild,
-    //removeChild: removeChild,
-    //getChildren: getChildren
+    addChild   : addChild,
+    removeChild: removeChild,
+    getChildren: getChildren
   };
 
 };

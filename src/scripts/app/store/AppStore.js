@@ -57,6 +57,7 @@ var AppStore = Nori.createStore({
     this.setState({
       currentState: this.gameStates[0],
       session     : {
+        socketIOID: '',
         roomID: ''
       },
       localPlayer : _.merge(this.createBlankPlayerObject(), this.createPlayerResetObject()),
