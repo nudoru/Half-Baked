@@ -3,12 +3,13 @@
 
  */
 
-var _noriActions = require('../../nori/action/ActionCreator.js'),
-    _appActions  = require('../action/ActionCreator.js'),
-    _appView     = require('./AppView.js'),
-    _appStore    = require('../store/AppStore.js'),
-    _socketIO    = require('../../nori/service/SocketIO.js'),
-    _template    = require('../../nori/utils/Templating.js');
+var _roomNumberLength = 4,
+    _noriActions      = require('../../nori/action/ActionCreator.js'),
+    _appActions       = require('../action/ActionCreator.js'),
+    _appView          = require('./AppView.js'),
+    _appStore         = require('../store/AppStore.js'),
+    _socketIO         = require('../../nori/service/SocketIO.js'),
+    _template         = require('../../nori/utils/Templating.js');
 
 /**
  * Module for a dynamic application view for a route or a persistent view
@@ -83,12 +84,20 @@ var Component = _appView.createComponentView({
     document.querySelector('#select__playertype').value = this.getState().appearance;
   },
 
+  onCreateRoom: function () {
+    if (this.validateUserDetailsInput()) {
+      _socketIO.notifyServer(_socketIO.events().CREATE_ROOM, {
+        playerDetails: _appStore.getState().localPlayer
+      });
+    }
+  },
+
   onJoinRoom: function () {
     var roomID = document.querySelector('#select__roomid').value;
     if (this.validateRoomID(roomID)) {
       _socketIO.notifyServer(_socketIO.events().JOIN_ROOM, {
-        roomID    : roomID,
-        playerName: this.getState().name
+        roomID       : roomID,
+        playerDetails: _appStore.getState().localPlayer
       });
     } else {
       _appView.alert('The room ID is not correct. Must be a 5 digit number.', 'Bad Room ID');
@@ -114,16 +123,10 @@ var Component = _appView.createComponentView({
   validateRoomID: function (roomID) {
     if (isNaN(parseInt(roomID))) {
       return false;
-    } else if (roomID.length !== 5) {
+    } else if (roomID.length !== _roomNumberLength) {
       return false;
     }
     return true;
-  },
-
-  onCreateRoom: function () {
-    if (this.validateUserDetailsInput()) {
-      _socketIO.notifyServer(_socketIO.events().CREATE_ROOM, {playerName: this.getState().name});
-    }
   },
 
   /**

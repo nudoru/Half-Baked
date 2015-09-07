@@ -44,14 +44,7 @@ var AppView = Nori.createView({
     this.mapStateToViewComponent(gameStates[2], 'waitingonplayer', screenWaitingOnPlayer);
     this.mapStateToViewComponent(gameStates[3], 'game', screenMainGame);
     this.mapStateToViewComponent(gameStates[4], 'gameover', screenGameOver);
-  },
-
-  /**
-   * Draw and UI to the DOM and set events
-   */
-  render: function () {
-    //
-  },
+  }
 
 });
 

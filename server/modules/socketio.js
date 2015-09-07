@@ -109,7 +109,7 @@ function onDisconnect() {
 //----------------------------------------------------------------------------
 
 function createRoomID() {
-  return Math.floor(Math.random() * (99999 - 10000 + 1)) + 10000;
+  return Math.floor(Math.random() * (9999 - 1000 + 1)) + 1000;
 }
 
 function createRoom() {

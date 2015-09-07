@@ -1,4 +1,8 @@
-var _noriActionConstants    = require('../../nori/action/ActionConstants.js'),
+var _restURL                = '',
+    _restNumQuestions       = 3,
+    _restQuestionCategory   = 24, // SCI/TECT
+    _rest                   = require('../../nori/service/Rest.js'),
+    _noriActionConstants    = require('../../nori/action/ActionConstants.js'),
     _appActionConstants     = require('../action/ActionConstants.js'),
     _mixinObservableSubject = require('../../nori/utils/MixinObservableSubject.js'),
     _mixinReducerStore      = require('../../nori/store/MixinReducerStore.js'),
@@ -34,6 +38,21 @@ var AppStore = Nori.createStore({
    * Set or load any necessary data and then broadcast a initialized event.
    */
   loadStore: function () {
+    //https://market.mashape.com/pareshchouhan/trivia
+    var getQuestions = _rest.request({
+      method : 'GET',
+      //https://pareshchouhan-trivia-v1.p.mashape.com/v1/getQuizQuestionsByCategory?categoryId=1&limit=10&page=1
+      url    : 'https://pareshchouhan-trivia-v1.p.mashape.com/v1/getAllQuizQuestions?limit=' + _restNumQuestions + '&page=1',
+      headers: [{'X-Mashape-Key': 'tPxKgDvrkqmshg8zW4olS87hzF7Ap1vi63rjsnUuVw1sBHV9KJ'}],
+      json   : true
+    }).subscribe(
+      function success(data) {
+        console.log('ok', data);
+      },
+      function error(data) {
+        console.log('err', data);
+      });
+
     this.setState({
       currentState: this.gameStates[0],
       session     : {
@@ -55,15 +74,7 @@ var AppStore = Nori.createStore({
       health    : 6,
       appearance: 'green',
       behaviors : [],
-      score     : _numUtils.rndNumber(10, 20)
-    }
-  },
-
-  createQuestionObject: function (prompt, distractors, pointValue) {
-    return {
-      prompt     : prompt,
-      distractors: distractors,
-      pointValue : pointValue
+      score     : 0
     };
   },
 
@@ -80,7 +91,6 @@ var AppStore = Nori.createStore({
     state = state || {};
 
     switch (event.type) {
-
       case _noriActionConstants.CHANGE_STORE_STATE:
       case _appActionConstants.SET_LOCAL_PLAYER_PROPS:
       case _appActionConstants.SET_REMOTE_PLAYER_PROPS:

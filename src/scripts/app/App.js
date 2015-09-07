@@ -45,13 +45,8 @@ var App = Nori.createApplication({
    */
   runApplication: function () {
     this.view.removeLoadingMessage();
-    this.view.render();
-
     // View will show based on the current store state
-    this.store.setState({currentState: 'GAME_OVER'});
-
-    // Test ping
-    //_rx.doEvery(1000, 3, () => this.socket.ping());
+    this.store.setState({currentState: 'PLAYER_SELECT'});
   },
 
   /**
