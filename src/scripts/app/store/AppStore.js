@@ -39,27 +39,28 @@ var AppStore = Nori.createStore({
    */
   loadStore: function () {
     //https://market.mashape.com/pareshchouhan/trivia
-    var getQuestions = _rest.request({
-      method : 'GET',
-      //https://pareshchouhan-trivia-v1.p.mashape.com/v1/getQuizQuestionsByCategory?categoryId=1&limit=10&page=1
-      url    : 'https://pareshchouhan-trivia-v1.p.mashape.com/v1/getAllQuizQuestions?limit=' + _restNumQuestions + '&page=1',
-      headers: [{'X-Mashape-Key': 'tPxKgDvrkqmshg8zW4olS87hzF7Ap1vi63rjsnUuVw1sBHV9KJ'}],
-      json   : true
-    }).subscribe(
-      function success(data) {
-        console.log('ok', data);
-      },
-      function error(data) {
-        console.log('err', data);
-      });
+    //var getQuestions = _rest.request({
+    //  method : 'GET',
+    //  //https://pareshchouhan-trivia-v1.p.mashape.com/v1/getQuizQuestionsByCategory?categoryId=1&limit=10&page=1
+    //  url    : 'https://pareshchouhan-trivia-v1.p.mashape.com/v1/getAllQuizQuestions?limit=' + _restNumQuestions + '&page=1',
+    //  headers: [{'X-Mashape-Key': 'tPxKgDvrkqmshg8zW4olS87hzF7Ap1vi63rjsnUuVw1sBHV9KJ'}],
+    //  json   : true
+    //}).subscribe(
+    //  function success(data) {
+    //    console.log('ok', data);
+    //  },
+    //  function error(data) {
+    //    console.log('err', data);
+    //  });
 
+    // Set initial state
     this.setState({
       currentState: this.gameStates[0],
       session     : {
         roomID: ''
       },
-      localPlayer : this.createBlankPlayerObject(),
-      remotePlayer: this.createBlankPlayerObject(),
+      localPlayer : _.merge(this.createBlankPlayerObject(), this.createPlayerResetObject()),
+      remotePlayer: _.merge(this.createBlankPlayerObject(), this.createPlayerResetObject()),
       questionBank: []
     });
 
@@ -71,10 +72,15 @@ var AppStore = Nori.createStore({
       id        : '',
       type      : '',
       name      : 'Mystery Player ' + _numUtils.rndNumber(100, 999),
-      health    : 6,
-      appearance: 'green',
-      behaviors : [],
-      score     : 0
+      appearance: 'green'
+    };
+  },
+
+  createPlayerResetObject: function () {
+    return {
+      health   : 6,
+      behaviors: [],
+      score    : 0
     };
   },
 

@@ -70,11 +70,7 @@ var Component = _appView.createComponentView({
    * State change on bound stores (map, etc.) Return nextState object
    */
   componentWillUpdate: function () {
-    var appState = _appStore.getState();
-    return {
-      name      : appState.localPlayer.name,
-      appearance: appState.localPlayer.appearance
-    };
+    return this.getInitialState();
   },
 
   /**
@@ -100,7 +96,7 @@ var Component = _appView.createComponentView({
         playerDetails: _appStore.getState().localPlayer
       });
     } else {
-      _appView.alert('The room ID is not correct. Must be a 5 digit number.', 'Bad Room ID');
+      _appView.alert('The room ID is not correct. Does it contain letters or is less than '+_roomNumberLength+' digits?', 'Bad Room ID');
     }
   },
 

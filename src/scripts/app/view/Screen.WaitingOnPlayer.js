@@ -45,7 +45,12 @@ var Component = _appView.createComponentView({
    * State change on bound stores (map, etc.) Return nextState object
    */
   componentWillUpdate: function () {
-    return {};
+    var appState = _appStore.getState();
+    return {
+      name      : appState.localPlayer.name,
+      appearance: appState.localPlayer.appearance,
+      roomID    : appState.session.roomID
+    };
   },
 
   /**

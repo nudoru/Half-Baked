@@ -30,7 +30,7 @@ var ActionCreator = {
 
   setSessionProps: function (data) {
     return {
-      type   : _actionConstants.SET_REMOTE_PLAYER_PROPS,
+      type   : _actionConstants.SET_SESSION_PROPS,
       payload: {
         data: {
           session: data

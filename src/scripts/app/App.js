@@ -1,6 +1,6 @@
-var _rx          = require('../nori/utils/Rx.js'),
-    _appActions  = require('./action/ActionCreator.js'),
-    _noriActions = require('../nori/action/ActionCreator.js'),
+var _rx             = require('../nori/utils/Rx.js'),
+    _appActions     = require('./action/ActionCreator.js'),
+    _noriActions    = require('../nori/action/ActionCreator.js'),
     _socketIOEvents = require('../nori/service/SocketIOEvents.js');
 
 /**
@@ -62,7 +62,7 @@ var App = Nori.createApplication({
     switch (payload.type) {
       case (_socketIOEvents.CONNECT):
         //console.log("Connected!");
-        this.store.setState({socketIOID: payload.id});
+        this.handleConnect(payload.id);
         return;
       case (_socketIOEvents.USER_CONNECTED):
         //console.log("Another client connected");
@@ -80,7 +80,7 @@ var App = Nori.createApplication({
         //console.log("create room");
         return;
       case (_socketIOEvents.JOIN_ROOM):
-        //console.log("join room", payload.payload);
+        console.log("join room", payload.payload);
         this.handleJoinNewlyCreatedRoom(payload.payload.roomID);
         return;
       case (_socketIOEvents.LEAVE_ROOM):
@@ -88,10 +88,14 @@ var App = Nori.createApplication({
         return;
       case (_socketIOEvents.GAME_START):
         console.log("GAME STARTED");
-        this.handleGameStart();
+        this.handleGameStart(payload.payload);
         return;
       case (_socketIOEvents.GAME_END):
         //console.log("Game ended");
+        this.handleGameEnd(payload);
+        return;
+      case (_socketIOEvents.GAME_ABORT):
+        this.handleGameAbort(payload);
         return;
       case (_socketIOEvents.SYSTEM_MESSAGE):
       case (_socketIOEvents.BROADCAST):
@@ -104,19 +108,44 @@ var App = Nori.createApplication({
     }
   },
 
+  handleConnect: function (socketID) {
+    this.store.setState({socketIOID: socketID});
+
+    var action = _appActions.setLocalPlayerProps({
+      id: socketID
+    });
+    this.store.apply(action);
+  },
+
   handleJoinNewlyCreatedRoom: function (roomID) {
     var setRoom               = _appActions.setSessionProps({roomID: roomID}),
         setWaitingScreenState = _noriActions.changeStoreState({currentState: this.store.gameStates[2]});
+
+    console.log(setRoom)
 
     this.store.apply(setRoom);
     this.store.apply(setWaitingScreenState);
   },
 
-  handleGameStart: function (roomID) {
-    console.log('Starting game');
+  handleGameStart: function (payload) {
+    console.log('Starting game', payload);
     var setGamePlayState = _noriActions.changeStoreState({currentState: this.store.gameStates[3]});
     this.store.apply(setGamePlayState);
-  }
+  },
+
+  handleGameEnd: function (payload) {
+  },
+
+  handleGameAbort: function (payload) {
+    this.view.alert(payload.payload, payload.type);
+    var setPlayerSelect = _noriActions.changeStoreState({currentState: this.store.gameStates[1]}),
+        resetSession    = _appActions.setSessionProps({roomID: ''}),
+        resetPlayer     = _appActions.setLocalPlayerProps(this.store.createPlayerResetObject());
+
+    this.store.apply(resetPlayer);
+    this.store.apply(resetSession);
+    this.store.apply(setPlayerSelect);
+  },
 
 });
 

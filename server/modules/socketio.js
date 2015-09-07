@@ -50,8 +50,57 @@ function addConnectionToMap(id, socket) {
   };
 }
 
+function updatePlayerDetails(id, details) {
+  _connectionsMap[id].playerDetails = details;
+}
+
+function getPlayerDetails() {
+  var details = [];
+  for (var id in _connectionsMap) {
+    if (_connectionsMap.hasOwnProperty(id)) {
+      details.push(_connectionsMap[id].playerDetails);
+    }
+  }
+  return details;
+}
+
 function getConnectionsForID(id) {
   return _.assign({}, _connectionsMap[id]);
+}
+
+function pruneConnectionsMap() {
+  var socketList = _io.sockets.server.eio.clients, notifyRoom, status = true;
+  for (var id in _connectionsMap) {
+    if (_connectionsMap.hasOwnProperty(id)) {
+      if (socketList[id] === undefined) {
+        status = false;
+
+        for (var roomid in _roomMap) {
+          if (_roomMap.hasOwnProperty(roomid)) {
+            var idx = _roomMap[roomid].indexOf(id);
+            if (idx >= 0) {
+              console.log('the disconnect was in room', roomid);
+              _roomMap[roomid].splice(idx, 1);
+              notifyRoom = roomid;
+            }
+          }
+        }
+
+        broadcastClientNotification(_events.USER_DISCONNECTED, id);
+        delete _connectionsMap[id];
+
+        if (notifyRoom) {
+          emitClientNotificationToRoom(notifyRoom, _events.GAME_ABORT, 'A player disconnected! The game was aborted.');
+          deleteRoom(notifyRoom);
+        }
+
+      } else {
+        console.log(id, ' OK');
+      }
+    }
+  }
+
+  return status;
 }
 
 //----------------------------------------------------------------------------
@@ -80,13 +129,11 @@ function handleSocketMessage(payload) {
       console.log("Connected!");
       return;
     case (_events.CREATE_ROOM):
-      // TODO get and pass user details object
-      //console.log("create room");
+      updatePlayerDetails(payload.connectionID, payload.payload.playerDetails);
       createAndAddConnectionToRoom(payload.connectionID);
       return;
     case (_events.JOIN_ROOM):
-      // TODO get and pass user details object
-      //console.log("join room");
+      updatePlayerDetails(payload.connectionID, payload.payload.playerDetails);
       addConnectionToRoom(payload.payload.roomID, payload.connectionID);
       return;
     case (_events.LEAVE_ROOM):
@@ -98,10 +145,12 @@ function handleSocketMessage(payload) {
   }
 }
 
+// Remove from room, end game
 function onDisconnect() {
   console.log('disconnect');
   _connectionsCount--;
-  broadcastClientNotification(_events.USER_DISCONNECTED);
+  pruneConnectionsMap();
+  //broadcastClientNotification(_events.USER_DISCONNECTED);
 }
 
 //----------------------------------------------------------------------------
@@ -134,9 +183,9 @@ function createAndAddConnectionToRoom(socketID) {
   var roomID  = createRoom(),
       success = addConnectionToRoom(roomID, socketID);
   if (success) {
-    emitClientNotificationToConnection(socketID,_events.JOIN_ROOM, {roomID: roomID});
+    emitClientNotificationToConnection(socketID, _events.JOIN_ROOM, {roomID: roomID});
   } else {
-    emitClientNotificationToConnection(socketID,_events.MESSAGE, 'Error creating and adding to room.');
+    emitClientNotificationToConnection(socketID, _events.MESSAGE, 'Error creating and adding to room.');
   }
 }
 
@@ -161,15 +210,13 @@ function addConnectionToRoom(roomID, socketID) {
 
 function checkForGameStart(roomID) {
   if (_roomMap[roomID].length === 2) {
-    // TODO need to send over remote player data
-    console.log('STARTING ...')
+    console.log('STARTING ...');
     _roomMap[roomID].forEach(function (socketID) {
-      emitClientNotificationToConnection(socketID, _events.GAME_START, {roomID: roomID});
+      emitClientNotificationToConnection(socketID, _events.GAME_START, {
+        roomID : roomID,
+        players: getPlayerDetails()
+      });
     });
-    //_roomMap[roomID].forEach(function (connection) {
-    //  console.log('Starting game for: ', connection);
-    //emitClientNotificationToRoom(roomID, _events.GAME_START, {roomID: roomID});
-    //});
     return;
   }
   console.log('Not ready to start');
@@ -181,7 +228,7 @@ function checkForGameStart(roomID) {
 
 function removeConnectionFromRoom(roomID, connection) {
   if (isValidRoomID(roomID)) {
-    console.log('Add connection to room ' + roomID);
+    console.log('Remove connection to room ' + roomID);
     var idx = _roomMap[roomID].indexOf(connection);
     _roomMap[roomID].splice(idx, 1);
     return true;
@@ -194,10 +241,7 @@ function removeConnectionFromRoom(roomID, connection) {
 function deleteRoom(roomID) {
   if (isValidRoomID(roomID)) {
     console.log('Deleting room ' + roomID + ' with ' + _roomMap[roomID].length + 'connections');
-    // TODO disconnect? or at least notify
-    //roomMap[roomMap].forEach(function(connection) {
-    //  // tell 'em
-    //});
+    //emitClientNotificationToRoom(roomID, _events.GAME_ABORT, 'For some reason the room was deleted!');
     delete _roomMap[roomID];
     return true;
   } else {
@@ -224,17 +268,14 @@ function emitClientNotificationToConnection(connectionID, type, payload) {
   });
 }
 
-function emitClientNotification(type, payload) {
-  _lastConnectedSocket.emit(_events.NOTIFY_CLIENT, {
-    type   : type,
-    id     : _lastConnectedSocketID,
-    time   : formattedDate(),
-    payload: payload
+function emitClientNotificationToRoom(roomID, type, payload) {
+  _roomMap[roomID].forEach(function (socket) {
+    emitClientNotificationToConnection(socket, type, payload);
   });
 }
 
-function emitClientNotificationToRoom(roomID, type, payload) {
-  _lastConnectedSocket.to(roomID).emit(_events.NOTIFY_CLIENT, {
+function emitClientNotification(type, payload) {
+  _lastConnectedSocket.emit(_events.NOTIFY_CLIENT, {
     type   : type,
     id     : _lastConnectedSocketID,
     time   : formattedDate(),
