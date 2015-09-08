@@ -5,6 +5,7 @@ BEGIN Templates for Sub Views
 <script id="title" type="text/template">
     <div>
         <h1>Half-Baked!</h1>
+
         <p>Quiz game!</p>
         <button id="title__button-start" class="button-success">Start!</button>
     </div>
@@ -13,9 +14,11 @@ BEGIN Templates for Sub Views
 <script id="playerselect" type="text/template">
     <div>
         <h1>Choose your player</h1>
+
         <p>Enter your name and select the appearance of your avatar.</p>
         <label for="select__playername">Your name
-            <input id="select__playername" type="text" placeholder="Type here" value="{{ name }}">
+            <input id="select__playername" type="text" placeholder="Type here"
+                   value="{{ name }}">
         </label>
         <label for="select__playertype">Appearance
             <select id="select__playertype">
@@ -25,14 +28,19 @@ BEGIN Templates for Sub Views
             </select>
         </label>
         <hr/>
-        <p>To join an existing game session, enter the room id provided to the room creator.</p>
+        <p>To join an existing game session, enter the room id provided to the
+            room creator.</p>
         <label for="select__roomid">Room ID
             <input id="select__roomid" type="text" placeholder="Type here">
         </label>
-        <button id="select__button-joinroom" class="button-success">Join Room</button>
+        <button id="select__button-joinroom" class="button-success">Join Room
+        </button>
         <hr/>
-        <p>Start a new game. You'll have to give the room ID to your opponent.</p>
-        <button id="select__button-createroom" class="button-success">Create Room</button>
+        <p>Start a new game. You'll have to give the room ID to your
+            opponent.</p>
+        <button id="select__button-createroom" class="button-success">Create
+            Room
+        </button>
         <hr/>
         <button id="select__button-go">Skip and GO!</button>
     </div>
@@ -41,7 +49,8 @@ BEGIN Templates for Sub Views
 <script id="waitingonplayer" type="text/template">
     <div>
         <h1>Waiting on another player to join.</h1>
-        <h4>Let your opponent know that the room number to join is: <strong>{{ roomID }}</strong></h4>
+        <h4>Let your opponent know that the room number to join is: <strong>{{
+            roomID }}</strong></h4>
         <button id="waiting__button-skip">Skip ...</button>
     </div>
 </script>
@@ -50,6 +59,18 @@ BEGIN Templates for Sub Views
     <div>
         <h1>PLAY!!!!</h1>
         <button id="game__button-skip">Done ...</button>
+        <div id="game__localplayerstats"></div>
+    </div>
+</script>
+
+<script id="game__playerstats" type="text/template">
+    <div>
+        <ul class="list-plain">
+            <li>{{name}}</li>
+            <li>{{appearance}}</li>
+            <li>{{health}}</li>
+            <li>{{score}}</li>
+        </ul>
     </div>
 </script>
 
@@ -66,11 +87,21 @@ BEGIN Templates for Sub Views
         </div>
         <div id="gameover__score">
             <ul class="list-plain">
-                <li><h4>Your score: <stong>{{ localScore }}</stong></h4></li>
-                <li><h4>Opponent's score: <stong>{{ remoteScore }}</stong></h4></li>
+                <li>
+                    <h4>Your score:
+                        <stong>{{ localScore }}</stong>
+                    </h4>
+                </li>
+                <li>
+                    <h4>Opponent's score:
+                        <stong>{{ remoteScore }}</stong>
+                    </h4>
+                </li>
             </ul>
         </div>
-        <button id="gameover__button-replay" class="button-success">Play again?</button>
+        <button id="gameover__button-replay" class="button-success">Play
+            again?
+        </button>
     </div>
 </script>
 
@@ -96,7 +127,8 @@ BEGIN Templates for Application Structure
     <div id="app__components">
         <div id="initialization__cover">
             <div class="initialization__message">
-                <h1>Please Wait ...</h1><img src="img/loading_squares_g.gif" alt="Loading" class="loader">
+                <h1>Please Wait ...</h1><img src="img/loading_squares_g.gif"
+                                             alt="Loading" class="loader">
             </div>
         </div>
         <div id="tooltip__container"></div>

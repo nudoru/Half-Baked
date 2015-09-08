@@ -1,10 +1,7 @@
-var _noriActions       = require('../../nori/action/ActionCreator.js'),
-    _appActions        = require('../action/ActionCreator.js'),
-    _appView           = require('./AppView.js'),
-    _appStore          = require('../store/AppStore.js'),
-    _socketIO          = require('../../nori/service/SocketIO.js'),
-    _template          = require('../../nori/utils/Templating.js'),
-    _regionPlayerStats = require('./Region.PlayerStats.js');
+var _noriActions = require('../../nori/action/ActionCreator'),
+    _appView     = require('./AppView'),
+    _appStore    = require('../store/AppStore'),
+    _template    = require('../../nori/utils/Templating.js');
 
 /**
  * Module for a dynamic application view for a route or a persistent view
@@ -17,13 +14,14 @@ var Component = _appView.createComponentView({
    * @param configProps
    */
   initialize: function (configProps) {
-    //
+    this.bindMap(_appStore); // Reducer store, map id string or map object
   },
 
-  defineRegions: function() {
+  configuration: function() {
     return {
-      localPlayerStats: _regionPlayerStats()
-    };
+      id: 'game__playerstats',
+      mountPoint: '#game__localplayerstats'
+    }
   },
 
   /**
@@ -31,37 +29,33 @@ var Component = _appView.createComponentView({
    * @returns {}
    */
   defineEvents: function () {
-    return {
-      'click #game__button-skip': function () {
-        _appStore.apply(_noriActions.changeStoreState({currentState: _appStore.gameStates[4]}));
-      }
-    };
+    return null;
   },
 
   /**
    * Set initial state properties. Call once on first render
    */
   getInitialState: function () {
-    var appState = _appStore.getState();
-    console.log(appState);
-    return {
-      local : appState.localPlayer,
-      remote: appState.remotePlayer
-    };
+    return _appStore.getState().localPlayer;
   },
 
   /**
    * State change on bound stores (map, etc.) Return nextState object
    */
   componentWillUpdate: function () {
-    return {};
+    return _appStore.getState().localPlayer;
+  },
+
+  template: function () {
+    var html = _template.getSource('game__playerstats');
+    return _.template(html);
   },
 
   /**
    * Component HTML was attached to the DOM
    */
   componentDidMount: function () {
-
+    //
   },
 
   /**
