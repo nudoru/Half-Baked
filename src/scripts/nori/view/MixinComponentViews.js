@@ -39,7 +39,7 @@ var MixinComponentViews = function () {
    * @returns {*}
    */
   function createComponentView(componentSource) {
-    return function () {
+    return function (configProps) {
       var componentViewFactory  = require('./ViewComponent.js'),
           eventDelegatorFactory = require('./MixinEventDelegator.js'),
           observableFactory     = require('../utils/MixinObservableSubject.js'),
@@ -66,6 +66,12 @@ var MixinComponentViews = function () {
         finalComponent.initializeComponent(initObj);
         previousInitialize.call(finalComponent, initObj);
       };
+
+      if(configProps) {
+        finalComponent.configuration = function() {
+          return configProps;
+        };
+      }
 
       return _.assign({}, finalComponent);
     };

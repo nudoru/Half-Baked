@@ -22,7 +22,16 @@ var Component = _appView.createComponentView({
 
   defineRegions: function() {
     return {
-      localPlayerStats: _regionPlayerStats()
+      localPlayerStats: _regionPlayerStats({
+        id: 'game__playerstats',
+        mountPoint: '#game__localplayerstats',
+        target: 'local'
+      }),
+      remotePlayerStats: _regionPlayerStats({
+        id: 'game__playerstats',
+        mountPoint: '#game__remoteplayerstats',
+        target: 'remote'
+      })
     };
   },
 
@@ -34,6 +43,14 @@ var Component = _appView.createComponentView({
     return {
       'click #game__button-skip': function () {
         _appStore.apply(_noriActions.changeStoreState({currentState: _appStore.gameStates[4]}));
+      },
+      'click #game__test': function () {
+        var state = _appStore.getState(),
+            localHealth = state.localPlayer.health+1;
+            remoteHealth = state.remotePlayer.health-1;
+
+        _appStore.apply(_appActions.setLocalPlayerProps({health: localHealth}));
+        _appStore.apply(_appActions.setRemotePlayerProps({health: remoteHealth}));
       }
     };
   },

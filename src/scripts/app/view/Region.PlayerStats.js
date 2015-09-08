@@ -9,6 +9,7 @@ var _noriActions = require('../../nori/action/ActionCreator'),
 var Component = _appView.createComponentView({
 
   /**
+   * configProps passed in from region definition on parent View
    * Initialize and bind, called once on first render. Parent component is
    * initialized from app view
    * @param configProps
@@ -17,12 +18,6 @@ var Component = _appView.createComponentView({
     this.bindMap(_appStore); // Reducer store, map id string or map object
   },
 
-  configuration: function() {
-    return {
-      id: 'game__playerstats',
-      mountPoint: '#game__localplayerstats'
-    }
-  },
 
   /**
    * Create an object to be used to define events on DOM elements
@@ -36,14 +31,24 @@ var Component = _appView.createComponentView({
    * Set initial state properties. Call once on first render
    */
   getInitialState: function () {
-    return _appStore.getState().localPlayer;
+    var appState = _appStore.getState(),
+        stats    = appState.localPlayer;
+    if (this.getConfigProps().target === 'remote') {
+      stats = appState.remotePlayer;
+    }
+    return stats;
   },
 
   /**
    * State change on bound stores (map, etc.) Return nextState object
    */
   componentWillUpdate: function () {
-    return _appStore.getState().localPlayer;
+    var appState = _appStore.getState(),
+        stats    = appState.localPlayer;
+    if (this.getConfigProps().target === 'remote') {
+      stats = appState.remotePlayer;
+    }
+    return stats;
   },
 
   template: function () {

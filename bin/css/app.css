@@ -4192,6 +4192,6 @@ body {
 .app__content h2, .app__content h3, .app__content h4, .app__content h5, .app__content h6 {
   text-shadow: 2px 2px 0 #005eb8, 2px 2px 5px rgba(0, 0, 0, 0.2);
 }
-.app__content p, .app__content label {
+.app__content p, .app__content label, .app__content li {
   color: #fff;
 }

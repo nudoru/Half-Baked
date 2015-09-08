@@ -114,7 +114,7 @@ var App = Nori.createApplication({
     var localPlayerID = this.store.getState().localPlayer.id;
     console.log('filtering for', localPlayerID, playersArry);
     return playersArry.filter(function (player) {
-      return !(player.id === localPlayerID);
+      return player.id !== localPlayerID;
     })[0];
   },
 
