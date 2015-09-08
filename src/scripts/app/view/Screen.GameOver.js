@@ -1,8 +1,9 @@
-var _noriActions          = require('../../nori/action/ActionCreator'),
-    _appView              = require('./AppView'),
-    _appStore             = require('../store/AppStore'),
-    _template             = require('../../nori/utils/Templating.js'),
-    _mixinDOMManipulation = require('../../nori/view/MixinDOMManipulation.js');
+const _noriActions          = require('../../nori/action/ActionCreator'),
+      _appActions           = require('../action/ActionCreator.js'),
+      _appView              = require('./AppView'),
+      _appStore             = require('../store/AppStore'),
+      _template             = require('../../nori/utils/Templating.js'),
+      _mixinDOMManipulation = require('../../nori/view/MixinDOMManipulation.js');
 
 /**
  * Module for a dynamic application view for a route or a persistent view
@@ -29,7 +30,7 @@ var Component = _appView.createComponentView({
   defineEvents: function () {
     return {
       'click #gameover__button-replay': function () {
-        _appStore.apply(_noriActions.changeStoreState({currentState: _appStore.gameStates[1]}));
+        _appStore.apply(_appActions.resetGame());
       }
     };
   },
@@ -38,17 +39,16 @@ var Component = _appView.createComponentView({
    * Set initial state properties. Call once on first render
    */
   getInitialState: function () {
-    var appState = _appStore.getState();
-    var state    = {
-      name       : appState.localPlayer.name,
-      appearance : appState.localPlayer.appearance,
-      localScore : appState.localPlayer.score,
-      remoteScore: appState.remotePlayer.score,
-      localWin   : appState.localPlayer.score > appState.remotePlayer.score,
-      remoteWin  : appState.localPlayer.score < appState.remotePlayer.score,
-      tieWin     : appState.localPlayer.score === appState.remotePlayer.score
-    };
-    console.log(state);
+    let appState = _appStore.getState(),
+        state    = {
+          name       : appState.localPlayer.name,
+          appearance : appState.localPlayer.appearance,
+          localScore : appState.localPlayer.score,
+          remoteScore: appState.remotePlayer.score,
+          localWin   : appState.localPlayer.score > appState.remotePlayer.score,
+          remoteWin  : appState.localPlayer.score < appState.remotePlayer.score,
+          tieWin     : appState.localPlayer.score === appState.remotePlayer.score
+        };
     return state;
   },
 
@@ -63,7 +63,7 @@ var Component = _appView.createComponentView({
    * Component HTML was attached to the DOM
    */
   componentDidMount: function () {
-    var state = this.getState();
+    let state = this.getState();
 
     this.hideEl('#gameover__win');
     this.hideEl('#gameover__tie');

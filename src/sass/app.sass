@@ -100,7 +100,7 @@ body
   box-shadow: 0px 20px 30px rgba(0, 0, 0, 0.2)
 
 =heading__shadow($voff: 5px)
-  text-shadow: 2px $voff 0 $dark-blue, 2px $voff 5px rgba(0,0,0,.2)
+  text-shadow: 2px $voff 0 $dark-blue, 2px $voff 5px rgba(0, 0, 0, .2)
 
 $app-width: 975px
 $app-height: 650px
@@ -113,15 +113,41 @@ $app-height: 650px
   height: $app-height
   margin: $double-base-line-height auto 0
   overflow: hidden
-  border-radius: $base-line-height
+  border-radius: $half-base-line-height
   padding: $double-base-line-height
   +app__area-shadow
-  h1,h2,h3,h4,h5,h6
+  h1, h2, h3, h4, h5, h6
     color: #fff
     +heading__shadow
-  h2,h3,h4,h5,h6
+  h2, h3, h4, h5, h6
     +heading__shadow(2px)
   p, label, li
     color: #fff
 
+#game__localplayerstats, #game__remoteplayerstats
+  +heading__shadow(1px)
+  div > ul
+    @extend .list-plain-horizontal
+    li
+      @extend .h3-alternate
+      margin: 0
+    li:after
+      content: '|'
+      color: rgba(255,255,255,.5)
+      padding-left: $base-line-height
+      padding-right: $base-line-height
+    li:last-of-type
+      &:after
+        content: ''
+        padding-left: 0
+        padding-right: 0
 
+#game__localplayerstats
+  position: absolute
+  bottom: $base-line-height
+  left: $base-line-height
+
+#game__remoteplayerstats
+  position: absolute
+  bottom: $base-line-height
+  right: $base-line-height

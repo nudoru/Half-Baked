@@ -1,4 +1,5 @@
-var _actionConstants = require('./ActionConstants.js');
+const _actionConstants = require('./ActionConstants.js'),
+      _appStore        = require('../store/AppStore.js');
 
 /**
  * Purely for convenience, an Event ("action") Creator ala Flux spec. Follow
@@ -34,6 +35,22 @@ var ActionCreator = {
       payload: {
         data: {
           session: data
+        }
+      }
+    };
+  },
+
+  resetGame: function () {
+    return {
+      type   : _actionConstants.RESET_GAME,
+      payload: {
+        data: {
+          currentState: _appStore.gameStates[1],
+          session     : {
+            roomID    : ''
+          },
+          localPlayer : _appStore.createPlayerResetObject(),
+          remotePlayer: _appStore.createPlayerResetObject()
         }
       }
     };

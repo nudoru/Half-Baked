@@ -1,12 +1,11 @@
-var _restURL                = '',
-    _restNumQuestions       = 3,
-    _restQuestionCategory   = 24, // SCI/TECT
-    _rest                   = require('../../nori/service/Rest.js'),
-    _noriActionConstants    = require('../../nori/action/ActionConstants.js'),
-    _appActionConstants     = require('../action/ActionConstants.js'),
-    _mixinObservableSubject = require('../../nori/utils/MixinObservableSubject.js'),
-    _mixinReducerStore      = require('../../nori/store/MixinReducerStore.js'),
-    _numUtils               = require('../../nudoru/core/NumberUtils.js');
+const _restNumQuestions       = 3,
+      _restQuestionCategory   = 24, // SCI/TECh
+      _rest                   = require('../../nori/service/Rest.js'),
+      _noriActionConstants    = require('../../nori/action/ActionConstants.js'),
+      _appActionConstants     = require('../action/ActionConstants.js'),
+      _mixinObservableSubject = require('../../nori/utils/MixinObservableSubject.js'),
+      _mixinReducerStore      = require('../../nori/store/MixinReducerStore.js'),
+      _numUtils               = require('../../nudoru/core/NumberUtils.js');
 
 /**
  * This application store contains "reducer store" functionality based on Redux.
@@ -58,7 +57,7 @@ var AppStore = Nori.createStore({
       currentState: this.gameStates[0],
       session     : {
         socketIOID: '',
-        roomID: ''
+        roomID    : ''
       },
       localPlayer : _.merge(this.createBlankPlayerObject(), this.createPlayerResetObject()),
       remotePlayer: _.merge(this.createBlankPlayerObject(), this.createPlayerResetObject()),
@@ -102,6 +101,7 @@ var AppStore = Nori.createStore({
       case _appActionConstants.SET_LOCAL_PLAYER_PROPS:
       case _appActionConstants.SET_REMOTE_PLAYER_PROPS:
       case _appActionConstants.SET_SESSION_PROPS:
+      case _appActionConstants.RESET_GAME:
         return _.merge({}, state, event.payload.data);
       case undefined:
         return state;
@@ -116,7 +116,33 @@ var AppStore = Nori.createStore({
    * not check to see if the state was actually updated.
    */
   handleStateMutation: function () {
-    this.notifySubscribers(this.getState());
+    let state = this.getState();
+
+    if (this.shouldGameEnd(state)) {
+      this.setState({currentState: this.gameStates[4]});
+    }
+
+    this.notifySubscribers(state);
+  },
+
+  /**
+   * When a player's health reaches 0, the game is over
+   * @param state
+   * @returns {boolean}
+   */
+  shouldGameEnd: function (state) {
+    if (!state.localPlayer || !state.remotePlayer || state.currentState !== 'MAIN_GAME') {
+      return false;
+    }
+
+    let local  = state.localPlayer.health,
+        remote = state.remotePlayer.health;
+
+    if (local <= 0 || remote <= 0) {
+      return true;
+    }
+
+    return false;
   }
 
 });

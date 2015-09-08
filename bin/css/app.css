@@ -2464,7 +2464,7 @@ select, textarea, select.spaced {
   margin-bottom: 1.236rem;
 }
 
-.h1-alternate, .h2-alternate, .h3-alternate, .h4-alternate, .h5-alternate, tr.row-header-inline td, .tooltip__coachmark .tooltip__item-content h1, .tooltip__coachmark .tooltip__item-content p, .h6-alternate {
+.h1-alternate, .h2-alternate, .h3-alternate, #game__localplayerstats div > ul li, #game__remoteplayerstats div > ul li, .h4-alternate, .h5-alternate, tr.row-header-inline td, .tooltip__coachmark .tooltip__item-content h1, .tooltip__coachmark .tooltip__item-content p, .h6-alternate {
   font-family: "Varela Round", "Helvetica Neue", Helvetica, Arial, sans-serif;
   margin-bottom: 1.236rem;
   padding-bottom: 0;
@@ -2481,7 +2481,7 @@ select, textarea, select.spaced {
   font-weight: 300;
 }
 
-.h3-alternate {
+.h3-alternate, #game__localplayerstats div > ul li, #game__remoteplayerstats div > ul li {
   font-size: 1.277rem;
   font-weight: 300;
 }
@@ -2649,13 +2649,13 @@ hr {
   border-top: 1px solid rgba(0, 0, 0, 0.1);
 }
 
-.list-plain, .list-plain-horizontal, .list-comma-separated {
+.list-plain, .list-plain-horizontal, .list-comma-separated, #game__localplayerstats div > ul, #game__remoteplayerstats div > ul {
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
-.list-plain-horizontal li, .list-comma-separated li {
+.list-plain-horizontal li, .list-comma-separated li, #game__localplayerstats div > ul li, #game__remoteplayerstats div > ul li {
   display: inline;
 }
 
@@ -4181,7 +4181,7 @@ body {
   height: 650px;
   margin: 1.236rem auto 0;
   overflow: hidden;
-  border-radius: 0.618rem;
+  border-radius: 0.309rem;
   padding: 1.236rem;
   box-shadow: 0px 20px 30px rgba(0, 0, 0, 0.2);
 }
@@ -4194,4 +4194,34 @@ body {
 }
 .app__content p, .app__content label, .app__content li {
   color: #fff;
+}
+
+#game__localplayerstats, #game__remoteplayerstats {
+  text-shadow: 2px 1px 0 #005eb8, 2px 1px 5px rgba(0, 0, 0, 0.2);
+}
+#game__localplayerstats div > ul li, #game__remoteplayerstats div > ul li {
+  margin: 0;
+}
+#game__localplayerstats div > ul li:after, #game__remoteplayerstats div > ul li:after {
+  content: "|";
+  color: rgba(255, 255, 255, 0.5);
+  padding-left: 0.618rem;
+  padding-right: 0.618rem;
+}
+#game__localplayerstats div > ul li:last-of-type:after, #game__remoteplayerstats div > ul li:last-of-type:after {
+  content: "";
+  padding-left: 0;
+  padding-right: 0;
+}
+
+#game__localplayerstats {
+  position: absolute;
+  bottom: 0.618rem;
+  left: 0.618rem;
+}
+
+#game__remoteplayerstats {
+  position: absolute;
+  bottom: 0.618rem;
+  right: 0.618rem;
 }

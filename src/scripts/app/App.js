@@ -1,7 +1,7 @@
-var _rx             = require('../nori/utils/Rx.js'),
-    _appActions     = require('./action/ActionCreator.js'),
-    _noriActions    = require('../nori/action/ActionCreator.js'),
-    _socketIOEvents = require('../nori/service/SocketIOEvents.js');
+const _rx             = require('../nori/utils/Rx.js'),
+      _appActions     = require('./action/ActionCreator.js'),
+      _noriActions    = require('../nori/action/ActionCreator.js'),
+      _socketIOEvents = require('../nori/service/SocketIOEvents.js');
 
 /**
  * "Controller" for a Nori application. The controller is responsible for
@@ -47,8 +47,8 @@ var App = Nori.createApplication({
     this.view.removeLoadingMessage();
 
     // View will show based on the current store state
-    this.store.setState({currentState: 'MAIN_GAME'});
-    //this.store.setState({currentState: 'PLAYER_SELECT'});
+    //this.store.setState({currentState: 'MAIN_GAME'});
+    this.store.setState({currentState: 'PLAYER_SELECT'});
   },
 
   /**
@@ -120,11 +120,7 @@ var App = Nori.createApplication({
 
   handleGameAbort: function (payload) {
     this.view.alert(payload.payload, payload.type);
-    var setPlayerSelect = _noriActions.changeStoreState({currentState: this.store.gameStates[1]}),
-        resetSession    = _appActions.setSessionProps({roomID: ''}),
-        resetPlayer     = _appActions.setLocalPlayerProps(this.store.createPlayerResetObject());
-
-    this.store.apply([resetPlayer, resetSession, setPlayerSelect]);
+    this.store.apply(_appActions.resetGame());
   },
 
 });
