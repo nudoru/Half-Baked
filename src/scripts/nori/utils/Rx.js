@@ -7,7 +7,7 @@
 
 module.exports = {
   dom: function (selector, event) {
-    var el = document.querySelector(selector);
+    let el = document.querySelector(selector);
     if (!el) {
       console.warn('nori/utils/Rx, dom, invalid DOM selector: ' + selector);
       return;

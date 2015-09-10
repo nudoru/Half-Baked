@@ -15,12 +15,13 @@
  *
  */
 
-var MixinEventDelegator = function () {
+let MixinEventDelegator = function () {
 
-  var _eventsMap,
-      _eventSubscribers,
-      _rx          = require('../utils/Rx'),
-      _browserInfo = require('../../nudoru/browser/BrowserInfo.js');
+  let _eventsMap,
+      _eventSubscribers;
+
+  const _rx          = require('../utils/Rx'),
+        _browserInfo = require('../../nudoru/browser/BrowserInfo.js');
 
   function setEvents(evtObj) {
     _eventsMap = evtObj;
@@ -45,7 +46,7 @@ var MixinEventDelegator = function () {
     for (var evtStrings in _eventsMap) {
       if (_eventsMap.hasOwnProperty(evtStrings)) {
 
-        var mappings     = evtStrings.split(','),
+        let mappings     = evtStrings.split(','),
             eventHandler = _eventsMap[evtStrings];
 
         if (!is.function(eventHandler)) {
@@ -55,9 +56,10 @@ var MixinEventDelegator = function () {
 
         /* jshint -W083 */
         // https://jslinterrors.com/dont-make-functions-within-a-loop
-        mappings.forEach(function (evtMap) {
-          evtMap       = evtMap.trim();
-          var eventStr = evtMap.split(' ')[0].trim(),
+        mappings.forEach(evtMap => {
+          evtMap = evtMap.trim();
+
+          let eventStr = evtMap.split(' ')[0].trim(),
               selector = evtMap.split(' ')[1].trim();
 
           if (_browserInfo.mobile.any()) {
@@ -92,7 +94,7 @@ var MixinEventDelegator = function () {
   }
 
   function createHandler(selector, eventStr, eventHandler, autoForm) {
-    var observable = _rx.dom(selector, eventStr),
+    let observable = _rx.dom(selector, eventStr),
         el         = document.querySelector(selector),
         tag        = el.tagName.toLowerCase(),
         type       = el.getAttribute('type');
@@ -101,29 +103,18 @@ var MixinEventDelegator = function () {
       if (tag === 'input' || tag === 'textarea') {
         if (!type || type === 'text') {
           if (eventStr === 'blur' || eventStr === 'focus') {
-            return observable
-              .map(evt => evt.target.value)
-              .subscribe(eventHandler);
+            return observable.map(evt => evt.target.value).subscribe(eventHandler);
           } else if (eventStr === 'keyup' || eventStr === 'keydown') {
-            return observable
-              .throttle(100)
-              .map(evt => evt.target.value)
-              .subscribe(eventHandler);
+            return observable.throttle(100).map(evt => evt.target.value).subscribe(eventHandler);
           }
         } else if (type === 'radio' || type === 'checkbox') {
           if (eventStr === 'click') {
-            return observable
-              .map(function (evt) {
-                return evt.target.checked;
-              })
-              .subscribe(eventHandler);
+            return observable.map(evt => evt.target.checked).subscribe(eventHandler);
           }
         }
       } else if (tag === 'select') {
         if (eventStr === 'change') {
-          return observable
-            .map(evt => evt.target.value)
-            .subscribe(eventHandler);
+          return observable.map(evt => evt.target.value).subscribe(eventHandler);
         }
       }
     }

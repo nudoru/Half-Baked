@@ -1,8 +1,8 @@
 /* @flow weak */
 
-var MixinBrowserEvents = function () {
+let MixinBrowserEvents = function () {
 
-  var _scrollableAppContainer,
+  let _scrollableAppContainer,
       _browserScrollStream,
       _browserResizeStream;
 
@@ -56,10 +56,9 @@ var MixinBrowserEvents = function () {
   }
 
   function getCurrentViewPortScroll() {
-    var scrollEL = _scrollableAppContainer ? _scrollableAppContainer : document.body;
-
-    var left = scrollEL.scrollLeft,
-        top  = scrollEL.scrollTop;
+    let scrollEL = _scrollableAppContainer ? _scrollableAppContainer : document.body,
+        left     = scrollEL.scrollLeft,
+        top      = scrollEL.scrollTop;
 
     left = left ? left : 0;
     top  = top ? top : 0;

@@ -1,8 +1,8 @@
 /* @flow weak */
 
-var ApplicationView = function () {
+let ApplicationView = function () {
 
-  var _this,
+  let _this,
       _template = require('../utils/Templating.js'),
       _domUtils = require('../../nudoru/browser/DOMUtils.js');
 
@@ -29,7 +29,7 @@ var ApplicationView = function () {
       return;
     }
 
-    var bodyEl = document.querySelector('body');
+    let bodyEl = document.querySelector('body');
 
     templates.forEach(function (templ) {
       bodyEl.appendChild(_domUtils.HTMLStrToNode(_template.getSource(templ, {})));
@@ -40,7 +40,7 @@ var ApplicationView = function () {
    * After app initialization, remove the loading message
    */
   function removeLoadingMessage() {
-    var cover   = document.querySelector('#initialization__cover'),
+    let cover   = document.querySelector('#initialization__cover'),
         message = document.querySelector('.initialization__message');
 
     TweenLite.to(cover, 1, {

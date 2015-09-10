@@ -1,8 +1,8 @@
 /* @flow weak */
 
-var Nori = function () {
+let Nori = function () {
 
-  var _dispatcher = require('./utils/Dispatcher.js'),
+  const _dispatcher = require('./utils/Dispatcher.js'),
       _router     = require('./utils/Router.js');
 
   // Switch Lodash to use Mustache style templates
@@ -83,7 +83,7 @@ var Nori = function () {
    * @returns {*}
    */
   function buildFromMixins(sourceObject) {
-    var mixins;
+    let mixins;
 
     if (sourceObject.mixins) {
       mixins = sourceObject.mixins;

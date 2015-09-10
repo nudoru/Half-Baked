@@ -6,10 +6,10 @@
  * View Docs http://facebook.github.io/immutable-js/docs/#/Map
  */
 
-var immutable = require('../../vendor/immutable.min.js');
+let immutable = require('../../vendor/immutable.min.js');
 
-var ImmutableMap = function () {
-  var _map = immutable.Map();
+let ImmutableMap = function () {
+  let _map = immutable.Map();
 
   /**
    * Returns the Map object

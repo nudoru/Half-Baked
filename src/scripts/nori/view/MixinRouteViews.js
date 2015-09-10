@@ -4,9 +4,9 @@
  * Mixin view that allows for component views to be display on routing changes
  */
 
-var MixinRouteViews = function () {
+let MixinRouteViews = function () {
 
-  var _this,
+  let _this,
       _currentRouteViewID,
       _routeViewMountPoint,
       _routeViewIDMap = Object.create(null);
@@ -73,7 +73,7 @@ var MixinRouteViews = function () {
    * @param route
    */
   function showRouteViewComponent(route) {
-    var componentID = _routeViewIDMap[route];
+    let componentID = _routeViewIDMap[route];
     if (!componentID) {
       console.warn("No view mapped for route: " + route);
       return;

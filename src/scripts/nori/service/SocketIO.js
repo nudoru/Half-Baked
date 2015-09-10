@@ -1,8 +1,8 @@
 /* @flow weak */
 
-var SocketIOConnector = function () {
+let SocketIOConnector = function () {
 
-  var _subject  = new Rx.BehaviorSubject(),
+  let _subject  = new Rx.BehaviorSubject(),
       _socketIO = io(),
       _log      = [],
       _connectionID,
@@ -20,11 +20,13 @@ var SocketIOConnector = function () {
   function onNotifyClient(payload) {
     _log.push(payload);
 
-    if (payload.type === _events.PING) {
+    let {type} = payload;
+
+    if (type === _events.PING) {
       notifyServer(_events.PONG, {});
-    } else if (payload.type === _events.PONG) {
+    } else if (type === _events.PONG) {
       console.log('SOCKET.IO PONG!');
-    } else if (payload.type === _events.CONNECT) {
+    } else if (type === _events.CONNECT) {
       _connectionID = payload.id;
     }
     notifySubscribers(payload);

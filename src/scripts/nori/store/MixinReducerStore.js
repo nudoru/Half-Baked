@@ -10,8 +10,8 @@
  *
  * Created 8/13/15
  */
-var MixinReducerStore = function () {
-  var _this,
+let MixinReducerStore = function () {
+  let _this,
       _state,
       _stateReducers = [];
 
@@ -73,7 +73,7 @@ var MixinReducerStore = function () {
    * @param actionObjOrArry Array of actions or a single action to reduce from
    */
   function apply(actionObjOrArry) {
-    if(is.array(actionObjOrArry)) {
+    if (is.array(actionObjOrArry)) {
       actionObjOrArry.forEach(actionObj => applyReducers(actionObj));
     } else {
       applyReducers(actionObjOrArry);
@@ -81,7 +81,7 @@ var MixinReducerStore = function () {
   }
 
   function applyReducers(actionObject) {
-    var nextState = applyReducersToState(getState(), actionObject);
+    let nextState = applyReducersToState(getState(), actionObject);
     setState(nextState);
     _this.handleStateMutation();
   }
@@ -102,10 +102,7 @@ var MixinReducerStore = function () {
    */
   function applyReducersToState(state, action) {
     state = state || {};
-    // TODO should this actually use array.reduce()?
-    _stateReducers.forEach(function applyStateReducerFunction(reducerFunc) {
-      state = reducerFunc(state, action);
-    });
+    _stateReducers.forEach(reducerFunc => state = reducerFunc(state, action));
     return state;
   }
 

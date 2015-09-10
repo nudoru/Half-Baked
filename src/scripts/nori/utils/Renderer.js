@@ -4,15 +4,12 @@
  * Utility to handle all view DOM attachment tasks
  */
 
-var Renderer = function () {
-  var _domUtils = require('../../nudoru/browser/DOMUtils.js');
+let Renderer = function () {
+  const _domUtils = require('../../nudoru/browser/DOMUtils.js');
 
-  function render(payload) {
-    var targetSelector = payload.target,
-        html           = payload.html,
-        domEl,
-        mountPoint     = document.querySelector(targetSelector),
-        cb             = payload.callback;
+  function render({target, html, callback}) {
+    let domEl,
+        mountPoint     = document.querySelector(target);
 
     mountPoint.innerHTML = '';
 
@@ -21,8 +18,8 @@ var Renderer = function () {
       mountPoint.appendChild(domEl);
     }
 
-    if (cb) {
-      cb(domEl);
+    if (callback) {
+      callback(domEl);
     }
 
     return domEl;

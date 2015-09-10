@@ -15,7 +15,7 @@ var socketIO               = require('socket.io'),
 //----------------------------------------------------------------------------
 
 module.exports = {
-  connect: function (server) {
+  connect: server => {
     _io = socketIO(server);
     _io.on('connection', onConnect);
   }
@@ -56,11 +56,11 @@ function updatePlayerDetails(id, details) {
 
 function getPlayerDetails() {
   var details = [];
-  for (var id in _connectionsMap) {
+  Object.keys(_connectionsMap).forEach(id => {
     if (_connectionsMap.hasOwnProperty(id)) {
       details.push(_connectionsMap[id].playerDetails);
     }
-  }
+  });
   return details;
 }
 
@@ -68,6 +68,7 @@ function getConnectionsForID(id) {
   return _.assign({}, _connectionsMap[id]);
 }
 
+// TODO itterate over Object.keys()
 function pruneConnectionsMap() {
   var socketList = _io.sockets.server.eio.clients, notifyRoom, status = true;
   for (var id in _connectionsMap) {
@@ -75,7 +76,7 @@ function pruneConnectionsMap() {
       if (socketList[id] === undefined) {
         status = false;
 
-        console.log('Disconnect ',id);
+        console.log('Disconnect ', id);
 
         for (var roomid in _roomMap) {
           if (_roomMap.hasOwnProperty(roomid)) {

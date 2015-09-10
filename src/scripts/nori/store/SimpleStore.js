@@ -1,7 +1,7 @@
 /* @flow weak */
 
-var SimpleStore = function () {
-  var _internalState = Object.create(null);
+let SimpleStore = function () {
+  let _internalState = Object.create(null);
 
   /**
    * Return a copy of the state

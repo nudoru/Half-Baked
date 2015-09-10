@@ -6,9 +6,9 @@
  * Add one simple observable subject or more complex ability to create others for
  * more complex eventing needs.
  */
-var MixinObservableSubject = function () {
+let MixinObservableSubject = function () {
 
-  var _subject    = new Rx.Subject(),
+  let _subject    = new Rx.Subject(),
       _subjectMap = {};
 
   /**

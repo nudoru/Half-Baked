@@ -61,11 +61,11 @@
  *
  */
 
-var Rest = function () {
+let Rest = function () {
 
   function request(reqObj) {
 
-    var xhr     = new XMLHttpRequest(),
+    let xhr     = new XMLHttpRequest(),
         json    = reqObj.json || false,
         method  = reqObj.method.toUpperCase() || 'GET',
         url     = reqObj.url,
@@ -105,7 +105,7 @@ var Rest = function () {
       };
 
       headers.forEach(function (headerPair) {
-        var prop = Object.keys(headerPair)[0],
+        let prop = Object.keys(headerPair)[0],
             value = headerPair[prop];
         if (prop && value) {
           xhr.setRequestHeader(prop, value);

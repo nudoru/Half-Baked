@@ -4,9 +4,9 @@
  * Mixin view that allows for component views
  */
 
-var MixinComponentViews = function () {
+let MixinComponentViews = function () {
 
-  var _componentViewMap = Object.create(null);
+  let _componentViewMap = Object.create(null);
 
   /**
    * Map a component to a mounting point. If a string is passed,
@@ -18,10 +18,10 @@ var MixinComponentViews = function () {
    * @param mountPoint
    */
   function mapViewComponent(componentID, componentIDorObj, mountPoint) {
-    var componentObj;
+    let componentObj;
 
     if (typeof componentIDorObj === 'string') {
-      var componentFactory = require(componentIDorObj);
+      let componentFactory = require(componentIDorObj);
       componentObj         = createComponentView(componentFactory())();
     } else {
       componentObj = componentIDorObj;
@@ -40,11 +40,12 @@ var MixinComponentViews = function () {
    */
   function createComponentView(componentSource) {
     return function (configProps) {
-      var componentViewFactory  = require('./ViewComponent.js'),
-          eventDelegatorFactory = require('./MixinEventDelegator.js'),
-          observableFactory     = require('../utils/MixinObservableSubject.js'),
-          stateObjFactory       = require('../store/ImmutableMap.js'),
-          componentAssembly, finalComponent, previousInitialize;
+      const componentViewFactory  = require('./ViewComponent.js'),
+            eventDelegatorFactory = require('./MixinEventDelegator.js'),
+            observableFactory     = require('../utils/MixinObservableSubject.js'),
+            stateObjFactory       = require('../store/ImmutableMap.js');
+
+      let componentAssembly, finalComponent, previousInitialize;
 
       componentAssembly = [
         componentViewFactory(),
@@ -67,8 +68,8 @@ var MixinComponentViews = function () {
         previousInitialize.call(finalComponent, initObj);
       };
 
-      if(configProps) {
-        finalComponent.configuration = function() {
+      if (configProps) {
+        finalComponent.configuration = function () {
           return configProps;
         };
       }
@@ -83,7 +84,7 @@ var MixinComponentViews = function () {
    * @param dataObj
    */
   function showViewComponent(componentID, mountPoint) {
-    var componentView = _componentViewMap[componentID];
+    let componentView = _componentViewMap[componentID];
     if (!componentView) {
       console.warn('No componentView mapped for id: ' + componentID);
       return;

@@ -5,9 +5,9 @@
  * Supporting IE9 so using hashes instead of the history API for now
  */
 
-var Router = function () {
+let Router = function () {
 
-  var _subject  = new Rx.Subject(),
+  let _subject  = new Rx.Subject(),
       _hashChangeObservable,
       _objUtils = require('../../nudoru/core/ObjectUtils.js');
 
@@ -32,7 +32,7 @@ var Router = function () {
    * @param fromApp True if the route was caused by an app event not URL or history change
    */
   function notifySubscribers() {
-    var eventPayload = {
+    let eventPayload = {
       routeObj: getCurrentRoute(), // { route:, data: }
       fragment: getURLFragment()
     };
@@ -45,7 +45,7 @@ var Router = function () {
    * @returns {{route: string, query: {}}}
    */
   function getCurrentRoute() {
-    var fragment    = getURLFragment(),
+    let fragment    = getURLFragment(),
         parts       = fragment.split('?'),
         route       = '/' + parts[0],
         queryStr    = decodeURIComponent(parts[1]),
@@ -64,11 +64,11 @@ var Router = function () {
    * @returns {{}}
    */
   function parseQueryStr(queryStr) {
-    var obj   = {},
+    let obj   = {},
         parts = queryStr.split('&');
 
-    parts.forEach(function (pairStr) {
-      var pairArr     = pairStr.split('=');
+    parts.forEach(pairStr => {
+      let pairArr     = pairStr.split('=');
       obj[pairArr[0]] = pairArr[1];
     });
 
@@ -81,7 +81,7 @@ var Router = function () {
    * @param dataObj
    */
   function set(route, dataObj) {
-    var path = route,
+    let path = route,
         data = [];
     if (!_objUtils.isNull(dataObj)) {
       path += "?";
@@ -102,7 +102,7 @@ var Router = function () {
    * @returns {string}
    */
   function getURLFragment() {
-    var fragment = location.hash.slice(1);
+    let fragment = location.hash.slice(1);
     return fragment.toString().replace(/\/$/, '').replace(/^\//, '');
   }
 
@@ -124,7 +124,7 @@ var Router = function () {
 
 };
 
-var r = Router();
+let r = Router();
 r.initialize();
 
 module.exports = r;

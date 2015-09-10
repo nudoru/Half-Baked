@@ -5,11 +5,11 @@
  * Must be extended with custom modules
  */
 
-var _template = require('../utils/Templating.js');
+const _template = require('../utils/Templating.js');
 
 var ViewComponent = function () {
 
-  var _isInitialized = false,
+  let _isInitialized = false,
       _configProps,
       _id,
       _templateObjCache,
@@ -57,7 +57,7 @@ var ViewComponent = function () {
    */
   function bindMap(mapObj) {
     if (!is.function(mapObj.subscribe)) {
-      console.warn('ViewComponent bindMap, map or mapcollection must be observable: ' + mapObj);
+      console.warn('ViewComponent bindMap, must be observable: ' + mapObj);
       return;
     }
 
@@ -73,18 +73,15 @@ var ViewComponent = function () {
   }
 
   function update() {
-    var currentState = this.getState();
-    var nextState    = this.componentWillUpdate();
+    let nextState    = this.componentWillUpdate();
 
     if (this.shouldComponentUpdate(nextState)) {
       this.setState(nextState);
 
       if (_isMounted) {
-        //if (this.shouldComponentRender(currentState)) {
         this.unmount();
         this.componentRender();
         this.mount();
-        //}
       }
 
       this.updateRegions();
@@ -127,7 +124,7 @@ var ViewComponent = function () {
    */
   function template() {
     // assumes the template ID matches the component's ID as passed on initialize
-    var html = _template.getSource(this.getID());
+    let html = _template.getSource(this.getID());
     return _.template(html);
   }
 

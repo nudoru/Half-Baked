@@ -1,4 +1,4 @@
-var MixinDOMManipulation = function () {
+let MixinDOMManipulation = function () {
 
   function hideEl(selector) {
     TweenLite.set(document.querySelector(selector), {
