@@ -24,6 +24,7 @@ module.exports = {
     });
 
     app.delete('/items/:id', jsonParser, function (req, res) {
+      // true for debug
       if (true) {
         res.status(200).json({
           data  : 'w00t!',

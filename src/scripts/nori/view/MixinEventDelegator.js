@@ -15,13 +15,15 @@
  *
  */
 
+
 let MixinEventDelegator = function () {
 
   let _eventsMap,
       _eventSubscribers;
 
   const _rx          = require('../utils/Rx'),
-        _browserInfo = require('../../nudoru/browser/BrowserInfo.js');
+        _browserInfo = require('../../nudoru/browser/BrowserInfo.js'),
+        is           = require('../../nudoru/util/is.js');
 
   function setEvents(evtObj) {
     _eventsMap = evtObj;
@@ -49,7 +51,7 @@ let MixinEventDelegator = function () {
         let mappings     = evtStrings.split(','),
             eventHandler = _eventsMap[evtStrings];
 
-        if (!is.function(eventHandler)) {
+        if (!is.func(eventHandler)) {
           console.warn('EventDelegator, handler for ' + evtStrings + ' is not a function');
           return;
         }

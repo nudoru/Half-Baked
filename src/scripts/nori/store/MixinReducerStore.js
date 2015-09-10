@@ -10,6 +10,9 @@
  *
  * Created 8/13/15
  */
+
+const is = require('../../nudoru/util/is.js');
+
 let MixinReducerStore = function () {
   let _this,
       _state,

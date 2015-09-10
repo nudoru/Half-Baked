@@ -6,6 +6,9 @@
  * Add one simple observable subject or more complex ability to create others for
  * more complex eventing needs.
  */
+
+const is = require('../../nudoru/util/is.js');
+
 let MixinObservableSubject = function () {
 
   let _subject    = new Rx.Subject(),
