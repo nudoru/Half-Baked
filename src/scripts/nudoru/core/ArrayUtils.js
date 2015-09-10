@@ -2,6 +2,10 @@ var _numberUtils = require('./NumberUtils.js');
 
 module.exports = {
 
+  arrify: function (a) {
+    return Array.prototype.slice.call(a, 0);
+  },
+
   // Reference: http://jhusain.github.io/learnrx/index.html
   mergeAll: function () {
     var results = [];
