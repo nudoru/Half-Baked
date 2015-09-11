@@ -4,8 +4,6 @@
  * Mixin view that allows for component views
  */
 
-
-
 let MixinComponentViews = function () {
 
   let _componentViewMap = Object.create(null);
@@ -40,7 +38,7 @@ let MixinComponentViews = function () {
             eventDelegatorFactory = require('./MixinEventDelegator.js'),
             observableFactory     = require('../utils/MixinObservableSubject.js'),
             stateObjFactory       = require('../store/ImmutableMap.js');
-      
+
       componentAssembly = [
         componentViewFactory(),
         eventDelegatorFactory(),
