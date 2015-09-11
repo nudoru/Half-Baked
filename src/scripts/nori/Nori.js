@@ -12,21 +12,6 @@ let Nori = function () {
   let _storeTemplate,
       _viewTemplate;
 
-  _storeTemplate = createStore({
-    mixins: [
-      _mixinReducerStore,
-      _mixinObservableSubject.default()
-    ]
-  })();
-
-  _viewTemplate = createView({
-    mixins: [
-      _mixinComponentViews,
-      _mixinEventDelegator.default(),
-      _mixinObservableSubject.default()
-    ]
-  })();
-
   // Switch Lodash to use Mustache style templates
   _.templateSettings.interpolate = /{{([\s\S]+?)}}/g;
 
@@ -57,6 +42,25 @@ let Nori = function () {
   function store() {
     return _storeTemplate;
   }
+
+  //----------------------------------------------------------------------------
+  //  Template parts
+  //----------------------------------------------------------------------------
+
+  _storeTemplate = createStore({
+    mixins: [
+      _mixinReducerStore,
+      _mixinObservableSubject.default()
+    ]
+  })();
+
+  _viewTemplate = createView({
+    mixins: [
+      _mixinComponentViews,
+      _mixinEventDelegator.default(),
+      _mixinObservableSubject.default()
+    ]
+  })();
 
   //----------------------------------------------------------------------------
   //  Factories - concatenative inheritance, decorators
