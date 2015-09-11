@@ -2,7 +2,11 @@ import * as _appStore from '../store/AppStore.js';
 import * as _mixinApplicationView from '../../nori/view/ApplicationView.js';
 import * as _mixinNudoruControls from '../../nori/view/MixinNudoruControls.js';
 import * as _mixinStoreStateViews from '../../nori/view/MixinStoreStateViews.js';
-
+import * as _screenTitleFactory from './Screen.Title.js';
+import * as _screenPlayerSelectFactory from './Screen.PlayerSelect.js';
+import * as _screenWaitingOnPlayerFactory from './Screen.WaitingOnPlayer.js';
+import * as _screenMainGameFactory from './Screen.MainGame.js';
+import * as _screenGameOverFactory from './Screen.GameOver.js';
 /**
  * View for an application.
  */
@@ -24,20 +28,15 @@ var AppView = Nori.createView({
   },
 
   configureViews: function () {
-    var screenTitle           = require('./Screen.Title.js')(),
-        screenPlayerSelect    = require('./Screen.PlayerSelect.js')(),
-        screenWaitingOnPlayer = require('./Screen.WaitingOnPlayer.js')(),
-        screenMainGame        = require('./Screen.MainGame.js')(),
-        screenGameOver        = require('./Screen.GameOver.js')(),
-        gameStates            = _appStore.gameStates;
+    var gameStates = _appStore.gameStates;
 
     this.setViewMountPoint('#contents');
 
-    this.mapStateToViewComponent(gameStates[0], 'title', screenTitle);
-    this.mapStateToViewComponent(gameStates[1], 'playerselect', screenPlayerSelect);
-    this.mapStateToViewComponent(gameStates[2], 'waitingonplayer', screenWaitingOnPlayer);
-    this.mapStateToViewComponent(gameStates[3], 'game', screenMainGame);
-    this.mapStateToViewComponent(gameStates[4], 'gameover', screenGameOver);
+    this.mapStateToViewComponent(gameStates[0], 'title', _screenTitleFactory.default());
+    this.mapStateToViewComponent(gameStates[1], 'playerselect', _screenPlayerSelectFactory.default());
+    this.mapStateToViewComponent(gameStates[2], 'waitingonplayer', _screenWaitingOnPlayerFactory.default());
+    this.mapStateToViewComponent(gameStates[3], 'game', _screenMainGameFactory.default());
+    this.mapStateToViewComponent(gameStates[4], 'gameover', _screenGameOverFactory.default());
   }
 
 });

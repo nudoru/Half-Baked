@@ -6,7 +6,7 @@ import * as _template from '../../nori/utils/Templating.js';
 /**
  * Module for a dynamic application view for a route or a persistent view
  */
-var Component = _appView.createComponentView({
+var Component = Nori.view().createComponentView({
 
   /**
    * Initialize and bind, called once on first render. Parent component is
