@@ -1,9 +1,9 @@
-const _noriActions          = require('../../nori/action/ActionCreator'),
-      _appActions           = require('../action/ActionCreator.js'),
-      _appView              = require('./AppView'),
-      _appStore             = require('../store/AppStore'),
-      _template             = require('../../nori/utils/Templating.js'),
-      _mixinDOMManipulation = require('../../nori/view/MixinDOMManipulation.js');
+import * as _noriActions from '../../nori/action/ActionCreator';
+import * as _appView from './AppView';
+import * as _appStore from '../store/AppStore';
+import * as _template from '../../nori/utils/Templating.js';
+import * as _appActions from '../action/ActionCreator.js';
+import * as _mixinDOMManipulation from '../../nori/view/MixinDOMManipulation.js';
 
 /**
  * Module for a dynamic application view for a route or a persistent view

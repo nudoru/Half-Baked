@@ -7,6 +7,7 @@
 
 import * as _template from '../utils/Templating.js';
 import * as _renderer from '../utils/Renderer.js';
+import * as is from '../../nudoru/util/is.js';
 
 var ViewComponent = function () {
 
@@ -56,7 +57,7 @@ var ViewComponent = function () {
    * @param mapObj Object to subscribe to or ID. Should implement nori/store/MixinObservableStore
    */
   function bindMap(mapObj) {
-    if (!is.function(mapObj.subscribe)) {
+    if (!is.func(mapObj.subscribe)) {
       console.warn('ViewComponent bindMap, must be observable: ' + mapObj);
       return;
     }

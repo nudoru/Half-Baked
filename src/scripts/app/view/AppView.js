@@ -1,10 +1,10 @@
-var _appStore               = require('../store/AppStore.js'),
-    _mixinApplicationView   = require('../../nori/view/ApplicationView.js'),
-    _mixinNudoruControls    = require('../../nori/view/MixinNudoruControls.js'),
-    _mixinComponentViews    = require('../../nori/view/MixinComponentViews.js'),
-    _mixinStoreStateViews   = require('../../nori/view/MixinStoreStateViews.js'),
-    _mixinEventDelegator    = require('../../nori/view/MixinEventDelegator.js'),
-    _mixinObservableSubject = require('../../nori/utils/MixinObservableSubject.js');
+import * as _appStore from '../store/AppStore.js';
+import * as _mixinApplicationView from '../../nori/view/ApplicationView.js';
+import * as _mixinNudoruControls from '../../nori/view/MixinNudoruControls.js';
+import * as _mixinComponentViews from '../../nori/view/MixinComponentViews.js';
+import * as _mixinStoreStateViews from '../../nori/view/MixinStoreStateViews.js';
+import * as _mixinEventDelegator from '../../nori/view/MixinEventDelegator.js';
+import * as _mixinObservableSubject from '../../nori/utils/MixinObservableSubject.js';
 
 /**
  * View for an application.
@@ -17,8 +17,8 @@ var AppView = Nori.createView({
     _mixinNudoruControls,
     _mixinComponentViews,
     _mixinStoreStateViews,
-    _mixinEventDelegator(),
-    _mixinObservableSubject()
+    _mixinEventDelegator.default(),
+    _mixinObservableSubject.default()
   ],
 
   initialize: function () {

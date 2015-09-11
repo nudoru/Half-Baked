@@ -1,11 +1,11 @@
-const _noriActions       = require('../../nori/action/ActionCreator.js'),
-      _appActions        = require('../action/ActionCreator.js'),
-      _appView           = require('./AppView.js'),
-      _appStore          = require('../store/AppStore.js'),
-      _socketIO          = require('../../nori/service/SocketIO.js'),
-      _template          = require('../../nori/utils/Templating.js'),
-      _regionPlayerStats = require('./Region.PlayerStats.js'),
-      _numUtils          = require('../../nudoru/core/NumberUtils.js');
+import * as _noriActions from '../../nori/action/ActionCreator';
+import * as _appView from './AppView';
+import * as _appStore from '../store/AppStore';
+import * as _template from '../../nori/utils/Templating.js';
+import * as _appActions from '../action/ActionCreator.js';
+import * as _socketIO from '../../nori/service/SocketIO.js';
+import * as _regionPlayerStats from './Region.PlayerStats.js';
+import * as _numUtils from '../../nudoru/core/NumberUtils.js';
 
 /**
  * Module for a dynamic application view for a route or a persistent view
@@ -23,12 +23,12 @@ var Component = _appView.createComponentView({
 
   defineRegions: function () {
     return {
-      localPlayerStats : _regionPlayerStats({
+      localPlayerStats : _regionPlayerStats.default({
         id        : 'game__playerstats',
         mountPoint: '#game__localplayerstats',
         target    : 'local'
       }),
-      remotePlayerStats: _regionPlayerStats({
+      remotePlayerStats: _regionPlayerStats.default({
         id        : 'game__playerstats',
         mountPoint: '#game__remoteplayerstats',
         target    : 'remote'
