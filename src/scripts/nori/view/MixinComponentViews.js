@@ -34,14 +34,13 @@ let MixinComponentViews = function () {
   function createComponentView(componentSource) {
     return function (configProps) {
 
-      // TODO use import for these
+      let componentAssembly, finalComponent, previousInitialize;
+
       const componentViewFactory  = require('./ViewComponent.js'),
             eventDelegatorFactory = require('./MixinEventDelegator.js'),
             observableFactory     = require('../utils/MixinObservableSubject.js'),
             stateObjFactory       = require('../store/ImmutableMap.js');
-
-      let componentAssembly, finalComponent, previousInitialize;
-
+      
       componentAssembly = [
         componentViewFactory(),
         eventDelegatorFactory(),
