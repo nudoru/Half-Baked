@@ -1,10 +1,7 @@
 import * as _rest from '../../nori/service/Rest.js';
 import * as _noriActionConstants from '../../nori/action/ActionConstants.js';
 import * as _appActionConstants from '../action/ActionConstants.js';
-import * as _mixinObservableSubject from '../../nori/utils/MixinObservableSubject.js';
-import * as _mixinReducerStore from '../../nori/store/MixinReducerStore.js';
 import * as _numUtils from '../../nudoru/core/NumberUtils.js';
-
 
 const _restNumQuestions     = 3,
       _restQuestionCategory = 24; // SCI/TECh
@@ -21,10 +18,7 @@ const _restNumQuestions     = 3,
  */
 var AppStore = Nori.createStore({
 
-  mixins: [
-    _mixinReducerStore,
-    _mixinObservableSubject.default()
-  ],
+  mixins: [],
 
   gameStates: ['TITLE', 'PLAYER_SELECT', 'WAITING_ON_PLAYER', 'MAIN_GAME', 'GAME_OVER'],
 

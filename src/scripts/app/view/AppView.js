@@ -1,10 +1,7 @@
 import * as _appStore from '../store/AppStore.js';
 import * as _mixinApplicationView from '../../nori/view/ApplicationView.js';
 import * as _mixinNudoruControls from '../../nori/view/MixinNudoruControls.js';
-import * as _mixinComponentViews from '../../nori/view/MixinComponentViews.js';
 import * as _mixinStoreStateViews from '../../nori/view/MixinStoreStateViews.js';
-import * as _mixinEventDelegator from '../../nori/view/MixinEventDelegator.js';
-import * as _mixinObservableSubject from '../../nori/utils/MixinObservableSubject.js';
 
 /**
  * View for an application.
@@ -15,10 +12,7 @@ var AppView = Nori.createView({
   mixins: [
     _mixinApplicationView,
     _mixinNudoruControls,
-    _mixinComponentViews,
-    _mixinStoreStateViews,
-    _mixinEventDelegator.default(),
-    _mixinObservableSubject.default()
+    _mixinStoreStateViews
   ],
 
   initialize: function () {

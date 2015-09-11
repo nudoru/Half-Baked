@@ -3,12 +3,10 @@ import * as _appView from './AppView';
 import * as _appStore from '../store/AppStore';
 import * as _template from '../../nori/utils/Templating.js';
 
-console.log('title', _appView);
-
 /**
  * Module for a dynamic application view for a route or a persistent view
  */
-var Component = _appView.createComponentView({
+var Component = Nori.view().createComponentView({
 
   /**
    * Initialize and bind, called once on first render. Parent component is

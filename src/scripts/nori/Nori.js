@@ -1,9 +1,31 @@
 /* @flow weak */
 
+import * as _mixinObservableSubject from './utils/MixinObservableSubject.js';
+import * as _mixinReducerStore from './store/MixinReducerStore.js';
+import * as _mixinComponentViews from './view/MixinComponentViews.js';
+import * as _mixinEventDelegator from './view/MixinEventDelegator.js';
 import * as _dispatcher from './utils/Dispatcher.js';
 import * as _router from './utils/Router.js';
 
 let Nori = function () {
+
+  let _storeTemplate,
+      _viewTemplate;
+
+  _storeTemplate = createStore({
+    mixins: [
+      _mixinReducerStore,
+      _mixinObservableSubject.default()
+    ]
+  })();
+
+  _viewTemplate = createView({
+    mixins: [
+      _mixinComponentViews,
+      _mixinEventDelegator.default(),
+      _mixinObservableSubject.default()
+    ]
+  })();
 
   // Switch Lodash to use Mustache style templates
   _.templateSettings.interpolate = /{{([\s\S]+?)}}/g;
@@ -26,6 +48,14 @@ let Nori = function () {
 
   function getCurrentRoute() {
     return _router.getCurrentRoute();
+  }
+
+  function view() {
+    return _viewTemplate;
+  }
+
+  function store() {
+    return _storeTemplate;
   }
 
   //----------------------------------------------------------------------------
@@ -62,7 +92,7 @@ let Nori = function () {
    */
   function createStore(custom) {
     return function cs() {
-      return _.assign({}, buildFromMixins(custom));
+      return _.assign({}, _storeTemplate, buildFromMixins(custom));
     };
   }
 
@@ -73,7 +103,7 @@ let Nori = function () {
    */
   function createView(custom) {
     return function cv() {
-      return _.assign({}, buildFromMixins(custom));
+      return _.assign({}, _viewTemplate, buildFromMixins(custom));
     };
   }
 
@@ -101,6 +131,8 @@ let Nori = function () {
     config           : getConfig,
     dispatcher       : getDispatcher,
     router           : getRouter,
+    view             : view,
+    store            : store,
     createApplication: createApplication,
     createStore      : createStore,
     createView       : createView,

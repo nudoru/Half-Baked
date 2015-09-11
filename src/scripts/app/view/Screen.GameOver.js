@@ -8,7 +8,7 @@ import * as _mixinDOMManipulation from '../../nori/view/MixinDOMManipulation.js'
 /**
  * Module for a dynamic application view for a route or a persistent view
  */
-var Component = _appView.createComponentView({
+var Component = Nori.view().createComponentView({
 
   mixins: [
     _mixinDOMManipulation
