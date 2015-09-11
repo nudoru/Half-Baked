@@ -5,7 +5,8 @@
  * Must be extended with custom modules
  */
 
-const _template = require('../utils/Templating.js');
+import * as _template from '../utils/Templating.js';
+import * as _renderer from '../utils/Renderer.js';
 
 var ViewComponent = function () {
 
@@ -17,8 +18,7 @@ var ViewComponent = function () {
       _DOMElement,
       _mountPoint,
       _regions       = {},
-      _isMounted     = false,
-      _renderer      = require('../utils/Renderer');
+      _isMounted     = false;
 
   /**
    * Initialization
@@ -313,4 +313,4 @@ var ViewComponent = function () {
 
 };
 
-module.exports = ViewComponent;
+export default ViewComponent;

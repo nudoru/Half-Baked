@@ -4,6 +4,8 @@
  * Mixin view that allows for component views
  */
 
+
+
 let MixinComponentViews = function () {
 
   let _componentViewMap = Object.create(null);
@@ -17,16 +19,7 @@ let MixinComponentViews = function () {
    * @param componentIDorObj
    * @param mountPoint
    */
-  function mapViewComponent(componentID, componentIDorObj, mountPoint) {
-    let componentObj;
-
-    if (typeof componentIDorObj === 'string') {
-      let componentFactory = require(componentIDorObj);
-      componentObj         = createComponentView(componentFactory())();
-    } else {
-      componentObj = componentIDorObj;
-    }
-
+  function mapViewComponent(componentID, componentObj, mountPoint) {
     _componentViewMap[componentID] = {
       controller: componentObj,
       mountPoint: mountPoint
@@ -40,6 +33,8 @@ let MixinComponentViews = function () {
    */
   function createComponentView(componentSource) {
     return function (configProps) {
+
+      // TODO use import for these
       const componentViewFactory  = require('./ViewComponent.js'),
             eventDelegatorFactory = require('./MixinEventDelegator.js'),
             observableFactory     = require('../utils/MixinObservableSubject.js'),
@@ -126,4 +121,4 @@ let MixinComponentViews = function () {
 
 };
 
-module.exports = MixinComponentViews();
+export default MixinComponentViews();

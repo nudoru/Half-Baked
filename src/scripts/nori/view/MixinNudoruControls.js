@@ -1,12 +1,12 @@
 /* @flow weak */
 
-let MixinNudoruControls = function () {
+import * as _notificationView from '../../nudoru/components/ToastView.js';
+import * as _toolTipView from '../../nudoru/components/ToolTipView.js';
+import * as _messageBoxView from '../../nudoru/components/MessageBoxView.js';
+import * as _messageBoxCreator from '../../nudoru/components/MessageBoxCreator.js';
+import * as _modalCoverView from '../../nudoru/components/ModalCoverView.js';
 
-  const _notificationView  = require('../../nudoru/components/ToastView.js'),
-        _toolTipView       = require('../../nudoru/components/ToolTipView.js'),
-        _messageBoxView    = require('../../nudoru/components/MessageBoxView.js'),
-        _messageBoxCreator = require('../../nudoru/components/MessageBoxCreator.js'),
-        _modalCoverView    = require('../../nudoru/components/ModalCoverView.js');
+let MixinNudoruControls = function () {
 
   function initializeNudoruControls() {
     _toolTipView.initialize('tooltip__container');
@@ -55,4 +55,4 @@ let MixinNudoruControls = function () {
 
 };
 
-module.exports = MixinNudoruControls();
+export default MixinNudoruControls();

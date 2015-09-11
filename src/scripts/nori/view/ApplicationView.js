@@ -1,10 +1,11 @@
 /* @flow weak */
 
+import * as _template from '../utils/Templating.js';
+import * as _domUtils from '../../nudoru/browser/DOMUtils.js';
+
 let ApplicationView = function () {
 
-  let _this,
-      _template = require('../utils/Templating.js'),
-      _domUtils = require('../../nudoru/browser/DOMUtils.js');
+  let _this;
 
   //----------------------------------------------------------------------------
   //  Initialization
@@ -67,4 +68,4 @@ let ApplicationView = function () {
 
 };
 
-module.exports = ApplicationView();
+export default ApplicationView();

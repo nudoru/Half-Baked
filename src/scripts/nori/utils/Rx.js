@@ -5,7 +5,7 @@
  * @type {{dom: Function, from: Function, interval: Function, doEvery: Function, just: Function, empty: Function}}
  */
 
-module.exports = {
+export default {
   dom: function (selector, event) {
     let el = document.querySelector(selector);
     if (!el) {

@@ -112,4 +112,4 @@ let MixinRouteViews = function () {
 
 };
 
-module.exports = MixinRouteViews();
+export default MixinRouteViews();

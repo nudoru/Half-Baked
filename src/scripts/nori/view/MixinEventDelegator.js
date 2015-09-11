@@ -15,15 +15,14 @@
  *
  */
 
+import * as _rx from '../utils/Rx.js';
+import * as _browserInfo from '../../nudoru/browser/BrowserInfo.js';
+import * as is from '../../nudoru/util/is.js';
 
 let MixinEventDelegator = function () {
 
   let _eventsMap,
       _eventSubscribers;
-
-  const _rx          = require('../utils/Rx'),
-        _browserInfo = require('../../nudoru/browser/BrowserInfo.js'),
-        is           = require('../../nudoru/util/is.js');
 
   function setEvents(evtObj) {
     _eventsMap = evtObj;
@@ -149,4 +148,4 @@ let MixinEventDelegator = function () {
 
 };
 
-module.exports = MixinEventDelegator;
+export default MixinEventDelegator;

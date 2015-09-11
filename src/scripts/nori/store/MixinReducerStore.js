@@ -11,7 +11,7 @@
  * Created 8/13/15
  */
 
-const is = require('../../nudoru/util/is.js');
+import * as is from '../../nudoru/util/is.js';
 
 let MixinReducerStore = function () {
   let _this,
@@ -147,4 +147,4 @@ let MixinReducerStore = function () {
 
 };
 
-module.exports = MixinReducerStore();
+export default MixinReducerStore();

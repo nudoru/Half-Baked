@@ -5,12 +5,14 @@
  Matt Perkins
  4/7/15
  */
+
+import * as _DOMUtils from '../../nudoru/browser/DOMUtils.js';
+
 let Templating = function () {
 
   let _templateMap       = Object.create(null),
       _templateHTMLCache = Object.create(null),
-      _templateCache     = Object.create(null),
-      _DOMUtils          = require('../../nudoru/browser/DOMUtils.js');
+      _templateCache     = Object.create(null);
 
   function addTemplate(id, html) {
     _templateMap[id] = html;
@@ -162,4 +164,4 @@ let Templating = function () {
 
 };
 
-module.exports = Templating();
+export default Templating();

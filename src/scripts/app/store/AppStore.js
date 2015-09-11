@@ -1,11 +1,13 @@
-const _restNumQuestions       = 3,
-      _restQuestionCategory   = 24, // SCI/TECh
-      _rest                   = require('../../nori/service/Rest.js'),
-      _noriActionConstants    = require('../../nori/action/ActionConstants.js'),
-      _appActionConstants     = require('../action/ActionConstants.js'),
-      _mixinObservableSubject = require('../../nori/utils/MixinObservableSubject.js'),
-      _mixinReducerStore      = require('../../nori/store/MixinReducerStore.js'),
-      _numUtils               = require('../../nudoru/core/NumberUtils.js');
+import * as _rest from '../../nori/service/Rest.js';
+import * as _noriActionConstants from '../../nori/action/ActionConstants.js';
+import * as _appActionConstants from '../action/ActionConstants.js';
+import * as _mixinObservableSubject from '../../nori/utils/MixinObservableSubject.js';
+import * as _mixinReducerStore from '../../nori/store/MixinReducerStore.js';
+import * as _numUtils from '../../nudoru/core/NumberUtils.js';
+
+
+const _restNumQuestions     = 3,
+      _restQuestionCategory = 24; // SCI/TECh
 
 /**
  * This application store contains "reducer store" functionality based on Redux.
@@ -21,7 +23,7 @@ var AppStore = Nori.createStore({
 
   mixins: [
     _mixinReducerStore,
-    _mixinObservableSubject()
+    _mixinObservableSubject.default()
   ],
 
   gameStates: ['TITLE', 'PLAYER_SELECT', 'WAITING_ON_PLAYER', 'MAIN_GAME', 'GAME_OVER'],
@@ -147,4 +149,4 @@ var AppStore = Nori.createStore({
 
 });
 
-module.exports = AppStore();
+export default AppStore();

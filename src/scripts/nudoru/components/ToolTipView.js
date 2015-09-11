@@ -274,4 +274,4 @@ var ToolTipView = function () {
 
 };
 
-module.exports = ToolTipView();
+export default ToolTipView();

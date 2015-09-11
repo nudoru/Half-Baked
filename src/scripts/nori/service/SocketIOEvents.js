@@ -1,6 +1,6 @@
 /* @flow weak */
 
-module.exports = {
+export default {
   PING             : 'ping',
   PONG             : 'pong',
   NOTIFY_CLIENT    : 'notify_client',

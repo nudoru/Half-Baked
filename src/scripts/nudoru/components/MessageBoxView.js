@@ -289,4 +289,4 @@ var MessageBoxView = function () {
 
 };
 
-module.exports = MessageBoxView();
+export default MessageBoxView();

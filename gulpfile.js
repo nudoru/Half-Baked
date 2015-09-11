@@ -81,7 +81,6 @@ gulp.task('jade', function () {
     .pipe(livereload());
 });
 
-
 gulp.task('concatglobals', function () {
   return gulp.src([
     'src/scripts/vendor/gsap/TweenLite.min.js',
@@ -111,7 +110,7 @@ gulp.task('jshint', function () {
 // disable strict to prevent 'this' in modules from becoming 'undefined'
 gulp.task('browserify', function () {
   return browserify('src/scripts/main.js', {debug: true})
-    .transform(babelify.configure({blacklist: ["strict"]}))
+    .transform(babelify.configure({blacklist: ["strict"], modules: "common"}))
     .bundle()
     .on('error', errorLog)
     .pipe(source('app.bundle.js'))

@@ -1,5 +1,5 @@
-const _actionConstants = require('./ActionConstants.js'),
-      _appStore        = require('../store/AppStore.js');
+import * as _actionConstants from './ActionConstants.js';
+import * as _appStore from '../store/AppStore.js';
 
 /**
  * Purely for convenience, an Event ("action") Creator ala Flux spec. Follow
@@ -58,4 +58,4 @@ var ActionCreator = {
 
 };
 
-module.exports = ActionCreator;
+export default ActionCreator;

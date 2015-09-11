@@ -1,4 +1,4 @@
-module.exports = {
+export default {
   existy     : function (x) {
     return x !== null;
   },

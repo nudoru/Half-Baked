@@ -21,4 +21,4 @@ let MixinDOMManipulation = function () {
 
 };
 
-module.exports = MixinDOMManipulation();
+export default MixinDOMManipulation();

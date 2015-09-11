@@ -48,4 +48,4 @@ var AppView = Nori.createView({
 
 });
 
-module.exports = AppView();
+export default AppView();

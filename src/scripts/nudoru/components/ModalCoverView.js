@@ -134,4 +134,4 @@ var ModalCoverView = function () {
 
 };
 
-module.exports = ModalCoverView();
+export default ModalCoverView();

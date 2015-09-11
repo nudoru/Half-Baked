@@ -7,7 +7,7 @@
  * more complex eventing needs.
  */
 
-const is = require('../../nudoru/util/is.js');
+import * as is from '../../nudoru/util/is.js';
 
 let MixinObservableSubject = function () {
 
@@ -70,4 +70,4 @@ let MixinObservableSubject = function () {
 
 };
 
-module.exports = MixinObservableSubject;
+export default MixinObservableSubject;

@@ -88,4 +88,4 @@ let MixinBrowserEvents = function () {
 
 };
 
-module.exports = MixinBrowserEvents();
+export default MixinBrowserEvents();

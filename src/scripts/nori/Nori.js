@@ -1,9 +1,9 @@
 /* @flow weak */
 
-let Nori = function () {
+import * as _dispatcher from './utils/Dispatcher.js';
+import * as _router from './utils/Router.js';
 
-  const _dispatcher = require('./utils/Dispatcher.js'),
-      _router     = require('./utils/Router.js');
+let Nori = function () {
 
   // Switch Lodash to use Mustache style templates
   _.templateSettings.interpolate = /{{([\s\S]+?)}}/g;
@@ -111,6 +111,6 @@ let Nori = function () {
 
 };
 
-module.exports = Nori();
+export default Nori();
 
 

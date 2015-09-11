@@ -137,4 +137,4 @@ let Rest = function () {
 
 };
 
-module.exports = Rest();
+export default Rest();

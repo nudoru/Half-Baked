@@ -112,4 +112,4 @@ let MixinStoreStateViews = function () {
 
 };
 
-module.exports = MixinStoreStateViews();
+export default MixinStoreStateViews();

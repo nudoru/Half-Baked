@@ -1,4 +1,4 @@
-module.exports = {
+export default {
   LOCAL_PLAYER_CONNECT       : 'LOCAL_PLAYER_CONNECT',
   SET_SESSION_PROPS          : 'SET_SESSION_PROPS',
   SET_LOCAL_PLAYER_PROPS     : 'SET_LOCAL_PLAYER_PROPS',

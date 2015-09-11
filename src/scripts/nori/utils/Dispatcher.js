@@ -230,4 +230,4 @@ var Dispatcher = function () {
 
 };
 
-module.exports = Dispatcher();
+export default Dispatcher();

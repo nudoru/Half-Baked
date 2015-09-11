@@ -238,4 +238,4 @@ var Keyboard = function () {
 
 };
 
-module.exports = Keyboard;
+export default Keyboard;

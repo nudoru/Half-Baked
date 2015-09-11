@@ -59,4 +59,4 @@ var Component = _appView.createComponentView({
 
 });
 
-module.exports = Component;
+export default Component;

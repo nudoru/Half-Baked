@@ -149,4 +149,4 @@ var ToastView = function () {
 
 };
 
-module.exports = ToastView();
+export default ToastView();

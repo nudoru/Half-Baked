@@ -26,4 +26,4 @@ let SimpleStore = function () {
 
 };
 
-module.exports = SimpleStore;
+export default SimpleStore;

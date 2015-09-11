@@ -1,7 +1,11 @@
-const _rx             = require('../nori/utils/Rx.js'),
-      _appActions     = require('./action/ActionCreator.js'),
-      _noriActions    = require('../nori/action/ActionCreator.js'),
-      _socketIOEvents = require('../nori/service/SocketIOEvents.js');
+import * as _rx from '../nori/utils/Rx.js';
+import * as _appActions from './action/ActionCreator.js';
+import * as _noriActions from '../nori/action/ActionCreator.js';
+import * as _socketIOEvents from '../nori/service/SocketIOEvents.js';
+
+import * as _appStore from './store/AppStore.js';
+import * as _appView from './view/AppView.js';
+import * as _Socket from '../nori/service/SocketIO.js';
 
 /**
  * "Controller" for a Nori application. The controller is responsible for
@@ -15,9 +19,9 @@ var App = Nori.createApplication({
   /**
    * Create the main Nori App store and view.
    */
-  store : require('./store/AppStore.js'),
-  view  : require('./view/AppView.js'),
-  socket: require('../nori/service/SocketIO.js'),
+  store : _appStore,
+  view  : _appView,
+  socket: _Socket,
 
   /**
    * Intialize the appilcation, view and store
@@ -125,4 +129,4 @@ var App = Nori.createApplication({
 
 });
 
-module.exports = App;
+export default App;

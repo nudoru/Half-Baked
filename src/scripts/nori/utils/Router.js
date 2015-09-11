@@ -5,11 +5,12 @@
  * Supporting IE9 so using hashes instead of the history API for now
  */
 
+import * as _objUtils from '../../nudoru/core/ObjectUtils.js';
+
 let Router = function () {
 
   let _subject  = new Rx.Subject(),
-      _hashChangeObservable,
-      _objUtils = require('../../nudoru/core/ObjectUtils.js');
+      _hashChangeObservable;
 
   /**
    * Set event handlers
@@ -127,4 +128,4 @@ let Router = function () {
 let r = Router();
 r.initialize();
 
-module.exports = r;
+export default r;

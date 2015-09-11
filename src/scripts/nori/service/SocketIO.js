@@ -1,13 +1,13 @@
 /* @flow weak */
 
+import * as _events from './SocketIOEvents.js';
+
 let SocketIOConnector = function () {
 
   let _subject  = new Rx.BehaviorSubject(),
       _socketIO = io(),
       _log      = [],
-      _connectionID,
-      _events   = require('./SocketIOEvents.js');
-
+      _connectionID;
 
   function initialize() {
     _socketIO.on(_events.NOTIFY_CLIENT, onNotifyClient);
@@ -100,4 +100,4 @@ let SocketIOConnector = function () {
 
 };
 
-module.exports = SocketIOConnector();
+export default SocketIOConnector();

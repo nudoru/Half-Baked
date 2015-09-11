@@ -4,9 +4,9 @@
  * Utility to handle all view DOM attachment tasks
  */
 
-let Renderer = function () {
-  const _domUtils = require('../../nudoru/browser/DOMUtils.js');
+import * as _domUtils from '../../nudoru/browser/DOMUtils.js';
 
+let Renderer = function () {
   function render({target, html, callback}) {
     let domEl,
         mountPoint     = document.querySelector(target);
@@ -31,4 +31,4 @@ let Renderer = function () {
 
 };
 
-module.exports = Renderer();
+export default Renderer();

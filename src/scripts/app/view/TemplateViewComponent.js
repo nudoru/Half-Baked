@@ -88,4 +88,4 @@ var Component = view.createComponentView({
 
 });
 
-module.exports = Component;
+export default Component;
