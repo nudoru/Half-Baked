@@ -5,8 +5,7 @@ BEGIN Templates for Sub Views
 <script id="title" type="text/template">
     <div>
         <h1>Half-Baked!</h1>
-
-        <p>Quiz game!</p>
+        <p>Two player quiz battle!</p>
         <button id="title__button-start" class="button-success">Start!</button>
     </div>
 </script>
@@ -22,9 +21,11 @@ BEGIN Templates for Sub Views
         </label>
         <label for="select__playertype">Appearance
             <select id="select__playertype">
-                <option value="red">Red</option>
-                <option value="yellow">Yellow</option>
-                <option value="green">Green</option>
+                <option value="Biege">Biege</option>
+                <option value="Blue">Blue</option>
+                <option value="Green">Green</option>
+                <option value="Pink">Pink</option>
+                <option value="Yellow">Yellow</option>
             </select>
         </label>
         <hr/>
@@ -41,8 +42,7 @@ BEGIN Templates for Sub Views
         <button id="select__button-createroom" class="button-success">Create
             Room
         </button>
-        <hr/>
-        <button id="select__button-go">Skip and GO!</button>
+        <button class="button-cheat" id="select__button-go">==>></button>
     </div>
 </script>
 
@@ -51,26 +51,42 @@ BEGIN Templates for Sub Views
         <h1>Waiting on another player to join.</h1>
         <h4>Let your opponent know that the room number to join is: <strong>{{
             roomID }}</strong></h4>
-        <button id="waiting__button-skip">Skip ...</button>
+        <button class="button-cheat" id="waiting__button-skip">==>></button>
     </div>
 </script>
 
+<!---->
+
+
 <script id="game" type="text/template">
     <div>
-        <h1>Game</h1>
-        <button id="game__test" class="button-danger">Test model binding</button>
-        <button id="game__button-skip">Done ...</button>
+        <div class="game__question-difficulty">
+            <h4>Choose a question to send to your opponent!</h4>
+            <button id="game_question-difficulty1">Difficulty 1</button>
+            <button id="game_question-difficulty2">Difficulty 2</button>
+            <button id="game_question-difficulty3">Difficulty 3</button>
+            <button id="game_question-difficulty4">Difficulty 4</button>
+            <button id="game_question-difficulty5">Difficulty 5</button>
+        </div>
+        <button class="button-cheat" id="game__button-skip">==>></button>
+        <button id="game__test" class="button-danger">Test</button>
         <div id="game__localplayerstats"></div>
         <div id="game__remoteplayerstats"></div>
     </div>
 </script>
 
+<!--<li>{{ _.times(parseInt(health), function(n) { }}<img src="img/hudHeart_full.png">{{ }); }}</li>-->
+
+
 <script id="game__playerstats" type="text/template">
     <div>
+        <div class="game__playerstats-avatar">
+            <img src="img/players/alien{{appearance}}_jump.png">
+        </div>
         <ul>
-            <li>{{name}}, {{appearance}}</li>
-            <li>HP <strong>{{health}}</strong></li>
-            <li>Score <strong>{{score}}</strong></li>
+            <li>{{name}}</li>
+            <li><img class="game__playerstats-icon" src="img/hudHeart_full.png">{{health}}</li>
+            <li><img class="game__playerstats-icon" src="img/hudCoin.png">{{score}}</li>
         </ul>
     </div>
 </script>
@@ -100,9 +116,7 @@ BEGIN Templates for Sub Views
                 </li>
             </ul>
         </div>
-        <button id="gameover__button-replay" class="button-success">Play
-            again?
-        </button>
+        <button id="gameover__button-replay" class="button-success">Play again?</button>
     </div>
 </script>
 

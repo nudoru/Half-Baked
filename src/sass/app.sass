@@ -93,11 +93,16 @@ body
 =app__area-shadow
   box-shadow: 0px 20px 30px rgba(0, 0, 0, 0.2)
 
-=heading__shadow($voff: 5px)
-  text-shadow: 2px $voff 0 $dark-blue, 2px $voff 5px rgba(0, 0, 0, .2)
+=text__shadow($voff: 5px, $blur: 0px)
+  text-shadow: 2px $voff $blur $dark-blue
 
+=box__shadow($voff: 5px, $blur: 0px)
+  box-shadow: 2px $voff $blur $dark-blue
+  
 $app-width: 975px
 $app-height: 650px
+$button-width: 190px
+$button-height: 45px
 
 .app__content
   background-color: $light-blue
@@ -112,36 +117,95 @@ $app-height: 650px
   +app__area-shadow
   h1, h2, h3, h4, h5, h6
     color: #fff
-    +heading__shadow
+  h1
+    +text__shadow
+    text-align: center
+    padding-bottom: $triple-base-line-height
   h2, h3, h4, h5, h6
-    +heading__shadow(2px)
+    +text__shadow(2px)
   p, label, li
+    font-size: $ms-1
     color: #fff
+  button
+    background-image: url('../img/blue_button05.png')
+    background-color: $color-nocolor
+    border: none
+    box-shadow: none
+    width: $button-width
+    height: $button-height
+    &:hover
+      background-image: url('../img/blue_button01.png')
+
+.button-cheat
+  position: absolute
+  top: -10px
+  right: -10px
+  font-size: $ms--1
+  font-family: $font-content
+  width: $button-width/2 !important
+
+.game__question-difficulty
+  position: relative
+  width: 100%
+  text-align: center
+  h4
+    padding-top: $triple-base-line-height
+    padding-bottom: $double-base-line-height*2
+  button
+    position: relative
+    width: 160px
+    height: 220px
+    display: inline
+    background-image: none
+    background-color: #eee
+    border: 5px solid #fff
+    +box__shadow
+    border-radius: $base-line-height
+    color: $dark-blue
+    &:hover
+      background-image: none
+      +box__shadow(10px, 10px)
+      border: 1px solid #fff
+      background-color: scale-lightness($clr-deep-orange-500, 80%)
 
 #game__localplayerstats, #game__remoteplayerstats
-  +heading__shadow(1px)
+  +text__shadow(1px)
+  background-color: rgba(0,0,0,.1)
+  border-radius: $half-base-line-height
+  border-top: 3px solid #fff
+  padding: $half-base-line-height $base-line-height
+  .game__playerstats-icon
+    position: relative
+    top: -3px
+    width: 48px
+    height: 48px
   div > ul
     @extend .list-plain-horizontal
     li
       @extend .h3-alternate
       margin: 0
-    li:after
-      content: '|'
-      color: rgba(255,255,255,.5)
-      padding-left: $base-line-height
-      padding-right: $base-line-height
-    li:last-of-type
-      &:after
-        content: ''
-        padding-left: 0
-        padding-right: 0
 
 #game__localplayerstats
   position: absolute
   bottom: $base-line-height
   left: $base-line-height
+  .game__playerstats-avatar
+    img
+      position: absolute
+      top: -136px
+      right: $triple-base-line-height
+      width: 100px
+      height: 138px
 
 #game__remoteplayerstats
   position: absolute
   bottom: $base-line-height
   right: $base-line-height
+  .game__playerstats-avatar
+    img
+      position: absolute
+      top: -91px
+      left: $triple-base-line-height
+      width: 67px
+      height: 92px
+      transform: scaleX(-1)

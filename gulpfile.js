@@ -67,7 +67,7 @@ gulp.task('compass', function () {
       image: 'bin/img',
       style: 'expanded'
     }))
-    .on('error', errorLog)
+    //.on('error', errorLog)
     //.pipe(minifyCSS())
     .pipe(gulp.dest('bin/css'))
     .pipe(livereload());
@@ -84,6 +84,7 @@ gulp.task('jade', function () {
 gulp.task('concatglobals', function () {
   return gulp.src([
     'src/scripts/vendor/gsap/TweenLite.min.js',
+    'src/scripts/vendor/gsap/utils/Draggable.min.js',
     'src/scripts/vendor/gsap/TimeLineLite.min.js',
     'src/scripts/vendor/gsap/easing/EasePack.min.js',
     'src/scripts/vendor/gsap/plugins/CSSPlugin.min.js',

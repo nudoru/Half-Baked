@@ -16,5 +16,7 @@ module.exports = {
   LEAVE_ROOM       : 'leave_room',
   GAME_START       : 'game_start',
   GAME_END         : 'game_end',
-  GAME_ABORT       : 'game_abort'
+  GAME_ABORT       : 'game_abort',
+  SEND_PLAYER_DETAILS: 'send_player_details',
+  SEND_QUESTION      : 'send_question'
 };

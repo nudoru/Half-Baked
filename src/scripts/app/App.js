@@ -41,6 +41,8 @@ var App = Nori.createApplication({
    * After the store data is ready
    */
   onStoreInitialized: function () {
+    this.store.subscribe('localPlayerDataUpdated', this.handleLocalPlayerPropsUpdate.bind(this));
+
     this.runApplication();
   },
 
@@ -50,12 +52,27 @@ var App = Nori.createApplication({
   runApplication: function () {
     this.view.removeLoadingMessage();
 
-    this.store.getState().questionBank.forEach(q => console.log(q.q_difficulty_level));
-
     // View will show based on the current store state
-    //this.store.setState({currentState: 'MAIN_GAME'});
-    this.store.setState({currentState: 'PLAYER_SELECT'});
+    this.store.setState({currentState: 'MAIN_GAME'});
+    //this.store.setState({currentState: 'PLAYER_SELECT'});
   },
+
+  //----------------------------------------------------------------------------
+  // Handle FROM store
+  //----------------------------------------------------------------------------
+
+  handleLocalPlayerPropsUpdate: function () {
+    let appState = this.store.getState();
+
+    this.socket.notifyServer(_socketIOEvents.SEND_PLAYER_DETAILS, {
+      roomID       : appState.session.roomID,
+      playerDetails: appState.localPlayer
+    });
+  },
+
+  //----------------------------------------------------------------------------
+  // Handle FROM server
+  //----------------------------------------------------------------------------
 
   /**
    * All messages from the Socket.IO server will be forwarded here
@@ -83,10 +100,18 @@ var App = Nori.createApplication({
       case (_socketIOEvents.GAME_ABORT):
         this.handleGameAbort(payload);
         return;
+      case (_socketIOEvents.SEND_PLAYER_DETAILS):
+        this.handleUpdatedPlayerDetails(payload.payload);
+        return;
+      case (_socketIOEvents.SEND_QUESTION):
+        this.handleReceivedQuestion(payload.payload);
+        return;
       case (_socketIOEvents.SYSTEM_MESSAGE):
       case (_socketIOEvents.BROADCAST):
       case (_socketIOEvents.MESSAGE):
         this.view.alert(payload.payload, payload.type);
+        return;
+      case (_socketIOEvents.USER_DISCONNECTED):
         return;
       default:
         console.warn("Unhandled SocketIO message type", payload);
@@ -118,7 +143,7 @@ var App = Nori.createApplication({
 
   pluckRemotePlayer: function (playersArry) {
     var localPlayerID = this.store.getState().localPlayer.id;
-    console.log('filtering for', localPlayerID, playersArry);
+    //console.log('filtering for', localPlayerID, playersArry);
     return playersArry.filter(function (player) {
       return player.id !== localPlayerID;
     })[0];
@@ -127,6 +152,31 @@ var App = Nori.createApplication({
   handleGameAbort: function (payload) {
     this.view.alert(payload.payload, payload.type);
     this.store.apply(_appActions.resetGame());
+  },
+
+  handleUpdatedPlayerDetails: function (payload) {
+    var remotePlayer    = this.pluckRemotePlayer(payload.players),
+        setRemotePlayer = _appActions.setRemotePlayerProps(remotePlayer);
+
+    this.store.apply(setRemotePlayer);
+  },
+
+  handleReceivedQuestion: function (question) {
+    console.log('received a question!',question);
+  },
+
+  //----------------------------------------------------------------------------
+  // Handle TO server
+  //----------------------------------------------------------------------------
+
+  sendQuestion: function (difficulty) {
+    let appState = this.store.getState(),
+        question = this.store.getQuestionOfDifficulty(difficulty);
+
+    this.socket.notifyServer(_socketIOEvents.SEND_QUESTION, {
+      roomID  : appState.session.roomID,
+      question: question
+    });
   },
 
 });

@@ -137,11 +137,16 @@ function handleSocketMessage(payload) {
       updatePlayerDetails(payload.connectionID, payload.payload.playerDetails);
       addConnectionToRoom(payload.payload.roomID, payload.connectionID);
       return;
-    case (_events.LEAVE_ROOM):
-      console.log("leave room");
+    case (_events.SEND_PLAYER_DETAILS):
+      //console.log(payload.connectionID, payload.payload.roomID, payload.payload.playerDetails);
+      updatePlayerDetails(payload.connectionID, payload.payload.playerDetails);
+      sendUpdatedPlayerDetails(payload.payload.roomID);
+      return;
+    case(_events.SEND_QUESTION):
+      sendQuestion(payload.connectionID, payload.payload);
       return;
     default:
-      //console.warn("Unhandled SocketIO message type", payload);
+      console.warn("Unhandled SocketIO message type", payload);
       return;
   }
 }
@@ -158,6 +163,10 @@ function onDisconnect() {
 
 function createRoomID() {
   return Math.floor(Math.random() * (9999 - 1000 + 1)) + 1000;
+}
+
+function createTestRoom() {
+  _roomMap['0000'] = [];
 }
 
 function createRoom() {
@@ -219,6 +228,53 @@ function checkForGameStart(roomID) {
     return;
   }
   console.log('Not ready to start');
+}
+
+function sendUpdatedPlayerDetails(roomID) {
+  if(roomID === '0000' || !roomID) {
+    console.log('sendUpdatedPlayerDetails on test socket');
+    return;
+  }
+
+  if(!_roomMap[roomID]) {
+    console.log('sendUpdatedPlayerDetails: No connections in room: ',roomID);
+    return;
+  }
+
+  _roomMap[roomID].forEach(function (socketID) {
+    emitClientNotificationToConnection(socketID, _events.SEND_PLAYER_DETAILS, {
+      roomID : roomID,
+      players: getPlayerDetails()
+    });
+  });
+}
+
+function sendQuestion(srcConnection, payload) {
+  var roomID = payload.roomID,
+      question = payload.question;
+
+  console.log(srcConnection);
+
+  if(roomID === '0000' || !roomID) {
+    console.log('sendQuestion on test socket');
+    emitClientNotificationToConnection(srcConnection, _events.SEND_QUESTION, {
+      question: question
+    });
+    return;
+  }
+
+  if(!_roomMap[roomID]) {
+    console.log('sendQuestion: No connections in room: ',roomID);
+    return;
+  }
+
+  _roomMap[roomID].forEach(function (socketID) {
+    if(socketID !== srcConnection) {
+      emitClientNotificationToConnection(socketID, _events.SEND_QUESTION, {
+        question: question
+      });
+    }
+  });
 }
 
 //----------------------------------------------------------------------------

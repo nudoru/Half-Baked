@@ -43,6 +43,7 @@ let SocketIOConnector = function () {
    * @param payload
    */
   function notifyServer(type, payload) {
+    //console.log('notify server',type,payload);
     _socketIO.emit(_events.NOTIFY_SERVER, {
       type        : type,
       connectionID: _connectionID,

@@ -1,4 +1,5 @@
 import * as _noriActions from '../../nori/action/ActionCreator';
+import * as _app from '../App';
 import * as _appView from './AppView';
 import * as _appStore from '../store/AppStore';
 import * as _template from '../../nori/utils/Templating.js';
@@ -20,6 +21,8 @@ var Component = Nori.view().createComponentView({
   initialize: function (configProps) {
     //
   },
+
+  answeringQuestion: false,
 
   defineRegions: function () {
     return {
@@ -45,23 +48,23 @@ var Component = Nori.view().createComponentView({
       'click #game__button-skip': function () {
         _appStore.apply(_noriActions.changeStoreState({currentState: _appStore.gameStates[4]}));
       },
+      'click #game_question-difficulty1, click #game_question-difficulty2, click #game_question-difficulty3, click #game_question-difficulty4, click #game_question-difficulty5': this.sendQuestion.bind(this),
       'click #game__test'       : function () {
         let state        = _appStore.getState(),
             localScore   = state.localPlayer.score + _numUtils.rndNumber(0, 5),
-            localHealth  = state.localPlayer.health + 1,
-            remoteScore  = state.remotePlayer.score + _numUtils.rndNumber(0, 5),
-            remoteHealth = state.remotePlayer.health - 1;
+            localHealth  = state.localPlayer.health -1;
 
         _appStore.apply(_appActions.setLocalPlayerProps({
           health: localHealth,
           score : localScore
         }));
-        _appStore.apply(_appActions.setRemotePlayerProps({
-          health: remoteHealth,
-          score : remoteScore
-        }));
       }
     };
+  },
+
+  sendQuestion: function(evt) {
+    var difficulty = parseInt(evt.target.getAttribute('id').substr(-1,1));
+    _app.default.sendQuestion(difficulty);
   },
 
   /**

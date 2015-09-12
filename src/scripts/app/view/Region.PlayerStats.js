@@ -33,6 +33,7 @@ var Component = Nori.view().createComponentView({
   getInitialState: function () {
     var appState = _appStore.getState(),
         stats    = appState.localPlayer;
+
     if (this.getConfigProps().target === 'remote') {
       stats = appState.remotePlayer;
     }

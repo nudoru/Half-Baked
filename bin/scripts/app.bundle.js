@@ -159,6 +159,8 @@ var App = Nori.createApplication({
    * After the store data is ready
    */
   onStoreInitialized: function onStoreInitialized() {
+    this.store.subscribe('localPlayerDataUpdated', this.handleLocalPlayerPropsUpdate.bind(this));
+
     this.runApplication();
   },
 
@@ -168,14 +170,27 @@ var App = Nori.createApplication({
   runApplication: function runApplication() {
     this.view.removeLoadingMessage();
 
-    this.store.getState().questionBank.forEach(function (q) {
-      return console.log(q.q_difficulty_level);
-    });
-
     // View will show based on the current store state
-    //this.store.setState({currentState: 'MAIN_GAME'});
-    this.store.setState({ currentState: 'PLAYER_SELECT' });
+    this.store.setState({ currentState: 'MAIN_GAME' });
+    //this.store.setState({currentState: 'PLAYER_SELECT'});
   },
+
+  //----------------------------------------------------------------------------
+  // Handle FROM store
+  //----------------------------------------------------------------------------
+
+  handleLocalPlayerPropsUpdate: function handleLocalPlayerPropsUpdate() {
+    var appState = this.store.getState();
+
+    this.socket.notifyServer(_socketIOEvents.SEND_PLAYER_DETAILS, {
+      roomID: appState.session.roomID,
+      playerDetails: appState.localPlayer
+    });
+  },
+
+  //----------------------------------------------------------------------------
+  // Handle FROM server
+  //----------------------------------------------------------------------------
 
   /**
    * All messages from the Socket.IO server will be forwarded here
@@ -203,10 +218,18 @@ var App = Nori.createApplication({
       case _socketIOEvents.GAME_ABORT:
         this.handleGameAbort(payload);
         return;
+      case _socketIOEvents.SEND_PLAYER_DETAILS:
+        this.handleUpdatedPlayerDetails(payload.payload);
+        return;
+      case _socketIOEvents.SEND_QUESTION:
+        this.handleReceivedQuestion(payload.payload);
+        return;
       case _socketIOEvents.SYSTEM_MESSAGE:
       case _socketIOEvents.BROADCAST:
       case _socketIOEvents.MESSAGE:
         this.view.alert(payload.payload, payload.type);
+        return;
+      case _socketIOEvents.USER_DISCONNECTED:
         return;
       default:
         console.warn("Unhandled SocketIO message type", payload);
@@ -238,7 +261,7 @@ var App = Nori.createApplication({
 
   pluckRemotePlayer: function pluckRemotePlayer(playersArry) {
     var localPlayerID = this.store.getState().localPlayer.id;
-    console.log('filtering for', localPlayerID, playersArry);
+    //console.log('filtering for', localPlayerID, playersArry);
     return playersArry.filter(function (player) {
       return player.id !== localPlayerID;
     })[0];
@@ -247,6 +270,31 @@ var App = Nori.createApplication({
   handleGameAbort: function handleGameAbort(payload) {
     this.view.alert(payload.payload, payload.type);
     this.store.apply(_appActions.resetGame());
+  },
+
+  handleUpdatedPlayerDetails: function handleUpdatedPlayerDetails(payload) {
+    var remotePlayer = this.pluckRemotePlayer(payload.players),
+        setRemotePlayer = _appActions.setRemotePlayerProps(remotePlayer);
+
+    this.store.apply(setRemotePlayer);
+  },
+
+  handleReceivedQuestion: function handleReceivedQuestion(question) {
+    console.log('received a question!', question);
+  },
+
+  //----------------------------------------------------------------------------
+  // Handle TO server
+  //----------------------------------------------------------------------------
+
+  sendQuestion: function sendQuestion(difficulty) {
+    var appState = this.store.getState(),
+        question = this.store.getQuestionOfDifficulty(difficulty);
+
+    this.socket.notifyServer(_socketIOEvents.SEND_QUESTION, {
+      roomID: appState.session.roomID,
+      question: question
+    });
   }
 
 });
@@ -371,12 +419,30 @@ var _actionActionConstantsJs = require('../action/ActionConstants.js');
 
 var _appActionConstants = _interopRequireWildcard(_actionActionConstantsJs);
 
+var _nudoruCoreStringUtilsJs = require('../../nudoru/core/StringUtils.js');
+
+var _stringUtils = _interopRequireWildcard(_nudoruCoreStringUtilsJs);
+
 var _nudoruCoreNumberUtilsJs = require('../../nudoru/core/NumberUtils.js');
 
 var _numUtils = _interopRequireWildcard(_nudoruCoreNumberUtilsJs);
 
+var _nudoruCoreArrayUtilsJs = require('../../nudoru/core/ArrayUtils.js');
+
+var _arrayUtils = _interopRequireWildcard(_nudoruCoreArrayUtilsJs);
+
 var _restNumQuestions = 300,
-    _restQuestionCategory = 24; // SCI/TECh
+    _restQuestionCategory = 166;
+
+/*
+SCI/TECh 24,
+63 General knowledge,
+59 general sci,
+98 banking and bus,
+117 world history,
+158 puzzle, contains HTML encoded
+166 comp intro
+ */
 
 /**
  * This application store contains "reducer store" functionality based on Redux.
@@ -392,13 +458,17 @@ var AppStore = Nori.createStore({
 
   mixins: [],
 
+  lastEventHandled: '',
   gameStates: ['TITLE', 'PLAYER_SELECT', 'WAITING_ON_PLAYER', 'MAIN_GAME', 'GAME_OVER'],
+  playerAppearences: ['Biege', 'Blue', 'Green', 'Pink', 'Yellow'],
 
   initialize: function initialize() {
-    this.addReducer(this.mainStateReducer);
+    this.addReducer(this.mainStateReducer.bind(this));
     this.initializeReducerStore();
     this.setState(Nori.config());
     this.createSubject('storeInitialized');
+    this.createSubject('localPlayerDataUpdated');
+    this.createSubject('remotePlayerDataUpdated');
   },
 
   /**
@@ -410,7 +480,7 @@ var AppStore = Nori.createStore({
       currentState: this.gameStates[0],
       session: {
         socketIOID: '',
-        roomID: ''
+        roomID: '0000'
       },
       localPlayer: _.merge(this.createBlankPlayerObject(), this.createPlayerResetObject()),
       remotePlayer: _.merge(this.createBlankPlayerObject(), this.createPlayerResetObject()),
@@ -420,16 +490,28 @@ var AppStore = Nori.createStore({
     //https://market.mashape.com/pareshchouhan/trivia
     var getQuestions = _rest.request({
       method: 'GET',
-      url: 'https://pareshchouhan-trivia-v1.p.mashape.com/v1/getAllQuizQuestions?limit=' + _restNumQuestions + '&page=1',
-      //url    : 'https://pareshchouhan-trivia-v1.p.mashape.com/v1/getQuizQuestionsByCategory?categoryId='+_restQuestionCategory+'&limit='+_restNumQuestions+'&page=1',
+      //url    : 'https://pareshchouhan-trivia-v1.p.mashape.com/v1/getAllQuizQuestions?limit=' + _restNumQuestions + '&page=1',
+      url: 'https://pareshchouhan-trivia-v1.p.mashape.com/v1/getQuizQuestionsByCategory?categoryId=' + _restQuestionCategory + '&limit=' + _restNumQuestions + '&page=1',
       headers: [{ 'X-Mashape-Key': 'tPxKgDvrkqmshg8zW4olS87hzF7Ap1vi63rjsnUuVw1sBHV9KJ' }],
       json: true
     }).subscribe(this.onQuestionsSuccess.bind(this), this.onQuestionError);
   },
 
   onQuestionsSuccess: function onQuestionsSuccess(data) {
-    //console.log('ok', data);
-    this.setState({ questionBank: data });
+    console.log('Questions fetched', data[0]);
+
+    // Service only returns 2 levels of difficulty. For now, fake it
+    var updated = data.map(function (q) {
+      // also strip tags
+      q.q_text = _stringUtils.stripTags(_stringUtils.unescapeHTML(q.q_text));
+      q.q_difficulty_level = _numUtils.rndNumber(1, 5);
+      q.used = false;
+      return q;
+    });
+
+    //updated.forEach(q => console.log(q.q_difficulty_level));
+
+    this.setState({ questionBank: updated });
     this.notifySubscribersOf('storeInitialized');
   },
 
@@ -437,18 +519,25 @@ var AppStore = Nori.createStore({
     throw new Error('Error fetching questions', data);
   },
 
+  getQuestionOfDifficulty: function getQuestionOfDifficulty(difficulty) {
+    var possibleQuestions = this.getState().questionBank.filter(function (q) {
+      return q.q_difficulty_level === difficulty;
+    });
+    return _arrayUtils.rndElement(possibleQuestions);
+  },
+
   createBlankPlayerObject: function createBlankPlayerObject() {
     return {
       id: '',
       type: '',
-      name: 'Mystery Player ' + _numUtils.rndNumber(100, 999),
-      appearance: 'green'
+      name: 'Mystery' + _numUtils.rndNumber(100, 999),
+      appearance: _arrayUtils.rndElement(this.playerAppearences)
     };
   },
 
   createPlayerResetObject: function createPlayerResetObject() {
     return {
-      health: 6,
+      health: 20,
       behaviors: [],
       score: 0
     };
@@ -465,6 +554,8 @@ var AppStore = Nori.createStore({
    */
   mainStateReducer: function mainStateReducer(state, event) {
     state = state || {};
+
+    this.lastEventHandled = event.type;
 
     switch (event.type) {
       case _noriActionConstants.CHANGE_STORE_STATE:
@@ -487,6 +578,10 @@ var AppStore = Nori.createStore({
    */
   handleStateMutation: function handleStateMutation() {
     var state = this.getState();
+
+    if (this.lastEventHandled === _appActionConstants.SET_LOCAL_PLAYER_PROPS) {
+      this.notifySubscribersOf('localPlayerDataUpdated');
+    }
 
     if (this.shouldGameEnd(state)) {
       this.setState({ currentState: this.gameStates[4] });
@@ -520,7 +615,7 @@ var AppStore = Nori.createStore({
 exports['default'] = AppStore();
 module.exports = exports['default'];
 
-},{"../../nori/action/ActionConstants.js":15,"../../nori/service/Rest.js":17,"../../nudoru/core/NumberUtils.js":43,"../action/ActionConstants.js":3}],6:[function(require,module,exports){
+},{"../../nori/action/ActionConstants.js":15,"../../nori/service/Rest.js":17,"../../nudoru/core/ArrayUtils.js":43,"../../nudoru/core/NumberUtils.js":44,"../../nudoru/core/StringUtils.js":46,"../action/ActionConstants.js":3}],6:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -648,6 +743,7 @@ var Component = Nori.view().createComponentView({
   getInitialState: function getInitialState() {
     var appState = _appStore.getState(),
         stats = appState.localPlayer;
+
     if (this.getConfigProps().target === 'remote') {
       stats = appState.remotePlayer;
     }
@@ -815,6 +911,10 @@ var _noriActionActionCreator = require('../../nori/action/ActionCreator');
 
 var _noriActions = _interopRequireWildcard(_noriActionActionCreator);
 
+var _App = require('../App');
+
+var _app = _interopRequireWildcard(_App);
+
 var _AppView = require('./AppView');
 
 var _appView = _interopRequireWildcard(_AppView);
@@ -857,6 +957,8 @@ var Component = Nori.view().createComponentView({
     //
   },
 
+  answeringQuestion: false,
+
   defineRegions: function defineRegions() {
     return {
       localPlayerStats: _regionPlayerStats['default']({
@@ -881,23 +983,23 @@ var Component = Nori.view().createComponentView({
       'click #game__button-skip': function clickGame__buttonSkip() {
         _appStore.apply(_noriActions.changeStoreState({ currentState: _appStore.gameStates[4] }));
       },
+      'click #game_question-difficulty1, click #game_question-difficulty2, click #game_question-difficulty3, click #game_question-difficulty4, click #game_question-difficulty5': this.sendQuestion.bind(this),
       'click #game__test': function clickGame__test() {
         var state = _appStore.getState(),
             localScore = state.localPlayer.score + _numUtils.rndNumber(0, 5),
-            localHealth = state.localPlayer.health + 1,
-            remoteScore = state.remotePlayer.score + _numUtils.rndNumber(0, 5),
-            remoteHealth = state.remotePlayer.health - 1;
+            localHealth = state.localPlayer.health - 1;
 
         _appStore.apply(_appActions.setLocalPlayerProps({
           health: localHealth,
           score: localScore
         }));
-        _appStore.apply(_appActions.setRemotePlayerProps({
-          health: remoteHealth,
-          score: remoteScore
-        }));
       }
     };
+  },
+
+  sendQuestion: function sendQuestion(evt) {
+    var difficulty = parseInt(evt.target.getAttribute('id').substr(-1, 1));
+    _app['default'].sendQuestion(difficulty);
   },
 
   /**
@@ -935,7 +1037,7 @@ var Component = Nori.view().createComponentView({
 exports['default'] = Component;
 module.exports = exports['default'];
 
-},{"../../nori/action/ActionCreator":16,"../../nori/service/SocketIO.js":18,"../../nori/utils/Templating.js":27,"../../nudoru/core/NumberUtils.js":43,"../action/ActionCreator.js":4,"../store/AppStore":5,"./AppView":6,"./Region.PlayerStats.js":7}],10:[function(require,module,exports){
+},{"../../nori/action/ActionCreator":16,"../../nori/service/SocketIO.js":18,"../../nori/utils/Templating.js":27,"../../nudoru/core/NumberUtils.js":44,"../App":2,"../action/ActionCreator.js":4,"../store/AppStore":5,"./AppView":6,"./Region.PlayerStats.js":7}],10:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -1661,7 +1763,7 @@ var Rest = function Rest() {
 exports['default'] = Rest();
 module.exports = exports['default'];
 
-},{"../../vendor/rxjs/rx.lite.min.js":47}],18:[function(require,module,exports){
+},{"../../vendor/rxjs/rx.lite.min.js":49}],18:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -1718,6 +1820,7 @@ var SocketIOConnector = function SocketIOConnector() {
    * @param payload
    */
   function notifyServer(type, payload) {
+    //console.log('notify server',type,payload);
     _socketIO.emit(_events.NOTIFY_SERVER, {
       type: type,
       connectionID: _connectionID,
@@ -1778,7 +1881,7 @@ var SocketIOConnector = function SocketIOConnector() {
 exports['default'] = SocketIOConnector();
 module.exports = exports['default'];
 
-},{"../../vendor/rxjs/rx.lite.min.js":47,"./SocketIOEvents.js":19}],19:[function(require,module,exports){
+},{"../../vendor/rxjs/rx.lite.min.js":49,"./SocketIOEvents.js":19}],19:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -1802,7 +1905,9 @@ exports['default'] = {
   LEAVE_ROOM: 'leave_room',
   GAME_START: 'game_start',
   GAME_END: 'game_end',
-  GAME_ABORT: 'game_abort'
+  GAME_ABORT: 'game_abort',
+  SEND_PLAYER_DETAILS: 'send_player_details',
+  SEND_QUESTION: 'send_question'
 };
 module.exports = exports['default'];
 
@@ -1862,7 +1967,7 @@ var ImmutableMap = function ImmutableMap() {
 exports['default'] = ImmutableMap;
 module.exports = exports['default'];
 
-},{"../../vendor/immutable.min.js":46}],21:[function(require,module,exports){
+},{"../../vendor/immutable.min.js":48}],21:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -2024,7 +2129,7 @@ var MixinReducerStore = function MixinReducerStore() {
 exports['default'] = MixinReducerStore();
 module.exports = exports['default'];
 
-},{"../../nudoru/util/is.js":45,"./ImmutableMap.js":20}],22:[function(require,module,exports){
+},{"../../nudoru/util/is.js":47,"./ImmutableMap.js":20}],22:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -2269,7 +2374,7 @@ var Dispatcher = function Dispatcher() {
 exports['default'] = Dispatcher();
 module.exports = exports['default'];
 
-},{"../../vendor/rxjs/rx.lite.min.js":47}],23:[function(require,module,exports){
+},{"../../vendor/rxjs/rx.lite.min.js":49}],23:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -2356,7 +2461,7 @@ var MixinObservableSubject = function MixinObservableSubject() {
 exports['default'] = MixinObservableSubject;
 module.exports = exports['default'];
 
-},{"../../nudoru/util/is.js":45,"../../vendor/rxjs/rx.lite.min.js":47}],24:[function(require,module,exports){
+},{"../../nudoru/util/is.js":47,"../../vendor/rxjs/rx.lite.min.js":49}],24:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -2549,7 +2654,7 @@ r.initialize();
 exports['default'] = r;
 module.exports = exports['default'];
 
-},{"../../nudoru/core/ObjectUtils.js":44,"../../vendor/rxjs/rx.lite.min.js":47}],26:[function(require,module,exports){
+},{"../../nudoru/core/ObjectUtils.js":45,"../../vendor/rxjs/rx.lite.min.js":49}],26:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -2603,7 +2708,7 @@ exports['default'] = {
 };
 module.exports = exports['default'];
 
-},{"../../vendor/rxjs/rx.lite.min.js":47}],27:[function(require,module,exports){
+},{"../../vendor/rxjs/rx.lite.min.js":49}],27:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -3210,7 +3315,7 @@ var MixinEventDelegator = function MixinEventDelegator() {
 exports['default'] = MixinEventDelegator;
 module.exports = exports['default'];
 
-},{"../../nudoru/browser/BrowserInfo.js":35,"../../nudoru/util/is.js":45,"../utils/Rx.js":26}],32:[function(require,module,exports){
+},{"../../nudoru/browser/BrowserInfo.js":35,"../../nudoru/util/is.js":47,"../utils/Rx.js":26}],32:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -3742,7 +3847,7 @@ var ViewComponent = function ViewComponent() {
 exports['default'] = ViewComponent;
 module.exports = exports['default'];
 
-},{"../../nudoru/util/is.js":45,"../utils/Renderer.js":24,"../utils/Templating.js":27}],35:[function(require,module,exports){
+},{"../../nudoru/util/is.js":47,"../utils/Renderer.js":24,"../utils/Templating.js":27}],35:[function(require,module,exports){
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
@@ -4484,7 +4589,7 @@ var MessageBoxView = function MessageBoxView() {
 exports['default'] = MessageBoxView();
 module.exports = exports['default'];
 
-},{"../../nori/utils/Templating.js":27,"../../nudoru/browser/BrowserInfo.js":35,"../../nudoru/browser/DOMUtils.js":36,"../../nudoru/browser/ThreeDTransforms.js":37,"../../vendor/rxjs/rx.lite.min.js":47,"./ModalCoverView.js":40}],40:[function(require,module,exports){
+},{"../../nori/utils/Templating.js":27,"../../nudoru/browser/BrowserInfo.js":35,"../../nudoru/browser/DOMUtils.js":36,"../../nudoru/browser/ThreeDTransforms.js":37,"../../vendor/rxjs/rx.lite.min.js":49,"./ModalCoverView.js":40}],40:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -4631,7 +4736,7 @@ var ModalCoverView = function ModalCoverView() {
 exports['default'] = ModalCoverView();
 module.exports = exports['default'];
 
-},{"../../nudoru/browser/BrowserInfo.js":35,"../../vendor/rxjs/rx.lite.min.js":47}],41:[function(require,module,exports){
+},{"../../nudoru/browser/BrowserInfo.js":35,"../../vendor/rxjs/rx.lite.min.js":49}],41:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -4794,7 +4899,7 @@ var ToastView = function ToastView() {
 exports['default'] = ToastView();
 module.exports = exports['default'];
 
-},{"../../nori/utils/Templating.js":27,"../../nudoru/browser/BrowserInfo.js":35,"../../nudoru/browser/DOMUtils.js":36,"../../nudoru/browser/ThreeDTransforms.js":37,"../../vendor/rxjs/rx.lite.min.js":47}],42:[function(require,module,exports){
+},{"../../nori/utils/Templating.js":27,"../../nudoru/browser/BrowserInfo.js":35,"../../nudoru/browser/DOMUtils.js":36,"../../nudoru/browser/ThreeDTransforms.js":37,"../../vendor/rxjs/rx.lite.min.js":49}],42:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -5076,7 +5181,100 @@ var ToolTipView = function ToolTipView() {
 exports['default'] = ToolTipView();
 module.exports = exports['default'];
 
-},{"../../nori/utils/Templating.js":27,"../../nudoru/browser/DOMUtils.js":36,"../../vendor/rxjs/rx.lite.min.js":47}],43:[function(require,module,exports){
+},{"../../nori/utils/Templating.js":27,"../../nudoru/browser/DOMUtils.js":36,"../../vendor/rxjs/rx.lite.min.js":49}],43:[function(require,module,exports){
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+var _numberUtils = require('./NumberUtils.js');
+
+exports['default'] = {
+
+  arrify: function arrify(a) {
+    return Array.prototype.slice.call(a, 0);
+  },
+
+  // Reference: http://jhusain.github.io/learnrx/index.html
+  mergeAll: function mergeAll() {
+    var results = [];
+
+    this.forEach(function (subArr) {
+      subArr.forEach(function (elm) {
+        results.push(elm);
+      });
+    });
+
+    return results;
+  },
+
+  // http://www.shamasis.net/2009/09/fast-algorithm-to-find-unique-items-in-javascript-array/
+  unique: function unique(arry) {
+    var o = {},
+        i,
+        l = arry.length,
+        r = [];
+    for (i = 0; i < l; i += 1) {
+      o[arry[i]] = arry[i];
+    }
+    for (i in o) {
+      r.push(o[i]);
+    }
+    return r;
+  },
+
+  removeIndex: function removeIndex(arr, idx) {
+    return arr.splice(idx, 1);
+  },
+
+  removeItem: function removeItem(arr, item) {
+    var idx = arr.indexOf(item);
+    if (idx > -1) {
+      arr.splice(idx, 1);
+    }
+  },
+
+  rndElement: function rndElement(arry) {
+    return arry[_numberUtils.rndNumber(0, arry.length - 1)];
+  },
+
+  getRandomSetOfElements: function getRandomSetOfElements(srcarry, max) {
+    var arry = [],
+        i = 0,
+        len = _numberUtils.rndNumber(1, max);
+
+    for (; i < len; i++) {
+      arry.push(this.rndElement(srcarry));
+    }
+
+    return arry;
+  },
+
+  getDifferences: function getDifferences(arr1, arr2) {
+    var dif = [];
+
+    arr1.forEach(function (value) {
+      var present = false,
+          i = 0,
+          len = arr2.length;
+
+      for (; i < len; i++) {
+        if (value === arr2[i]) {
+          present = true;
+          break;
+        }
+      }
+
+      if (!present) {
+        dif.push(value);
+      }
+    });
+
+    return dif;
+  }
+
+};
+module.exports = exports['default'];
+
+},{"./NumberUtils.js":44}],44:[function(require,module,exports){
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
@@ -5108,7 +5306,7 @@ exports["default"] = {
 };
 module.exports = exports["default"];
 
-},{}],44:[function(require,module,exports){
+},{}],45:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -5322,7 +5520,61 @@ exports['default'] = {
 };
 module.exports = exports['default'];
 
-},{}],45:[function(require,module,exports){
+},{}],46:[function(require,module,exports){
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+exports['default'] = {
+
+  capitalizeFirstLetter: function capitalizeFirstLetter(str) {
+    return str.charAt(0).toUpperCase() + str.substring(1);
+  },
+
+  toTitleCase: function toTitleCase(str) {
+    return str.replace(/\w\S*/g, function (txt) {
+      return txt.charAt(0).toUpperCase() + txt.substr(1);
+    });
+  },
+
+  removeTags: function removeTags(str) {
+    return str.replace(/(<([^>]+)>)/ig, '');
+  },
+
+  ellipses: function ellipses(len) {
+    return this.length > len ? this.substr(0, len) + "..." : this;
+  },
+
+  // From https://github.com/sstephenson/prototype/blob/d9411e5/src/prototype/lang/string.js#L426
+  stripTags: function stripTags(str) {
+    return str.replace(/<\w+(\s+("[^"]*"|'[^']*'|[^>])+)?>|<\/\w+>/gi, '');
+  },
+
+  // From https://github.com/sstephenson/prototype/blob/d9411e5/src/prototype/lang/string.js#L426
+  unescapeHTML: function unescapeHTML(str) {
+    // Warning: In 1.7 String#unescapeHTML will no longer call String#stripTags.
+    return this.stripTags(str).replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&');
+  },
+
+  capitalize: function capitalize(str) {
+    return str.charAt(0).toUpperCase() + this.substring(1).toLowerCase();
+  },
+
+  underscore: function underscore(str) {
+    return str.replace(/::/g, '/').replace(/([A-Z]+)([A-Z][a-z])/g, '$1_$2').replace(/([a-z\d])([A-Z])/g, '$1_$2').replace(/-/g, '_').toLowerCase();
+  },
+
+  dasherize: function dasherize(str) {
+    return str.replace(/_/g, '-');
+  },
+
+  DOMtoCSSStyle: function DOMtoCSSStyle(str) {
+    return this.dasherize(this.underscore(str));
+  }
+
+};
+module.exports = exports['default'];
+
+},{}],47:[function(require,module,exports){
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
@@ -5370,7 +5622,7 @@ exports["default"] = {
 };
 module.exports = exports["default"];
 
-},{}],46:[function(require,module,exports){
+},{}],48:[function(require,module,exports){
 /**
  *  Copyright (c) 2014-2015, Facebook, Inc.
  *  All rights reserved.
@@ -6957,7 +7209,7 @@ module.exports = exports["default"];
     } }), l.prototype.has = un.includes, Xe(x, p.prototype), Xe(k, v.prototype), Xe(A, l.prototype), Xe(V, p.prototype), Xe(Y, v.prototype), Xe(Q, l.prototype);var an = { Iterable: _, Seq: O, Collection: H, Map: Lt, OrderedMap: Ie, List: fe, Stack: Ee, Set: Ae, OrderedSet: Le, Record: Ce, Range: Ye, Repeat: Qe, is: X, fromJS: F };return an;
 });
 
-},{}],47:[function(require,module,exports){
+},{}],49:[function(require,module,exports){
 (function (process,global){
 /* Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.*/
 (function (a) {
