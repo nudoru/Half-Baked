@@ -8,10 +8,11 @@
  */
 
 import * as is from '../../nudoru/util/is.js';
+import * as Rxjs from '../../vendor/rxjs/rx.lite.min.js';
 
 let MixinObservableSubject = function () {
 
-  let _subject    = new Rx.Subject(),
+  let _subject    = new Rxjs.Subject(),
       _subjectMap = {};
 
   /**
@@ -21,7 +22,7 @@ let MixinObservableSubject = function () {
    */
   function createSubject(name) {
     if (!_subjectMap.hasOwnProperty(name)) {
-      _subjectMap[name] = new Rx.Subject();
+      _subjectMap[name] = new Rxjs.Subject();
     }
     return _subjectMap[name];
   }

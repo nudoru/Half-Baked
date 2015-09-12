@@ -61,6 +61,8 @@
  *
  */
 
+import * as Rxjs from '../../vendor/rxjs/rx.lite.min.js';
+
 let Rest = function () {
 
   function request(reqObj) {
@@ -72,7 +74,7 @@ let Rest = function () {
         headers = reqObj.headers || [],
         data    = reqObj.data || null;
 
-    return new Rx.Observable.create(function makeReq(observer) {
+    return new Rxjs.Observable.create(function makeReq(observer) {
       xhr.open(method, url, true);
 
       xhr.onreadystatechange = function () {

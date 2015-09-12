@@ -50,6 +50,8 @@ var App = Nori.createApplication({
   runApplication: function () {
     this.view.removeLoadingMessage();
 
+    this.store.getState().questionBank.forEach(q => console.log(q.q_difficulty_level));
+
     // View will show based on the current store state
     //this.store.setState({currentState: 'MAIN_GAME'});
     this.store.setState({currentState: 'PLAYER_SELECT'});

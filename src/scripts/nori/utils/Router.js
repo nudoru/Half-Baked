@@ -6,17 +6,18 @@
  */
 
 import * as _objUtils from '../../nudoru/core/ObjectUtils.js';
+import * as Rxjs from '../../vendor/rxjs/rx.lite.min.js';
 
 let Router = function () {
 
-  let _subject  = new Rx.Subject(),
+  let _subject  = new Rxjs.Subject(),
       _hashChangeObservable;
 
   /**
    * Set event handlers
    */
   function initialize() {
-    _hashChangeObservable = Rx.Observable.fromEvent(window, 'hashchange').subscribe(notifySubscribers);
+    _hashChangeObservable = Rxjs.Observable.fromEvent(window, 'hashchange').subscribe(notifySubscribers);
   }
 
   /**

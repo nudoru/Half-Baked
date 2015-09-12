@@ -3,7 +3,7 @@ import * as _noriActionConstants from '../../nori/action/ActionConstants.js';
 import * as _appActionConstants from '../action/ActionConstants.js';
 import * as _numUtils from '../../nudoru/core/NumberUtils.js';
 
-const _restNumQuestions     = 3,
+const _restNumQuestions     = 300,
       _restQuestionCategory = 24; // SCI/TECh
 
 /**
@@ -33,21 +33,6 @@ var AppStore = Nori.createStore({
    * Set or load any necessary data and then broadcast a initialized event.
    */
   loadStore: function () {
-    //https://market.mashape.com/pareshchouhan/trivia
-    var getQuestions = _rest.request({
-      method : 'GET',
-      //https://pareshchouhan-trivia-v1.p.mashape.com/v1/getQuizQuestionsByCategory?categoryId=1&limit=10&page=1
-      url    : 'https://pareshchouhan-trivia-v1.p.mashape.com/v1/getAllQuizQuestions?limit=' + _restNumQuestions + '&page=1',
-      headers: [{'X-Mashape-Key': 'tPxKgDvrkqmshg8zW4olS87hzF7Ap1vi63rjsnUuVw1sBHV9KJ'}],
-      json   : true
-    }).subscribe(
-      function success(data) {
-        console.log('ok', data);
-      },
-      function error(data) {
-        console.log('err', data);
-      });
-
     // Set initial state
     this.setState({
       currentState: this.gameStates[0],
@@ -60,7 +45,24 @@ var AppStore = Nori.createStore({
       questionBank: []
     });
 
+    //https://market.mashape.com/pareshchouhan/trivia
+    var getQuestions = _rest.request({
+      method : 'GET',
+      url    : 'https://pareshchouhan-trivia-v1.p.mashape.com/v1/getAllQuizQuestions?limit=' + _restNumQuestions + '&page=1',
+      //url    : 'https://pareshchouhan-trivia-v1.p.mashape.com/v1/getQuizQuestionsByCategory?categoryId='+_restQuestionCategory+'&limit='+_restNumQuestions+'&page=1',
+      headers: [{'X-Mashape-Key': 'tPxKgDvrkqmshg8zW4olS87hzF7Ap1vi63rjsnUuVw1sBHV9KJ'}],
+      json   : true
+    }).subscribe(this.onQuestionsSuccess.bind(this), this.onQuestionError);
+  },
+
+  onQuestionsSuccess: function(data) {
+    //console.log('ok', data);
+    this.setState({questionBank:data});
     this.notifySubscribersOf('storeInitialized');
+  },
+
+  onQuestionError: function(data) {
+    throw new Error('Error fetching questions',data);
   },
 
   createBlankPlayerObject: function () {

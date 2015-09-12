@@ -92,7 +92,7 @@ var Component = Nori.view().createComponentView({
         playerDetails: _appStore.getState().localPlayer
       });
     } else {
-      _appView.alert('The room ID is not correct. Does it contain letters or is less than '+_roomNumberLength+' digits?', 'Bad Room ID');
+      _appView.default.alert('The room ID is not correct. Does it contain letters or is less than '+_roomNumberLength+' digits?', 'Bad Room ID');
     }
   },
 
@@ -101,7 +101,7 @@ var Component = Nori.view().createComponentView({
         appearance = document.querySelector('#select__playertype').value;
 
     if (!name.length || !appearance) {
-      _appView.alert('Make sure you\'ve typed a name for yourself and selected an appearance');
+      _appView.default.alert('Make sure you\'ve typed a name for yourself and selected an appearance');
       return false;
     }
     return true;

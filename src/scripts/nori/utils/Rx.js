@@ -5,6 +5,8 @@
  * @type {{dom: Function, from: Function, interval: Function, doEvery: Function, just: Function, empty: Function}}
  */
 
+import * as Rxjs from '../../vendor/rxjs/rx.lite.min.js';
+
 export default {
   dom: function (selector, event) {
     let el = document.querySelector(selector);
@@ -12,15 +14,15 @@ export default {
       console.warn('nori/utils/Rx, dom, invalid DOM selector: ' + selector);
       return;
     }
-    return Rx.Observable.fromEvent(el, event.trim());
+    return Rxjs.Observable.fromEvent(el, event.trim());
   },
 
   from: function (ittr) {
-    return Rx.Observable.from(ittr);
+    return Rxjs.Observable.from(ittr);
   },
 
   interval: function (ms) {
-    return Rx.Observable.interval(ms);
+    return Rxjs.Observable.interval(ms);
   },
 
   doEvery: function (ms, ...args) {
@@ -31,11 +33,11 @@ export default {
   },
 
   just: function (value) {
-    return Rx.Observable.just(value);
+    return Rxjs.Observable.just(value);
   },
 
   empty: function () {
-    return Rx.Observable.empty();
+    return Rxjs.Observable.empty();
   }
 
 };

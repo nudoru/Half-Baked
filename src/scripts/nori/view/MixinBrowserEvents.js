@@ -1,5 +1,7 @@
 /* @flow weak */
 
+import * as Rxjs from '../../vendor/rxjs/rx.lite.min.js';
+
 let MixinBrowserEvents = function () {
 
   let _scrollableAppContainer,
@@ -31,11 +33,11 @@ let MixinBrowserEvents = function () {
    * Set up RxJS streams for events
    */
   function createBrowserEventStreams() {
-    _browserResizeStream = Rx.Observable.fromEvent(window, 'resize')
+    _browserResizeStream = Rxjs.Observable.fromEvent(window, 'resize')
       .throttle(100)
       .subscribe(handleViewPortResize.bind(this));
 
-    _browserScrollStream = Rx.Observable.fromEvent(_scrollableAppContainer, 'scroll')
+    _browserScrollStream = Rxjs.Observable.fromEvent(_scrollableAppContainer, 'scroll')
       .throttle(100)
       .subscribe(handleViewPortScroll.bind(this));
   }

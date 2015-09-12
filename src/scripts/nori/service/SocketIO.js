@@ -1,10 +1,11 @@
 /* @flow weak */
 
 import * as _events from './SocketIOEvents.js';
+import * as Rxjs from '../../vendor/rxjs/rx.lite.min.js';
 
 let SocketIOConnector = function () {
 
-  let _subject  = new Rx.BehaviorSubject(),
+  let _subject  = new Rxjs.Subject(),
       _socketIO = io(),
       _log      = [],
       _connectionID;
