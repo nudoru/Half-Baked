@@ -9,13 +9,13 @@ const _restNumQuestions     = 300,
       _restQuestionCategory = 166;
 
 /*
-SCI/TECh 24,
-63 General knowledge,
-59 general sci,
-98 banking and bus,
-117 world history,
-158 puzzle, contains HTML encoded
-166 comp intro
+ SCI/TECh 24,
+ 63 General knowledge,
+ 59 general sci,
+ 98 banking and bus,
+ 117 world history,
+ 158 puzzle, contains HTML encoded
+ 166 comp intro
  */
 
 /**
@@ -32,8 +32,9 @@ var AppStore = Nori.createStore({
 
   mixins: [],
 
-  lastEventHandled   : '',
+  lastEventHandled : '',
   gameStates       : ['TITLE', 'PLAYER_SELECT', 'WAITING_ON_PLAYER', 'MAIN_GAME', 'GAME_OVER'],
+  gamePlayStates   : ['CHOOSE', 'ANSWERING', 'WAITING'],
   playerAppearences: ['Biege', 'Blue', 'Green', 'Pink', 'Yellow'],
 
   initialize: function () {
@@ -43,6 +44,8 @@ var AppStore = Nori.createStore({
     this.createSubject('storeInitialized');
     this.createSubject('localPlayerDataUpdated');
     this.createSubject('remotePlayerDataUpdated');
+    this.createSubject('gamePlayStateUpdated');
+    this.createSubject('currentQuestionChange');
   },
 
   /**
@@ -51,35 +54,37 @@ var AppStore = Nori.createStore({
   loadStore: function () {
     // Set initial state
     this.setState({
-      currentState: this.gameStates[0],
-      session     : {
+      currentState    : this.gameStates[0],
+      currentPlayState: this.gamePlayStates[0],
+      currentQuestion : null,
+      session         : {
         socketIOID: '',
         roomID    : '0000'
       },
-      localPlayer : _.merge(this.createBlankPlayerObject(), this.createPlayerResetObject()),
-      remotePlayer: _.merge(this.createBlankPlayerObject(), this.createPlayerResetObject()),
-      questionBank: []
+      localPlayer     : _.merge(this.createBlankPlayerObject(), this.createPlayerResetObject()),
+      remotePlayer    : _.merge(this.createBlankPlayerObject(), this.createPlayerResetObject()),
+      questionBank    : []
     });
 
     //https://market.mashape.com/pareshchouhan/trivia
     var getQuestions = _rest.request({
       method : 'GET',
       //url    : 'https://pareshchouhan-trivia-v1.p.mashape.com/v1/getAllQuizQuestions?limit=' + _restNumQuestions + '&page=1',
-      url    : 'https://pareshchouhan-trivia-v1.p.mashape.com/v1/getQuizQuestionsByCategory?categoryId='+_restQuestionCategory+'&limit='+_restNumQuestions+'&page=1',
+      url    : 'https://pareshchouhan-trivia-v1.p.mashape.com/v1/getQuizQuestionsByCategory?categoryId=' + _restQuestionCategory + '&limit=' + _restNumQuestions + '&page=1',
       headers: [{'X-Mashape-Key': 'tPxKgDvrkqmshg8zW4olS87hzF7Ap1vi63rjsnUuVw1sBHV9KJ'}],
       json   : true
     }).subscribe(this.onQuestionsSuccess.bind(this), this.onQuestionError);
   },
 
   onQuestionsSuccess: function (data) {
-    console.log('Questions fetched',data[0]);
+    console.log('Questions fetched', data[0]);
 
     // Service only returns 2 levels of difficulty. For now, fake it
     let updated = data.map(q => {
       // also strip tags
-      q.q_text = _stringUtils.stripTags(_stringUtils.unescapeHTML(q.q_text));
+      q.q_text             = _stringUtils.stripTags(_stringUtils.unescapeHTML(q.q_text));
       q.q_difficulty_level = _numUtils.rndNumber(1, 5);
-      q.used = false;
+      q.used               = false;
       return q;
     });
 
@@ -93,8 +98,10 @@ var AppStore = Nori.createStore({
     throw new Error('Error fetching questions', data);
   },
 
-  getQuestionOfDifficulty: function(difficulty) {
-    var possibleQuestions = this.getState().questionBank.filter(q => { return q.q_difficulty_level === difficulty });
+  getQuestionOfDifficulty: function (difficulty) {
+    var possibleQuestions = this.getState().questionBank.filter(q => {
+      return q.q_difficulty_level === difficulty
+    });
     return _arrayUtils.rndElement(possibleQuestions);
   },
 
@@ -135,6 +142,8 @@ var AppStore = Nori.createStore({
       case _appActionConstants.SET_REMOTE_PLAYER_PROPS:
       case _appActionConstants.SET_SESSION_PROPS:
       case _appActionConstants.RESET_GAME:
+      case _appActionConstants.SET_GAME_PLAY_STATE:
+      case _appActionConstants.SET_CURRENT_QUESTION:
         return _.merge({}, state, event.payload.data);
       case undefined:
         return state;
@@ -145,20 +154,29 @@ var AppStore = Nori.createStore({
   },
 
   /**
-   * Called after all reducers have run to broadcast possible updates. Does
-   * not check to see if the state was actually updated.
+   * Called after all reducers have run to broadcast possible updates.
    */
   handleStateMutation: function () {
     let state = this.getState();
 
-    if(this.lastEventHandled === _appActionConstants.SET_LOCAL_PLAYER_PROPS) {
+    // Pick out certain events for specific notifications.
+    // Rather than blasting out a new store every time
+    if (this.lastEventHandled === _appActionConstants.SET_LOCAL_PLAYER_PROPS) {
       this.notifySubscribersOf('localPlayerDataUpdated');
+    } else if (this.lastEventHandled === _appActionConstants.SET_GAME_PLAY_STATE) {
+      this.notifySubscribersOf('gamePlayStateUpdated');
+      //console.log('game play state:', this.getState().currentPlayState);
+    } else if (this.lastEventHandled === _appActionConstants.SET_CURRENT_QUESTION) {
+      this.notifySubscribersOf('currentQuestionChange');
+      //console.log('question:', this.getState().currentQuestion);
     }
 
+    // Check if player health is 0
     if (this.shouldGameEnd(state)) {
       this.setState({currentState: this.gameStates[4]});
     }
 
+    // update everyone
     this.notifySubscribers(state);
   },
 

@@ -12,7 +12,7 @@ import * as _Socket from '../nori/service/SocketIO.js';
  * bootstrapping the app and possibly handling socket/server interaction.
  * Any additional functionality should be handled in a specific module.
  */
-var App = Nori.createApplication({
+let App = Nori.createApplication({
 
   mixins: [],
 
@@ -120,29 +120,31 @@ var App = Nori.createApplication({
   },
 
   handleConnect: function (socketID) {
-    var setSessionID = _appActions.setSessionProps({socketIOID: socketID}),
+    let setSessionID = _appActions.setSessionProps({socketIOID: socketID}),
         setLocalID   = _appActions.setLocalPlayerProps({id: socketID});
 
     this.store.apply([setSessionID, setLocalID]);
   },
 
   handleJoinNewlyCreatedRoom: function (roomID) {
-    var setRoom               = _appActions.setSessionProps({roomID: roomID}),
+    let setRoom               = _appActions.setSessionProps({roomID: roomID}),
         setWaitingScreenState = _noriActions.changeStoreState({currentState: this.store.gameStates[2]});
 
     this.store.apply([setRoom, setWaitingScreenState]);
   },
 
   handleGameStart: function (payload) {
-    var remotePlayer     = this.pluckRemotePlayer(payload.players),
-        setRemotePlayer  = _appActions.setRemotePlayerProps(remotePlayer),
-        setGamePlayState = _noriActions.changeStoreState({currentState: this.store.gameStates[3]});
+    let remotePlayer       = this.pluckRemotePlayer(payload.players),
+        setRemotePlayer    = _appActions.setRemotePlayerProps(remotePlayer),
+        setGameState       = _noriActions.changeStoreState({currentState: this.store.gameStates[3]}),
+        setGamePlayState   = _appActions.setGamePlayState(this.store.gamePlayStates[0]),
+        setCurrentQuestion = _appActions.setCurrentQuestion(null);
 
-    this.store.apply([setRemotePlayer, setGamePlayState]);
+    this.store.apply([setRemotePlayer, setGameState, setGamePlayState, setCurrentQuestion]);
   },
 
   pluckRemotePlayer: function (playersArry) {
-    var localPlayerID = this.store.getState().localPlayer.id;
+    let localPlayerID = this.store.getState().localPlayer.id;
     //console.log('filtering for', localPlayerID, playersArry);
     return playersArry.filter(function (player) {
       return player.id !== localPlayerID;
@@ -155,14 +157,18 @@ var App = Nori.createApplication({
   },
 
   handleUpdatedPlayerDetails: function (payload) {
-    var remotePlayer    = this.pluckRemotePlayer(payload.players),
+    let remotePlayer    = this.pluckRemotePlayer(payload.players),
         setRemotePlayer = _appActions.setRemotePlayerProps(remotePlayer);
 
     this.store.apply(setRemotePlayer);
   },
 
   handleReceivedQuestion: function (question) {
-    console.log('received a question!',question);
+    console.log('received a question!', question);
+    let setGamePlayState   = _appActions.setGamePlayState(this.store.gamePlayStates[1]),
+        setCurrentQuestion = _appActions.setCurrentQuestion(question);
+
+    this.store.apply([setGamePlayState, setCurrentQuestion]);
   },
 
   //----------------------------------------------------------------------------
@@ -170,13 +176,17 @@ var App = Nori.createApplication({
   //----------------------------------------------------------------------------
 
   sendQuestion: function (difficulty) {
-    let appState = this.store.getState(),
-        question = this.store.getQuestionOfDifficulty(difficulty);
+    let appState           = this.store.getState(),
+        question           = this.store.getQuestionOfDifficulty(difficulty),
+        setGamePlayState   = _appActions.setGamePlayState(this.store.gamePlayStates[2]),
+        setCurrentQuestion = _appActions.setCurrentQuestion(null);
 
     this.socket.notifyServer(_socketIOEvents.SEND_QUESTION, {
       roomID  : appState.session.roomID,
       question: question
     });
+
+    this.store.apply([setGamePlayState, setCurrentQuestion]);
   },
 
 });

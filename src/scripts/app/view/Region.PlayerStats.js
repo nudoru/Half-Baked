@@ -37,6 +37,9 @@ var Component = Nori.view().createComponentView({
     if (this.getConfigProps().target === 'remote') {
       stats = appState.remotePlayer;
     }
+    
+    stats.playerImage = this.getPlayerHUDImage(appState.currentPlayState, stats.appearance);
+
     return stats;
   },
 
@@ -46,10 +49,32 @@ var Component = Nori.view().createComponentView({
   componentWillUpdate: function () {
     var appState = _appStore.getState(),
         stats    = appState.localPlayer;
+
     if (this.getConfigProps().target === 'remote') {
       stats = appState.remotePlayer;
     }
+
+    stats.playerImage = this.getPlayerHUDImage(appState.currentPlayState, stats.appearance);
+
     return stats;
+  },
+
+  getPlayerHUDImage: function (state, color) {
+    let prefix    = 'alien',
+        postfix   = '.png',
+        statePart = '_front';
+    switch (state) {
+      case('CHOOSE'):
+        statePart = '_jump';
+        break;
+      case('ANSWERING'):
+        statePart = '_hit';
+        break;
+      case('WAITING'):
+        statePart = '_swim1';
+        break;
+    }
+    return prefix + color + statePart + postfix;
   },
 
   template: function () {

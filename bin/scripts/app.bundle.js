@@ -254,9 +254,11 @@ var App = Nori.createApplication({
   handleGameStart: function handleGameStart(payload) {
     var remotePlayer = this.pluckRemotePlayer(payload.players),
         setRemotePlayer = _appActions.setRemotePlayerProps(remotePlayer),
-        setGamePlayState = _noriActions.changeStoreState({ currentState: this.store.gameStates[3] });
+        setGameState = _noriActions.changeStoreState({ currentState: this.store.gameStates[3] }),
+        setGamePlayState = _appActions.setGamePlayState(this.store.gamePlayStates[0]),
+        setCurrentQuestion = _appActions.setCurrentQuestion(null);
 
-    this.store.apply([setRemotePlayer, setGamePlayState]);
+    this.store.apply([setRemotePlayer, setGameState, setGamePlayState, setCurrentQuestion]);
   },
 
   pluckRemotePlayer: function pluckRemotePlayer(playersArry) {
@@ -281,6 +283,10 @@ var App = Nori.createApplication({
 
   handleReceivedQuestion: function handleReceivedQuestion(question) {
     console.log('received a question!', question);
+    var setGamePlayState = _appActions.setGamePlayState(this.store.gamePlayStates[1]),
+        setCurrentQuestion = _appActions.setCurrentQuestion(question);
+
+    this.store.apply([setGamePlayState, setCurrentQuestion]);
   },
 
   //----------------------------------------------------------------------------
@@ -289,12 +295,16 @@ var App = Nori.createApplication({
 
   sendQuestion: function sendQuestion(difficulty) {
     var appState = this.store.getState(),
-        question = this.store.getQuestionOfDifficulty(difficulty);
+        question = this.store.getQuestionOfDifficulty(difficulty),
+        setGamePlayState = _appActions.setGamePlayState(this.store.gamePlayStates[2]),
+        setCurrentQuestion = _appActions.setCurrentQuestion(null);
 
     this.socket.notifyServer(_socketIOEvents.SEND_QUESTION, {
       roomID: appState.session.roomID,
       question: question
     });
+
+    this.store.apply([setGamePlayState, setCurrentQuestion]);
   }
 
 });
@@ -313,7 +323,9 @@ exports['default'] = {
   SET_LOCAL_PLAYER_NAME: 'SET_LOCAL_PLAYER_NAME',
   SET_LOCAL_PLAYER_APPEARANCE: 'SET_LOCAL_PLAYER_APPEARANCE',
   SET_REMOTE_PLAYER_PROPS: 'SET_REMOTE_PLAYER_PROPS',
-  RESET_GAME: 'RESET_GAME'
+  RESET_GAME: 'RESET_GAME',
+  SET_GAME_PLAY_STATE: 'SET_GAME_PLAY_STATE',
+  SET_CURRENT_QUESTION: 'SET_CURRENT_QUESTION'
   //SELECT_PLAYER              : 'SELECT_PLAYER',
   //REMOTE_PLAYER_CONNECT      : 'REMOTE_PLAYER_CONNECT',
   //GAME_START                 : 'GAME_START',
@@ -379,6 +391,28 @@ var ActionCreator = {
     };
   },
 
+  setGamePlayState: function setGamePlayState(data) {
+    return {
+      type: _actionConstants.SET_GAME_PLAY_STATE,
+      payload: {
+        data: {
+          currentPlayState: data
+        }
+      }
+    };
+  },
+
+  setCurrentQuestion: function setCurrentQuestion(data) {
+    return {
+      type: _actionConstants.SET_CURRENT_QUESTION,
+      payload: {
+        data: {
+          currentQuestion: data
+        }
+      }
+    };
+  },
+
   resetGame: function resetGame() {
     return {
       type: _actionConstants.RESET_GAME,
@@ -435,13 +469,13 @@ var _restNumQuestions = 300,
     _restQuestionCategory = 166;
 
 /*
-SCI/TECh 24,
-63 General knowledge,
-59 general sci,
-98 banking and bus,
-117 world history,
-158 puzzle, contains HTML encoded
-166 comp intro
+ SCI/TECh 24,
+ 63 General knowledge,
+ 59 general sci,
+ 98 banking and bus,
+ 117 world history,
+ 158 puzzle, contains HTML encoded
+ 166 comp intro
  */
 
 /**
@@ -460,6 +494,7 @@ var AppStore = Nori.createStore({
 
   lastEventHandled: '',
   gameStates: ['TITLE', 'PLAYER_SELECT', 'WAITING_ON_PLAYER', 'MAIN_GAME', 'GAME_OVER'],
+  gamePlayStates: ['CHOOSE', 'ANSWERING', 'WAITING'],
   playerAppearences: ['Biege', 'Blue', 'Green', 'Pink', 'Yellow'],
 
   initialize: function initialize() {
@@ -469,6 +504,8 @@ var AppStore = Nori.createStore({
     this.createSubject('storeInitialized');
     this.createSubject('localPlayerDataUpdated');
     this.createSubject('remotePlayerDataUpdated');
+    this.createSubject('gamePlayStateUpdated');
+    this.createSubject('currentQuestionChange');
   },
 
   /**
@@ -478,6 +515,8 @@ var AppStore = Nori.createStore({
     // Set initial state
     this.setState({
       currentState: this.gameStates[0],
+      currentPlayState: this.gamePlayStates[0],
+      currentQuestion: null,
       session: {
         socketIOID: '',
         roomID: '0000'
@@ -563,6 +602,8 @@ var AppStore = Nori.createStore({
       case _appActionConstants.SET_REMOTE_PLAYER_PROPS:
       case _appActionConstants.SET_SESSION_PROPS:
       case _appActionConstants.RESET_GAME:
+      case _appActionConstants.SET_GAME_PLAY_STATE:
+      case _appActionConstants.SET_CURRENT_QUESTION:
         return _.merge({}, state, event.payload.data);
       case undefined:
         return state;
@@ -573,20 +614,29 @@ var AppStore = Nori.createStore({
   },
 
   /**
-   * Called after all reducers have run to broadcast possible updates. Does
-   * not check to see if the state was actually updated.
+   * Called after all reducers have run to broadcast possible updates.
    */
   handleStateMutation: function handleStateMutation() {
     var state = this.getState();
 
+    // Pick out certain events for specific notifications.
+    // Rather than blasting out a new store every time
     if (this.lastEventHandled === _appActionConstants.SET_LOCAL_PLAYER_PROPS) {
       this.notifySubscribersOf('localPlayerDataUpdated');
-    }
+    } else if (this.lastEventHandled === _appActionConstants.SET_GAME_PLAY_STATE) {
+      this.notifySubscribersOf('gamePlayStateUpdated');
+      //console.log('game play state:', this.getState().currentPlayState);
+    } else if (this.lastEventHandled === _appActionConstants.SET_CURRENT_QUESTION) {
+        this.notifySubscribersOf('currentQuestionChange');
+        //console.log('question:', this.getState().currentQuestion);
+      }
 
+    // Check if player health is 0
     if (this.shouldGameEnd(state)) {
       this.setState({ currentState: this.gameStates[4] });
     }
 
+    // update everyone
     this.notifySubscribers(state);
   },
 
@@ -747,6 +797,9 @@ var Component = Nori.view().createComponentView({
     if (this.getConfigProps().target === 'remote') {
       stats = appState.remotePlayer;
     }
+
+    stats.playerImage = this.getPlayerHUDImage(appState.currentPlayState, stats.appearance);
+
     return stats;
   },
 
@@ -756,10 +809,32 @@ var Component = Nori.view().createComponentView({
   componentWillUpdate: function componentWillUpdate() {
     var appState = _appStore.getState(),
         stats = appState.localPlayer;
+
     if (this.getConfigProps().target === 'remote') {
       stats = appState.remotePlayer;
     }
+
+    stats.playerImage = this.getPlayerHUDImage(appState.currentPlayState, stats.appearance);
+
     return stats;
+  },
+
+  getPlayerHUDImage: function getPlayerHUDImage(state, color) {
+    var prefix = 'alien',
+        postfix = '.png',
+        statePart = '_front';
+    switch (state) {
+      case 'CHOOSE':
+        statePart = '_jump';
+        break;
+      case 'ANSWERING':
+        statePart = '_hit';
+        break;
+      case 'WAITING':
+        statePart = '_swim1';
+        break;
+    }
+    return prefix + color + statePart + postfix;
   },
 
   template: function template() {
