@@ -70,8 +70,9 @@ BEGIN Templates for Sub Views
         </div>
         <button class="button-cheat" id="game__button-skip">==>></button>
         <button id="game__test" class="button-danger">Test</button>
-        <div id="game__localplayerstats"></div>
         <div id="game__remoteplayerstats"></div>
+        <div id="game__questionarea"></div>
+        <div id="game__localplayerstats"></div>
     </div>
 </script>
 
@@ -89,6 +90,19 @@ BEGIN Templates for Sub Views
             <li><img class="game__playerstats-icon" src="img/hudCoin.png">{{score}}</li>
         </ul>
     </div>
+</script>
+
+<!--q_correct_option: 1-->
+<!--q_date_added: "2013-06-19T04:00:00.000Z"-->
+<!--q_difficulty_level: 1-->
+<!--q_options_1: "Artificial Intelligence"-->
+<!--q_options_2: "System Knowledge"-->
+<!--q_options_3: "Programming Intelligence"-->
+<!--q_options_4: "All of these"-->
+<!--q_text: "Vth Generation Computers are based on."-->
+
+<script id="game__question" type="text/template">
+    <div></div>
 </script>
 
 <script id="gameover" type="text/template">

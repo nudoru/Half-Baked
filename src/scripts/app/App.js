@@ -175,6 +175,19 @@ let App = Nori.createApplication({
   // Handle TO server
   //----------------------------------------------------------------------------
 
+  createRoom: function() {
+    this.socket.notifyServer(_socketIOEvents.CREATE_ROOM, {
+      playerDetails: this.store.getState().localPlayer
+    });
+  },
+
+  joinRoom: function(roomID) {
+    this.socket.notifyServer(_socketIOEvents.JOIN_ROOM, {
+      roomID       : roomID,
+      playerDetails: this.store.getState().localPlayer
+    });
+  },
+
   sendQuestion: function (difficulty) {
     let appState           = this.store.getState(),
         question           = this.store.getQuestionOfDifficulty(difficulty),

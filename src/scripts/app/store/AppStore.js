@@ -100,7 +100,7 @@ var AppStore = Nori.createStore({
 
   getQuestionOfDifficulty: function (difficulty) {
     var possibleQuestions = this.getState().questionBank.filter(q => {
-      return q.q_difficulty_level === difficulty
+      return q.q_difficulty_level === difficulty;
     });
     return _arrayUtils.rndElement(possibleQuestions);
   },

@@ -1,9 +1,9 @@
 import * as _noriActions from '../../nori/action/ActionCreator';
+import * as _app from '../App';
 import * as _appView from './AppView';
 import * as _appStore from '../store/AppStore';
 import * as _template from '../../nori/utils/Templating.js';
 import * as _appActions from '../action/ActionCreator.js';
-import * as _socketIO from '../../nori/service/SocketIO.js';
 
 let _roomNumberLength = 4;
 
@@ -78,19 +78,14 @@ var Component = Nori.view().createComponentView({
 
   onCreateRoom: function () {
     if (this.validateUserDetailsInput()) {
-      _socketIO.notifyServer(_socketIO.events().CREATE_ROOM, {
-        playerDetails: _appStore.getState().localPlayer
-      });
+      _app.default.createRoom();
     }
   },
 
   onJoinRoom: function () {
     var roomID = document.querySelector('#select__roomid').value;
     if (this.validateRoomID(roomID)) {
-      _socketIO.notifyServer(_socketIO.events().JOIN_ROOM, {
-        roomID       : roomID,
-        playerDetails: _appStore.getState().localPlayer
-      });
+      _app.default.joinRoom(roomID);
     } else {
       _appView.default.alert('The room ID is not correct. Does it contain letters or is less than '+_roomNumberLength+' digits?', 'Bad Room ID');
     }

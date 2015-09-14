@@ -6,6 +6,7 @@ import * as _template from '../../nori/utils/Templating.js';
 import * as _appActions from '../action/ActionCreator.js';
 import * as _socketIO from '../../nori/service/SocketIO.js';
 import * as _regionPlayerStats from './Region.PlayerStats.js';
+import * as _regionQuestion from './Region.Question.js';
 import * as _numUtils from '../../nudoru/core/NumberUtils.js';
 
 /**
@@ -35,6 +36,10 @@ var Component = Nori.view().createComponentView({
         id        : 'game__playerstats',
         mountPoint: '#game__remoteplayerstats',
         target    : 'remote'
+      }),
+      questionView: _regionQuestion.default({
+        id        : 'game__question',
+        mountPoint: '#game__questionarea'
       })
     };
   },
@@ -65,6 +70,10 @@ var Component = Nori.view().createComponentView({
   sendQuestion: function(evt) {
     var difficulty = parseInt(evt.target.getAttribute('id').substr(-1,1));
     _app.default.sendQuestion(difficulty);
+  },
+
+  receiveQuestion: function(questionObj) {
+    console.log('Main game view received question', questionObj);
   },
 
   /**

@@ -293,6 +293,19 @@ var App = Nori.createApplication({
   // Handle TO server
   //----------------------------------------------------------------------------
 
+  createRoom: function createRoom() {
+    this.socket.notifyServer(_socketIOEvents.CREATE_ROOM, {
+      playerDetails: this.store.getState().localPlayer
+    });
+  },
+
+  joinRoom: function joinRoom(roomID) {
+    this.socket.notifyServer(_socketIOEvents.JOIN_ROOM, {
+      roomID: roomID,
+      playerDetails: this.store.getState().localPlayer
+    });
+  },
+
   sendQuestion: function sendQuestion(difficulty) {
     var appState = this.store.getState(),
         question = this.store.getQuestionOfDifficulty(difficulty),
@@ -312,7 +325,7 @@ var App = Nori.createApplication({
 exports['default'] = App;
 module.exports = exports['default'];
 
-},{"../nori/action/ActionCreator.js":16,"../nori/service/SocketIO.js":18,"../nori/service/SocketIOEvents.js":19,"../nori/utils/Rx.js":26,"./action/ActionCreator.js":4,"./store/AppStore.js":5,"./view/AppView.js":6}],3:[function(require,module,exports){
+},{"../nori/action/ActionCreator.js":17,"../nori/service/SocketIO.js":19,"../nori/service/SocketIOEvents.js":20,"../nori/utils/Rx.js":27,"./action/ActionCreator.js":4,"./store/AppStore.js":5,"./view/AppView.js":6}],3:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -665,7 +678,7 @@ var AppStore = Nori.createStore({
 exports['default'] = AppStore();
 module.exports = exports['default'];
 
-},{"../../nori/action/ActionConstants.js":15,"../../nori/service/Rest.js":17,"../../nudoru/core/ArrayUtils.js":43,"../../nudoru/core/NumberUtils.js":44,"../../nudoru/core/StringUtils.js":46,"../action/ActionConstants.js":3}],6:[function(require,module,exports){
+},{"../../nori/action/ActionConstants.js":16,"../../nori/service/Rest.js":18,"../../nudoru/core/ArrayUtils.js":44,"../../nudoru/core/NumberUtils.js":45,"../../nudoru/core/StringUtils.js":47,"../action/ActionConstants.js":3}],6:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -741,7 +754,7 @@ var AppView = Nori.createView({
 exports['default'] = AppView();
 module.exports = exports['default'];
 
-},{"../../nori/view/ApplicationView.js":28,"../../nori/view/MixinNudoruControls.js":32,"../../nori/view/MixinStoreStateViews.js":33,"../store/AppStore.js":5,"./Screen.GameOver.js":8,"./Screen.MainGame.js":9,"./Screen.PlayerSelect.js":10,"./Screen.Title.js":11,"./Screen.WaitingOnPlayer.js":12}],7:[function(require,module,exports){
+},{"../../nori/view/ApplicationView.js":29,"../../nori/view/MixinNudoruControls.js":33,"../../nori/view/MixinStoreStateViews.js":34,"../store/AppStore.js":5,"./Screen.GameOver.js":9,"./Screen.MainGame.js":10,"./Screen.PlayerSelect.js":11,"./Screen.Title.js":12,"./Screen.WaitingOnPlayer.js":13}],7:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -791,32 +804,39 @@ var Component = Nori.view().createComponentView({
    * Set initial state properties. Call once on first render
    */
   getInitialState: function getInitialState() {
-    var appState = _appStore.getState(),
-        stats = appState.localPlayer;
-
-    if (this.getConfigProps().target === 'remote') {
-      stats = appState.remotePlayer;
-    }
-
-    stats.playerImage = this.getPlayerHUDImage(appState.currentPlayState, stats.appearance);
-
-    return stats;
+    return this.getHUDState();
   },
 
   /**
    * State change on bound stores (map, etc.) Return nextState object
    */
   componentWillUpdate: function componentWillUpdate() {
-    var appState = _appStore.getState(),
-        stats = appState.localPlayer;
+    return this.getHUDState();
+  },
 
-    if (this.getConfigProps().target === 'remote') {
+  getHUDState: function getHUDState() {
+    var appState = _appStore.getState(),
+        stats;
+
+    if (this.getConfigProps().target === 'local') {
+      stats = appState.localPlayer;
+      stats.playerImage = this.getPlayerHUDImage(appState.currentPlayState, stats.appearance);
+    } else {
       stats = appState.remotePlayer;
+      stats.playerImage = this.getPlayerHUDImage(this.getOppositePlayState(appState.currentPlayState), stats.appearance);
     }
 
-    stats.playerImage = this.getPlayerHUDImage(appState.currentPlayState, stats.appearance);
-
     return stats;
+  },
+
+  //'CHOOSE', 'ANSWERING', 'WAITING'
+  getOppositePlayState: function getOppositePlayState(playState) {
+    //if(playState === 'CHOOSE') {
+    //
+    //} else if(playState === 'ANSWERING') {
+    //
+    //}
+    return 'WAITING';
   },
 
   getPlayerHUDImage: function getPlayerHUDImage(state, color) {
@@ -861,7 +881,95 @@ var Component = Nori.view().createComponentView({
 exports['default'] = Component;
 module.exports = exports['default'];
 
-},{"../../nori/action/ActionCreator":16,"../../nori/utils/Templating.js":27,"../store/AppStore":5,"./AppView":6}],8:[function(require,module,exports){
+},{"../../nori/action/ActionCreator":17,"../../nori/utils/Templating.js":28,"../store/AppStore":5,"./AppView":6}],8:[function(require,module,exports){
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj['default'] = obj; return newObj; } }
+
+var _noriActionActionCreator = require('../../nori/action/ActionCreator');
+
+var _noriActions = _interopRequireWildcard(_noriActionActionCreator);
+
+var _AppView = require('./AppView');
+
+var _appView = _interopRequireWildcard(_AppView);
+
+var _storeAppStore = require('../store/AppStore');
+
+var _appStore = _interopRequireWildcard(_storeAppStore);
+
+var _noriUtilsTemplatingJs = require('../../nori/utils/Templating.js');
+
+var _template = _interopRequireWildcard(_noriUtilsTemplatingJs);
+
+/**
+ * Module for a dynamic application view for a route or a persistent view
+ */
+var Component = Nori.view().createComponentView({
+
+  /**
+   * configProps passed in from region definition on parent View
+   * Initialize and bind, called once on first render. Parent component is
+   * initialized from app view
+   * @param configProps
+   */
+  initialize: function initialize(configProps) {
+    this.bindMap(_appStore); // Reducer store, map id string or map object
+  },
+
+  /**
+   * Create an object to be used to define events on DOM elements
+   * @returns {}
+   */
+  defineEvents: function defineEvents() {
+    return null;
+  },
+
+  /**
+   * Set initial state properties. Call once on first render
+   */
+  getInitialState: function getInitialState() {
+    var state = _appStore.getState();
+    console.log('question region, initial q:', state.currentQuestion);
+    return {};
+  },
+
+  /**
+   * State change on bound stores (map, etc.) Return nextState object
+   */
+  componentWillUpdate: function componentWillUpdate() {
+    var state = _appStore.getState();
+    console.log('question region, update q:', state.currentQuestion);
+    return {};
+  },
+
+  template: function template() {
+    var html = _template.getSource('game__question');
+    return _.template(html);
+  },
+
+  /**
+   * Component HTML was attached to the DOM
+   */
+  componentDidMount: function componentDidMount() {
+    //
+  },
+
+  /**
+   * Component will be removed from the DOM
+   */
+  componentWillUnmount: function componentWillUnmount() {
+    //
+  }
+
+});
+
+exports['default'] = Component;
+module.exports = exports['default'];
+
+},{"../../nori/action/ActionCreator":17,"../../nori/utils/Templating.js":28,"../store/AppStore":5,"./AppView":6}],9:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -975,7 +1083,7 @@ var Component = Nori.view().createComponentView({
 exports['default'] = Component;
 module.exports = exports['default'];
 
-},{"../../nori/action/ActionCreator":16,"../../nori/utils/Templating.js":27,"../../nori/view/MixinDOMManipulation.js":30,"../action/ActionCreator.js":4,"../store/AppStore":5,"./AppView":6}],9:[function(require,module,exports){
+},{"../../nori/action/ActionCreator":17,"../../nori/utils/Templating.js":28,"../../nori/view/MixinDOMManipulation.js":31,"../action/ActionCreator.js":4,"../store/AppStore":5,"./AppView":6}],10:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -1014,6 +1122,10 @@ var _RegionPlayerStatsJs = require('./Region.PlayerStats.js');
 
 var _regionPlayerStats = _interopRequireWildcard(_RegionPlayerStatsJs);
 
+var _RegionQuestionJs = require('./Region.Question.js');
+
+var _regionQuestion = _interopRequireWildcard(_RegionQuestionJs);
+
 var _nudoruCoreNumberUtilsJs = require('../../nudoru/core/NumberUtils.js');
 
 var _numUtils = _interopRequireWildcard(_nudoruCoreNumberUtilsJs);
@@ -1045,6 +1157,10 @@ var Component = Nori.view().createComponentView({
         id: 'game__playerstats',
         mountPoint: '#game__remoteplayerstats',
         target: 'remote'
+      }),
+      questionView: _regionQuestion['default']({
+        id: 'game__question',
+        mountPoint: '#game__questionarea'
       })
     };
   },
@@ -1075,6 +1191,10 @@ var Component = Nori.view().createComponentView({
   sendQuestion: function sendQuestion(evt) {
     var difficulty = parseInt(evt.target.getAttribute('id').substr(-1, 1));
     _app['default'].sendQuestion(difficulty);
+  },
+
+  receiveQuestion: function receiveQuestion(questionObj) {
+    console.log('Main game view received question', questionObj);
   },
 
   /**
@@ -1112,7 +1232,7 @@ var Component = Nori.view().createComponentView({
 exports['default'] = Component;
 module.exports = exports['default'];
 
-},{"../../nori/action/ActionCreator":16,"../../nori/service/SocketIO.js":18,"../../nori/utils/Templating.js":27,"../../nudoru/core/NumberUtils.js":44,"../App":2,"../action/ActionCreator.js":4,"../store/AppStore":5,"./AppView":6,"./Region.PlayerStats.js":7}],10:[function(require,module,exports){
+},{"../../nori/action/ActionCreator":17,"../../nori/service/SocketIO.js":19,"../../nori/utils/Templating.js":28,"../../nudoru/core/NumberUtils.js":45,"../App":2,"../action/ActionCreator.js":4,"../store/AppStore":5,"./AppView":6,"./Region.PlayerStats.js":7,"./Region.Question.js":8}],11:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -1122,6 +1242,10 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 var _noriActionActionCreator = require('../../nori/action/ActionCreator');
 
 var _noriActions = _interopRequireWildcard(_noriActionActionCreator);
+
+var _App = require('../App');
+
+var _app = _interopRequireWildcard(_App);
 
 var _AppView = require('./AppView');
 
@@ -1138,10 +1262,6 @@ var _template = _interopRequireWildcard(_noriUtilsTemplatingJs);
 var _actionActionCreatorJs = require('../action/ActionCreator.js');
 
 var _appActions = _interopRequireWildcard(_actionActionCreatorJs);
-
-var _noriServiceSocketIOJs = require('../../nori/service/SocketIO.js');
-
-var _socketIO = _interopRequireWildcard(_noriServiceSocketIOJs);
 
 var _roomNumberLength = 4;
 
@@ -1216,19 +1336,14 @@ var Component = Nori.view().createComponentView({
 
   onCreateRoom: function onCreateRoom() {
     if (this.validateUserDetailsInput()) {
-      _socketIO.notifyServer(_socketIO.events().CREATE_ROOM, {
-        playerDetails: _appStore.getState().localPlayer
-      });
+      _app['default'].createRoom();
     }
   },
 
   onJoinRoom: function onJoinRoom() {
     var roomID = document.querySelector('#select__roomid').value;
     if (this.validateRoomID(roomID)) {
-      _socketIO.notifyServer(_socketIO.events().JOIN_ROOM, {
-        roomID: roomID,
-        playerDetails: _appStore.getState().localPlayer
-      });
+      _app['default'].joinRoom(roomID);
     } else {
       _appView['default'].alert('The room ID is not correct. Does it contain letters or is less than ' + _roomNumberLength + ' digits?', 'Bad Room ID');
     }
@@ -1271,7 +1386,7 @@ var Component = Nori.view().createComponentView({
 exports['default'] = Component;
 module.exports = exports['default'];
 
-},{"../../nori/action/ActionCreator":16,"../../nori/service/SocketIO.js":18,"../../nori/utils/Templating.js":27,"../action/ActionCreator.js":4,"../store/AppStore":5,"./AppView":6}],11:[function(require,module,exports){
+},{"../../nori/action/ActionCreator":17,"../../nori/utils/Templating.js":28,"../App":2,"../action/ActionCreator.js":4,"../store/AppStore":5,"./AppView":6}],12:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -1353,7 +1468,7 @@ var Component = Nori.view().createComponentView({
 exports['default'] = Component;
 module.exports = exports['default'];
 
-},{"../../nori/action/ActionCreator":16,"../../nori/utils/Templating.js":27,"../store/AppStore":5,"./AppView":6}],12:[function(require,module,exports){
+},{"../../nori/action/ActionCreator":17,"../../nori/utils/Templating.js":28,"../store/AppStore":5,"./AppView":6}],13:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -1445,7 +1560,7 @@ var Component = Nori.view().createComponentView({
 exports['default'] = Component;
 module.exports = exports['default'];
 
-},{"../../nori/action/ActionCreator":16,"../../nori/utils/Templating.js":27,"../store/AppStore":5,"./AppView":6}],13:[function(require,module,exports){
+},{"../../nori/action/ActionCreator":17,"../../nori/utils/Templating.js":28,"../store/AppStore":5,"./AppView":6}],14:[function(require,module,exports){
 /**
  * Initial file for the Application
  */
@@ -1472,7 +1587,7 @@ module.exports = exports['default'];
   }
 })();
 
-},{"./app/App.js":2,"./nori/Nori.js":14,"./nudoru/browser/BrowserInfo.js":35}],14:[function(require,module,exports){
+},{"./app/App.js":2,"./nori/Nori.js":15,"./nudoru/browser/BrowserInfo.js":36}],15:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -1640,7 +1755,7 @@ var Nori = function Nori() {
 exports['default'] = Nori();
 module.exports = exports['default'];
 
-},{"./store/MixinReducerStore.js":21,"./utils/Dispatcher.js":22,"./utils/MixinObservableSubject.js":23,"./utils/Router.js":25,"./view/MixinComponentViews.js":29,"./view/MixinEventDelegator.js":31}],15:[function(require,module,exports){
+},{"./store/MixinReducerStore.js":22,"./utils/Dispatcher.js":23,"./utils/MixinObservableSubject.js":24,"./utils/Router.js":26,"./view/MixinComponentViews.js":30,"./view/MixinEventDelegator.js":32}],16:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -1651,7 +1766,7 @@ exports['default'] = {
 };
 module.exports = exports['default'];
 
-},{}],16:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -1687,7 +1802,7 @@ var NoriActionCreator = {
 exports['default'] = NoriActionCreator;
 module.exports = exports['default'];
 
-},{"./ActionConstants.js":15}],17:[function(require,module,exports){
+},{"./ActionConstants.js":16}],18:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -1838,7 +1953,7 @@ var Rest = function Rest() {
 exports['default'] = Rest();
 module.exports = exports['default'];
 
-},{"../../vendor/rxjs/rx.lite.min.js":49}],18:[function(require,module,exports){
+},{"../../vendor/rxjs/rx.lite.min.js":50}],19:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -1956,7 +2071,7 @@ var SocketIOConnector = function SocketIOConnector() {
 exports['default'] = SocketIOConnector();
 module.exports = exports['default'];
 
-},{"../../vendor/rxjs/rx.lite.min.js":49,"./SocketIOEvents.js":19}],19:[function(require,module,exports){
+},{"../../vendor/rxjs/rx.lite.min.js":50,"./SocketIOEvents.js":20}],20:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -1986,7 +2101,7 @@ exports['default'] = {
 };
 module.exports = exports['default'];
 
-},{}],20:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -2042,7 +2157,7 @@ var ImmutableMap = function ImmutableMap() {
 exports['default'] = ImmutableMap;
 module.exports = exports['default'];
 
-},{"../../vendor/immutable.min.js":48}],21:[function(require,module,exports){
+},{"../../vendor/immutable.min.js":49}],22:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -2204,7 +2319,7 @@ var MixinReducerStore = function MixinReducerStore() {
 exports['default'] = MixinReducerStore();
 module.exports = exports['default'];
 
-},{"../../nudoru/util/is.js":47,"./ImmutableMap.js":20}],22:[function(require,module,exports){
+},{"../../nudoru/util/is.js":48,"./ImmutableMap.js":21}],23:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -2449,7 +2564,7 @@ var Dispatcher = function Dispatcher() {
 exports['default'] = Dispatcher();
 module.exports = exports['default'];
 
-},{"../../vendor/rxjs/rx.lite.min.js":49}],23:[function(require,module,exports){
+},{"../../vendor/rxjs/rx.lite.min.js":50}],24:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -2536,7 +2651,7 @@ var MixinObservableSubject = function MixinObservableSubject() {
 exports['default'] = MixinObservableSubject;
 module.exports = exports['default'];
 
-},{"../../nudoru/util/is.js":47,"../../vendor/rxjs/rx.lite.min.js":49}],24:[function(require,module,exports){
+},{"../../nudoru/util/is.js":48,"../../vendor/rxjs/rx.lite.min.js":50}],25:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -2584,7 +2699,7 @@ var Renderer = function Renderer() {
 exports['default'] = Renderer();
 module.exports = exports['default'];
 
-},{"../../nudoru/browser/DOMUtils.js":36}],25:[function(require,module,exports){
+},{"../../nudoru/browser/DOMUtils.js":37}],26:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -2729,7 +2844,7 @@ r.initialize();
 exports['default'] = r;
 module.exports = exports['default'];
 
-},{"../../nudoru/core/ObjectUtils.js":45,"../../vendor/rxjs/rx.lite.min.js":49}],26:[function(require,module,exports){
+},{"../../nudoru/core/ObjectUtils.js":46,"../../vendor/rxjs/rx.lite.min.js":50}],27:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -2783,7 +2898,7 @@ exports['default'] = {
 };
 module.exports = exports['default'];
 
-},{"../../vendor/rxjs/rx.lite.min.js":49}],27:[function(require,module,exports){
+},{"../../vendor/rxjs/rx.lite.min.js":50}],28:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -2960,7 +3075,7 @@ var Templating = function Templating() {
 exports['default'] = Templating();
 module.exports = exports['default'];
 
-},{"../../nudoru/browser/DOMUtils.js":36}],28:[function(require,module,exports){
+},{"../../nudoru/browser/DOMUtils.js":37}],29:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -3044,7 +3159,7 @@ var ApplicationView = function ApplicationView() {
 exports['default'] = ApplicationView();
 module.exports = exports['default'];
 
-},{"../../nudoru/browser/DOMUtils.js":36,"../utils/Templating.js":27}],29:[function(require,module,exports){
+},{"../../nudoru/browser/DOMUtils.js":37,"../utils/Templating.js":28}],30:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -3180,7 +3295,7 @@ var MixinComponentViews = function MixinComponentViews() {
 exports['default'] = MixinComponentViews();
 module.exports = exports['default'];
 
-},{"../store/ImmutableMap.js":20,"../utils/MixinObservableSubject.js":23,"./MixinEventDelegator.js":31,"./ViewComponent.js":34}],30:[function(require,module,exports){
+},{"../store/ImmutableMap.js":21,"../utils/MixinObservableSubject.js":24,"./MixinEventDelegator.js":32,"./ViewComponent.js":35}],31:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -3209,7 +3324,7 @@ var MixinDOMManipulation = function MixinDOMManipulation() {
 exports['default'] = MixinDOMManipulation();
 module.exports = exports['default'];
 
-},{}],31:[function(require,module,exports){
+},{}],32:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -3390,7 +3505,7 @@ var MixinEventDelegator = function MixinEventDelegator() {
 exports['default'] = MixinEventDelegator;
 module.exports = exports['default'];
 
-},{"../../nudoru/browser/BrowserInfo.js":35,"../../nudoru/util/is.js":47,"../utils/Rx.js":26}],32:[function(require,module,exports){
+},{"../../nudoru/browser/BrowserInfo.js":36,"../../nudoru/util/is.js":48,"../utils/Rx.js":27}],33:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -3470,7 +3585,7 @@ var MixinNudoruControls = function MixinNudoruControls() {
 exports['default'] = MixinNudoruControls();
 module.exports = exports['default'];
 
-},{"../../nudoru/components/MessageBoxCreator.js":38,"../../nudoru/components/MessageBoxView.js":39,"../../nudoru/components/ModalCoverView.js":40,"../../nudoru/components/ToastView.js":41,"../../nudoru/components/ToolTipView.js":42}],33:[function(require,module,exports){
+},{"../../nudoru/components/MessageBoxCreator.js":39,"../../nudoru/components/MessageBoxView.js":40,"../../nudoru/components/ModalCoverView.js":41,"../../nudoru/components/ToastView.js":42,"../../nudoru/components/ToolTipView.js":43}],34:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -3590,7 +3705,7 @@ var MixinStoreStateViews = function MixinStoreStateViews() {
 exports['default'] = MixinStoreStateViews();
 module.exports = exports['default'];
 
-},{}],34:[function(require,module,exports){
+},{}],35:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -3922,7 +4037,7 @@ var ViewComponent = function ViewComponent() {
 exports['default'] = ViewComponent;
 module.exports = exports['default'];
 
-},{"../../nudoru/util/is.js":47,"../utils/Renderer.js":24,"../utils/Templating.js":27}],35:[function(require,module,exports){
+},{"../../nudoru/util/is.js":48,"../utils/Renderer.js":25,"../utils/Templating.js":28}],36:[function(require,module,exports){
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
@@ -3991,7 +4106,7 @@ var browserInfo = {
 exports["default"] = browserInfo;
 module.exports = exports["default"];
 
-},{}],36:[function(require,module,exports){
+},{}],37:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -4201,7 +4316,7 @@ exports['default'] = {
 };
 module.exports = exports['default'];
 
-},{}],37:[function(require,module,exports){
+},{}],38:[function(require,module,exports){
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
@@ -4252,7 +4367,7 @@ exports["default"] = {
 };
 module.exports = exports["default"];
 
-},{}],38:[function(require,module,exports){
+},{}],39:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -4362,7 +4477,7 @@ var MessageBoxCreator = function MessageBoxCreator() {
 exports['default'] = MessageBoxCreator();
 module.exports = exports['default'];
 
-},{"./MessageBoxView":39}],39:[function(require,module,exports){
+},{"./MessageBoxView":40}],40:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -4664,7 +4779,7 @@ var MessageBoxView = function MessageBoxView() {
 exports['default'] = MessageBoxView();
 module.exports = exports['default'];
 
-},{"../../nori/utils/Templating.js":27,"../../nudoru/browser/BrowserInfo.js":35,"../../nudoru/browser/DOMUtils.js":36,"../../nudoru/browser/ThreeDTransforms.js":37,"../../vendor/rxjs/rx.lite.min.js":49,"./ModalCoverView.js":40}],40:[function(require,module,exports){
+},{"../../nori/utils/Templating.js":28,"../../nudoru/browser/BrowserInfo.js":36,"../../nudoru/browser/DOMUtils.js":37,"../../nudoru/browser/ThreeDTransforms.js":38,"../../vendor/rxjs/rx.lite.min.js":50,"./ModalCoverView.js":41}],41:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -4811,7 +4926,7 @@ var ModalCoverView = function ModalCoverView() {
 exports['default'] = ModalCoverView();
 module.exports = exports['default'];
 
-},{"../../nudoru/browser/BrowserInfo.js":35,"../../vendor/rxjs/rx.lite.min.js":49}],41:[function(require,module,exports){
+},{"../../nudoru/browser/BrowserInfo.js":36,"../../vendor/rxjs/rx.lite.min.js":50}],42:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -4974,7 +5089,7 @@ var ToastView = function ToastView() {
 exports['default'] = ToastView();
 module.exports = exports['default'];
 
-},{"../../nori/utils/Templating.js":27,"../../nudoru/browser/BrowserInfo.js":35,"../../nudoru/browser/DOMUtils.js":36,"../../nudoru/browser/ThreeDTransforms.js":37,"../../vendor/rxjs/rx.lite.min.js":49}],42:[function(require,module,exports){
+},{"../../nori/utils/Templating.js":28,"../../nudoru/browser/BrowserInfo.js":36,"../../nudoru/browser/DOMUtils.js":37,"../../nudoru/browser/ThreeDTransforms.js":38,"../../vendor/rxjs/rx.lite.min.js":50}],43:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -5256,7 +5371,7 @@ var ToolTipView = function ToolTipView() {
 exports['default'] = ToolTipView();
 module.exports = exports['default'];
 
-},{"../../nori/utils/Templating.js":27,"../../nudoru/browser/DOMUtils.js":36,"../../vendor/rxjs/rx.lite.min.js":49}],43:[function(require,module,exports){
+},{"../../nori/utils/Templating.js":28,"../../nudoru/browser/DOMUtils.js":37,"../../vendor/rxjs/rx.lite.min.js":50}],44:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -5349,7 +5464,7 @@ exports['default'] = {
 };
 module.exports = exports['default'];
 
-},{"./NumberUtils.js":44}],44:[function(require,module,exports){
+},{"./NumberUtils.js":45}],45:[function(require,module,exports){
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
@@ -5381,7 +5496,7 @@ exports["default"] = {
 };
 module.exports = exports["default"];
 
-},{}],45:[function(require,module,exports){
+},{}],46:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -5595,7 +5710,7 @@ exports['default'] = {
 };
 module.exports = exports['default'];
 
-},{}],46:[function(require,module,exports){
+},{}],47:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -5649,7 +5764,7 @@ exports['default'] = {
 };
 module.exports = exports['default'];
 
-},{}],47:[function(require,module,exports){
+},{}],48:[function(require,module,exports){
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
@@ -5697,7 +5812,7 @@ exports["default"] = {
 };
 module.exports = exports["default"];
 
-},{}],48:[function(require,module,exports){
+},{}],49:[function(require,module,exports){
 /**
  *  Copyright (c) 2014-2015, Facebook, Inc.
  *  All rights reserved.
@@ -7284,7 +7399,7 @@ module.exports = exports["default"];
     } }), l.prototype.has = un.includes, Xe(x, p.prototype), Xe(k, v.prototype), Xe(A, l.prototype), Xe(V, p.prototype), Xe(Y, v.prototype), Xe(Q, l.prototype);var an = { Iterable: _, Seq: O, Collection: H, Map: Lt, OrderedMap: Ie, List: fe, Stack: Ee, Set: Ae, OrderedSet: Le, Record: Ce, Range: Ye, Repeat: Qe, is: X, fromJS: F };return an;
 });
 
-},{}],49:[function(require,module,exports){
+},{}],50:[function(require,module,exports){
 (function (process,global){
 /* Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.*/
 (function (a) {
@@ -9529,4 +9644,4 @@ module.exports = exports["default"];
 }).call(this);
 
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"_process":1}]},{},[13]);
+},{"_process":1}]},{},[14]);

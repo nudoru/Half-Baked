@@ -31,61 +31,22 @@ var Component = Nori.view().createComponentView({
    * Set initial state properties. Call once on first render
    */
   getInitialState: function () {
-    return this.getHUDState();
+    let state = _appStore.getState();
+    console.log('question region, initial q:',state.currentQuestion);
+    return {};
   },
 
   /**
    * State change on bound stores (map, etc.) Return nextState object
    */
   componentWillUpdate: function () {
-    return this.getHUDState();
-  },
-
-  getHUDState: function() {
-    var appState = _appStore.getState(),
-        stats;
-
-    if (this.getConfigProps().target === 'local') {
-      stats = appState.localPlayer;
-      stats.playerImage = this.getPlayerHUDImage(appState.currentPlayState, stats.appearance);
-    } else {
-      stats = appState.remotePlayer;
-      stats.playerImage = this.getPlayerHUDImage(this.getOppositePlayState(appState.currentPlayState), stats.appearance);
-    }
-
-    return stats;
-  },
-
-  //'CHOOSE', 'ANSWERING', 'WAITING'
-  getOppositePlayState: function(playState) {
-    //if(playState === 'CHOOSE') {
-    //
-    //} else if(playState === 'ANSWERING') {
-    //
-    //}
-    return 'WAITING';
-  },
-
-  getPlayerHUDImage: function (state, color) {
-    let prefix    = 'alien',
-        postfix   = '.png',
-        statePart = '_front';
-    switch (state) {
-      case('CHOOSE'):
-        statePart = '_jump';
-        break;
-      case('ANSWERING'):
-        statePart = '_hit';
-        break;
-      case('WAITING'):
-        statePart = '_swim1';
-        break;
-    }
-    return prefix + color + statePart + postfix;
+    let state = _appStore.getState();
+    console.log('question region, update q:',state.currentQuestion);
+    return {};
   },
 
   template: function () {
-    var html = _template.getSource('game__playerstats');
+    var html = _template.getSource('game__question');
     return _.template(html);
   },
 
