@@ -13,7 +13,7 @@ var Component = Nori.view().createComponentView({
    * initialized from app view
    * @param configProps
    */
-  initialize: function (configProps) {
+  initialize(configProps) {
     //
   },
 
@@ -21,9 +21,9 @@ var Component = Nori.view().createComponentView({
    * Create an object to be used to define events on DOM elements
    * @returns {}
    */
-  defineEvents: function () {
+  defineEvents() {
     return {
-      'click #waiting__button-skip': function () {
+      'click #waiting__button-skip'() {
         _appStore.apply(_noriActions.changeStoreState({currentState: _appStore.gameStates[3]}));
       }
     };
@@ -32,7 +32,7 @@ var Component = Nori.view().createComponentView({
   /**
    * Set initial state properties. Call once on first render
    */
-  getInitialState: function () {
+  getInitialState() {
     var appState = _appStore.getState();
     return {
       name      : appState.localPlayer.name,
@@ -44,7 +44,7 @@ var Component = Nori.view().createComponentView({
   /**
    * State change on bound stores (map, etc.) Return nextState object
    */
-  componentWillUpdate: function () {
+  componentWillUpdate() {
     var appState = _appStore.getState();
     return {
       name      : appState.localPlayer.name,
@@ -56,14 +56,14 @@ var Component = Nori.view().createComponentView({
   /**
    * Component HTML was attached to the DOM
    */
-  componentDidMount: function () {
+  componentDidMount() {
     //
   },
 
   /**
    * Component will be removed from the DOM
    */
-  componentWillUnmount: function () {
+  componentWillUnmount() {
     //
   }
 

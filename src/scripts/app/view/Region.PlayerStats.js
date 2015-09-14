@@ -14,7 +14,7 @@ var Component = Nori.view().createComponentView({
    * initialized from app view
    * @param configProps
    */
-  initialize: function (configProps) {
+  initialize(configProps) {
     this.bindMap(_appStore); // Reducer store, map id string or map object
   },
 
@@ -23,21 +23,21 @@ var Component = Nori.view().createComponentView({
    * Create an object to be used to define events on DOM elements
    * @returns {}
    */
-  defineEvents: function () {
+  defineEvents() {
     return null;
   },
 
   /**
    * Set initial state properties. Call once on first render
    */
-  getInitialState: function () {
+  getInitialState() {
     return this.getHUDState();
   },
 
   /**
    * State change on bound stores (map, etc.) Return nextState object
    */
-  componentWillUpdate: function () {
+  componentWillUpdate() {
     return this.getHUDState();
   },
 
@@ -66,7 +66,7 @@ var Component = Nori.view().createComponentView({
     return 'WAITING';
   },
 
-  getPlayerHUDImage: function (state, color) {
+  getPlayerHUDImage(state, color) {
     let prefix    = 'alien',
         postfix   = '.png',
         statePart = '_front';
@@ -84,7 +84,7 @@ var Component = Nori.view().createComponentView({
     return prefix + color + statePart + postfix;
   },
 
-  template: function () {
+  template() {
     var html = _template.getSource('game__playerstats');
     return _.template(html);
   },
@@ -92,14 +92,14 @@ var Component = Nori.view().createComponentView({
   /**
    * Component HTML was attached to the DOM
    */
-  componentDidMount: function () {
+  componentDidMount() {
     //
   },
 
   /**
    * Component will be removed from the DOM
    */
-  componentWillUnmount: function () {
+  componentWillUnmount() {
     //
   }
 

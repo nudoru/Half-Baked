@@ -11,7 +11,7 @@ var Component = view.createComponentView({
    */
   //mixins: [
   //  {
-  //    render: function () {
+  //    render() {
   //      return '<h1>MIXIN!</h1>';
   //    }
   //  }
@@ -22,7 +22,7 @@ var Component = view.createComponentView({
    * initialized from app view
    * @param configProps
    */
-  initialize: function (configProps) {
+  initialize(configProps) {
     //Bind to a map, update will be called on changes to the map
     //this.bindMap(APP.store()); // Reducer store, map id string or map object
 
@@ -43,14 +43,14 @@ var Component = view.createComponentView({
   /**
    * Set initial state properties. Call once on first render
    */
-  getInitialState: function () {
+  getInitialState() {
     return APP.store.getState();
   },
 
   /**
    * State change on bound stores (map, etc.) Return nextState object
    */
-  componentWillUpdate: function () {
+  componentWillUpdate() {
     var nextState = APP.store.getState();
     nextState.greeting += ' (updated)';
     return nextState;
@@ -75,14 +75,14 @@ var Component = view.createComponentView({
   /**
    * Component HTML was attached to the DOM
    */
-  componentDidMount: function () {
+  componentDidMount() {
     //
   },
 
   /**
    * Component will be removed from the DOM
    */
-  componentWillUnmount: function () {
+  componentWillUnmount() {
     // Clean up
   }
 

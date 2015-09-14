@@ -17,7 +17,7 @@ var Component = Nori.view().createComponentView({
    * initialized from app view
    * @param configProps
    */
-  initialize: function (configProps) {
+  initialize(configProps) {
     //
   },
 
@@ -25,26 +25,26 @@ var Component = Nori.view().createComponentView({
    * Create an object to be used to define events on DOM elements
    * @returns {}
    */
-  defineEvents: function () {
+  defineEvents() {
     return {
       'blur #select__playername'        : this.setPlayerName.bind(this),
       'change #select__playertype'      : this.setPlayerAppearance.bind(this),
       'click #select__button-joinroom'  : this.onJoinRoom.bind(this),
       'click #select__button-createroom': this.onCreateRoom.bind(this),
-      'click #select__button-go'        : function () {
+      'click #select__button-go'        () {
         _appStore.apply(_noriActions.changeStoreState({currentState: _appStore.gameStates[2]}));
       }
     };
   },
 
-  setPlayerName: function (value) {
+  setPlayerName(value) {
     var action = _appActions.setLocalPlayerProps({
       name: value
     });
     _appStore.apply(action);
   },
 
-  setPlayerAppearance: function (value) {
+  setPlayerAppearance(value) {
     var action = _appActions.setLocalPlayerProps({
       appearance: value
     });
@@ -54,7 +54,7 @@ var Component = Nori.view().createComponentView({
   /**
    * Set initial state properties. Call once on first render
    */
-  getInitialState: function () {
+  getInitialState() {
     var appState = _appStore.getState();
     return {
       name      : appState.localPlayer.name,
@@ -65,24 +65,24 @@ var Component = Nori.view().createComponentView({
   /**
    * State change on bound stores (map, etc.) Return nextState object
    */
-  componentWillUpdate: function () {
+  componentWillUpdate() {
     return this.getInitialState();
   },
 
   /**
    * Component HTML was attached to the DOM
    */
-  componentDidMount: function () {
+  componentDidMount() {
     document.querySelector('#select__playertype').value = this.getState().appearance;
   },
 
-  onCreateRoom: function () {
+  onCreateRoom() {
     if (this.validateUserDetailsInput()) {
       _app.default.createRoom();
     }
   },
 
-  onJoinRoom: function () {
+  onJoinRoom() {
     var roomID = document.querySelector('#select__roomid').value;
     if (this.validateRoomID(roomID)) {
       _app.default.joinRoom(roomID);
@@ -91,7 +91,7 @@ var Component = Nori.view().createComponentView({
     }
   },
 
-  validateUserDetailsInput: function () {
+  validateUserDetailsInput() {
     var name       = document.querySelector('#select__playername').value,
         appearance = document.querySelector('#select__playertype').value;
 
@@ -107,7 +107,7 @@ var Component = Nori.view().createComponentView({
    * @param roomID
    * @returns {boolean}
    */
-  validateRoomID: function (roomID) {
+  validateRoomID(roomID) {
     if (isNaN(parseInt(roomID))) {
       return false;
     } else if (roomID.length !== _roomNumberLength) {
@@ -119,7 +119,7 @@ var Component = Nori.view().createComponentView({
   /**
    * Component will be removed from the DOM
    */
-  componentWillUnmount: function () {
+  componentWillUnmount() {
     //
   }
 

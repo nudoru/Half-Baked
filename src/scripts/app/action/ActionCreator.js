@@ -7,7 +7,7 @@ import * as _appStore from '../store/AppStore.js';
  */
 var ActionCreator = {
 
-  setLocalPlayerProps: function (data) {
+  setLocalPlayerProps(data) {
     return {
       type   : _actionConstants.SET_LOCAL_PLAYER_PROPS,
       payload: {
@@ -18,7 +18,7 @@ var ActionCreator = {
     };
   },
 
-  setRemotePlayerProps: function (data) {
+  setRemotePlayerProps(data) {
     return {
       type   : _actionConstants.SET_REMOTE_PLAYER_PROPS,
       payload: {
@@ -29,7 +29,7 @@ var ActionCreator = {
     };
   },
 
-  setSessionProps: function (data) {
+  setSessionProps(data) {
     return {
       type   : _actionConstants.SET_SESSION_PROPS,
       payload: {
@@ -62,7 +62,7 @@ var ActionCreator = {
     };
   },
 
-  resetGame: function () {
+  resetGame() {
     return {
       type   : _actionConstants.RESET_GAME,
       payload: {

@@ -26,7 +26,7 @@ let App = Nori.createApplication({
   /**
    * Intialize the appilcation, view and store
    */
-  initialize: function () {
+  initialize() {
     this.socket.initialize();
     this.socket.subscribe(this.handleSocketMessage.bind(this));
 
@@ -40,7 +40,7 @@ let App = Nori.createApplication({
   /**
    * After the store data is ready
    */
-  onStoreInitialized: function () {
+  onStoreInitialized() {
     this.store.subscribe('localPlayerDataUpdated', this.handleLocalPlayerPropsUpdate.bind(this));
 
     this.runApplication();
@@ -49,7 +49,7 @@ let App = Nori.createApplication({
   /**
    * Remove the "Please wait" cover and start the app
    */
-  runApplication: function () {
+  runApplication() {
     this.view.removeLoadingMessage();
 
     // View will show based on the current store state
@@ -61,7 +61,7 @@ let App = Nori.createApplication({
   // Handle FROM store
   //----------------------------------------------------------------------------
 
-  handleLocalPlayerPropsUpdate: function () {
+  handleLocalPlayerPropsUpdate() {
     let appState = this.store.getState();
 
     this.socket.notifyServer(_socketIOEvents.SEND_PLAYER_DETAILS, {
@@ -78,7 +78,7 @@ let App = Nori.createApplication({
    * All messages from the Socket.IO server will be forwarded here
    * @param payload
    */
-  handleSocketMessage: function (payload) {
+  handleSocketMessage(payload) {
     if (!payload) {
       return;
     }
@@ -119,21 +119,21 @@ let App = Nori.createApplication({
     }
   },
 
-  handleConnect: function (socketID) {
+  handleConnect(socketID) {
     let setSessionID = _appActions.setSessionProps({socketIOID: socketID}),
         setLocalID   = _appActions.setLocalPlayerProps({id: socketID});
 
     this.store.apply([setSessionID, setLocalID]);
   },
 
-  handleJoinNewlyCreatedRoom: function (roomID) {
+  handleJoinNewlyCreatedRoom(roomID) {
     let setRoom               = _appActions.setSessionProps({roomID: roomID}),
         setWaitingScreenState = _noriActions.changeStoreState({currentState: this.store.gameStates[2]});
 
     this.store.apply([setRoom, setWaitingScreenState]);
   },
 
-  handleGameStart: function (payload) {
+  handleGameStart(payload) {
     let remotePlayer       = this.pluckRemotePlayer(payload.players),
         setRemotePlayer    = _appActions.setRemotePlayerProps(remotePlayer),
         setGameState       = _noriActions.changeStoreState({currentState: this.store.gameStates[3]}),
@@ -143,7 +143,7 @@ let App = Nori.createApplication({
     this.store.apply([setRemotePlayer, setGameState, setGamePlayState, setCurrentQuestion]);
   },
 
-  pluckRemotePlayer: function (playersArry) {
+  pluckRemotePlayer(playersArry) {
     let localPlayerID = this.store.getState().localPlayer.id;
     //console.log('filtering for', localPlayerID, playersArry);
     return playersArry.filter(function (player) {
@@ -151,19 +151,19 @@ let App = Nori.createApplication({
     })[0];
   },
 
-  handleGameAbort: function (payload) {
+  handleGameAbort(payload) {
     this.view.alert(payload.payload, payload.type);
     this.store.apply(_appActions.resetGame());
   },
 
-  handleUpdatedPlayerDetails: function (payload) {
+  handleUpdatedPlayerDetails(payload) {
     let remotePlayer    = this.pluckRemotePlayer(payload.players),
         setRemotePlayer = _appActions.setRemotePlayerProps(remotePlayer);
 
     this.store.apply(setRemotePlayer);
   },
 
-  handleReceivedQuestion: function (question) {
+  handleReceivedQuestion(question) {
     console.log('received a question!', question);
     let setGamePlayState   = _appActions.setGamePlayState(this.store.gamePlayStates[1]),
         setCurrentQuestion = _appActions.setCurrentQuestion(question);
@@ -188,7 +188,7 @@ let App = Nori.createApplication({
     });
   },
 
-  sendQuestion: function (difficulty) {
+  sendQuestion(difficulty) {
     let appState           = this.store.getState(),
         question           = this.store.getQuestionOfDifficulty(difficulty),
         setGamePlayState   = _appActions.setGamePlayState(this.store.gamePlayStates[2]),

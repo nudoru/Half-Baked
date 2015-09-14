@@ -11,7 +11,7 @@ import * as _screenGameOverFactory from './Screen.GameOver.js';
  * View for an application.
  */
 
-var AppView = Nori.createView({
+let AppView = Nori.createView({
 
   mixins: [
     _mixinApplicationView,
@@ -19,7 +19,7 @@ var AppView = Nori.createView({
     _mixinStoreStateViews
   ],
 
-  initialize: function () {
+  initialize() {
     this.initializeApplicationView(['applicationscaffold', 'applicationcomponentsscaffold']);
     this.initializeStateViews(_appStore);
     this.initializeNudoruControls();
@@ -27,7 +27,7 @@ var AppView = Nori.createView({
     this.configureViews();
   },
 
-  configureViews: function () {
+  configureViews() {
     var gameStates = _appStore.gameStates;
 
     this.setViewMountPoint('#contents');

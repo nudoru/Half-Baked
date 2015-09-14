@@ -37,7 +37,7 @@ var AppStore = Nori.createStore({
   gamePlayStates   : ['CHOOSE', 'ANSWERING', 'WAITING'],
   playerAppearences: ['Biege', 'Blue', 'Green', 'Pink', 'Yellow'],
 
-  initialize: function () {
+  initialize() {
     this.addReducer(this.mainStateReducer.bind(this));
     this.initializeReducerStore();
     this.setState(Nori.config());
@@ -51,7 +51,7 @@ var AppStore = Nori.createStore({
   /**
    * Set or load any necessary data and then broadcast a initialized event.
    */
-  loadStore: function () {
+  loadStore() {
     // Set initial state
     this.setState({
       currentState    : this.gameStates[0],
@@ -76,7 +76,7 @@ var AppStore = Nori.createStore({
     }).subscribe(this.onQuestionsSuccess.bind(this), this.onQuestionError);
   },
 
-  onQuestionsSuccess: function (data) {
+  onQuestionsSuccess(data) {
     console.log('Questions fetched', data[0]);
 
     // Service only returns 2 levels of difficulty. For now, fake it
@@ -94,18 +94,18 @@ var AppStore = Nori.createStore({
     this.notifySubscribersOf('storeInitialized');
   },
 
-  onQuestionError: function (data) {
+  onQuestionError(data) {
     throw new Error('Error fetching questions', data);
   },
 
-  getQuestionOfDifficulty: function (difficulty) {
+  getQuestionOfDifficulty(difficulty) {
     var possibleQuestions = this.getState().questionBank.filter(q => {
       return q.q_difficulty_level === difficulty;
     });
     return _arrayUtils.rndElement(possibleQuestions);
   },
 
-  createBlankPlayerObject: function () {
+  createBlankPlayerObject() {
     return {
       id        : '',
       type      : '',
@@ -114,7 +114,7 @@ var AppStore = Nori.createStore({
     };
   },
 
-  createPlayerResetObject: function () {
+  createPlayerResetObject() {
     return {
       health   : 20,
       behaviors: [],
@@ -131,7 +131,7 @@ var AppStore = Nori.createStore({
    * @param event
    * @returns {*}
    */
-  mainStateReducer: function (state, event) {
+  mainStateReducer(state, event) {
     state = state || {};
 
     this.lastEventHandled = event.type;
@@ -156,7 +156,7 @@ var AppStore = Nori.createStore({
   /**
    * Called after all reducers have run to broadcast possible updates.
    */
-  handleStateMutation: function () {
+  handleStateMutation() {
     let state = this.getState();
 
     // Pick out certain events for specific notifications.
@@ -185,7 +185,7 @@ var AppStore = Nori.createStore({
    * @param state
    * @returns {boolean}
    */
-  shouldGameEnd: function (state) {
+  shouldGameEnd(state) {
     if (!state.localPlayer || !state.remotePlayer || state.currentState !== 'MAIN_GAME') {
       return false;
     }

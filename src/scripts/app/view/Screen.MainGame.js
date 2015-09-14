@@ -19,13 +19,13 @@ var Component = Nori.view().createComponentView({
    * initialized from app view
    * @param configProps
    */
-  initialize: function (configProps) {
+  initialize (configProps) {
     //
   },
 
   answeringQuestion: false,
 
-  defineRegions: function () {
+  defineRegions () {
     return {
       localPlayerStats : _regionPlayerStats.default({
         id        : 'game__playerstats',
@@ -48,13 +48,13 @@ var Component = Nori.view().createComponentView({
    * Create an object to be used to define events on DOM elements
    * @returns {}
    */
-  defineEvents: function () {
+  defineEvents () {
     return {
-      'click #game__button-skip': function () {
+      'click #game__button-skip' () {
         _appStore.apply(_noriActions.changeStoreState({currentState: _appStore.gameStates[4]}));
       },
       'click #game_question-difficulty1, click #game_question-difficulty2, click #game_question-difficulty3, click #game_question-difficulty4, click #game_question-difficulty5': this.sendQuestion.bind(this),
-      'click #game__test'       : function () {
+      'click #game__test'        () {
         let state        = _appStore.getState(),
             localScore   = state.localPlayer.score + _numUtils.rndNumber(0, 5),
             localHealth  = state.localPlayer.health -1;
@@ -67,19 +67,19 @@ var Component = Nori.view().createComponentView({
     };
   },
 
-  sendQuestion: function(evt) {
+  sendQuestion(evt) {
     var difficulty = parseInt(evt.target.getAttribute('id').substr(-1,1));
     _app.default.sendQuestion(difficulty);
   },
 
-  receiveQuestion: function(questionObj) {
+  receiveQuestion(questionObj) {
     console.log('Main game view received question', questionObj);
   },
 
   /**
    * Set initial state properties. Call once on first render
    */
-  getInitialState: function () {
+  getInitialState () {
     let appState = _appStore.getState();
     return {
       local : appState.localPlayer,
@@ -90,21 +90,21 @@ var Component = Nori.view().createComponentView({
   /**
    * State change on bound stores (map, etc.) Return nextState object
    */
-  componentWillUpdate: function () {
+  componentWillUpdate () {
     return {};
   },
 
   /**
    * Component HTML was attached to the DOM
    */
-  componentDidMount: function () {
+  componentDidMount () {
 
   },
 
   /**
    * Component will be removed from the DOM
    */
-  componentWillUnmount: function () {
+  componentWillUnmount () {
     //
   }
 
