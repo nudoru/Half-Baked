@@ -924,30 +924,53 @@ var Component = Nori.view().createComponentView({
    * @returns {}
    */
   defineEvents: function defineEvents() {
-    return null;
+    return {
+      'click #question__choice_1, click #question__choice_2, click #question__choice_3, click #question__choice_4': this.pickChoice.bind(this)
+    };
+  },
+
+  pickChoice: function pickChoice(evt) {
+    var choice = parseInt(evt.target.getAttribute('id').substr(-1, 1));
+    console.log('picked', choice);
+    //_app.default.sendQuestion(difficulty);
+  },
+
+  getQuestion: function getQuestion() {
+    var state = _appStore.getState(),
+        question = null;
+    if (state.currentQuestion) {
+      question = state.currentQuestion.hasOwnProperty('question') ? state.currentQuestion.question : null;
+    }
+    return question;
   },
 
   /**
    * Set initial state properties. Call once on first render
    */
   getInitialState: function getInitialState() {
-    var state = _appStore.getState();
-    console.log('question region, initial q:', state.currentQuestion);
-    return {};
+    return this.getQuestion();
   },
 
   /**
    * State change on bound stores (map, etc.) Return nextState object
    */
   componentWillUpdate: function componentWillUpdate() {
-    var state = _appStore.getState();
-    console.log('question region, update q:', state.currentQuestion);
-    return {};
+    return this.getQuestion();
   },
 
   template: function template() {
     var html = _template.getSource('game__question');
     return _.template(html);
+  },
+
+  /**
+   * Only renders if there is a current question
+   */
+  render: function render(state) {
+    if (state.hasOwnProperty('q_text')) {
+      return this.template()(state);
+    }
+    return '<div></div>';
   },
 
   /**
@@ -3797,7 +3820,6 @@ var ViewComponent = function ViewComponent() {
 
   function update() {
     var nextState = this.componentWillUpdate();
-
     if (this.shouldComponentUpdate(nextState)) {
       this.setState(nextState);
 
@@ -3865,8 +3887,9 @@ var ViewComponent = function ViewComponent() {
    * @param mountEl
    */
   function mount() {
-    if (!_html) {
-      throw new Error('Component ' + _id + ' cannot mount with no HTML. Call render() first?');
+    if (!_html || _html.length === 0) {
+      console.warn('Component ' + _id + ' cannot mount with no HTML. Call render() first?');
+      return;
     }
 
     _isMounted = true;

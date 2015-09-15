@@ -24,30 +24,53 @@ var Component = Nori.view().createComponentView({
    * @returns {}
    */
   defineEvents() {
-    return null;
+    return {
+    'click #question__choice_1, click #question__choice_2, click #question__choice_3, click #question__choice_4': this.pickChoice.bind(this)
+    };
+  },
+
+  pickChoice(evt) {
+    var choice = parseInt(evt.target.getAttribute('id').substr(-1,1));
+    console.log('picked',choice);
+    //_app.default.sendQuestion(difficulty);
+  },
+
+  getQuestion() {
+    let state = _appStore.getState(),
+        question = null;
+    if(state.currentQuestion) {
+      question = state.currentQuestion.hasOwnProperty('question') ? state.currentQuestion.question : null;
+    }
+    return question;
   },
 
   /**
    * Set initial state properties. Call once on first render
    */
   getInitialState() {
-    let state = _appStore.getState();
-    console.log('question region, initial q:',state.currentQuestion);
-    return {};
+    return this.getQuestion();
   },
 
   /**
    * State change on bound stores (map, etc.) Return nextState object
    */
   componentWillUpdate() {
-    let state = _appStore.getState();
-    console.log('question region, update q:',state.currentQuestion);
-    return {};
+    return this.getQuestion();
   },
 
   template() {
     var html = _template.getSource('game__question');
     return _.template(html);
+  },
+
+  /**
+   * Only renders if there is a current question
+   */
+  render(state) {
+    if(state.hasOwnProperty('q_text')) {
+      return this.template()(state);
+    }
+    return '<div></div>';
   },
 
   /**

@@ -102,7 +102,18 @@ BEGIN Templates for Sub Views
 <!--q_text: "Vth Generation Computers are based on."-->
 
 <script id="game__question" type="text/template">
-    <div></div>
+    <div id="question__layer">
+        <div class="question__container">
+            <h1>{{q_text}}</h1>
+            <ul class="list-plain question__choices">
+                <li><button id="question__choice_1" class="question__choice">{{q_options_1}}</button></li>
+                <li><button id="question__choice_2" class="question__choice">{{q_options_2}}</button></li>
+                <li><button id="question__choice_3" class="question__choice">{{q_options_3}}</button></li>
+                <li><button id="question__choice_4" class="question__choice">{{q_options_4}}</button></li>
+            </ul>
+            <h4 id="question__timer">Timer</h4>
+        </div>
+    </div>
 </script>
 
 <script id="gameover" type="text/template">

@@ -126,15 +126,15 @@ $button-height: 45px
   p, label, li
     font-size: $ms-1
     color: #fff
-  button
-    background-image: url('../img/blue_button05.png')
-    background-color: $color-nocolor
-    border: none
-    box-shadow: none
-    width: $button-width
-    height: $button-height
-    &:hover
-      background-image: url('../img/blue_button01.png')
+  //button
+  //  background-image: url('../img/blue_button05.png')
+  //  background-color: $color-nocolor
+  //  border: none
+  //  box-shadow: none
+  //  width: $button-width
+  //  height: $button-height
+  //  &:hover
+  //    background-image: url('../img/blue_button01.png')
 
 .button-cheat
   position: absolute
@@ -167,6 +167,34 @@ $button-height: 45px
       +box__shadow(10px, 10px)
       border: 1px solid #fff
       background-color: scale-lightness($clr-deep-orange-500, 80%)
+
+#game__questionarea
+
+
+#question__layer
+  position: absolute
+  top: 0
+  left: 0
+  width: $app-width
+  height: $app-height
+  background-color: rgba(0,0,0,.75)
+  padding: $base-line-height * 5
+  h1, h2, h3, h4, h5, h6
+    text-shadow: 2px 2px 0 rgba(0,0,0,1)
+  h1
+    @extend .h1-alternate
+    font-size: $ms-3
+    line-height: $base-line-height*5
+  ul.question__choices
+    text-align: center
+  .question__choice
+    @extend .h3-alternate
+    padding: $double-base-line-height
+
+#question__timer
+  position: absolute
+  right: $base-line-height * 5
+  bottom: $base-line-height * 10
 
 #game__localplayerstats, #game__remoteplayerstats
   +text__shadow(1px)

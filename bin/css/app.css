@@ -2464,14 +2464,14 @@ select, textarea, select.spaced {
   margin-bottom: 1.236rem;
 }
 
-.h1-alternate, .h2-alternate, .h3-alternate, #game__localplayerstats div > ul li, #game__remoteplayerstats div > ul li, .h4-alternate, .h5-alternate, tr.row-header-inline td, .tooltip__coachmark .tooltip__item-content h1, .tooltip__coachmark .tooltip__item-content p, .h6-alternate {
+.h1-alternate, #question__layer h1, .h2-alternate, .h3-alternate, #question__layer .question__choice, #game__localplayerstats div > ul li, #game__remoteplayerstats div > ul li, .h4-alternate, .h5-alternate, tr.row-header-inline td, .tooltip__coachmark .tooltip__item-content h1, .tooltip__coachmark .tooltip__item-content p, .h6-alternate {
   font-family: "Varela Round", "Helvetica Neue", Helvetica, Arial, sans-serif;
   margin-bottom: 1.236rem;
   padding-bottom: 0;
   padding-top: 0.309rem;
 }
 
-.h1-alternate {
+.h1-alternate, #question__layer h1 {
   font-size: 2.067rem;
   font-weight: 300;
 }
@@ -2481,7 +2481,7 @@ select, textarea, select.spaced {
   font-weight: 300;
 }
 
-.h3-alternate, #game__localplayerstats div > ul li, #game__remoteplayerstats div > ul li {
+.h3-alternate, #question__layer .question__choice, #game__localplayerstats div > ul li, #game__remoteplayerstats div > ul li {
   font-size: 1.277rem;
   font-weight: 300;
 }
@@ -4200,17 +4200,6 @@ body {
   font-size: 1.277rem;
   color: #fff;
 }
-.app__content button {
-  background-image: url("../img/blue_button05.png");
-  background-color: transparent;
-  border: none;
-  box-shadow: none;
-  width: 190px;
-  height: 45px;
-}
-.app__content button:hover {
-  background-image: url("../img/blue_button01.png");
-}
 
 .button-cheat {
   position: absolute;
@@ -4247,6 +4236,35 @@ body {
   box-shadow: 2px 10px 10px #005eb8;
   border: 1px solid #fff;
   background-color: #ffddd3;
+}
+
+#question__layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 975px;
+  height: 650px;
+  background-color: rgba(0, 0, 0, 0.75);
+  padding: 3.09rem;
+}
+#question__layer h1, #question__layer h2, #question__layer h3, #question__layer h4, #question__layer h5, #question__layer h6 {
+  text-shadow: 2px 2px 0 black;
+}
+#question__layer h1 {
+  font-size: 2.067rem;
+  line-height: 3.09rem;
+}
+#question__layer ul.question__choices {
+  text-align: center;
+}
+#question__layer .question__choice {
+  padding: 1.236rem;
+}
+
+#question__timer {
+  position: absolute;
+  right: 3.09rem;
+  bottom: 6.18rem;
 }
 
 #game__localplayerstats, #game__remoteplayerstats {

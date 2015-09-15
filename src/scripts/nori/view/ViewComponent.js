@@ -75,7 +75,6 @@ var ViewComponent = function () {
 
   function update() {
     let nextState    = this.componentWillUpdate();
-
     if (this.shouldComponentUpdate(nextState)) {
       this.setState(nextState);
 
@@ -143,8 +142,9 @@ var ViewComponent = function () {
    * @param mountEl
    */
   function mount() {
-    if (!_html) {
-      throw new Error('Component ' + _id + ' cannot mount with no HTML. Call render() first?');
+    if (!_html || _html.length === 0) {
+      console.warn('Component ' + _id + ' cannot mount with no HTML. Call render() first?');
+      return;
     }
 
     _isMounted = true;
