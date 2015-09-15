@@ -51,17 +51,19 @@ var Component = Nori.view().createComponentView({
         _appStore.apply(_noriActions.changeStoreState({currentState: _appStore.gameStates[4]}));
       },
       'click #game_question-difficulty1, click #game_question-difficulty2, click #game_question-difficulty3, click #game_question-difficulty4, click #game_question-difficulty5': this.sendQuestion.bind(this)
-      //'click #game__test'        () {
-      //  let state       = _appStore.getState(),
-      //      localScore  = state.localPlayer.score + _numUtils.rndNumber(0, 5),
-      //      localHealth = state.localPlayer.health - 1;
-      //
-      //  _appStore.apply(_appActions.setLocalPlayerProps({
-      //    health: localHealth,
-      //    score : localScore
-      //  }));
-      }
+      //'click #game__test': this.testPlayerUpdate.bind(this)
     };
+  },
+
+  testPlayerUpdate() {
+    let state       = _appStore.getState(),
+        localScore  = state.localPlayer.score + _numUtils.rndNumber(0, 5),
+        localHealth = state.localPlayer.health - 1;
+
+    _appStore.apply(_appActions.setLocalPlayerProps({
+      health: localHealth,
+      score : localScore
+    }));
   },
 
   sendQuestion(evt) {
@@ -95,12 +97,14 @@ var Component = Nori.view().createComponentView({
   /**
    * Component HTML was attached to the DOM
    */
-    componentDidMount () {},
+    componentDidMount () {
+  },
 
   /**
    * Component will be removed from the DOM
    */
-    componentWillUnmount () {}
+    componentWillUnmount () {
+  }
 
 });
 

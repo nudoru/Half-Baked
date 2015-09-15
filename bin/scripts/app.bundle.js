@@ -171,8 +171,8 @@ var App = Nori.createApplication({
     this.view.removeLoadingMessage();
 
     // View will show based on the current store state
-    this.store.setState({ currentState: 'MAIN_GAME' });
-    //this.store.setState({currentState: 'PLAYER_SELECT'});
+    //this.store.setState({currentState: 'MAIN_GAME'});
+    this.store.setState({ currentState: 'PLAYER_SELECT' });
   },
 
   //----------------------------------------------------------------------------
@@ -902,11 +902,6 @@ Object.defineProperty(exports, '__esModule', {
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj['default'] = obj; return newObj; } }
 
-/**
- * TODO
- * Need to remove storeObservable when it's truely removed from the DOM
- */
-
 var _noriActionActionCreator = require('../../nori/action/ActionCreator');
 
 var _noriActions = _interopRequireWildcard(_noriActionActionCreator);
@@ -1090,7 +1085,9 @@ var Component = Nori.view().createComponentView({
 
   updateTimerText: function updateTimerText(number) {
     var timerEl = document.querySelector('#question__timer');
-    timerEl.innerHTML = number + ' seconds left';
+    if (timerEl) {
+      timerEl.innerHTML = number + ' seconds left';
+    }
   },
 
   onTimerComplete: function onTimerComplete() {
@@ -1322,18 +1319,20 @@ var Component = Nori.view().createComponentView({
       'click #game__button-skip': function clickGame__buttonSkip() {
         _appStore.apply(_noriActions.changeStoreState({ currentState: _appStore.gameStates[4] }));
       },
-      'click #game_question-difficulty1, click #game_question-difficulty2, click #game_question-difficulty3, click #game_question-difficulty4, click #game_question-difficulty5': this.sendQuestion.bind(this),
-      'click #game__test': function clickGame__test() {
-        var state = _appStore.getState(),
-            localScore = state.localPlayer.score + _numUtils.rndNumber(0, 5),
-            localHealth = state.localPlayer.health - 1;
-
-        _appStore.apply(_appActions.setLocalPlayerProps({
-          health: localHealth,
-          score: localScore
-        }));
-      }
+      'click #game_question-difficulty1, click #game_question-difficulty2, click #game_question-difficulty3, click #game_question-difficulty4, click #game_question-difficulty5': this.sendQuestion.bind(this)
+      //'click #game__test': this.testPlayerUpdate.bind(this)
     };
+  },
+
+  testPlayerUpdate: function testPlayerUpdate() {
+    var state = _appStore.getState(),
+        localScore = state.localPlayer.score + _numUtils.rndNumber(0, 5),
+        localHealth = state.localPlayer.health - 1;
+
+    _appStore.apply(_appActions.setLocalPlayerProps({
+      health: localHealth,
+      score: localScore
+    }));
   },
 
   sendQuestion: function sendQuestion(evt) {

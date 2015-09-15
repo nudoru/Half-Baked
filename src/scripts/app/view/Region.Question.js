@@ -1,9 +1,3 @@
-/**
- * TODO
- * Need to remove storeObservable when it's truely removed from the DOM
- */
-
-
 import * as _noriActions from '../../nori/action/ActionCreator';
 import * as _appView from './AppView';
 import * as _appStore from '../store/AppStore';
@@ -173,7 +167,9 @@ var Component = Nori.view().createComponentView({
 
   updateTimerText(number) {
     let timerEl       = document.querySelector('#question__timer');
-    timerEl.innerHTML = number + ' seconds left';
+    if(timerEl) {
+      timerEl.innerHTML = number + ' seconds left';
+    }
   },
 
   onTimerComplete() {
