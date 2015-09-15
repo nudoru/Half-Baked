@@ -137,7 +137,7 @@ BEGIN Templates for Sub Views
             <button id="game_question-difficulty5">Difficulty 5</button>
         </div>
         <button class="button-cheat" id="game__button-skip">==>></button>
-        <button id="game__test" class="button-danger">Test</button>
+        <!--<button id="game__test" class="button-danger">Test</button>-->
         <div id="game__remoteplayerstats"></div>
         <div id="game__questionarea"></div>
         <div id="game__localplayerstats"></div>
@@ -172,14 +172,16 @@ BEGIN Templates for Sub Views
 <script id="game__question" type="text/template">
     <div id="question__layer">
         <div class="question__container">
-            <h1>{{q_text}}</h1>
+            <h5 id="question__difficulty"><img src="img/hudCoin.png"> This question is worth {{question.q_difficulty_level}}!</h5>
+            <h5 id="question__timer">Timer</h5>
+            <h1>{{question.q_text}}</h1>
             <ul class="list-plain question__choices">
-                <li><button id="question__choice_1" class="question__choice">{{q_options_1}}</button></li>
-                <li><button id="question__choice_2" class="question__choice">{{q_options_2}}</button></li>
-                <li><button id="question__choice_3" class="question__choice">{{q_options_3}}</button></li>
-                <li><button id="question__choice_4" class="question__choice">{{q_options_4}}</button></li>
+                <li><button id="question__choice_1" class="question__choice">{{question.q_options_1}}</button></li>
+                <li><button id="question__choice_2" class="question__choice">{{question.q_options_2}}</button></li>
+                <li><button id="question__choice_3" class="question__choice">{{question.q_options_3}}</button></li>
+                <li><button id="question__choice_4" class="question__choice">{{question.q_options_4}}</button></li>
             </ul>
-            <h4 id="question__timer">Timer</h4>
+
         </div>
     </div>
 </script>

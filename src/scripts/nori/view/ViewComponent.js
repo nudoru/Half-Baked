@@ -74,8 +74,9 @@ var ViewComponent = function () {
   }
 
   function update() {
-    let nextState    = this.componentWillUpdate();
+    let nextState = this.componentWillUpdate();
     if (this.shouldComponentUpdate(nextState)) {
+
       this.setState(nextState);
 
       if (_isMounted) {
@@ -155,8 +156,11 @@ var ViewComponent = function () {
     }));
 
     if (this.delegateEvents) {
-      // Pass true to automatically pass form element handlers the elements value or other status
-      this.delegateEvents(true);
+      if (this.shouldDelegateEvents()) {
+        // Pass true to automatically pass form element handlers the elements value or other status
+        this.delegateEvents(true);
+      }
+
     }
 
     this.mountRegions();
@@ -166,6 +170,14 @@ var ViewComponent = function () {
     }
 
     this.notifySubscribersOf('mount', this.getID());
+  }
+
+  /**
+   * Override to delegate events or not based on some state trigger
+   * @returns {boolean}
+   */
+  function shouldDelegateEvents() {
+    return true;
   }
 
   /**
@@ -185,7 +197,7 @@ var ViewComponent = function () {
   function unmount() {
     this.componentWillUnmount();
 
-    this.unmountRegions();
+    //this.unmountRegions();
 
     _isMounted = false;
 
@@ -201,6 +213,16 @@ var ViewComponent = function () {
     _html       = '';
     _DOMElement = null;
     this.notifySubscribersOf('unmount', this.getID());
+  }
+
+  function dispose() {
+    this.componentWillDispose();
+    this.disposeRegions();
+    this.unmount();
+  }
+
+  function componentWillDispose() {
+    //
   }
 
   //----------------------------------------------------------------------------
@@ -246,6 +268,12 @@ var ViewComponent = function () {
   function unmountRegions() {
     getRegionIDs().forEach(region => {
       _regions[region].unmount();
+    });
+  }
+
+  function disposeRegions() {
+    getRegionIDs().forEach(region => {
+      _regions[region].dispose();
     });
   }
 
@@ -300,16 +328,20 @@ var ViewComponent = function () {
     componentRender      : componentRender,
     render               : render,
     mount                : mount,
+    shouldDelegateEvents : shouldDelegateEvents,
     componentDidMount    : componentDidMount,
     componentWillUnmount : componentWillUnmount,
     unmount              : unmount,
+    dispose              : dispose,
+    componentWillDispose : componentWillDispose,
     getRegion            : getRegion,
     getRegionIDs         : getRegionIDs,
     initializeRegions    : initializeRegions,
     updateRegions        : updateRegions,
     renderRegions        : renderRegions,
     mountRegions         : mountRegions,
-    unmountRegions       : unmountRegions
+    unmountRegions       : unmountRegions,
+    disposeRegions       : disposeRegions
   };
 
 };

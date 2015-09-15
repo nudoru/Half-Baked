@@ -106,6 +106,7 @@ $button-height: 45px
 
 .app__content
   background-color: $light-blue
+  background-image: url('../img/main-background.png')
   position: relative
   display: block
   width: $app-width
@@ -126,15 +127,6 @@ $button-height: 45px
   p, label, li
     font-size: $ms-1
     color: #fff
-  //button
-  //  background-image: url('../img/blue_button05.png')
-  //  background-color: $color-nocolor
-  //  border: none
-  //  box-shadow: none
-  //  width: $button-width
-  //  height: $button-height
-  //  &:hover
-  //    background-image: url('../img/blue_button01.png')
 
 .button-cheat
   position: absolute
@@ -158,18 +150,16 @@ $button-height: 45px
     display: inline
     background-image: none
     background-color: #eee
-    border: 5px solid #fff
+    border: 5px solid $light-purple
     +box__shadow
     border-radius: $base-line-height
-    color: $dark-blue
+    color: $dark-purple
+    text-shadow: none
     &:hover
       background-image: none
       +box__shadow(10px, 10px)
       border: 1px solid #fff
-      background-color: scale-lightness($clr-deep-orange-500, 80%)
-
-#game__questionarea
-
+      background-color: scale-lightness($light-purple, 80%)
 
 #question__layer
   position: absolute
@@ -177,24 +167,36 @@ $button-height: 45px
   left: 0
   width: $app-width
   height: $app-height
-  background-color: rgba(0,0,0,.75)
+  +gradient-vertical(rgba(81,45,109,1), rgba(81,45,109,.85))
+  //background-color: rgba(0,0,0,.75)
   padding: $base-line-height * 5
+  padding-top: $base-line-height * 10
   h1, h2, h3, h4, h5, h6
     text-shadow: 2px 2px 0 rgba(0,0,0,1)
   h1
     @extend .h1-alternate
-    font-size: $ms-3
-    line-height: $base-line-height*5
+    font-size: $ms-2
+    line-height: $base-line-height*4
   ul.question__choices
     text-align: center
   .question__choice
     @extend .h3-alternate
     padding: $double-base-line-height
 
+#question__difficulty
+  position: absolute
+  left: $base-line-height * 5
+  top: $base-line-height * 2
+  img
+    position: relative
+    width: 48px
+    height: 48px
+    top: -3px
+
 #question__timer
   position: absolute
   right: $base-line-height * 5
-  bottom: $base-line-height * 10
+  top: $base-line-height * 2.5
 
 #game__localplayerstats, #game__remoteplayerstats
   +text__shadow(1px)

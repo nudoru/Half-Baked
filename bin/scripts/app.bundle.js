@@ -338,7 +338,8 @@ exports['default'] = {
   SET_REMOTE_PLAYER_PROPS: 'SET_REMOTE_PLAYER_PROPS',
   RESET_GAME: 'RESET_GAME',
   SET_GAME_PLAY_STATE: 'SET_GAME_PLAY_STATE',
-  SET_CURRENT_QUESTION: 'SET_CURRENT_QUESTION'
+  SET_CURRENT_QUESTION: 'SET_CURRENT_QUESTION',
+  CLEAR_QUESTION: 'CLEAR_QUESTION'
   //SELECT_PLAYER              : 'SELECT_PLAYER',
   //REMOTE_PLAYER_CONNECT      : 'REMOTE_PLAYER_CONNECT',
   //GAME_START                 : 'GAME_START',
@@ -426,6 +427,15 @@ var ActionCreator = {
     };
   },
 
+  clearQuestion: function clearQuestion() {
+    return {
+      type: _actionConstants.CLEAR_QUESTION,
+      payload: {
+        data: {}
+      }
+    };
+  },
+
   resetGame: function resetGame() {
     return {
       type: _actionConstants.RESET_GAME,
@@ -479,7 +489,7 @@ var _nudoruCoreArrayUtilsJs = require('../../nudoru/core/ArrayUtils.js');
 var _arrayUtils = _interopRequireWildcard(_nudoruCoreArrayUtilsJs);
 
 var _restNumQuestions = 300,
-    _restQuestionCategory = 166;
+    _restQuestionCategory = 117;
 
 /*
  SCI/TECh 24,
@@ -589,7 +599,7 @@ var AppStore = Nori.createStore({
 
   createPlayerResetObject: function createPlayerResetObject() {
     return {
-      health: 20,
+      health: 10,
       behaviors: [],
       score: 0
     };
@@ -618,6 +628,10 @@ var AppStore = Nori.createStore({
       case _appActionConstants.SET_GAME_PLAY_STATE:
       case _appActionConstants.SET_CURRENT_QUESTION:
         return _.merge({}, state, event.payload.data);
+      case _appActionConstants.CLEAR_QUESTION:
+        console.log('clearing question');
+        state.currentQuestion = null;
+        return state;
       case undefined:
         return state;
       default:
@@ -639,7 +653,7 @@ var AppStore = Nori.createStore({
     } else if (this.lastEventHandled === _appActionConstants.SET_GAME_PLAY_STATE) {
       this.notifySubscribersOf('gamePlayStateUpdated');
       //console.log('game play state:', this.getState().currentPlayState);
-    } else if (this.lastEventHandled === _appActionConstants.SET_CURRENT_QUESTION) {
+    } else if (this.lastEventHandled === _appActionConstants.SET_CURRENT_QUESTION || this.lastEventHandled === _appActionConstants.CLEAR_QUESTION) {
         this.notifySubscribersOf('currentQuestionChange');
         //console.log('question:', this.getState().currentQuestion);
       }
@@ -888,6 +902,11 @@ Object.defineProperty(exports, '__esModule', {
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj['default'] = obj; return newObj; } }
 
+/**
+ * TODO
+ * Need to remove storeObservable when it's truely removed from the DOM
+ */
+
 var _noriActionActionCreator = require('../../nori/action/ActionCreator');
 
 var _noriActions = _interopRequireWildcard(_noriActionActionCreator);
@@ -900,14 +919,29 @@ var _storeAppStore = require('../store/AppStore');
 
 var _appStore = _interopRequireWildcard(_storeAppStore);
 
+var _actionActionCreatorJs = require('../action/ActionCreator.js');
+
+var _appActions = _interopRequireWildcard(_actionActionCreatorJs);
+
 var _noriUtilsTemplatingJs = require('../../nori/utils/Templating.js');
 
 var _template = _interopRequireWildcard(_noriUtilsTemplatingJs);
+
+var _vendorRxjsRxLiteMinJs = require('../../vendor/rxjs/rx.lite.min.js');
+
+var Rxjs = _interopRequireWildcard(_vendorRxjsRxLiteMinJs);
 
 /**
  * Module for a dynamic application view for a route or a persistent view
  */
 var Component = Nori.view().createComponentView({
+
+  storeObservable: null,
+  timerObservable: null,
+  maxSeconds: 10,
+
+  // cache this
+  correctChoiceText: '',
 
   /**
    * configProps passed in from region definition on parent View
@@ -916,7 +950,8 @@ var Component = Nori.view().createComponentView({
    * @param configProps
    */
   initialize: function initialize(configProps) {
-    this.bindMap(_appStore); // Reducer store, map id string or map object
+
+    this.storeObservable = _appStore.subscribe('currentQuestionChange', this.update.bind(this));
   },
 
   /**
@@ -931,17 +966,60 @@ var Component = Nori.view().createComponentView({
 
   pickChoice: function pickChoice(evt) {
     var choice = parseInt(evt.target.getAttribute('id').substr(-1, 1));
-    console.log('picked', choice);
-    //_app.default.sendQuestion(difficulty);
+    console.log(choice, this.isCorrect(choice));
+    if (this.isCorrect(choice)) {
+      this.scoreCorrect();
+      _appView['default'].alert('You got it!', 'Correct!');
+    } else {
+      this.scoreIncorrect();
+      _appView['default'].alert('You missed that one!<br><br>The correct answer was <strong>' + this.correctChoiceText + '</strong>.', 'Ooops!');
+    }
+  },
+
+  isCorrect: function isCorrect(choice) {
+    return parseInt(choice) === this.getState().question.q_correct_option;
+  },
+
+  scoreCorrect: function scoreCorrect() {
+    var state = _appStore.getState(),
+        localScore = state.localPlayer.score + this.getState().question.q_difficulty_level,
+        localHealth = state.localPlayer.health,
+        playerAction = _appActions.setLocalPlayerProps({
+      health: localHealth,
+      score: localScore
+    }),
+        clearQuestion = _appActions.clearQuestion();
+
+    _appStore.apply([playerAction, clearQuestion]);
+  },
+
+  scoreIncorrect: function scoreIncorrect() {
+    var state = _appStore.getState(),
+        localScore = state.localPlayer.score,
+        localHealth = state.localPlayer.health - this.getState().question.q_difficulty_level,
+        playerAction = _appActions.setLocalPlayerProps({
+      health: localHealth,
+      score: localScore
+    }),
+        clearQuestion = _appActions.clearQuestion();
+
+    _appStore.apply([playerAction, clearQuestion]);
   },
 
   getQuestion: function getQuestion() {
     var state = _appStore.getState(),
-        question = null;
+        viewState = { question: null };
+
     if (state.currentQuestion) {
-      question = state.currentQuestion.hasOwnProperty('question') ? state.currentQuestion.question : null;
+      if (state.currentQuestion.hasOwnProperty('question')) {
+        var question = state.currentQuestion.question;
+        viewState.question = question;
+        this.correctChoiceText = question['q_options_' + question.q_correct_option];
+        console.log('Correct choice: ', this.correctChoiceText);
+      }
     }
-    return question;
+
+    return viewState;
   },
 
   /**
@@ -967,24 +1045,77 @@ var Component = Nori.view().createComponentView({
    * Only renders if there is a current question
    */
   render: function render(state) {
-    if (state.hasOwnProperty('q_text')) {
+    if (this.hasQuestion()) {
       return this.template()(state);
     }
+
     return '<div></div>';
+  },
+
+  hasQuestion: function hasQuestion() {
+    return this.getState().question;
+  },
+
+  /**
+   * Only attach events to buttons if there is a question!
+   */
+  shouldDelegateEvents: function shouldDelegateEvents() {
+    return this.hasQuestion();
   },
 
   /**
    * Component HTML was attached to the DOM
    */
   componentDidMount: function componentDidMount() {
-    //
+    if (this.hasQuestion()) {
+      this.startTimer();
+    } else {
+      this.clearTimer();
+    }
+  },
+
+  startTimer: function startTimer() {
+    if (this.timerObservable) {
+      this.clearTimer();
+    }
+
+    this.updateTimerText(this.maxSeconds);
+
+    this.timerObservable = Rxjs.Observable.interval(1000).take(this.maxSeconds).subscribe(this.onTimerTick.bind(this), function onErr() {}, this.onTimerComplete.bind(this));
+  },
+
+  onTimerTick: function onTimerTick(second) {
+    this.updateTimerText(this.maxSeconds - (second + 1));
+  },
+
+  updateTimerText: function updateTimerText(number) {
+    var timerEl = document.querySelector('#question__timer');
+    timerEl.innerHTML = number + ' seconds left';
+  },
+
+  onTimerComplete: function onTimerComplete() {
+    this.clearTimer();
+    this.scoreIncorrect();
+    _appView['default'].alert('Time\'s up!<br><br>The correct answer was <strong>' + this.correctChoiceText + '</strong>.', 'Ooops!');
+  },
+
+  clearTimer: function clearTimer() {
+    if (this.timerObservable) {
+      this.timerObservable.dispose();
+    }
   },
 
   /**
    * Component will be removed from the DOM
    */
   componentWillUnmount: function componentWillUnmount() {
-    //
+    this.clearTimer();
+  },
+
+  componentWillDispose: function componentWillDispose() {
+    if (this.storeObservable) {
+      this.storeObservable.dispose();
+    }
   }
 
 });
@@ -992,7 +1123,7 @@ var Component = Nori.view().createComponentView({
 exports['default'] = Component;
 module.exports = exports['default'];
 
-},{"../../nori/action/ActionCreator":17,"../../nori/utils/Templating.js":28,"../store/AppStore":5,"./AppView":6}],9:[function(require,module,exports){
+},{"../../nori/action/ActionCreator":17,"../../nori/utils/Templating.js":28,"../../vendor/rxjs/rx.lite.min.js":50,"../action/ActionCreator.js":4,"../store/AppStore":5,"./AppView":6}],9:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -1137,10 +1268,6 @@ var _actionActionCreatorJs = require('../action/ActionCreator.js');
 
 var _appActions = _interopRequireWildcard(_actionActionCreatorJs);
 
-var _noriServiceSocketIOJs = require('../../nori/service/SocketIO.js');
-
-var _socketIO = _interopRequireWildcard(_noriServiceSocketIOJs);
-
 var _RegionPlayerStatsJs = require('./Region.PlayerStats.js');
 
 var _regionPlayerStats = _interopRequireWildcard(_RegionPlayerStatsJs);
@@ -1166,8 +1293,6 @@ var Component = Nori.view().createComponentView({
   initialize: function initialize(configProps) {
     //
   },
-
-  answeringQuestion: false,
 
   defineRegions: function defineRegions() {
     return {
@@ -1212,6 +1337,7 @@ var Component = Nori.view().createComponentView({
   },
 
   sendQuestion: function sendQuestion(evt) {
+    console.log('Sending a question ...');
     var difficulty = parseInt(evt.target.getAttribute('id').substr(-1, 1));
     _app['default'].sendQuestion(difficulty);
   },
@@ -1246,16 +1372,14 @@ var Component = Nori.view().createComponentView({
   /**
    * Component will be removed from the DOM
    */
-  componentWillUnmount: function componentWillUnmount() {
-    //
-  }
+  componentWillUnmount: function componentWillUnmount() {}
 
 });
 
 exports['default'] = Component;
 module.exports = exports['default'];
 
-},{"../../nori/action/ActionCreator":17,"../../nori/service/SocketIO.js":19,"../../nori/utils/Templating.js":28,"../../nudoru/core/NumberUtils.js":45,"../App":2,"../action/ActionCreator.js":4,"../store/AppStore":5,"./AppView":6,"./Region.PlayerStats.js":7,"./Region.Question.js":8}],11:[function(require,module,exports){
+},{"../../nori/action/ActionCreator":17,"../../nori/utils/Templating.js":28,"../../nudoru/core/NumberUtils.js":45,"../App":2,"../action/ActionCreator.js":4,"../store/AppStore":5,"./AppView":6,"./Region.PlayerStats.js":7,"./Region.Question.js":8}],11:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -3467,8 +3591,16 @@ var MixinEventDelegator = function MixinEventDelegator() {
   function createHandler(selector, eventStr, eventHandler, autoForm) {
     var observable = _rx.dom(selector, eventStr),
         el = document.querySelector(selector),
-        tag = el.tagName.toLowerCase(),
-        type = el.getAttribute('type');
+        tag = undefined,
+        type = undefined;
+
+    if (!el) {
+      console.warn('MixinEventDelegator, createHandler, Element not found:', selector);
+      return;
+    }
+
+    tag = el.tagName.toLowerCase();
+    type = el.getAttribute('type');
 
     if (autoForm) {
       if (tag === 'input' || tag === 'textarea') {
@@ -3510,7 +3642,12 @@ var MixinEventDelegator = function MixinEventDelegator() {
     }
 
     for (var event in _eventSubscribers) {
-      _eventSubscribers[event].dispose();
+
+      if (_eventSubscribers[event]) {
+        _eventSubscribers[event].dispose();
+      } else {
+        console.warn('MixinEventDelegator, undelegateEvents, not a valid observable: ', event);
+      }
       delete _eventSubscribers[event];
     }
 
@@ -3710,7 +3847,7 @@ var MixinStoreStateViews = function MixinStoreStateViews() {
    */
   function removeCurrentView() {
     if (_currentViewID) {
-      _this.getComponentViewMap()[_currentViewID].controller.unmount();
+      _this.getComponentViewMap()[_currentViewID].controller.dispose();
     }
     _currentViewID = '';
   }
@@ -3821,6 +3958,7 @@ var ViewComponent = function ViewComponent() {
   function update() {
     var nextState = this.componentWillUpdate();
     if (this.shouldComponentUpdate(nextState)) {
+
       this.setState(nextState);
 
       if (_isMounted) {
@@ -3900,8 +4038,10 @@ var ViewComponent = function ViewComponent() {
     });
 
     if (this.delegateEvents) {
-      // Pass true to automatically pass form element handlers the elements value or other status
-      this.delegateEvents(true);
+      if (this.shouldDelegateEvents()) {
+        // Pass true to automatically pass form element handlers the elements value or other status
+        this.delegateEvents(true);
+      }
     }
 
     this.mountRegions();
@@ -3911,6 +4051,14 @@ var ViewComponent = function ViewComponent() {
     }
 
     this.notifySubscribersOf('mount', this.getID());
+  }
+
+  /**
+   * Override to delegate events or not based on some state trigger
+   * @returns {boolean}
+   */
+  function shouldDelegateEvents() {
+    return true;
   }
 
   /**
@@ -3929,7 +4077,7 @@ var ViewComponent = function ViewComponent() {
   function unmount() {
     this.componentWillUnmount();
 
-    this.unmountRegions();
+    //this.unmountRegions();
 
     _isMounted = false;
 
@@ -3946,6 +4094,15 @@ var ViewComponent = function ViewComponent() {
     _DOMElement = null;
     this.notifySubscribersOf('unmount', this.getID());
   }
+
+  function dispose() {
+    this.componentWillDispose();
+    this.disposeRegions();
+    this.unmount();
+  }
+
+  function componentWillDispose() {}
+  //
 
   //----------------------------------------------------------------------------
   //  Regions
@@ -3990,6 +4147,12 @@ var ViewComponent = function ViewComponent() {
   function unmountRegions() {
     getRegionIDs().forEach(function (region) {
       _regions[region].unmount();
+    });
+  }
+
+  function disposeRegions() {
+    getRegionIDs().forEach(function (region) {
+      _regions[region].dispose();
     });
   }
 
@@ -4044,16 +4207,20 @@ var ViewComponent = function ViewComponent() {
     componentRender: componentRender,
     render: render,
     mount: mount,
+    shouldDelegateEvents: shouldDelegateEvents,
     componentDidMount: componentDidMount,
     componentWillUnmount: componentWillUnmount,
     unmount: unmount,
+    dispose: dispose,
+    componentWillDispose: componentWillDispose,
     getRegion: getRegion,
     getRegionIDs: getRegionIDs,
     initializeRegions: initializeRegions,
     updateRegions: updateRegions,
     renderRegions: renderRegions,
     mountRegions: mountRegions,
-    unmountRegions: unmountRegions
+    unmountRegions: unmountRegions,
+    disposeRegions: disposeRegions
   };
 };
 

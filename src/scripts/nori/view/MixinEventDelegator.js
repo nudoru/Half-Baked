@@ -97,8 +97,15 @@ let MixinEventDelegator = function () {
   function createHandler(selector, eventStr, eventHandler, autoForm) {
     let observable = _rx.dom(selector, eventStr),
         el         = document.querySelector(selector),
-        tag        = el.tagName.toLowerCase(),
-        type       = el.getAttribute('type');
+        tag, type;
+
+    if (!el) {
+      console.warn('MixinEventDelegator, createHandler, Element not found:', selector);
+      return;
+    }
+
+    tag  = el.tagName.toLowerCase();
+    type = el.getAttribute('type');
 
     if (autoForm) {
       if (tag === 'input' || tag === 'textarea') {
@@ -132,7 +139,12 @@ let MixinEventDelegator = function () {
     }
 
     for (var event in _eventSubscribers) {
-      _eventSubscribers[event].dispose();
+
+      if(_eventSubscribers[event]) {
+        _eventSubscribers[event].dispose();
+      } else {
+        console.warn('MixinEventDelegator, undelegateEvents, not a valid observable: ',event);
+      }
       delete _eventSubscribers[event];
     }
 

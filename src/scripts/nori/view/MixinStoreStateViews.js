@@ -96,7 +96,7 @@ let MixinStoreStateViews = function () {
    */
   function removeCurrentView() {
     if (_currentViewID) {
-      _this.getComponentViewMap()[_currentViewID].controller.unmount();
+      _this.getComponentViewMap()[_currentViewID].controller.dispose();
     }
     _currentViewID = '';
   }

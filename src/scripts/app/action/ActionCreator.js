@@ -62,6 +62,15 @@ var ActionCreator = {
     };
   },
 
+  clearQuestion: function() {
+    return {
+      type   : _actionConstants.CLEAR_QUESTION,
+      payload: {
+        data: {}
+      }
+    };
+  },
+
   resetGame() {
     return {
       type   : _actionConstants.RESET_GAME,

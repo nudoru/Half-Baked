@@ -6,7 +6,7 @@ import * as _numUtils from '../../nudoru/core/NumberUtils.js';
 import * as _arrayUtils from '../../nudoru/core/ArrayUtils.js';
 
 const _restNumQuestions     = 300,
-      _restQuestionCategory = 166;
+      _restQuestionCategory = 117;
 
 /*
  SCI/TECh 24,
@@ -51,7 +51,7 @@ var AppStore = Nori.createStore({
   /**
    * Set or load any necessary data and then broadcast a initialized event.
    */
-  loadStore() {
+    loadStore() {
     // Set initial state
     this.setState({
       currentState    : this.gameStates[0],
@@ -116,7 +116,7 @@ var AppStore = Nori.createStore({
 
   createPlayerResetObject() {
     return {
-      health   : 20,
+      health   : 10,
       behaviors: [],
       score    : 0
     };
@@ -131,7 +131,7 @@ var AppStore = Nori.createStore({
    * @param event
    * @returns {*}
    */
-  mainStateReducer(state, event) {
+    mainStateReducer(state, event) {
     state = state || {};
 
     this.lastEventHandled = event.type;
@@ -145,6 +145,10 @@ var AppStore = Nori.createStore({
       case _appActionConstants.SET_GAME_PLAY_STATE:
       case _appActionConstants.SET_CURRENT_QUESTION:
         return _.merge({}, state, event.payload.data);
+      case _appActionConstants.CLEAR_QUESTION:
+        console.log('clearing question')
+        state.currentQuestion = null;
+        return state;
       case undefined:
         return state;
       default:
@@ -156,7 +160,7 @@ var AppStore = Nori.createStore({
   /**
    * Called after all reducers have run to broadcast possible updates.
    */
-  handleStateMutation() {
+    handleStateMutation() {
     let state = this.getState();
 
     // Pick out certain events for specific notifications.
@@ -166,7 +170,8 @@ var AppStore = Nori.createStore({
     } else if (this.lastEventHandled === _appActionConstants.SET_GAME_PLAY_STATE) {
       this.notifySubscribersOf('gamePlayStateUpdated');
       //console.log('game play state:', this.getState().currentPlayState);
-    } else if (this.lastEventHandled === _appActionConstants.SET_CURRENT_QUESTION) {
+    } else if (this.lastEventHandled === _appActionConstants.SET_CURRENT_QUESTION ||
+      this.lastEventHandled === _appActionConstants.CLEAR_QUESTION) {
       this.notifySubscribersOf('currentQuestionChange');
       //console.log('question:', this.getState().currentQuestion);
     }
@@ -185,7 +190,7 @@ var AppStore = Nori.createStore({
    * @param state
    * @returns {boolean}
    */
-  shouldGameEnd(state) {
+    shouldGameEnd(state) {
     if (!state.localPlayer || !state.remotePlayer || state.currentState !== 'MAIN_GAME') {
       return false;
     }

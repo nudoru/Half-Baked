@@ -96,7 +96,7 @@ let MixinRouteViews = function () {
    */
   function removeCurrentRouteView() {
     if (_currentRouteViewID) {
-      _this.getComponentViewMap()[_currentRouteViewID].controller.unmount();
+      _this.getComponentViewMap()[_currentRouteViewID].controller.dispose();
     }
     _currentRouteViewID = '';
   }
