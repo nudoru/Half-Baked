@@ -73,6 +73,7 @@ BEGIN Templates for Sub Views
 <script id="title" type="text/template">
     <div>
         <h1>Half-Baked!</h1>
+
         <p>Two player quiz battle!</p>
         <button id="title__button-start" class="button-success">Start!</button>
     </div>
@@ -82,43 +83,67 @@ BEGIN Templates for Sub Views
     <div>
         <h1>Choose your player</h1>
 
-        <p>Enter your name and select the appearance of your avatar.</p>
-        <label for="select__playername">Your name
-            <input id="select__playername" type="text" placeholder="Type here"
-                   value="{{ name }}">
-        </label>
-        <label for="select__playertype">Appearance
-            <select id="select__playertype">
-                <option value="Biege">Biege</option>
-                <option value="Blue">Blue</option>
-                <option value="Green">Green</option>
-                <option value="Pink">Pink</option>
-                <option value="Yellow">Yellow</option>
-            </select>
-        </label>
-        <hr/>
-        <p>To join an existing game session, enter the room id provided to the
-            room creator.</p>
-        <label for="select__roomid">Room ID
-            <input id="select__roomid" type="text" placeholder="Type here">
-        </label>
-        <button id="select__button-joinroom" class="button-success">Join Room
-        </button>
-        <hr/>
-        <p>Start a new game. You'll have to give the room ID to your
-            opponent.</p>
-        <button id="select__button-createroom" class="button-success">Create
-            Room
-        </button>
+        <div class="game__area-shaded">
+            <h3>What's your name?</h3>
+
+            <p>Enter your name and select the appearance of your avatar.</p>
+            <label for="select__playername">Your name
+                <input id="select__playername" type="text"
+                       placeholder="Type here"
+                       value="{{ name }}">
+            </label>
+            <label for="select__playertype">Appearance
+                <select id="select__playertype">
+                    <option value="Biege">Biege</option>
+                    <option value="Blue">Blue</option>
+                    <option value="Green">Green</option>
+                    <option value="Pink">Pink</option>
+                    <option value="Yellow">Yellow</option>
+                </select>
+            </label>
+        </div>
+        <div class="game__area-shaded">
+            <div class="grid__12-container">
+                <div class="grid__row">
+                    <div class="grid__col-6">
+                        <h3>Start a game!</h3>
+
+                        <p>You'll have to give the room ID to your opponent.</p>
+                        <button id="select__button-createroom"
+                                class="button-success">Create
+                            Room
+                        </button>
+                    </div>
+                    <div class="grid__col-6">
+                        <h3>To join a game!</h3>
+
+                        <p>Enter the room id provided to you by your
+                            opponent.</p>
+                        <label for="select__roomid">Room ID
+                            <input id="select__roomid" type="text"
+                                   placeholder="Type here">
+                        </label>
+                        <button id="select__button-joinroom"
+                                class="button-success">Join Room
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <button class="button-cheat" id="select__button-go">==>></button>
     </div>
 </script>
 
 <script id="waitingonplayer" type="text/template">
     <div>
-        <h1>Waiting on another player to join.</h1>
-        <h4>Let your opponent know that the room number to join is: <strong>{{
-            roomID }}</strong></h4>
+        <h1>Waiting on your opponent ...</h1>
+
+        <div class="game__area-shaded text-center">
+            <h4>Let your opponent know that the room number to join is</h4>
+
+            <h2>{{roomID }}</h2>
+        </div>
         <button class="button-cheat" id="waiting__button-skip">==>></button>
     </div>
 </script>
@@ -154,8 +179,10 @@ BEGIN Templates for Sub Views
         </div>
         <ul>
             <li>{{name}}</li>
-            <li><img class="game__playerstats-icon" src="img/hudHeart_full.png">{{health}}</li>
-            <li><img class="game__playerstats-icon" src="img/hudCoin.png">{{score}}</li>
+            <li><img class="game__playerstats-icon" src="img/hudHeart_full.png">{{health}}
+            </li>
+            <li><img class="game__playerstats-icon" src="img/hudCoin.png">{{score}}
+            </li>
         </ul>
     </div>
 </script>
@@ -172,14 +199,32 @@ BEGIN Templates for Sub Views
 <script id="game__question" type="text/template">
     <div id="question__layer">
         <div class="question__container">
-            <h5 id="question__difficulty"><img src="img/hudCoin.png"> This question is worth {{question.q_difficulty_level}}!</h5>
+            <h5 id="question__difficulty"><img src="img/hudCoin.png"> This
+                question is worth {{question.q_difficulty_level}}!</h5>
             <h5 id="question__timer">Timer</h5>
+
             <h1>{{question.q_text}}</h1>
             <ul class="list-plain question__choices">
-                <li><button id="question__choice_1" class="question__choice">{{question.q_options_1}}</button></li>
-                <li><button id="question__choice_2" class="question__choice">{{question.q_options_2}}</button></li>
-                <li><button id="question__choice_3" class="question__choice">{{question.q_options_3}}</button></li>
-                <li><button id="question__choice_4" class="question__choice">{{question.q_options_4}}</button></li>
+                <li>
+                    <button id="question__choice_1" class="question__choice">
+                        {{question.q_options_1}}
+                    </button>
+                </li>
+                <li>
+                    <button id="question__choice_2" class="question__choice">
+                        {{question.q_options_2}}
+                    </button>
+                </li>
+                <li>
+                    <button id="question__choice_3" class="question__choice">
+                        {{question.q_options_3}}
+                    </button>
+                </li>
+                <li>
+                    <button id="question__choice_4" class="question__choice">
+                        {{question.q_options_4}}
+                    </button>
+                </li>
             </ul>
 
         </div>
@@ -197,21 +242,25 @@ BEGIN Templates for Sub Views
         <div id="gameover__loose">
             <h1>You lost!</h1>
         </div>
-        <div id="gameover__score">
-            <ul class="list-plain">
-                <li>
-                    <h4>Your score:
-                        <stong>{{ localScore }}</stong>
-                    </h4>
-                </li>
-                <li>
-                    <h4>Opponent's score:
-                        <stong>{{ remoteScore }}</stong>
-                    </h4>
-                </li>
-            </ul>
+        <div class="game__area-shaded text-center">
+            <div id="gameover__score">
+                <ul class="list-plain">
+                    <li>
+                        <h4>Your score:
+                            <stong>{{ localScore }}</stong>
+                        </h4>
+                    </li>
+                    <li>
+                        <h4>Opponent's score:
+                            <stong>{{ remoteScore }}</stong>
+                        </h4>
+                    </li>
+                </ul>
+            </div>
         </div>
-        <button id="gameover__button-replay" class="button-success">Play again?</button>
+        <button id="gameover__button-replay" class="button-success">Play
+            again?
+        </button>
     </div>
 </script>
 

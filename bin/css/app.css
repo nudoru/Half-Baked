@@ -4202,6 +4202,13 @@ body {
   color: #fff;
 }
 
+.game__area-shaded {
+  background-color: rgba(81, 45, 109, 0.75);
+  padding: 1.236rem;
+  border-radius: 0.618rem;
+  margin-bottom: 1.236rem;
+}
+
 .button-cheat {
   position: absolute;
   top: -10px;
