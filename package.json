@@ -9,7 +9,7 @@
     "url": "https://github.com/nudoru/Half-Baked"
   },
   "engines": {
-    "node": "0.10.36"
+    "node": "4.0.0"
   },
   "devDependencies": {
     "babelify": "^6.3.0",
@@ -36,10 +36,9 @@
     "vinyl-source-stream": "^1.1.0"
   },
   "scripts": {
-    "start": "nodemon server/server.js",
+    "start": "node server/server.js",
     "lint": "jshint src/scripts/nori/",
-    "build": "gulp default",
-    "test": "mocha test/"
+    "build": "gulp default"
   },
   "dependencies": {
     "body-parser": "^1.13.3",
