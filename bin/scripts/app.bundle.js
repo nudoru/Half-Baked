@@ -160,7 +160,8 @@ var App = Nori.createApplication({
    */
   onStoreInitialized: function onStoreInitialized() {
     this.store.subscribe('localPlayerDataUpdated', this.handleLocalPlayerPropsUpdate.bind(this));
-
+    this.store.subscribe('answeredCorrect', this.handleAnswerCorrect.bind(this));
+    this.store.subscribe('answeredIncorrect', this.handleAnswerIncorrect.bind(this));
     this.runApplication();
   },
 
@@ -225,6 +226,9 @@ var App = Nori.createApplication({
       case _socketIOEvents.SEND_QUESTION:
         this.handleReceivedQuestion(payload.payload);
         return;
+      case _socketIOEvents.OPPONENT_ANSWERED:
+        this.handleOpponentAnswered(payload.payload);
+        return;
       case _socketIOEvents.SYSTEM_MESSAGE:
       case _socketIOEvents.BROADCAST:
       case _socketIOEvents.MESSAGE:
@@ -283,11 +287,20 @@ var App = Nori.createApplication({
   },
 
   handleReceivedQuestion: function handleReceivedQuestion(question) {
-    console.log('received a question!', question);
+    //console.log('received a question!', question);
     var setGamePlayState = _appActions.setGamePlayState(this.store.gamePlayStates[1]),
         setCurrentQuestion = _appActions.setCurrentQuestion(question);
 
     this.store.apply([setGamePlayState, setCurrentQuestion]);
+  },
+
+  handleOpponentAnswered: function handleOpponentAnswered(payload) {
+    var message = payload.result ? 'Your opponent got it right!' : 'Your opponent got it wrong!';
+    this.view.alert(message, 'Opponent\'s Answer');
+
+    var opponentAnswered = _appActions.opponentAnswered(payload.result);
+
+    this.store.apply(opponentAnswered);
   },
 
   //----------------------------------------------------------------------------
@@ -319,6 +332,22 @@ var App = Nori.createApplication({
     });
 
     this.store.apply([setGamePlayState, setCurrentQuestion]);
+  },
+
+  handleAnswerCorrect: function handleAnswerCorrect() {
+    this.sendMyAnswer(true);
+  },
+
+  handleAnswerIncorrect: function handleAnswerIncorrect() {
+    this.sendMyAnswer(false);
+  },
+
+  sendMyAnswer: function sendMyAnswer(isCorrect) {
+    var appState = this.store.getState();
+    this.socket.notifyServer(_socketIOEvents.OPPONENT_ANSWERED, {
+      roomID: appState.session.roomID,
+      result: isCorrect
+    });
   }
 
 });
@@ -340,7 +369,10 @@ exports['default'] = {
   RESET_GAME: 'RESET_GAME',
   SET_GAME_PLAY_STATE: 'SET_GAME_PLAY_STATE',
   SET_CURRENT_QUESTION: 'SET_CURRENT_QUESTION',
-  CLEAR_QUESTION: 'CLEAR_QUESTION'
+  CLEAR_QUESTION: 'CLEAR_QUESTION',
+  ANSWERED_CORRECT: 'ANSWERED_CORRECT',
+  ANSWERED_INCORRECT: 'ANSWERED_INCORRECT',
+  OPPONENT_ANSWERED: 'OPPONENT_ANSWERED'
   //SELECT_PLAYER              : 'SELECT_PLAYER',
   //REMOTE_PLAYER_CONNECT      : 'REMOTE_PLAYER_CONNECT',
   //GAME_START                 : 'GAME_START',
@@ -437,6 +469,33 @@ var ActionCreator = {
     };
   },
 
+  answeredCorrect: function answeredCorrect(points) {
+    return {
+      type: _actionConstants.ANSWERED_CORRECT,
+      payload: {
+        data: points
+      }
+    };
+  },
+
+  answeredIncorrect: function answeredIncorrect(points) {
+    return {
+      type: _actionConstants.ANSWERED_INCORRECT,
+      payload: {
+        data: points
+      }
+    };
+  },
+
+  opponentAnswered: function opponentAnswered(result) {
+    return {
+      type: _actionConstants.OPPONENT_ANSWERED,
+      payload: {
+        data: result
+      }
+    };
+  },
+
   resetGame: function resetGame() {
     return {
       type: _actionConstants.RESET_GAME,
@@ -520,6 +579,7 @@ var AppStore = Nori.createStore({
   gameStates: ['TITLE', 'PLAYER_SELECT', 'WAITING_ON_PLAYER', 'MAIN_GAME', 'GAME_OVER'],
   gamePlayStates: ['CHOOSE', 'ANSWERING', 'WAITING'],
   playerAppearences: ['Biege', 'Blue', 'Green', 'Pink', 'Yellow'],
+  mockNames: ['Bagel', 'Loaf', 'Bready', 'Twist', 'Cupcake', 'Cake', 'Batter', 'Cookie', 'Donut', 'Bun', 'Biscuit', 'Flakey', 'Gluten', 'Croissant', 'Dough', 'Knead', 'Sugar', 'Flour', 'Butter', 'Yeast', 'Icing', 'Frost', 'Eggy', 'Fondant', 'Mix', 'Fluffy', 'Whip', 'Chip', 'Honey', 'Eclaire'],
 
   initialize: function initialize() {
     this.addReducer(this.mainStateReducer.bind(this));
@@ -530,6 +590,9 @@ var AppStore = Nori.createStore({
     this.createSubject('remotePlayerDataUpdated');
     this.createSubject('gamePlayStateUpdated');
     this.createSubject('currentQuestionChange');
+    this.createSubject('opponentAnswered');
+    this.createSubject('answeredCorrect');
+    this.createSubject('answeredIncorrect');
   },
 
   /**
@@ -563,10 +626,10 @@ var AppStore = Nori.createStore({
   onQuestionsSuccess: function onQuestionsSuccess(data) {
     console.log('Questions fetched', data[0]);
 
-    // Service only returns 2 levels of difficulty. For now, fake it
     var updated = data.map(function (q) {
-      // also strip tags
+      // Strip tags from text
       q.q_text = _stringUtils.stripTags(_stringUtils.unescapeHTML(q.q_text));
+      // Service only returns 2 levels of difficulty. For now, fake it
       q.q_difficulty_level = _numUtils.rndNumber(1, 5);
       q.used = false;
       return q;
@@ -585,7 +648,12 @@ var AppStore = Nori.createStore({
   getQuestionOfDifficulty: function getQuestionOfDifficulty(difficulty) {
     var possibleQuestions = this.getState().questionBank.filter(function (q) {
       return q.q_difficulty_level === difficulty;
+    }).filter(function (q) {
+      return !q.used;
     });
+
+    // TODO set .used to true here
+
     return _arrayUtils.rndElement(possibleQuestions);
   },
 
@@ -593,7 +661,7 @@ var AppStore = Nori.createStore({
     return {
       id: '',
       type: '',
-      name: 'Mystery' + _numUtils.rndNumber(100, 999),
+      name: _arrayUtils.rndElement(this.mockNames) + _numUtils.rndNumber(100, 999),
       appearance: _arrayUtils.rndElement(this.playerAppearences)
     };
   },
@@ -630,9 +698,11 @@ var AppStore = Nori.createStore({
       case _appActionConstants.SET_CURRENT_QUESTION:
         return _.merge({}, state, event.payload.data);
       case _appActionConstants.CLEAR_QUESTION:
-        console.log('clearing question');
         state.currentQuestion = null;
         return state;
+      case _appActionConstants.ANSWERED_CORRECT:
+      case _appActionConstants.ANSWERED_INCORRECT:
+      case _appActionConstants.OPPONENT_ANSWERED:
       case undefined:
         return state;
       default:
@@ -653,11 +723,15 @@ var AppStore = Nori.createStore({
       this.notifySubscribersOf('localPlayerDataUpdated');
     } else if (this.lastEventHandled === _appActionConstants.SET_GAME_PLAY_STATE) {
       this.notifySubscribersOf('gamePlayStateUpdated');
-      //console.log('game play state:', this.getState().currentPlayState);
     } else if (this.lastEventHandled === _appActionConstants.SET_CURRENT_QUESTION || this.lastEventHandled === _appActionConstants.CLEAR_QUESTION) {
-        this.notifySubscribersOf('currentQuestionChange');
-        //console.log('question:', this.getState().currentQuestion);
-      }
+      this.notifySubscribersOf('currentQuestionChange');
+    } else if (this.lastEventHandled === _appActionConstants.ANSWERED_CORRECT) {
+      this.notifySubscribersOf('answeredCorrect');
+    } else if (this.lastEventHandled === _appActionConstants.ANSWERED_INCORRECT) {
+      this.notifySubscribersOf('answeredIncorrect');
+    } else if (this.lastEventHandled === _appActionConstants.OPPONENT_ANSWERED) {
+      this.notifySubscribersOf('opponentAnswered');
+    }
 
     // Check if player health is 0
     if (this.shouldGameEnd(state)) {
@@ -847,9 +921,11 @@ var Component = Nori.view().createComponentView({
   //'CHOOSE', 'ANSWERING', 'WAITING'
   getOppositePlayState: function getOppositePlayState(playState) {
     //if(playState === 'CHOOSE') {
-    //
+    //  return 'WAITING';
     //} else if(playState === 'ANSWERING') {
-    //
+    //  return 'WAITING';
+    //} else if(playState === 'WAITING') {
+    //  return 'ANSWERING'
     //}
     return 'WAITING';
   },
@@ -932,7 +1008,7 @@ var Rxjs = _interopRequireWildcard(_vendorRxjsRxLiteMinJs);
  */
 var Component = Nori.view().createComponentView({
 
-  storeObservable: null,
+  storeQuestionChangeObs: null,
   timerObservable: null,
   maxSeconds: 10,
 
@@ -946,8 +1022,7 @@ var Component = Nori.view().createComponentView({
    * @param configProps
    */
   initialize: function initialize(configProps) {
-
-    this.storeObservable = _appStore.subscribe('currentQuestionChange', this.update.bind(this));
+    this.storeQuestionChangeObs = _appStore.subscribe('currentQuestionChange', this.update.bind(this));
   },
 
   /**
@@ -961,9 +1036,10 @@ var Component = Nori.view().createComponentView({
   },
 
   pickChoice: function pickChoice(evt) {
-    var choice = parseInt(evt.target.getAttribute('id').substr(-1, 1));
-    console.log(choice, this.isCorrect(choice));
-    if (this.isCorrect(choice)) {
+    var choice = parseInt(evt.target.getAttribute('id').substr(-1, 1)),
+        correct = this.isCorrect(choice);
+
+    if (correct) {
       this.scoreCorrect();
       _appView['default'].alert('You got it!', 'Correct!');
     } else {
@@ -978,28 +1054,32 @@ var Component = Nori.view().createComponentView({
 
   scoreCorrect: function scoreCorrect() {
     var state = _appStore.getState(),
-        localScore = state.localPlayer.score + this.getState().question.q_difficulty_level,
+        qPoints = this.getState().question.q_difficulty_level,
+        localScore = state.localPlayer.score + qPoints,
         localHealth = state.localPlayer.health,
         playerAction = _appActions.setLocalPlayerProps({
       health: localHealth,
       score: localScore
     }),
+        answeredCorrect = _appActions.answeredCorrect(qPoints),
         clearQuestion = _appActions.clearQuestion();
 
-    _appStore.apply([playerAction, clearQuestion]);
+    _appStore.apply([playerAction, clearQuestion, answeredCorrect]);
   },
 
   scoreIncorrect: function scoreIncorrect() {
     var state = _appStore.getState(),
+        qPoints = this.getState().question.q_difficulty_level,
         localScore = state.localPlayer.score,
-        localHealth = state.localPlayer.health - this.getState().question.q_difficulty_level,
+        localHealth = state.localPlayer.health - qPoints,
         playerAction = _appActions.setLocalPlayerProps({
       health: localHealth,
       score: localScore
     }),
+        answeredIncorrect = _appActions.answeredIncorrect(qPoints),
         clearQuestion = _appActions.clearQuestion();
 
-    _appStore.apply([playerAction, clearQuestion]);
+    _appStore.apply([playerAction, clearQuestion, answeredIncorrect]);
   },
 
   getQuestion: function getQuestion() {
@@ -1091,6 +1171,7 @@ var Component = Nori.view().createComponentView({
     }
   },
 
+  // TODO move this logic up to pickChoice
   onTimerComplete: function onTimerComplete() {
     this.clearTimer();
     this.scoreIncorrect();
@@ -1111,8 +1192,8 @@ var Component = Nori.view().createComponentView({
   },
 
   componentWillDispose: function componentWillDispose() {
-    if (this.storeObservable) {
-      this.storeObservable.dispose();
+    if (this.storeQuestionChangeObs) {
+      this.storeQuestionChangeObs.dispose();
     }
   }
 
@@ -1299,10 +1380,18 @@ var _nudoruCoreNumberUtilsJs = require('../../nudoru/core/NumberUtils.js');
 
 var _numUtils = _interopRequireWildcard(_nudoruCoreNumberUtilsJs);
 
+var _noriViewMixinDOMManipulationJs = require('../../nori/view/MixinDOMManipulation.js');
+
+var _mixinDOMManipulation = _interopRequireWildcard(_noriViewMixinDOMManipulationJs);
+
 /**
  * Module for a dynamic application view for a route or a persistent view
  */
 var Component = Nori.view().createComponentView({
+
+  mixins: [_mixinDOMManipulation],
+
+  storeQuestionChangeObs: null,
 
   /**
    * Initialize and bind, called once on first render. Parent component is
@@ -1310,7 +1399,8 @@ var Component = Nori.view().createComponentView({
    * @param configProps
    */
   initialize: function initialize(configProps) {
-    //
+    //this.storeQuestionChangeObs = _appStore.subscribe('currentQuestionChange', this.handleQuestionChange.bind(this));
+    this.storeQuestionChangeObs = _appStore.subscribe('opponentAnswered', this.handleOpponentAnswered.bind(this));
   },
 
   defineRegions: function defineRegions() {
@@ -1358,9 +1448,26 @@ var Component = Nori.view().createComponentView({
   },
 
   sendQuestion: function sendQuestion(evt) {
-    console.log('Sending a question ...');
+    //console.log('Sending a question ...');
+    _appView['default'].closeAllAlerts();
+
     var difficulty = parseInt(evt.target.getAttribute('id').substr(-1, 1));
     _app['default'].sendQuestion(difficulty);
+    this.showWaitingMessage();
+  },
+
+  handleOpponentAnswered: function handleOpponentAnswered() {
+    this.showDifficultyCards();
+  },
+
+  showDifficultyCards: function showDifficultyCards() {
+    this.hideEl('.game__question-waiting');
+    this.showEl('.game__question-difficulty');
+  },
+
+  showWaitingMessage: function showWaitingMessage() {
+    this.showEl('.game__question-waiting');
+    this.hideEl('.game__question-difficulty');
   },
 
   receiveQuestion: function receiveQuestion(questionObj) {
@@ -1388,19 +1495,27 @@ var Component = Nori.view().createComponentView({
   /**
    * Component HTML was attached to the DOM
    */
-  componentDidMount: function componentDidMount() {},
+  componentDidMount: function componentDidMount() {
+    this.showDifficultyCards();
+  },
 
   /**
    * Component will be removed from the DOM
    */
-  componentWillUnmount: function componentWillUnmount() {}
+  componentWillUnmount: function componentWillUnmount() {},
+
+  componentWillDispose: function componentWillDispose() {
+    if (this.storeQuestionChangeObs) {
+      this.storeQuestionChangeObs.dispose();
+    }
+  }
 
 });
 
 exports['default'] = Component;
 module.exports = exports['default'];
 
-},{"../../nori/action/ActionCreator":17,"../../nori/utils/Templating.js":28,"../../nudoru/core/NumberUtils.js":45,"../App":2,"../action/ActionCreator.js":4,"../store/AppStore":5,"./AppView":6,"./Region.PlayerStats.js":7,"./Region.Question.js":8}],11:[function(require,module,exports){
+},{"../../nori/action/ActionCreator":17,"../../nori/utils/Templating.js":28,"../../nori/view/MixinDOMManipulation.js":31,"../../nudoru/core/NumberUtils.js":45,"../App":2,"../action/ActionCreator.js":4,"../store/AppStore":5,"./AppView":6,"./Region.PlayerStats.js":7,"./Region.Question.js":8}],11:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -2265,7 +2380,8 @@ exports['default'] = {
   GAME_END: 'game_end',
   GAME_ABORT: 'game_abort',
   SEND_PLAYER_DETAILS: 'send_player_details',
-  SEND_QUESTION: 'send_question'
+  SEND_QUESTION: 'send_question',
+  OPPONENT_ANSWERED: 'opponent_answered'
 };
 module.exports = exports['default'];
 
@@ -3717,6 +3833,8 @@ var _modalCoverView = _interopRequireWildcard(_nudoruComponentsModalCoverViewJs)
 
 var MixinNudoruControls = function MixinNudoruControls() {
 
+  var _alerts = [];
+
   function initializeNudoruControls() {
     _toolTipView.initialize('tooltip__container');
     _notificationView.initialize('toast__container');
@@ -3737,7 +3855,17 @@ var MixinNudoruControls = function MixinNudoruControls() {
   }
 
   function alert(message, title) {
-    return mbCreator().alert(title || 'Alert', message);
+    var alertInst = mbCreator().alert(title || 'Alert', message);
+
+    _alerts.push(alertInst);
+    return alertInst;
+  }
+
+  function closeAllAlerts() {
+    _alerts.forEach(function (id) {
+      removeMessageBox(id);
+    });
+    _alerts = [];
   }
 
   function addNotification(obj) {
@@ -3759,6 +3887,7 @@ var MixinNudoruControls = function MixinNudoruControls() {
     removeMessageBox: removeMessageBox,
     addNotification: addNotification,
     alert: alert,
+    closeAllAlerts: closeAllAlerts,
     notify: notify
   };
 };

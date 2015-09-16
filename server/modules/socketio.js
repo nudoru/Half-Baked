@@ -145,6 +145,9 @@ function handleSocketMessage(payload) {
     case(_events.SEND_QUESTION):
       sendQuestion(payload.connectionID, payload.payload);
       return;
+    case(_events.OPPONENT_ANSWERED):
+      sendOpponentResult(payload.connectionID, payload.payload);
+      return;
     default:
       console.warn("Unhandled SocketIO message type", payload);
       return;
@@ -253,8 +256,6 @@ function sendQuestion(srcConnection, payload) {
   var roomID = payload.roomID,
       question = payload.question;
 
-  console.log(srcConnection);
-
   if(roomID === '0000' || !roomID) {
     console.log('sendQuestion on test socket');
     emitClientNotificationToConnection(srcConnection, _events.SEND_QUESTION, {
@@ -272,6 +273,32 @@ function sendQuestion(srcConnection, payload) {
     if(socketID !== srcConnection) {
       emitClientNotificationToConnection(socketID, _events.SEND_QUESTION, {
         question: question
+      });
+    }
+  });
+}
+
+function sendOpponentResult(srcConnection, payload) {
+  var roomID = payload.roomID,
+      result = payload.result;
+
+  if(roomID === '0000' || !roomID) {
+    console.log('sendQuestion on test socket');
+    emitClientNotificationToConnection(srcConnection, _events.OPPONENT_ANSWERED, {
+      result: result
+    });
+    return;
+  }
+
+  if(!_roomMap[roomID]) {
+    console.log('sendOpponentResult: No connections in room: ',roomID);
+    return;
+  }
+
+  _roomMap[roomID].forEach(function (socketID) {
+    if(socketID !== srcConnection) {
+      emitClientNotificationToConnection(socketID, _events.OPPONENT_ANSWERED, {
+        result: result
       });
     }
   });

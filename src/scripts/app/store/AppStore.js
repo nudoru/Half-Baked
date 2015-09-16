@@ -36,6 +36,7 @@ var AppStore = Nori.createStore({
   gameStates       : ['TITLE', 'PLAYER_SELECT', 'WAITING_ON_PLAYER', 'MAIN_GAME', 'GAME_OVER'],
   gamePlayStates   : ['CHOOSE', 'ANSWERING', 'WAITING'],
   playerAppearences: ['Biege', 'Blue', 'Green', 'Pink', 'Yellow'],
+  mockNames        : ['Bagel', 'Loaf', 'Bready', 'Twist', 'Cupcake', 'Cake', 'Batter', 'Cookie', 'Donut', 'Bun', 'Biscuit', 'Flakey', 'Gluten', 'Croissant', 'Dough', 'Knead', 'Sugar', 'Flour', 'Butter', 'Yeast', 'Icing', 'Frost', 'Eggy', 'Fondant', 'Mix', 'Fluffy', 'Whip', 'Chip', 'Honey', 'Eclaire'],
 
   initialize() {
     this.addReducer(this.mainStateReducer.bind(this));
@@ -46,6 +47,9 @@ var AppStore = Nori.createStore({
     this.createSubject('remotePlayerDataUpdated');
     this.createSubject('gamePlayStateUpdated');
     this.createSubject('currentQuestionChange');
+    this.createSubject('opponentAnswered');
+    this.createSubject('answeredCorrect');
+    this.createSubject('answeredIncorrect');
   },
 
   /**
@@ -79,10 +83,11 @@ var AppStore = Nori.createStore({
   onQuestionsSuccess(data) {
     console.log('Questions fetched', data[0]);
 
-    // Service only returns 2 levels of difficulty. For now, fake it
+
     let updated = data.map(q => {
-      // also strip tags
-      q.q_text             = _stringUtils.stripTags(_stringUtils.unescapeHTML(q.q_text));
+      // Strip tags from text
+      q.q_text = _stringUtils.stripTags(_stringUtils.unescapeHTML(q.q_text));
+      // Service only returns 2 levels of difficulty. For now, fake it
       q.q_difficulty_level = _numUtils.rndNumber(1, 5);
       q.used               = false;
       return q;
@@ -99,9 +104,16 @@ var AppStore = Nori.createStore({
   },
 
   getQuestionOfDifficulty(difficulty) {
-    var possibleQuestions = this.getState().questionBank.filter(q => {
-      return q.q_difficulty_level === difficulty;
-    });
+    var possibleQuestions = this.getState().questionBank
+      .filter(q => {
+        return q.q_difficulty_level === difficulty;
+      })
+      .filter(q => {
+        return !q.used;
+      });
+
+    // TODO set .used to true here
+
     return _arrayUtils.rndElement(possibleQuestions);
   },
 
@@ -109,7 +121,7 @@ var AppStore = Nori.createStore({
     return {
       id        : '',
       type      : '',
-      name      : 'Mystery' + _numUtils.rndNumber(100, 999),
+      name      : _arrayUtils.rndElement(this.mockNames) + _numUtils.rndNumber(100, 999),
       appearance: _arrayUtils.rndElement(this.playerAppearences)
     };
   },
@@ -146,9 +158,11 @@ var AppStore = Nori.createStore({
       case _appActionConstants.SET_CURRENT_QUESTION:
         return _.merge({}, state, event.payload.data);
       case _appActionConstants.CLEAR_QUESTION:
-        console.log('clearing question')
         state.currentQuestion = null;
         return state;
+      case _appActionConstants.ANSWERED_CORRECT:
+      case _appActionConstants.ANSWERED_INCORRECT:
+      case _appActionConstants.OPPONENT_ANSWERED:
       case undefined:
         return state;
       default:
@@ -169,11 +183,15 @@ var AppStore = Nori.createStore({
       this.notifySubscribersOf('localPlayerDataUpdated');
     } else if (this.lastEventHandled === _appActionConstants.SET_GAME_PLAY_STATE) {
       this.notifySubscribersOf('gamePlayStateUpdated');
-      //console.log('game play state:', this.getState().currentPlayState);
     } else if (this.lastEventHandled === _appActionConstants.SET_CURRENT_QUESTION ||
       this.lastEventHandled === _appActionConstants.CLEAR_QUESTION) {
       this.notifySubscribersOf('currentQuestionChange');
-      //console.log('question:', this.getState().currentQuestion);
+    } else if (this.lastEventHandled === _appActionConstants.ANSWERED_CORRECT) {
+      this.notifySubscribersOf('answeredCorrect');
+    } else if (this.lastEventHandled === _appActionConstants.ANSWERED_INCORRECT) {
+      this.notifySubscribersOf('answeredIncorrect');
+    } else if (this.lastEventHandled === _appActionConstants.OPPONENT_ANSWERED) {
+      this.notifySubscribersOf('opponentAnswered');
     }
 
     // Check if player health is 0

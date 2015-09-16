@@ -59,9 +59,11 @@ var Component = Nori.view().createComponentView({
   //'CHOOSE', 'ANSWERING', 'WAITING'
   getOppositePlayState: function(playState) {
     //if(playState === 'CHOOSE') {
-    //
+    //  return 'WAITING';
     //} else if(playState === 'ANSWERING') {
-    //
+    //  return 'WAITING';
+    //} else if(playState === 'WAITING') {
+    //  return 'ANSWERING'
     //}
     return 'WAITING';
   },

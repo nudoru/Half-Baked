@@ -40,7 +40,7 @@ var ActionCreator = {
     };
   },
 
-  setGamePlayState: function(data) {
+  setGamePlayState: function (data) {
     return {
       type   : _actionConstants.SET_GAME_PLAY_STATE,
       payload: {
@@ -51,7 +51,7 @@ var ActionCreator = {
     };
   },
 
-  setCurrentQuestion: function(data) {
+  setCurrentQuestion: function (data) {
     return {
       type   : _actionConstants.SET_CURRENT_QUESTION,
       payload: {
@@ -62,11 +62,38 @@ var ActionCreator = {
     };
   },
 
-  clearQuestion: function() {
+  clearQuestion: function () {
     return {
       type   : _actionConstants.CLEAR_QUESTION,
       payload: {
         data: {}
+      }
+    };
+  },
+
+  answeredCorrect: function (points) {
+    return {
+      type   : _actionConstants.ANSWERED_CORRECT,
+      payload: {
+        data: points
+      }
+    };
+  },
+
+  answeredIncorrect: function (points) {
+    return {
+      type   : _actionConstants.ANSWERED_INCORRECT,
+      payload: {
+        data: points
+      }
+    };
+  },
+
+  opponentAnswered : function (result) {
+    return {
+      type   : _actionConstants.OPPONENT_ANSWERED,
+      payload: {
+        data: result
       }
     };
   },
@@ -78,7 +105,7 @@ var ActionCreator = {
         data: {
           currentState: _appStore.gameStates[1],
           session     : {
-            roomID    : ''
+            roomID: ''
           },
           localPlayer : _appStore.createPlayerResetObject(),
           remotePlayer: _appStore.createPlayerResetObject()

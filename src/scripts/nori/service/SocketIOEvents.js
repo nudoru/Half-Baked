@@ -20,5 +20,6 @@ export default {
   GAME_END           : 'game_end',
   GAME_ABORT         : 'game_abort',
   SEND_PLAYER_DETAILS: 'send_player_details',
-  SEND_QUESTION      : 'send_question'
+  SEND_QUESTION      : 'send_question',
+  OPPONENT_ANSWERED  : 'opponent_answered'
 };

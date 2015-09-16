@@ -10,7 +10,7 @@ import * as Rxjs from '../../vendor/rxjs/rx.lite.min.js';
  */
 var Component = Nori.view().createComponentView({
 
-  storeObservable: null,
+  storeQuestionChangeObs: null,
   timerObservable: null,
   maxSeconds     : 10,
 
@@ -24,8 +24,7 @@ var Component = Nori.view().createComponentView({
    * @param configProps
    */
     initialize(configProps) {
-
-    this.storeObservable = _appStore.subscribe('currentQuestionChange', this.update.bind(this));
+    this.storeQuestionChangeObs = _appStore.subscribe('currentQuestionChange', this.update.bind(this));
   },
 
   /**
@@ -39,9 +38,10 @@ var Component = Nori.view().createComponentView({
   },
 
   pickChoice(evt) {
-    var choice = parseInt(evt.target.getAttribute('id').substr(-1, 1));
-    console.log(choice, this.isCorrect(choice));
-    if (this.isCorrect(choice)) {
+    let choice  = parseInt(evt.target.getAttribute('id').substr(-1, 1)),
+        correct = this.isCorrect(choice);
+
+    if (correct) {
       this.scoreCorrect();
       _appView.default.alert('You got it!', 'Correct!');
     } else {
@@ -55,29 +55,33 @@ var Component = Nori.view().createComponentView({
   },
 
   scoreCorrect() {
-    let state         = _appStore.getState(),
-        localScore    = state.localPlayer.score + this.getState().question.q_difficulty_level,
-        localHealth   = state.localPlayer.health,
-        playerAction  = _appActions.setLocalPlayerProps({
+    let state           = _appStore.getState(),
+        qPoints         = this.getState().question.q_difficulty_level,
+        localScore      = state.localPlayer.score + qPoints,
+        localHealth     = state.localPlayer.health,
+        playerAction    = _appActions.setLocalPlayerProps({
           health: localHealth,
           score : localScore
         }),
-        clearQuestion = _appActions.clearQuestion();
+        answeredCorrect = _appActions.answeredCorrect(qPoints),
+        clearQuestion   = _appActions.clearQuestion();
 
-    _appStore.apply([playerAction, clearQuestion]);
+    _appStore.apply([playerAction, clearQuestion, answeredCorrect]);
   },
 
   scoreIncorrect() {
-    let state         = _appStore.getState(),
-        localScore    = state.localPlayer.score,
-        localHealth   = state.localPlayer.health - this.getState().question.q_difficulty_level,
-        playerAction  = _appActions.setLocalPlayerProps({
+    let state             = _appStore.getState(),
+        qPoints           = this.getState().question.q_difficulty_level,
+        localScore        = state.localPlayer.score,
+        localHealth       = state.localPlayer.health - qPoints,
+        playerAction      = _appActions.setLocalPlayerProps({
           health: localHealth,
           score : localScore
         }),
-        clearQuestion = _appActions.clearQuestion();
+        answeredIncorrect = _appActions.answeredIncorrect(qPoints),
+        clearQuestion     = _appActions.clearQuestion();
 
-    _appStore.apply([playerAction, clearQuestion]);
+    _appStore.apply([playerAction, clearQuestion, answeredIncorrect]);
   },
 
   getQuestion() {
@@ -166,12 +170,13 @@ var Component = Nori.view().createComponentView({
   },
 
   updateTimerText(number) {
-    let timerEl       = document.querySelector('#question__timer');
-    if(timerEl) {
+    let timerEl = document.querySelector('#question__timer');
+    if (timerEl) {
       timerEl.innerHTML = number + ' seconds left';
     }
   },
 
+  // TODO move this logic up to pickChoice
   onTimerComplete() {
     this.clearTimer();
     this.scoreIncorrect();
@@ -192,8 +197,8 @@ var Component = Nori.view().createComponentView({
   },
 
   componentWillDispose() {
-    if (this.storeObservable) {
-      this.storeObservable.dispose();
+    if (this.storeQuestionChangeObs) {
+      this.storeQuestionChangeObs.dispose();
     }
   }
 

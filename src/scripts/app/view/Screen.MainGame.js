@@ -7,11 +7,18 @@ import * as _appActions from '../action/ActionCreator.js';
 import * as _regionPlayerStats from './Region.PlayerStats.js';
 import * as _regionQuestion from './Region.Question.js';
 import * as _numUtils from '../../nudoru/core/NumberUtils.js';
+import * as _mixinDOMManipulation from '../../nori/view/MixinDOMManipulation.js';
 
 /**
  * Module for a dynamic application view for a route or a persistent view
  */
 var Component = Nori.view().createComponentView({
+
+  mixins: [
+    _mixinDOMManipulation
+  ],
+
+  storeQuestionChangeObs: null,
 
   /**
    * Initialize and bind, called once on first render. Parent component is
@@ -19,7 +26,8 @@ var Component = Nori.view().createComponentView({
    * @param configProps
    */
     initialize (configProps) {
-    //
+    //this.storeQuestionChangeObs = _appStore.subscribe('currentQuestionChange', this.handleQuestionChange.bind(this));
+    this.storeQuestionChangeObs = _appStore.subscribe('opponentAnswered', this.handleOpponentAnswered.bind(this));
   },
 
   defineRegions () {
@@ -67,9 +75,26 @@ var Component = Nori.view().createComponentView({
   },
 
   sendQuestion(evt) {
-    console.log('Sending a question ...');
+    //console.log('Sending a question ...');
+    _appView.default.closeAllAlerts();
+
     var difficulty = parseInt(evt.target.getAttribute('id').substr(-1, 1));
     _app.default.sendQuestion(difficulty);
+    this.showWaitingMessage();
+  },
+
+  handleOpponentAnswered() {
+    this.showDifficultyCards();
+  },
+
+  showDifficultyCards() {
+    this.hideEl('.game__question-waiting');
+    this.showEl('.game__question-difficulty');
+  },
+
+  showWaitingMessage() {
+    this.showEl('.game__question-waiting');
+    this.hideEl('.game__question-difficulty');
   },
 
   receiveQuestion(questionObj) {
@@ -98,12 +123,19 @@ var Component = Nori.view().createComponentView({
    * Component HTML was attached to the DOM
    */
     componentDidMount () {
+    this.showDifficultyCards();
   },
 
   /**
    * Component will be removed from the DOM
    */
     componentWillUnmount () {
+  },
+
+  componentWillDispose() {
+    if (this.storeQuestionChangeObs) {
+      this.storeQuestionChangeObs.dispose();
+    }
   }
 
 });

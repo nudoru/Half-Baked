@@ -8,6 +8,8 @@ import * as _modalCoverView from '../../nudoru/components/ModalCoverView.js';
 
 let MixinNudoruControls = function () {
 
+  var _alerts = [];
+
   function initializeNudoruControls() {
     _toolTipView.initialize('tooltip__container');
     _notificationView.initialize('toast__container');
@@ -28,7 +30,17 @@ let MixinNudoruControls = function () {
   }
 
   function alert(message, title) {
-    return mbCreator().alert(title || 'Alert', message);
+    let alertInst = mbCreator().alert(title || 'Alert', message);
+
+    _alerts.push(alertInst);
+    return alertInst;
+  }
+
+  function closeAllAlerts() {
+    _alerts.forEach(id => {
+      removeMessageBox(id);
+    });
+    _alerts = [];
   }
 
   function addNotification(obj) {
@@ -50,6 +62,7 @@ let MixinNudoruControls = function () {
     removeMessageBox        : removeMessageBox,
     addNotification         : addNotification,
     alert                   : alert,
+    closeAllAlerts          : closeAllAlerts,
     notify                  : notify
   };
 

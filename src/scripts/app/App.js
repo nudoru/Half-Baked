@@ -26,7 +26,7 @@ let App = Nori.createApplication({
   /**
    * Intialize the appilcation, view and store
    */
-  initialize() {
+    initialize() {
     this.socket.initialize();
     this.socket.subscribe(this.handleSocketMessage.bind(this));
 
@@ -40,16 +40,17 @@ let App = Nori.createApplication({
   /**
    * After the store data is ready
    */
-  onStoreInitialized() {
+    onStoreInitialized() {
     this.store.subscribe('localPlayerDataUpdated', this.handleLocalPlayerPropsUpdate.bind(this));
-
+    this.store.subscribe('answeredCorrect', this.handleAnswerCorrect.bind(this));
+    this.store.subscribe('answeredIncorrect', this.handleAnswerIncorrect.bind(this));
     this.runApplication();
   },
 
   /**
    * Remove the "Please wait" cover and start the app
    */
-  runApplication() {
+    runApplication() {
     this.view.removeLoadingMessage();
 
     // View will show based on the current store state
@@ -79,7 +80,7 @@ let App = Nori.createApplication({
    * All messages from the Socket.IO server will be forwarded here
    * @param payload
    */
-  handleSocketMessage(payload) {
+    handleSocketMessage(payload) {
     if (!payload) {
       return;
     }
@@ -106,6 +107,9 @@ let App = Nori.createApplication({
         return;
       case (_socketIOEvents.SEND_QUESTION):
         this.handleReceivedQuestion(payload.payload);
+        return;
+      case (_socketIOEvents.OPPONENT_ANSWERED):
+        this.handleOpponentAnswered(payload.payload);
         return;
       case (_socketIOEvents.SYSTEM_MESSAGE):
       case (_socketIOEvents.BROADCAST):
@@ -165,24 +169,33 @@ let App = Nori.createApplication({
   },
 
   handleReceivedQuestion(question) {
-    console.log('received a question!', question);
+    //console.log('received a question!', question);
     let setGamePlayState   = _appActions.setGamePlayState(this.store.gamePlayStates[1]),
         setCurrentQuestion = _appActions.setCurrentQuestion(question);
 
     this.store.apply([setGamePlayState, setCurrentQuestion]);
   },
 
+  handleOpponentAnswered(payload) {
+    let message = payload.result ? 'Your opponent got it right!' : 'Your opponent got it wrong!';
+    this.view.alert(message, 'Opponent\'s Answer');
+
+    let opponentAnswered = _appActions.opponentAnswered(payload.result);
+
+    this.store.apply(opponentAnswered);
+  },
+
   //----------------------------------------------------------------------------
   // Handle TO server
   //----------------------------------------------------------------------------
 
-  createRoom: function() {
+  createRoom: function () {
     this.socket.notifyServer(_socketIOEvents.CREATE_ROOM, {
       playerDetails: this.store.getState().localPlayer
     });
   },
 
-  joinRoom: function(roomID) {
+  joinRoom: function (roomID) {
     this.socket.notifyServer(_socketIOEvents.JOIN_ROOM, {
       roomID       : roomID,
       playerDetails: this.store.getState().localPlayer
@@ -202,6 +215,22 @@ let App = Nori.createApplication({
 
     this.store.apply([setGamePlayState, setCurrentQuestion]);
   },
+
+  handleAnswerCorrect() {
+    this.sendMyAnswer(true);
+  },
+
+  handleAnswerIncorrect() {
+    this.sendMyAnswer(false);
+  },
+
+  sendMyAnswer(isCorrect) {
+    let appState = this.store.getState();
+    this.socket.notifyServer(_socketIOEvents.OPPONENT_ANSWERED, {
+      roomID       : appState.session.roomID,
+      result       : isCorrect
+    });
+  }
 
 });
 
