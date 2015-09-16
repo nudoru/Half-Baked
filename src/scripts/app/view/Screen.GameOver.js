@@ -19,7 +19,7 @@ var Component = Nori.view().createComponentView({
    * initialized from app view
    * @param configProps
    */
-  initialize(configProps) {
+    initialize(configProps) {
     //
   },
 
@@ -27,7 +27,7 @@ var Component = Nori.view().createComponentView({
    * Create an object to be used to define events on DOM elements
    * @returns {}
    */
-  defineEvents() {
+    defineEvents() {
     return {
       'click #gameover__button-replay'() {
         _appStore.apply(_appActions.resetGame());
@@ -38,7 +38,7 @@ var Component = Nori.view().createComponentView({
   /**
    * Set initial state properties. Call once on first render
    */
-  getInitialState() {
+    getInitialState() {
     let appState = _appStore.getState(),
         state    = {
           name       : appState.localPlayer.name,
@@ -47,22 +47,43 @@ var Component = Nori.view().createComponentView({
           remoteScore: appState.remotePlayer.score,
           localWin   : appState.localPlayer.score > appState.remotePlayer.score,
           remoteWin  : appState.localPlayer.score < appState.remotePlayer.score,
-          tieWin     : appState.localPlayer.score === appState.remotePlayer.score
+          tieWin     : appState.localPlayer.score === appState.remotePlayer.score,
+          playerImage: ''
         };
+
+    state = this.getPlayerImage(state);
+
+    return state;
+  },
+
+  getPlayerImage(state) {
+    let prefix    = 'alien',
+        color     = state.appearance,
+        postfix   = '.png',
+        statePart = '_swim2';
+
+    if(state.remoteWin) {
+      statePart = '_hit';
+    } else if(state.tieWin) {
+      statePart = '_duck';
+    }
+
+    state.playerImage = prefix + color + statePart + postfix;
+
     return state;
   },
 
   /**
    * State change on bound stores (map, etc.) Return nextState object
    */
-  componentWillUpdate() {
+    componentWillUpdate() {
     return {};
   },
 
   /**
    * Component HTML was attached to the DOM
    */
-  componentDidMount() {
+    componentDidMount() {
     let state = this.getState();
 
     this.hideEl('#gameover__win');
@@ -81,7 +102,7 @@ var Component = Nori.view().createComponentView({
   /**
    * Component will be removed from the DOM
    */
-  componentWillUnmount() {
+    componentWillUnmount() {
     //
   }
 

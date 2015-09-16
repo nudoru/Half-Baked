@@ -175,24 +175,34 @@ BEGIN Templates for Sub Views
             <h1>You lost!</h1>
         </div>
         <div class="game__area-shaded text-center">
-            <div id="gameover__score">
-                <ul class="list-plain">
-                    <li>
-                        <h4>Your score:
-                            <stong>{{ localScore }}</stong>
-                        </h4>
-                    </li>
-                    <li>
-                        <h4>Opponent's score:
-                            <stong>{{ remoteScore }}</stong>
-                        </h4>
-                    </li>
-                </ul>
+            <div class="grid__12-container">
+                <div class="grid__row" style="overflow: visible;">
+                    <div class="grid__col-3 text-center" style="overflow: visible;">
+                        <img class="gameover__score-avatar" src="img/players/{{playerImage}}">
+                    </div>
+                    <div class="grid__col-9">
+                        <div id="gameover__score">
+                            <ul class="list-plain">
+                                <li>
+                                    <h2>Your score:
+                                        <stong>{{ localScore }}</stong>
+                                    </h2>
+                                </li>
+                                <li>
+                                    <h3>Opponent's score:
+                                        <stong>{{ remoteScore }}</stong>
+                                    </h3>
+                                </li>
+                            </ul>
+                        </div>
+                        <button id="gameover__button-replay" class="button-success">Play
+                            again?
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
-        <button id="gameover__button-replay" class="button-success">Play
-            again?
-        </button>
+
     </div>
 </script>
 

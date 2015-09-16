@@ -173,6 +173,7 @@ var App = Nori.createApplication({
     // View will show based on the current store state
     //this.store.setState({currentState: 'MAIN_GAME'});
     this.store.setState({ currentState: 'PLAYER_SELECT' });
+    //this.store.setState({currentState: 'GAME_OVER'});
   },
 
   //----------------------------------------------------------------------------
@@ -1191,8 +1192,29 @@ var Component = Nori.view().createComponentView({
       remoteScore: appState.remotePlayer.score,
       localWin: appState.localPlayer.score > appState.remotePlayer.score,
       remoteWin: appState.localPlayer.score < appState.remotePlayer.score,
-      tieWin: appState.localPlayer.score === appState.remotePlayer.score
+      tieWin: appState.localPlayer.score === appState.remotePlayer.score,
+      playerImage: ''
     };
+
+    state = this.getPlayerImage(state);
+
+    return state;
+  },
+
+  getPlayerImage: function getPlayerImage(state) {
+    var prefix = 'alien',
+        color = state.appearance,
+        postfix = '.png',
+        statePart = '_swim2';
+
+    if (state.remoteWin) {
+      statePart = '_hit';
+    } else if (state.tieWin) {
+      statePart = '_duck';
+    }
+
+    state.playerImage = prefix + color + statePart + postfix;
+
     return state;
   },
 

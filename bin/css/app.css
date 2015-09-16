@@ -4337,3 +4337,8 @@ body {
   height: 92px;
   transform: scaleX(-1);
 }
+
+.gameover__score-avatar {
+  position: absolute;
+  top: -45px;
+}
