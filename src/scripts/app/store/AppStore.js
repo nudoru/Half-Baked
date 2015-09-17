@@ -61,6 +61,7 @@ var AppStore = Nori.createStore({
       currentState    : this.gameStates[0],
       currentPlayState: this.gamePlayStates[0],
       currentQuestion : null,
+      sentQuestion    : this.createNullQuestion(),
       session         : {
         socketIOID: '',
         roomID    : '0000'
@@ -82,8 +83,6 @@ var AppStore = Nori.createStore({
 
   onQuestionsSuccess(data) {
     console.log('Questions fetched', data[0]);
-
-
     let updated = data.map(q => {
       // Strip tags from text
       q.q_text = _stringUtils.stripTags(_stringUtils.unescapeHTML(q.q_text));
@@ -115,6 +114,17 @@ var AppStore = Nori.createStore({
     // TODO set .used to true here
 
     return _arrayUtils.rndElement(possibleQuestions);
+  },
+
+  createNullQuestion() {
+    return {
+      q_text: 'its a null',
+      q_options_1: '',
+      q_options_2: '',
+      q_options_3: '',
+      q_options_4: '',
+      q_correct_option: 0
+    }
   },
 
   createBlankPlayerObject() {
@@ -156,9 +166,11 @@ var AppStore = Nori.createStore({
       case _appActionConstants.RESET_GAME:
       case _appActionConstants.SET_GAME_PLAY_STATE:
       case _appActionConstants.SET_CURRENT_QUESTION:
+      case _appActionConstants.SET_SENT_QUESTION:
         return _.merge({}, state, event.payload.data);
       case _appActionConstants.CLEAR_QUESTION:
         state.currentQuestion = null;
+        state.sentQuestion    = this.createNullQuestion();
         return state;
       case _appActionConstants.ANSWERED_CORRECT:
       case _appActionConstants.ANSWERED_INCORRECT:

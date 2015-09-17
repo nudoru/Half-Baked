@@ -27,6 +27,7 @@ var Component = Nori.view().createComponentView({
    */
     initialize (configProps) {
     //this.storeQuestionChangeObs = _appStore.subscribe('currentQuestionChange', this.handleQuestionChange.bind(this));
+    this.bindMap(_appStore);
     this.storeQuestionChangeObs = _appStore.subscribe('opponentAnswered', this.handleOpponentAnswered.bind(this));
   },
 
@@ -107,8 +108,9 @@ var Component = Nori.view().createComponentView({
     getInitialState () {
     let appState = _appStore.getState();
     return {
-      local : appState.localPlayer,
-      remote: appState.remotePlayer
+      sentQuestion: appState.sentQuestion,
+      local      : appState.localPlayer,
+      remote     : appState.remotePlayer
     };
   },
 
@@ -116,28 +118,36 @@ var Component = Nori.view().createComponentView({
    * State change on bound stores (map, etc.) Return nextState object
    */
     componentWillUpdate () {
-    return {};
+    return {
+      sentQuestion: _appStore.getState().sentQuestion
+    };
   },
 
   /**
    * Component HTML was attached to the DOM
    */
-    componentDidMount () {
+    componentDidMount()
+  {
     this.showDifficultyCards();
-  },
+  }
+  ,
 
   /**
    * Component will be removed from the DOM
    */
-    componentWillUnmount () {
-  },
+    componentWillUnmount()
+  {
+  }
+  ,
 
-  componentWillDispose() {
+  componentWillDispose()
+  {
     if (this.storeQuestionChangeObs) {
       this.storeQuestionChangeObs.dispose();
     }
   }
 
-});
+})
+  ;
 
 export default Component;

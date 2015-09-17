@@ -62,6 +62,17 @@ var ActionCreator = {
     };
   },
 
+  setSentQuestion: function (data) {
+    return {
+      type   : _actionConstants.SET_SENT_QUESTION,
+      payload: {
+        data: {
+          sentQuestion: data
+        }
+      }
+    };
+  },
+
   clearQuestion: function () {
     return {
       type   : _actionConstants.CLEAR_QUESTION,
@@ -89,7 +100,7 @@ var ActionCreator = {
     };
   },
 
-  opponentAnswered : function (result) {
+  opponentAnswered: function (result) {
     return {
       type   : _actionConstants.OPPONENT_ANSWERED,
       payload: {

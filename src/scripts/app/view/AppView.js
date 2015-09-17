@@ -25,6 +25,8 @@ let AppView = Nori.createView({
     this.initializeNudoruControls();
 
     this.configureViews();
+
+    this.subscribe('viewChange', this.handleViewChange.bind(this));
   },
 
   configureViews() {
@@ -37,7 +39,13 @@ let AppView = Nori.createView({
     this.mapStateToViewComponent(gameStates[2], 'waitingonplayer', _screenWaitingOnPlayerFactory.default());
     this.mapStateToViewComponent(gameStates[3], 'game', _screenMainGameFactory.default());
     this.mapStateToViewComponent(gameStates[4], 'gameover', _screenGameOverFactory.default());
-  }
+  },
+
+  handleViewChange() {
+    this.closeAllAlerts();
+  },
+
+
 
 });
 

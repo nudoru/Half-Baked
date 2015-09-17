@@ -90,11 +90,29 @@ body
 //  App Stuff
 //------------------------------------------------------------------------------
 
+.messagebox__default
+  border-radius: $half-base-line-height
+  .header
+    h1
+      font-family: $font-header
+      font-size: $ms-1
+      padding: $base-line-height
+  .content
+    p
+      text-align: center
+      font-size: $ms-1
+      color: $dark-purple
+      line-height: $triple-base-line-height
+    .correct-answer
+      font-weight: 700
+      color: $light-purple
+      border-bottom: 1px solid $light-purple
+
 =app__area-shadow
   box-shadow: 0px 20px 30px rgba(0, 0, 0, 0.2)
 
-=text__shadow($voff: 5px, $blur: 0px)
-  text-shadow: 2px $voff $blur $dark-blue
+=text__shadow($voff: 5px, $blur: 0px, $color: $dark-blue)
+  text-shadow: 2px $voff $blur $color
 
 =box__shadow($voff: 5px, $blur: 0px)
   box-shadow: 2px $voff $blur $dark-blue
@@ -220,6 +238,16 @@ $button-height: 45px
     li
       @extend .h3-alternate
       margin: 0
+
+.game__sent-question
+  padding-top: $triple-base-line-height
+  h1, li
+    +text__shadow(1px, 0px, rgba(255,255,255,.5))
+    color: $dark-purple
+  h1
+    @extend .h2-alternate
+  li
+    @extend .h2-alternate
 
 #game__localplayerstats
   position: absolute

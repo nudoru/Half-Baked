@@ -93,11 +93,12 @@ var ViewComponent = function () {
 
   /**
    * Compare current state and next state to determine if updating should occur
+   * If the next state exists and it's not equal to the current state
    * @param nextState
    * @returns {*}
    */
   function shouldComponentUpdate(nextState) {
-    return is.existy(nextState);
+    return is.existy(nextState) && !_.isEqual(this.getState(), nextState);
   }
 
   /**

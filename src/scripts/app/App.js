@@ -177,8 +177,11 @@ let App = Nori.createApplication({
   },
 
   handleOpponentAnswered(payload) {
-    let message = payload.result ? 'Your opponent got it right!' : 'Your opponent got it wrong!';
-    this.view.alert(message, 'Opponent\'s Answer');
+    if (payload.result) {
+      this.view.positiveAlert('Your opponent got it right!', 'Opponent\'s Answer');
+    } else {
+      this.view.negativeAlert('Your opponent got it wrong!', 'Opponent\'s Answer');
+    }
 
     let opponentAnswered = _appActions.opponentAnswered(payload.result);
 
@@ -203,17 +206,17 @@ let App = Nori.createApplication({
   },
 
   sendQuestion(difficulty) {
-    let appState           = this.store.getState(),
-        question           = this.store.getQuestionOfDifficulty(difficulty),
-        setGamePlayState   = _appActions.setGamePlayState(this.store.gamePlayStates[2]),
-        setCurrentQuestion = _appActions.setCurrentQuestion(null);
+    let appState         = this.store.getState(),
+        question         = this.store.getQuestionOfDifficulty(difficulty),
+        setGamePlayState = _appActions.setGamePlayState(this.store.gamePlayStates[2]),
+        setSentQuestion  = _appActions.setSentQuestion(question);
 
     this.socket.notifyServer(_socketIOEvents.SEND_QUESTION, {
       roomID  : appState.session.roomID,
       question: question
     });
 
-    this.store.apply([setGamePlayState, setCurrentQuestion]);
+    this.store.apply([setGamePlayState, setSentQuestion]);
   },
 
   handleAnswerCorrect() {
@@ -227,8 +230,8 @@ let App = Nori.createApplication({
   sendMyAnswer(isCorrect) {
     let appState = this.store.getState();
     this.socket.notifyServer(_socketIOEvents.OPPONENT_ANSWERED, {
-      roomID       : appState.session.roomID,
-      result       : isCorrect
+      roomID: appState.session.roomID,
+      result: isCorrect
     });
   }
 

@@ -1,17 +1,23 @@
 let MixinDOMManipulation = function () {
 
   function hideEl(selector) {
-    TweenLite.set(document.querySelector(selector), {
-      alpha  : 0,
-      display: 'none'
-    });
+    let el = document.querySelector(selector);
+    if (el) {
+      TweenLite.set(el, {
+        alpha  : 0,
+        display: 'none'
+      });
+    }
   }
 
   function showEl(selector) {
-    TweenLite.set(document.querySelector(selector), {
-      alpha  : 1,
-      display: 'block'
-    });
+    let el = document.querySelector(selector);
+    if (el) {
+      TweenLite.set(el, {
+        alpha  : 1,
+        display: 'block'
+      });
+    }
   }
 
   return {

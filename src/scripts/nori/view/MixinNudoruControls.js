@@ -30,11 +30,36 @@ let MixinNudoruControls = function () {
   }
 
   function alert(message, title) {
-    let alertInst = mbCreator().alert(title || 'Alert', message);
-
-    _alerts.push(alertInst);
-    return alertInst;
+    _alerts.push(customAlert(message, title || 'Alert', 'danger'));
   }
+
+  function positiveAlert(message, title) {
+    _alerts.push(customAlert(message, title, 'success'));
+  }
+
+  function negativeAlert(message, title) {
+    _alerts.push(customAlert(message, title, 'warning'));
+  }
+
+  function customAlert(message, title, type) {
+    return _messageBoxView.add({
+      title  : title,
+      content: '<p>' + message + '</p>',
+      type   : type,
+      modal  : false,
+      width  : 400,
+      buttons: [
+        {
+          label  : 'Close',
+          id     : 'Close',
+          type   : '',
+          icon   : 'times',
+          onClick: null
+        }
+      ]
+    });
+  }
+
 
   function closeAllAlerts() {
     _alerts.forEach(id => {
@@ -62,6 +87,8 @@ let MixinNudoruControls = function () {
     removeMessageBox        : removeMessageBox,
     addNotification         : addNotification,
     alert                   : alert,
+    positiveAlert           : positiveAlert,
+    negativeAlert           : negativeAlert,
     closeAllAlerts          : closeAllAlerts,
     notify                  : notify
   };

@@ -2464,7 +2464,7 @@ select, textarea, select.spaced {
   margin-bottom: 1.236rem;
 }
 
-.h1-alternate, #question__layer h1, .h2-alternate, .h3-alternate, #question__layer .question__choice, #game__localplayerstats div > ul li, #game__remoteplayerstats div > ul li, .h4-alternate, .h5-alternate, tr.row-header-inline td, .tooltip__coachmark .tooltip__item-content h1, .tooltip__coachmark .tooltip__item-content p, .h6-alternate {
+.h1-alternate, #question__layer h1, .h2-alternate, .game__sent-question h1, .game__sent-question li, .h3-alternate, #question__layer .question__choice, #game__localplayerstats div > ul li, #game__remoteplayerstats div > ul li, .h4-alternate, .h5-alternate, tr.row-header-inline td, .tooltip__coachmark .tooltip__item-content h1, .tooltip__coachmark .tooltip__item-content p, .h6-alternate {
   font-family: "Varela Round", "Helvetica Neue", Helvetica, Arial, sans-serif;
   margin-bottom: 1.236rem;
   padding-bottom: 0;
@@ -2476,7 +2476,7 @@ select, textarea, select.spaced {
   font-weight: 300;
 }
 
-.h2-alternate {
+.h2-alternate, .game__sent-question h1, .game__sent-question li {
   font-size: 1.618rem;
   font-weight: 300;
 }
@@ -4173,6 +4173,26 @@ body {
   height: 25px;
 }
 
+.messagebox__default {
+  border-radius: 0.309rem;
+}
+.messagebox__default .header h1 {
+  font-family: "Fredoka One", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 1.277rem;
+  padding: 0.618rem;
+}
+.messagebox__default .content p {
+  text-align: center;
+  font-size: 1.277rem;
+  color: #512d6d;
+  line-height: 1.854rem;
+}
+.messagebox__default .content .correct-answer {
+  font-weight: 700;
+  color: #93328e;
+  border-bottom: 1px solid #93328e;
+}
+
 .app__content {
   background-color: #00a9e0;
   background-image: url("../img/main-background.png");
@@ -4309,6 +4329,14 @@ body {
 }
 #game__localplayerstats div > ul li, #game__remoteplayerstats div > ul li {
   margin: 0;
+}
+
+.game__sent-question {
+  padding-top: 1.854rem;
+}
+.game__sent-question h1, .game__sent-question li {
+  text-shadow: 2px 1px 0px rgba(255, 255, 255, 0.5);
+  color: #512d6d;
 }
 
 #game__localplayerstats {

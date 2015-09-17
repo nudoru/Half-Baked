@@ -10,9 +10,16 @@ import * as Rxjs from '../../vendor/rxjs/rx.lite.min.js';
  */
 var Component = Nori.view().createComponentView({
 
-  storeQuestionChangeObs: null,
-  timerObservable: null,
-  maxSeconds     : 10,
+  storeQuestionChangeObs : null,
+  timerObservable        : null,
+  baseMaxSeconds         : 10,
+  d1MaxSeconds           : 10,
+  d2MaxSeconds           : 15,
+  d3MaxSeconds           : 20,
+  d4MaxSeconds           : 25,
+  d5MaxSeconds           : 30,
+  currentSecondTimerValue: 0,
+
 
   // cache this
   correctChoiceText: '',
@@ -43,10 +50,10 @@ var Component = Nori.view().createComponentView({
 
     if (correct) {
       this.scoreCorrect();
-      _appView.default.alert('You got it!', 'Correct!');
+      _appView.default.positiveAlert('You got it!', 'Correct!');
     } else {
       this.scoreIncorrect();
-      _appView.default.alert('You missed that one!<br><br>The correct answer was <strong>' + this.correctChoiceText + '</strong>.', 'Ooops!');
+      _appView.default.negativeAlert('The correct answer was <span class="correct-answer">' + this.correctChoiceText + '</span>', 'You missed that one!');
     }
   },
 
@@ -124,6 +131,7 @@ var Component = Nori.view().createComponentView({
    */
     render(state) {
     if (this.hasQuestion()) {
+      _appView.default.closeAllAlerts();
       return this.template()(state);
     }
 
@@ -157,16 +165,19 @@ var Component = Nori.view().createComponentView({
       this.clearTimer();
     }
 
-    this.updateTimerText(this.maxSeconds);
+    let viewState = this.getState();
+        this.currentSecondTimerValue   = this['d' + viewState.question.q_difficulty_level + 'MaxSeconds'];
 
-    this.timerObservable = Rxjs.Observable.interval(1000).take(this.maxSeconds).subscribe(this.onTimerTick.bind(this),
+    this.updateTimerText(this.currentSecondTimerValue);
+
+    this.timerObservable = Rxjs.Observable.interval(1000).take(this.currentSecondTimerValue).subscribe(this.onTimerTick.bind(this),
       function onErr() {
       },
       this.onTimerComplete.bind(this));
   },
 
   onTimerTick(second) {
-    this.updateTimerText(this.maxSeconds - (second + 1));
+    this.updateTimerText(this.currentSecondTimerValue - (second + 1));
   },
 
   updateTimerText(number) {
@@ -180,7 +191,7 @@ var Component = Nori.view().createComponentView({
   onTimerComplete() {
     this.clearTimer();
     this.scoreIncorrect();
-    _appView.default.alert('Time\'s up!<br><br>The correct answer was <strong>' + this.correctChoiceText + '</strong>.', 'Ooops!');
+    _appView.default.negativeAlert('The correct answer was <span class="correct-answer">' + this.correctChoiceText + '</span>.', 'Time\'s up!');
   },
 
   clearTimer() {

@@ -295,8 +295,11 @@ var App = Nori.createApplication({
   },
 
   handleOpponentAnswered: function handleOpponentAnswered(payload) {
-    var message = payload.result ? 'Your opponent got it right!' : 'Your opponent got it wrong!';
-    this.view.alert(message, 'Opponent\'s Answer');
+    if (payload.result) {
+      this.view.positiveAlert('Your opponent got it right!', 'Opponent\'s Answer');
+    } else {
+      this.view.negativeAlert('Your opponent got it wrong!', 'Opponent\'s Answer');
+    }
 
     var opponentAnswered = _appActions.opponentAnswered(payload.result);
 
@@ -324,14 +327,14 @@ var App = Nori.createApplication({
     var appState = this.store.getState(),
         question = this.store.getQuestionOfDifficulty(difficulty),
         setGamePlayState = _appActions.setGamePlayState(this.store.gamePlayStates[2]),
-        setCurrentQuestion = _appActions.setCurrentQuestion(null);
+        setSentQuestion = _appActions.setSentQuestion(question);
 
     this.socket.notifyServer(_socketIOEvents.SEND_QUESTION, {
       roomID: appState.session.roomID,
       question: question
     });
 
-    this.store.apply([setGamePlayState, setCurrentQuestion]);
+    this.store.apply([setGamePlayState, setSentQuestion]);
   },
 
   handleAnswerCorrect: function handleAnswerCorrect() {
@@ -368,6 +371,7 @@ exports['default'] = {
   SET_REMOTE_PLAYER_PROPS: 'SET_REMOTE_PLAYER_PROPS',
   RESET_GAME: 'RESET_GAME',
   SET_GAME_PLAY_STATE: 'SET_GAME_PLAY_STATE',
+  SET_SENT_QUESTION: 'SET_SENT_QUESTION',
   SET_CURRENT_QUESTION: 'SET_CURRENT_QUESTION',
   CLEAR_QUESTION: 'CLEAR_QUESTION',
   ANSWERED_CORRECT: 'ANSWERED_CORRECT',
@@ -455,6 +459,17 @@ var ActionCreator = {
       payload: {
         data: {
           currentQuestion: data
+        }
+      }
+    };
+  },
+
+  setSentQuestion: function setSentQuestion(data) {
+    return {
+      type: _actionConstants.SET_SENT_QUESTION,
+      payload: {
+        data: {
+          sentQuestion: data
         }
       }
     };
@@ -604,6 +619,7 @@ var AppStore = Nori.createStore({
       currentState: this.gameStates[0],
       currentPlayState: this.gamePlayStates[0],
       currentQuestion: null,
+      sentQuestion: this.createNullQuestion(),
       session: {
         socketIOID: '',
         roomID: '0000'
@@ -625,7 +641,6 @@ var AppStore = Nori.createStore({
 
   onQuestionsSuccess: function onQuestionsSuccess(data) {
     console.log('Questions fetched', data[0]);
-
     var updated = data.map(function (q) {
       // Strip tags from text
       q.q_text = _stringUtils.stripTags(_stringUtils.unescapeHTML(q.q_text));
@@ -655,6 +670,17 @@ var AppStore = Nori.createStore({
     // TODO set .used to true here
 
     return _arrayUtils.rndElement(possibleQuestions);
+  },
+
+  createNullQuestion: function createNullQuestion() {
+    return {
+      q_text: 'its a null',
+      q_options_1: '',
+      q_options_2: '',
+      q_options_3: '',
+      q_options_4: '',
+      q_correct_option: 0
+    };
   },
 
   createBlankPlayerObject: function createBlankPlayerObject() {
@@ -696,9 +722,11 @@ var AppStore = Nori.createStore({
       case _appActionConstants.RESET_GAME:
       case _appActionConstants.SET_GAME_PLAY_STATE:
       case _appActionConstants.SET_CURRENT_QUESTION:
+      case _appActionConstants.SET_SENT_QUESTION:
         return _.merge({}, state, event.payload.data);
       case _appActionConstants.CLEAR_QUESTION:
         state.currentQuestion = null;
+        state.sentQuestion = this.createNullQuestion();
         return state;
       case _appActionConstants.ANSWERED_CORRECT:
       case _appActionConstants.ANSWERED_INCORRECT:
@@ -824,6 +852,8 @@ var AppView = Nori.createView({
     this.initializeNudoruControls();
 
     this.configureViews();
+
+    this.subscribe('viewChange', this.handleViewChange.bind(this));
   },
 
   configureViews: function configureViews() {
@@ -836,6 +866,10 @@ var AppView = Nori.createView({
     this.mapStateToViewComponent(gameStates[2], 'waitingonplayer', _screenWaitingOnPlayerFactory['default']());
     this.mapStateToViewComponent(gameStates[3], 'game', _screenMainGameFactory['default']());
     this.mapStateToViewComponent(gameStates[4], 'gameover', _screenGameOverFactory['default']());
+  },
+
+  handleViewChange: function handleViewChange() {
+    this.closeAllAlerts();
   }
 
 });
@@ -1010,7 +1044,13 @@ var Component = Nori.view().createComponentView({
 
   storeQuestionChangeObs: null,
   timerObservable: null,
-  maxSeconds: 10,
+  baseMaxSeconds: 10,
+  d1MaxSeconds: 10,
+  d2MaxSeconds: 15,
+  d3MaxSeconds: 20,
+  d4MaxSeconds: 25,
+  d5MaxSeconds: 30,
+  currentSecondTimerValue: 0,
 
   // cache this
   correctChoiceText: '',
@@ -1041,10 +1081,10 @@ var Component = Nori.view().createComponentView({
 
     if (correct) {
       this.scoreCorrect();
-      _appView['default'].alert('You got it!', 'Correct!');
+      _appView['default'].positiveAlert('You got it!', 'Correct!');
     } else {
       this.scoreIncorrect();
-      _appView['default'].alert('You missed that one!<br><br>The correct answer was <strong>' + this.correctChoiceText + '</strong>.', 'Ooops!');
+      _appView['default'].negativeAlert('The correct answer was <span class="correct-answer">' + this.correctChoiceText + '</span>', 'You missed that one!');
     }
   },
 
@@ -1122,6 +1162,7 @@ var Component = Nori.view().createComponentView({
    */
   render: function render(state) {
     if (this.hasQuestion()) {
+      _appView['default'].closeAllAlerts();
       return this.template()(state);
     }
 
@@ -1155,13 +1196,16 @@ var Component = Nori.view().createComponentView({
       this.clearTimer();
     }
 
-    this.updateTimerText(this.maxSeconds);
+    var viewState = this.getState();
+    this.currentSecondTimerValue = this['d' + viewState.question.q_difficulty_level + 'MaxSeconds'];
 
-    this.timerObservable = Rxjs.Observable.interval(1000).take(this.maxSeconds).subscribe(this.onTimerTick.bind(this), function onErr() {}, this.onTimerComplete.bind(this));
+    this.updateTimerText(this.currentSecondTimerValue);
+
+    this.timerObservable = Rxjs.Observable.interval(1000).take(this.currentSecondTimerValue).subscribe(this.onTimerTick.bind(this), function onErr() {}, this.onTimerComplete.bind(this));
   },
 
   onTimerTick: function onTimerTick(second) {
-    this.updateTimerText(this.maxSeconds - (second + 1));
+    this.updateTimerText(this.currentSecondTimerValue - (second + 1));
   },
 
   updateTimerText: function updateTimerText(number) {
@@ -1175,7 +1219,7 @@ var Component = Nori.view().createComponentView({
   onTimerComplete: function onTimerComplete() {
     this.clearTimer();
     this.scoreIncorrect();
-    _appView['default'].alert('Time\'s up!<br><br>The correct answer was <strong>' + this.correctChoiceText + '</strong>.', 'Ooops!');
+    _appView['default'].negativeAlert('The correct answer was <span class="correct-answer">' + this.correctChoiceText + '</span>.', 'Time\'s up!');
   },
 
   clearTimer: function clearTimer() {
@@ -1400,6 +1444,7 @@ var Component = Nori.view().createComponentView({
    */
   initialize: function initialize(configProps) {
     //this.storeQuestionChangeObs = _appStore.subscribe('currentQuestionChange', this.handleQuestionChange.bind(this));
+    this.bindMap(_appStore);
     this.storeQuestionChangeObs = _appStore.subscribe('opponentAnswered', this.handleOpponentAnswered.bind(this));
   },
 
@@ -1480,6 +1525,7 @@ var Component = Nori.view().createComponentView({
   getInitialState: function getInitialState() {
     var appState = _appStore.getState();
     return {
+      sentQuestion: appState.sentQuestion,
       local: appState.localPlayer,
       remote: appState.remotePlayer
     };
@@ -1489,7 +1535,9 @@ var Component = Nori.view().createComponentView({
    * State change on bound stores (map, etc.) Return nextState object
    */
   componentWillUpdate: function componentWillUpdate() {
-    return {};
+    return {
+      sentQuestion: _appStore.getState().sentQuestion
+    };
   },
 
   /**
@@ -3586,17 +3634,23 @@ Object.defineProperty(exports, '__esModule', {
 var MixinDOMManipulation = function MixinDOMManipulation() {
 
   function hideEl(selector) {
-    TweenLite.set(document.querySelector(selector), {
-      alpha: 0,
-      display: 'none'
-    });
+    var el = document.querySelector(selector);
+    if (el) {
+      TweenLite.set(el, {
+        alpha: 0,
+        display: 'none'
+      });
+    }
   }
 
   function showEl(selector) {
-    TweenLite.set(document.querySelector(selector), {
-      alpha: 1,
-      display: 'block'
-    });
+    var el = document.querySelector(selector);
+    if (el) {
+      TweenLite.set(el, {
+        alpha: 1,
+        display: 'block'
+      });
+    }
   }
 
   return {
@@ -3855,10 +3909,32 @@ var MixinNudoruControls = function MixinNudoruControls() {
   }
 
   function alert(message, title) {
-    var alertInst = mbCreator().alert(title || 'Alert', message);
+    _alerts.push(customAlert(message, title || 'Alert', 'danger'));
+  }
 
-    _alerts.push(alertInst);
-    return alertInst;
+  function positiveAlert(message, title) {
+    _alerts.push(customAlert(message, title, 'success'));
+  }
+
+  function negativeAlert(message, title) {
+    _alerts.push(customAlert(message, title, 'warning'));
+  }
+
+  function customAlert(message, title, type) {
+    return _messageBoxView.add({
+      title: title,
+      content: '<p>' + message + '</p>',
+      type: type,
+      modal: false,
+      width: 400,
+      buttons: [{
+        label: 'Close',
+        id: 'Close',
+        type: '',
+        icon: 'times',
+        onClick: null
+      }]
+    });
   }
 
   function closeAllAlerts() {
@@ -3887,6 +3963,8 @@ var MixinNudoruControls = function MixinNudoruControls() {
     removeMessageBox: removeMessageBox,
     addNotification: addNotification,
     alert: alert,
+    positiveAlert: positiveAlert,
+    negativeAlert: negativeAlert,
     closeAllAlerts: closeAllAlerts,
     notify: notify
   };
@@ -4125,11 +4203,12 @@ var ViewComponent = function ViewComponent() {
 
   /**
    * Compare current state and next state to determine if updating should occur
+   * If the next state exists and it's not equal to the current state
    * @param nextState
    * @returns {*}
    */
   function shouldComponentUpdate(nextState) {
-    return is.existy(nextState);
+    return is.existy(nextState) && !_.isEqual(this.getState(), nextState);
   }
 
   /**
