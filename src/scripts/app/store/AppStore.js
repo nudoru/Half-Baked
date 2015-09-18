@@ -155,7 +155,6 @@ var AppStore = Nori.createStore({
    */
     mainStateReducer(state, event) {
     state = state || {};
-
     this.lastEventHandled = event.type;
 
     switch (event.type) {
@@ -188,7 +187,6 @@ var AppStore = Nori.createStore({
    */
     handleStateMutation() {
     let state = this.getState();
-
     // Pick out certain events for specific notifications.
     // Rather than blasting out a new store every time
     if (this.lastEventHandled === _appActionConstants.SET_LOCAL_PLAYER_PROPS) {

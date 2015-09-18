@@ -172,8 +172,8 @@ var App = Nori.createApplication({
     this.view.removeLoadingMessage();
 
     // View will show based on the current store state
-    this.store.setState({ currentState: 'MAIN_GAME' });
-    //this.store.setState({currentState: 'PLAYER_SELECT'});
+    //this.store.setState({currentState: 'MAIN_GAME'});
+    this.store.setState({ currentState: 'PLAYER_SELECT' });
     //this.store.setState({currentState: 'GAME_OVER'});
   },
 
@@ -711,7 +711,6 @@ var AppStore = Nori.createStore({
    */
   mainStateReducer: function mainStateReducer(state, event) {
     state = state || {};
-
     this.lastEventHandled = event.type;
 
     switch (event.type) {
@@ -744,7 +743,6 @@ var AppStore = Nori.createStore({
    */
   handleStateMutation: function handleStateMutation() {
     var state = this.getState();
-
     // Pick out certain events for specific notifications.
     // Rather than blasting out a new store every time
     if (this.lastEventHandled === _appActionConstants.SET_LOCAL_PLAYER_PROPS) {
