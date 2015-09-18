@@ -233,7 +233,11 @@ var AppStore = Nori.createStore({
     }
 
     return false;
-  }
+  },
+
+  isGameOver() {
+    return this.shouldGameEnd(this.getState());
+  },
 
 });
 

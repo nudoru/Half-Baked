@@ -172,8 +172,8 @@ var App = Nori.createApplication({
     this.view.removeLoadingMessage();
 
     // View will show based on the current store state
-    //this.store.setState({currentState: 'MAIN_GAME'});
-    this.store.setState({ currentState: 'PLAYER_SELECT' });
+    this.store.setState({ currentState: 'MAIN_GAME' });
+    //this.store.setState({currentState: 'PLAYER_SELECT'});
     //this.store.setState({currentState: 'GAME_OVER'});
   },
 
@@ -358,7 +358,7 @@ var App = Nori.createApplication({
 exports['default'] = App;
 module.exports = exports['default'];
 
-},{"../nori/action/ActionCreator.js":17,"../nori/service/SocketIO.js":19,"../nori/service/SocketIOEvents.js":20,"../nori/utils/Rx.js":27,"./action/ActionCreator.js":4,"./store/AppStore.js":5,"./view/AppView.js":6}],3:[function(require,module,exports){
+},{"../nori/action/ActionCreator.js":17,"../nori/service/SocketIO.js":19,"../nori/service/SocketIOEvents.js":20,"../nori/utils/Rx.js":28,"./action/ActionCreator.js":4,"./store/AppStore.js":5,"./view/AppView.js":6}],3:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -788,6 +788,10 @@ var AppStore = Nori.createStore({
     }
 
     return false;
+  },
+
+  isGameOver: function isGameOver() {
+    return this.shouldGameEnd(this.getState());
   }
 
 });
@@ -795,7 +799,7 @@ var AppStore = Nori.createStore({
 exports['default'] = AppStore();
 module.exports = exports['default'];
 
-},{"../../nori/action/ActionConstants.js":16,"../../nori/service/Rest.js":18,"../../nudoru/core/ArrayUtils.js":44,"../../nudoru/core/NumberUtils.js":45,"../../nudoru/core/StringUtils.js":47,"../action/ActionConstants.js":3}],6:[function(require,module,exports){
+},{"../../nori/action/ActionConstants.js":16,"../../nori/service/Rest.js":18,"../../nudoru/core/ArrayUtils.js":45,"../../nudoru/core/NumberUtils.js":46,"../../nudoru/core/StringUtils.js":48,"../action/ActionConstants.js":3}],6:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -877,7 +881,7 @@ var AppView = Nori.createView({
 exports['default'] = AppView();
 module.exports = exports['default'];
 
-},{"../../nori/view/ApplicationView.js":29,"../../nori/view/MixinNudoruControls.js":33,"../../nori/view/MixinStoreStateViews.js":34,"../store/AppStore.js":5,"./Screen.GameOver.js":9,"./Screen.MainGame.js":10,"./Screen.PlayerSelect.js":11,"./Screen.Title.js":12,"./Screen.WaitingOnPlayer.js":13}],7:[function(require,module,exports){
+},{"../../nori/view/ApplicationView.js":30,"../../nori/view/MixinNudoruControls.js":34,"../../nori/view/MixinStoreStateViews.js":35,"../store/AppStore.js":5,"./Screen.GameOver.js":9,"./Screen.MainGame.js":10,"./Screen.PlayerSelect.js":11,"./Screen.Title.js":12,"./Screen.WaitingOnPlayer.js":13}],7:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -1006,7 +1010,7 @@ var Component = Nori.view().createComponentView({
 exports['default'] = Component;
 module.exports = exports['default'];
 
-},{"../../nori/action/ActionCreator":17,"../../nori/utils/Templating.js":28,"../store/AppStore":5,"./AppView":6}],8:[function(require,module,exports){
+},{"../../nori/action/ActionCreator":17,"../../nori/utils/Templating.js":29,"../store/AppStore":5,"./AppView":6}],8:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -1081,10 +1085,8 @@ var Component = Nori.view().createComponentView({
 
     if (correct) {
       this.scoreCorrect();
-      _appView['default'].positiveAlert('You got it!', 'Correct!');
     } else {
       this.scoreIncorrect();
-      _appView['default'].negativeAlert('The correct answer was <span class="correct-answer">' + this.correctChoiceText + '</span>', 'You missed that one!');
     }
   },
 
@@ -1104,7 +1106,13 @@ var Component = Nori.view().createComponentView({
         answeredCorrect = _appActions.answeredCorrect(qPoints),
         clearQuestion = _appActions.clearQuestion();
 
+    this.clearTimer();
+
     _appStore.apply([playerAction, clearQuestion, answeredCorrect]);
+
+    if (!_appStore.isGameOver()) {
+      _appView['default'].positiveAlert('You got it!', 'Correct!');
+    }
   },
 
   scoreIncorrect: function scoreIncorrect() {
@@ -1119,7 +1127,13 @@ var Component = Nori.view().createComponentView({
         answeredIncorrect = _appActions.answeredIncorrect(qPoints),
         clearQuestion = _appActions.clearQuestion();
 
+    this.clearTimer();
+
     _appStore.apply([playerAction, clearQuestion, answeredIncorrect]);
+
+    if (!_appStore.isGameOver()) {
+      _appView['default'].negativeAlert('The correct answer was <span class="correct-answer">' + this.correctChoiceText + '</span>', 'You missed that one!');
+    }
   },
 
   getQuestion: function getQuestion() {
@@ -1215,11 +1229,8 @@ var Component = Nori.view().createComponentView({
     }
   },
 
-  // TODO move this logic up to pickChoice
   onTimerComplete: function onTimerComplete() {
-    this.clearTimer();
     this.scoreIncorrect();
-    _appView['default'].negativeAlert('The correct answer was <span class="correct-answer">' + this.correctChoiceText + '</span>.', 'Time\'s up!');
   },
 
   clearTimer: function clearTimer() {
@@ -1246,7 +1257,7 @@ var Component = Nori.view().createComponentView({
 exports['default'] = Component;
 module.exports = exports['default'];
 
-},{"../../nori/action/ActionCreator":17,"../../nori/utils/Templating.js":28,"../../vendor/rxjs/rx.lite.min.js":50,"../action/ActionCreator.js":4,"../store/AppStore":5,"./AppView":6}],9:[function(require,module,exports){
+},{"../../nori/action/ActionCreator":17,"../../nori/utils/Templating.js":29,"../../vendor/rxjs/rx.lite.min.js":51,"../action/ActionCreator.js":4,"../store/AppStore":5,"./AppView":6}],9:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -1381,7 +1392,7 @@ var Component = Nori.view().createComponentView({
 exports['default'] = Component;
 module.exports = exports['default'];
 
-},{"../../nori/action/ActionCreator":17,"../../nori/utils/Templating.js":28,"../../nori/view/MixinDOMManipulation.js":31,"../action/ActionCreator.js":4,"../store/AppStore":5,"./AppView":6}],10:[function(require,module,exports){
+},{"../../nori/action/ActionCreator":17,"../../nori/utils/Templating.js":29,"../../nori/view/MixinDOMManipulation.js":32,"../action/ActionCreator.js":4,"../store/AppStore":5,"./AppView":6}],10:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -1535,8 +1546,11 @@ var Component = Nori.view().createComponentView({
    * State change on bound stores (map, etc.) Return nextState object
    */
   componentWillUpdate: function componentWillUpdate() {
+    var appState = _appStore.getState();
     return {
-      sentQuestion: _appStore.getState().sentQuestion
+      sentQuestion: appState.sentQuestion,
+      local: appState.localPlayer,
+      remote: appState.remotePlayer
     };
   },
 
@@ -1563,7 +1577,7 @@ var Component = Nori.view().createComponentView({
 exports['default'] = Component;
 module.exports = exports['default'];
 
-},{"../../nori/action/ActionCreator":17,"../../nori/utils/Templating.js":28,"../../nori/view/MixinDOMManipulation.js":31,"../../nudoru/core/NumberUtils.js":45,"../App":2,"../action/ActionCreator.js":4,"../store/AppStore":5,"./AppView":6,"./Region.PlayerStats.js":7,"./Region.Question.js":8}],11:[function(require,module,exports){
+},{"../../nori/action/ActionCreator":17,"../../nori/utils/Templating.js":29,"../../nori/view/MixinDOMManipulation.js":32,"../../nudoru/core/NumberUtils.js":46,"../App":2,"../action/ActionCreator.js":4,"../store/AppStore":5,"./AppView":6,"./Region.PlayerStats.js":7,"./Region.Question.js":8}],11:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -1717,7 +1731,7 @@ var Component = Nori.view().createComponentView({
 exports['default'] = Component;
 module.exports = exports['default'];
 
-},{"../../nori/action/ActionCreator":17,"../../nori/utils/Templating.js":28,"../App":2,"../action/ActionCreator.js":4,"../store/AppStore":5,"./AppView":6}],12:[function(require,module,exports){
+},{"../../nori/action/ActionCreator":17,"../../nori/utils/Templating.js":29,"../App":2,"../action/ActionCreator.js":4,"../store/AppStore":5,"./AppView":6}],12:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -1799,7 +1813,7 @@ var Component = Nori.view().createComponentView({
 exports['default'] = Component;
 module.exports = exports['default'];
 
-},{"../../nori/action/ActionCreator":17,"../../nori/utils/Templating.js":28,"../store/AppStore":5,"./AppView":6}],13:[function(require,module,exports){
+},{"../../nori/action/ActionCreator":17,"../../nori/utils/Templating.js":29,"../store/AppStore":5,"./AppView":6}],13:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -1891,7 +1905,7 @@ var Component = Nori.view().createComponentView({
 exports['default'] = Component;
 module.exports = exports['default'];
 
-},{"../../nori/action/ActionCreator":17,"../../nori/utils/Templating.js":28,"../store/AppStore":5,"./AppView":6}],14:[function(require,module,exports){
+},{"../../nori/action/ActionCreator":17,"../../nori/utils/Templating.js":29,"../store/AppStore":5,"./AppView":6}],14:[function(require,module,exports){
 /**
  * Initial file for the Application
  */
@@ -1918,7 +1932,7 @@ module.exports = exports['default'];
   }
 })();
 
-},{"./app/App.js":2,"./nori/Nori.js":15,"./nudoru/browser/BrowserInfo.js":36}],15:[function(require,module,exports){
+},{"./app/App.js":2,"./nori/Nori.js":15,"./nudoru/browser/BrowserInfo.js":37}],15:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -2086,7 +2100,7 @@ var Nori = function Nori() {
 exports['default'] = Nori();
 module.exports = exports['default'];
 
-},{"./store/MixinReducerStore.js":22,"./utils/Dispatcher.js":23,"./utils/MixinObservableSubject.js":24,"./utils/Router.js":26,"./view/MixinComponentViews.js":30,"./view/MixinEventDelegator.js":32}],16:[function(require,module,exports){
+},{"./store/MixinReducerStore.js":22,"./utils/Dispatcher.js":24,"./utils/MixinObservableSubject.js":25,"./utils/Router.js":27,"./view/MixinComponentViews.js":31,"./view/MixinEventDelegator.js":33}],16:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -2284,7 +2298,7 @@ var Rest = function Rest() {
 exports['default'] = Rest();
 module.exports = exports['default'];
 
-},{"../../vendor/rxjs/rx.lite.min.js":50}],19:[function(require,module,exports){
+},{"../../vendor/rxjs/rx.lite.min.js":51}],19:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -2402,7 +2416,7 @@ var SocketIOConnector = function SocketIOConnector() {
 exports['default'] = SocketIOConnector();
 module.exports = exports['default'];
 
-},{"../../vendor/rxjs/rx.lite.min.js":50,"./SocketIOEvents.js":20}],20:[function(require,module,exports){
+},{"../../vendor/rxjs/rx.lite.min.js":51,"./SocketIOEvents.js":20}],20:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -2489,7 +2503,7 @@ var ImmutableMap = function ImmutableMap() {
 exports['default'] = ImmutableMap;
 module.exports = exports['default'];
 
-},{"../../vendor/immutable.min.js":49}],22:[function(require,module,exports){
+},{"../../vendor/immutable.min.js":50}],22:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -2651,7 +2665,41 @@ var MixinReducerStore = function MixinReducerStore() {
 exports['default'] = MixinReducerStore();
 module.exports = exports['default'];
 
-},{"../../nudoru/util/is.js":48,"./ImmutableMap.js":21}],23:[function(require,module,exports){
+},{"../../nudoru/util/is.js":49,"./ImmutableMap.js":21}],23:[function(require,module,exports){
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+/*  weak */
+
+var SimpleStore = function SimpleStore() {
+  var _internalState = Object.create(null);
+
+  /**
+   * Return a copy of the state
+   * @returns {void|*}
+   */
+  function getState() {
+    return _.assign({}, _internalState);
+  }
+
+  /**
+   * Sets the state
+   * @param nextState
+   */
+  function setState(nextState) {
+    _internalState = _.assign(_internalState, nextState);
+  }
+
+  return {
+    getState: getState,
+    setState: setState
+  };
+};
+
+exports["default"] = SimpleStore;
+module.exports = exports["default"];
+
+},{}],24:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -2896,7 +2944,7 @@ var Dispatcher = function Dispatcher() {
 exports['default'] = Dispatcher();
 module.exports = exports['default'];
 
-},{"../../vendor/rxjs/rx.lite.min.js":50}],24:[function(require,module,exports){
+},{"../../vendor/rxjs/rx.lite.min.js":51}],25:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -2983,7 +3031,7 @@ var MixinObservableSubject = function MixinObservableSubject() {
 exports['default'] = MixinObservableSubject;
 module.exports = exports['default'];
 
-},{"../../nudoru/util/is.js":48,"../../vendor/rxjs/rx.lite.min.js":50}],25:[function(require,module,exports){
+},{"../../nudoru/util/is.js":49,"../../vendor/rxjs/rx.lite.min.js":51}],26:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -3031,7 +3079,7 @@ var Renderer = function Renderer() {
 exports['default'] = Renderer();
 module.exports = exports['default'];
 
-},{"../../nudoru/browser/DOMUtils.js":37}],26:[function(require,module,exports){
+},{"../../nudoru/browser/DOMUtils.js":38}],27:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -3176,7 +3224,7 @@ r.initialize();
 exports['default'] = r;
 module.exports = exports['default'];
 
-},{"../../nudoru/core/ObjectUtils.js":46,"../../vendor/rxjs/rx.lite.min.js":50}],27:[function(require,module,exports){
+},{"../../nudoru/core/ObjectUtils.js":47,"../../vendor/rxjs/rx.lite.min.js":51}],28:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -3230,7 +3278,7 @@ exports['default'] = {
 };
 module.exports = exports['default'];
 
-},{"../../vendor/rxjs/rx.lite.min.js":50}],28:[function(require,module,exports){
+},{"../../vendor/rxjs/rx.lite.min.js":51}],29:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -3407,7 +3455,7 @@ var Templating = function Templating() {
 exports['default'] = Templating();
 module.exports = exports['default'];
 
-},{"../../nudoru/browser/DOMUtils.js":37}],29:[function(require,module,exports){
+},{"../../nudoru/browser/DOMUtils.js":38}],30:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -3491,7 +3539,7 @@ var ApplicationView = function ApplicationView() {
 exports['default'] = ApplicationView();
 module.exports = exports['default'];
 
-},{"../../nudoru/browser/DOMUtils.js":37,"../utils/Templating.js":28}],30:[function(require,module,exports){
+},{"../../nudoru/browser/DOMUtils.js":38,"../utils/Templating.js":29}],31:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -3516,9 +3564,9 @@ var _utilsMixinObservableSubjectJs = require('../utils/MixinObservableSubject.js
 
 var _observableFactory = _interopRequireWildcard(_utilsMixinObservableSubjectJs);
 
-var _storeImmutableMapJs = require('../store/ImmutableMap.js');
+var _storeSimpleStoreJs = require('../store/SimpleStore.js');
 
-var _stateObjFactory = _interopRequireWildcard(_storeImmutableMapJs);
+var _stateObjFactory = _interopRequireWildcard(_storeSimpleStoreJs);
 
 var MixinComponentViews = function MixinComponentViews() {
 
@@ -3627,7 +3675,7 @@ var MixinComponentViews = function MixinComponentViews() {
 exports['default'] = MixinComponentViews();
 module.exports = exports['default'];
 
-},{"../store/ImmutableMap.js":21,"../utils/MixinObservableSubject.js":24,"./MixinEventDelegator.js":32,"./ViewComponent.js":35}],31:[function(require,module,exports){
+},{"../store/SimpleStore.js":23,"../utils/MixinObservableSubject.js":25,"./MixinEventDelegator.js":33,"./ViewComponent.js":36}],32:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -3662,7 +3710,7 @@ var MixinDOMManipulation = function MixinDOMManipulation() {
 exports['default'] = MixinDOMManipulation();
 module.exports = exports['default'];
 
-},{}],32:[function(require,module,exports){
+},{}],33:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -3856,7 +3904,7 @@ var MixinEventDelegator = function MixinEventDelegator() {
 exports['default'] = MixinEventDelegator;
 module.exports = exports['default'];
 
-},{"../../nudoru/browser/BrowserInfo.js":36,"../../nudoru/util/is.js":48,"../utils/Rx.js":27}],33:[function(require,module,exports){
+},{"../../nudoru/browser/BrowserInfo.js":37,"../../nudoru/util/is.js":49,"../utils/Rx.js":28}],34:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -3973,7 +4021,7 @@ var MixinNudoruControls = function MixinNudoruControls() {
 exports['default'] = MixinNudoruControls();
 module.exports = exports['default'];
 
-},{"../../nudoru/components/MessageBoxCreator.js":39,"../../nudoru/components/MessageBoxView.js":40,"../../nudoru/components/ModalCoverView.js":41,"../../nudoru/components/ToastView.js":42,"../../nudoru/components/ToolTipView.js":43}],34:[function(require,module,exports){
+},{"../../nudoru/components/MessageBoxCreator.js":40,"../../nudoru/components/MessageBoxView.js":41,"../../nudoru/components/ModalCoverView.js":42,"../../nudoru/components/ToastView.js":43,"../../nudoru/components/ToolTipView.js":44}],35:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -4093,7 +4141,7 @@ var MixinStoreStateViews = function MixinStoreStateViews() {
 exports['default'] = MixinStoreStateViews();
 module.exports = exports['default'];
 
-},{}],35:[function(require,module,exports){
+},{}],36:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -4208,7 +4256,8 @@ var ViewComponent = function ViewComponent() {
    * @returns {*}
    */
   function shouldComponentUpdate(nextState) {
-    return is.existy(nextState) && !_.isEqual(this.getState(), nextState);
+    //console.log('Should update '+this.getID(),(_.isEqual(this.getState(), nextState) !== true));
+    return _.isEqual(this.getState(), nextState) !== true;
   }
 
   /**
@@ -4456,7 +4505,7 @@ var ViewComponent = function ViewComponent() {
 exports['default'] = ViewComponent;
 module.exports = exports['default'];
 
-},{"../../nudoru/util/is.js":48,"../utils/Renderer.js":25,"../utils/Templating.js":28}],36:[function(require,module,exports){
+},{"../../nudoru/util/is.js":49,"../utils/Renderer.js":26,"../utils/Templating.js":29}],37:[function(require,module,exports){
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
@@ -4525,7 +4574,7 @@ var browserInfo = {
 exports["default"] = browserInfo;
 module.exports = exports["default"];
 
-},{}],37:[function(require,module,exports){
+},{}],38:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -4735,7 +4784,7 @@ exports['default'] = {
 };
 module.exports = exports['default'];
 
-},{}],38:[function(require,module,exports){
+},{}],39:[function(require,module,exports){
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
@@ -4786,7 +4835,7 @@ exports["default"] = {
 };
 module.exports = exports["default"];
 
-},{}],39:[function(require,module,exports){
+},{}],40:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -4896,7 +4945,7 @@ var MessageBoxCreator = function MessageBoxCreator() {
 exports['default'] = MessageBoxCreator();
 module.exports = exports['default'];
 
-},{"./MessageBoxView":40}],40:[function(require,module,exports){
+},{"./MessageBoxView":41}],41:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -5198,7 +5247,7 @@ var MessageBoxView = function MessageBoxView() {
 exports['default'] = MessageBoxView();
 module.exports = exports['default'];
 
-},{"../../nori/utils/Templating.js":28,"../../nudoru/browser/BrowserInfo.js":36,"../../nudoru/browser/DOMUtils.js":37,"../../nudoru/browser/ThreeDTransforms.js":38,"../../vendor/rxjs/rx.lite.min.js":50,"./ModalCoverView.js":41}],41:[function(require,module,exports){
+},{"../../nori/utils/Templating.js":29,"../../nudoru/browser/BrowserInfo.js":37,"../../nudoru/browser/DOMUtils.js":38,"../../nudoru/browser/ThreeDTransforms.js":39,"../../vendor/rxjs/rx.lite.min.js":51,"./ModalCoverView.js":42}],42:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -5345,7 +5394,7 @@ var ModalCoverView = function ModalCoverView() {
 exports['default'] = ModalCoverView();
 module.exports = exports['default'];
 
-},{"../../nudoru/browser/BrowserInfo.js":36,"../../vendor/rxjs/rx.lite.min.js":50}],42:[function(require,module,exports){
+},{"../../nudoru/browser/BrowserInfo.js":37,"../../vendor/rxjs/rx.lite.min.js":51}],43:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -5508,7 +5557,7 @@ var ToastView = function ToastView() {
 exports['default'] = ToastView();
 module.exports = exports['default'];
 
-},{"../../nori/utils/Templating.js":28,"../../nudoru/browser/BrowserInfo.js":36,"../../nudoru/browser/DOMUtils.js":37,"../../nudoru/browser/ThreeDTransforms.js":38,"../../vendor/rxjs/rx.lite.min.js":50}],43:[function(require,module,exports){
+},{"../../nori/utils/Templating.js":29,"../../nudoru/browser/BrowserInfo.js":37,"../../nudoru/browser/DOMUtils.js":38,"../../nudoru/browser/ThreeDTransforms.js":39,"../../vendor/rxjs/rx.lite.min.js":51}],44:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -5790,7 +5839,7 @@ var ToolTipView = function ToolTipView() {
 exports['default'] = ToolTipView();
 module.exports = exports['default'];
 
-},{"../../nori/utils/Templating.js":28,"../../nudoru/browser/DOMUtils.js":37,"../../vendor/rxjs/rx.lite.min.js":50}],44:[function(require,module,exports){
+},{"../../nori/utils/Templating.js":29,"../../nudoru/browser/DOMUtils.js":38,"../../vendor/rxjs/rx.lite.min.js":51}],45:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -5883,7 +5932,7 @@ exports['default'] = {
 };
 module.exports = exports['default'];
 
-},{"./NumberUtils.js":45}],45:[function(require,module,exports){
+},{"./NumberUtils.js":46}],46:[function(require,module,exports){
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
@@ -5915,7 +5964,7 @@ exports["default"] = {
 };
 module.exports = exports["default"];
 
-},{}],46:[function(require,module,exports){
+},{}],47:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -6129,7 +6178,7 @@ exports['default'] = {
 };
 module.exports = exports['default'];
 
-},{}],47:[function(require,module,exports){
+},{}],48:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -6183,7 +6232,7 @@ exports['default'] = {
 };
 module.exports = exports['default'];
 
-},{}],48:[function(require,module,exports){
+},{}],49:[function(require,module,exports){
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
@@ -6231,7 +6280,7 @@ exports["default"] = {
 };
 module.exports = exports["default"];
 
-},{}],49:[function(require,module,exports){
+},{}],50:[function(require,module,exports){
 /**
  *  Copyright (c) 2014-2015, Facebook, Inc.
  *  All rights reserved.
@@ -7818,7 +7867,7 @@ module.exports = exports["default"];
     } }), l.prototype.has = un.includes, Xe(x, p.prototype), Xe(k, v.prototype), Xe(A, l.prototype), Xe(V, p.prototype), Xe(Y, v.prototype), Xe(Q, l.prototype);var an = { Iterable: _, Seq: O, Collection: H, Map: Lt, OrderedMap: Ie, List: fe, Stack: Ee, Set: Ae, OrderedSet: Le, Record: Ce, Range: Ye, Repeat: Qe, is: X, fromJS: F };return an;
 });
 
-},{}],50:[function(require,module,exports){
+},{}],51:[function(require,module,exports){
 (function (process,global){
 /* Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.*/
 (function (a) {

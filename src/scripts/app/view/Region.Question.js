@@ -50,10 +50,8 @@ var Component = Nori.view().createComponentView({
 
     if (correct) {
       this.scoreCorrect();
-      _appView.default.positiveAlert('You got it!', 'Correct!');
     } else {
       this.scoreIncorrect();
-      _appView.default.negativeAlert('The correct answer was <span class="correct-answer">' + this.correctChoiceText + '</span>', 'You missed that one!');
     }
   },
 
@@ -73,7 +71,13 @@ var Component = Nori.view().createComponentView({
         answeredCorrect = _appActions.answeredCorrect(qPoints),
         clearQuestion   = _appActions.clearQuestion();
 
+    this.clearTimer();
+
     _appStore.apply([playerAction, clearQuestion, answeredCorrect]);
+
+    if(!_appStore.isGameOver()) {
+      _appView.default.positiveAlert('You got it!', 'Correct!');
+    }
   },
 
   scoreIncorrect() {
@@ -88,7 +92,14 @@ var Component = Nori.view().createComponentView({
         answeredIncorrect = _appActions.answeredIncorrect(qPoints),
         clearQuestion     = _appActions.clearQuestion();
 
+    this.clearTimer();
+
     _appStore.apply([playerAction, clearQuestion, answeredIncorrect]);
+
+    if(!_appStore.isGameOver()) {
+      _appView.default.negativeAlert('The correct answer was <span class="correct-answer">' + this.correctChoiceText + '</span>', 'You missed that one!');
+    }
+
   },
 
   getQuestion() {
@@ -187,11 +198,8 @@ var Component = Nori.view().createComponentView({
     }
   },
 
-  // TODO move this logic up to pickChoice
   onTimerComplete() {
-    this.clearTimer();
     this.scoreIncorrect();
-    _appView.default.negativeAlert('The correct answer was <span class="correct-answer">' + this.correctChoiceText + '</span>.', 'Time\'s up!');
   },
 
   clearTimer() {

@@ -118,8 +118,11 @@ var Component = Nori.view().createComponentView({
    * State change on bound stores (map, etc.) Return nextState object
    */
     componentWillUpdate () {
+    let appState = _appStore.getState();
     return {
-      sentQuestion: _appStore.getState().sentQuestion
+      sentQuestion: appState.sentQuestion,
+      local      : appState.localPlayer,
+      remote     : appState.remotePlayer
     };
   },
 
