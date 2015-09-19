@@ -87,11 +87,28 @@ BEGIN Templates for Sub Views
     <div>
         <div class="game__question-difficulty">
             <h4>Choose a question to send to your opponent!</h4>
-            <button id="game_question-difficulty1">Difficulty 1</button>
-            <button id="game_question-difficulty2">Difficulty 2</button>
-            <button id="game_question-difficulty3">Difficulty 3</button>
-            <button id="game_question-difficulty4">Difficulty 4</button>
-            <button id="game_question-difficulty5">Difficulty 5</button>
+            <ul>
+                <li id="game_question-difficulty1">
+                    <img src="img/pastries/pastry_cookie01.png">
+                    <p>Difficulty 1</p>
+                </li>
+                <li id="game_question-difficulty2">
+                    <img src="img/pastries/pastry_poptart01.png">
+                    <p>Difficulty 2</p>
+                </li>
+                <li id="game_question-difficulty3">
+                    <img src="img/pastries/pastry_donut.png">
+                    <p>Difficulty 3</p>
+                </li>
+                <li id="game_question-difficulty4">
+                    <img src="img/pastries/pastry_pie.png">
+                    <p>Difficulty 4</p>
+                </li>
+                <li id="game_question-difficulty5">
+                    <img src="img/pastries/pastry_cupcake.png">
+                    <p>Difficulty 5</p>
+                </li>
+            </ul>
         </div>
         <div class="game__question-waiting text-center">
             <h2>Waiting on opponent to answer</h2>
@@ -119,7 +136,8 @@ BEGIN Templates for Sub Views
 <script id="game__playerstats" type="text/template">
     <div>
         <div class="game__playerstats-avatar">
-            <img src="img/players/{{playerImage}}">
+            <img class="game__playerstats-player" src="img/players/{{playerImage}}">
+            <img class="game__playerstats-food" src="img/pastries/{{questionDifficultyImage}}">
         </div>
         <ul>
             <li>{{name}}</li>

@@ -167,23 +167,42 @@ $button-height: 45px
   h4
     padding-top: $triple-base-line-height
     padding-bottom: $double-base-line-height*2
-  button
+  ul
+    margin: 0
+    padding: 0 33px
     position: relative
-    width: 160px
-    height: 220px
-    display: inline
-    background-image: none
-    background-color: #eee
-    border: 5px solid $light-purple
-    +box__shadow
-    border-radius: $base-line-height
-    color: $dark-purple
-    text-shadow: none
-    &:hover
+    list-style: none
+    li
+      +transition-all()
+      list-style: none
+      float: left
+      display: inline
+      width: 160px
+      height: 220px
       background-image: none
-      +box__shadow(10px, 10px)
-      border: 1px solid #fff
-      background-color: scale-lightness($light-purple, 80%)
+      background-color: #eee
+      border: 5px solid $light-purple
+      +box__shadow
+      border-radius: $base-line-height
+      cursor: pointer
+      &:hover
+        background-image: none
+        +box__shadow(10px, 10px)
+        border: 1px solid #fff
+        background-color: scale-lightness($light-purple, 80%)
+      img
+        pointer-events: none
+        padding-top: 50px
+        padding-bottom: $base-line-height
+      p
+        pointer-events: none
+        width: 100%
+        text-align: center
+        font-family: $font-header
+        color: $dark-purple
+        text-shadow: none
+        font-size: $ms-0
+
 
 #question__layer
   position: absolute
@@ -233,6 +252,7 @@ $button-height: 45px
     top: -3px
     width: 48px
     height: 48px
+  .game__playerstats-food
   div > ul
     @extend .list-plain-horizontal
     li
@@ -254,25 +274,35 @@ $button-height: 45px
   bottom: $base-line-height
   left: $base-line-height
   .game__playerstats-avatar
-    img
+    img.game__playerstats-player
       position: absolute
       top: -136px
       right: $triple-base-line-height
       width: 100px
       height: 138px
+    img.game__playerstats-food
+      position: absolute
+      top: -145px
+      right: -10px
+      transform: rotate(-125deg)
 
 #game__remoteplayerstats
   position: absolute
   bottom: $base-line-height
   right: $base-line-height
   .game__playerstats-avatar
-    img
+    img.game__playerstats-player
       position: absolute
       top: -91px
       left: $triple-base-line-height
       width: 67px
       height: 92px
       transform: scaleX(-1)
+    img.game__playerstats-food
+      position: absolute
+      top: -125px
+      left: -10px
+      transform: rotate(125deg)
 
 .gameover__score-avatar
   position: absolute

@@ -14,7 +14,7 @@ var Component = Nori.view().createComponentView({
    * initialized from app view
    * @param configProps
    */
-  initialize(configProps) {
+    initialize(configProps) {
     this.bindMap(_appStore); // Reducer store, map id string or map object
   },
 
@@ -23,48 +23,57 @@ var Component = Nori.view().createComponentView({
    * Create an object to be used to define events on DOM elements
    * @returns {}
    */
-  defineEvents() {
+    defineEvents() {
     return null;
   },
 
   /**
    * Set initial state properties. Call once on first render
    */
-  getInitialState() {
+    getInitialState() {
     return this.getHUDState();
   },
 
   /**
    * State change on bound stores (map, etc.) Return nextState object
    */
-  componentWillUpdate() {
+    componentWillUpdate() {
     return this.getHUDState();
   },
 
-  getHUDState: function() {
-    var appState = _appStore.getState(),
+  getHUDState: function () {
+    var appState         = _appStore.getState(),
+        difficultyImages = _appStore.difficultyImages,
         stats;
-
+    
     if (this.getConfigProps().target === 'local') {
-      stats = appState.localPlayer;
+      stats             = appState.localPlayer;
       stats.playerImage = this.getPlayerHUDImage(appState.currentPlayState, stats.appearance);
+      if (appState.currentQuestion) {
+        let dlevel                    = appState.currentQuestion.question.q_difficulty_level - 1;
+        stats.questionDifficultyImage = difficultyImages[dlevel];
+      } else {
+        stats.questionDifficultyImage = 'null.png';
+      }
     } else {
-      stats = appState.remotePlayer;
+      stats             = appState.remotePlayer;
       stats.playerImage = this.getPlayerHUDImage(this.getOppositePlayState(appState.currentPlayState), stats.appearance);
+      // there will be a dummy sent question rather than null
+      if (appState.sentQuestion.q_difficulty_level >= 0) {
+        let dlevel                    = appState.sentQuestion.q_difficulty_level - 1;
+        stats.questionDifficultyImage = difficultyImages[dlevel];
+      } else {
+        stats.questionDifficultyImage = 'null.png';
+      }
     }
-
     return stats;
   },
 
   //'CHOOSE', 'ANSWERING', 'WAITING'
-  getOppositePlayState: function(playState) {
-    //if(playState === 'CHOOSE') {
-    //  return 'WAITING';
-    //} else if(playState === 'ANSWERING') {
-    //  return 'WAITING';
-    //} else if(playState === 'WAITING') {
-    //  return 'ANSWERING'
-    //}
+  getOppositePlayState: function (playState) {
+    if (playState === 'WAITING') {
+      return 'ANSWERING'
+    }
     return 'WAITING';
   },
 
@@ -94,14 +103,14 @@ var Component = Nori.view().createComponentView({
   /**
    * Component HTML was attached to the DOM
    */
-  componentDidMount() {
+    componentDidMount() {
     //
   },
 
   /**
    * Component will be removed from the DOM
    */
-  componentWillUnmount() {
+    componentWillUnmount() {
     //
   }
 

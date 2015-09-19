@@ -150,21 +150,19 @@ let App = Nori.createApplication({
 
   pluckRemotePlayer(playersArry) {
     let localPlayerID = this.store.getState().localPlayer.id;
-    //console.log('filtering for', localPlayerID, playersArry);
     return playersArry.filter(function (player) {
       return player.id !== localPlayerID;
     })[0];
   },
 
   handleGameAbort(payload) {
-    this.view.alert(payload.payload, payload.type);
     this.store.apply(_appActions.resetGame());
+    this.view.alert(payload.payload, payload.type);
   },
 
   handleUpdatedPlayerDetails(payload) {
     let remotePlayer    = this.pluckRemotePlayer(payload.players),
-        setRemotePlayer = _appActions.setRemotePlayerProps(remotePlayer);
-
+        setRemotePlayer = _appActions.setRemotePlayerProps(remotePlayer)
     this.store.apply(setRemotePlayer);
   },
 

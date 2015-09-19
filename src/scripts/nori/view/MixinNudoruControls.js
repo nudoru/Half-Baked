@@ -29,8 +29,8 @@ let MixinNudoruControls = function () {
     _messageBoxView.remove(id);
   }
 
-  function alert(message, title) {
-    _alerts.push(customAlert(message, title || 'Alert', 'danger'));
+  function alert(message) {
+    _alerts.push(customAlert(message, 'Alert', 'danger'));
   }
 
   function positiveAlert(message, title) {

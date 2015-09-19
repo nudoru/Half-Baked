@@ -268,21 +268,19 @@ var App = Nori.createApplication({
 
   pluckRemotePlayer: function pluckRemotePlayer(playersArry) {
     var localPlayerID = this.store.getState().localPlayer.id;
-    //console.log('filtering for', localPlayerID, playersArry);
     return playersArry.filter(function (player) {
       return player.id !== localPlayerID;
     })[0];
   },
 
   handleGameAbort: function handleGameAbort(payload) {
-    this.view.alert(payload.payload, payload.type);
     this.store.apply(_appActions.resetGame());
+    this.view.alert(payload.payload, payload.type);
   },
 
   handleUpdatedPlayerDetails: function handleUpdatedPlayerDetails(payload) {
     var remotePlayer = this.pluckRemotePlayer(payload.players),
         setRemotePlayer = _appActions.setRemotePlayerProps(remotePlayer);
-
     this.store.apply(setRemotePlayer);
   },
 
@@ -594,6 +592,7 @@ var AppStore = Nori.createStore({
   gameStates: ['TITLE', 'PLAYER_SELECT', 'WAITING_ON_PLAYER', 'MAIN_GAME', 'GAME_OVER'],
   gamePlayStates: ['CHOOSE', 'ANSWERING', 'WAITING'],
   playerAppearences: ['Biege', 'Blue', 'Green', 'Pink', 'Yellow'],
+  difficultyImages: ['pastry_cookie01.png', 'pastry_poptart01.png', 'pastry_donut.png', 'pastry_pie.png', 'pastry_cupcake.png'],
   mockNames: ['Bagel', 'Loaf', 'Bready', 'Twist', 'Cupcake', 'Cake', 'Batter', 'Cookie', 'Donut', 'Bun', 'Biscuit', 'Flakey', 'Gluten', 'Croissant', 'Dough', 'Knead', 'Sugar', 'Flour', 'Butter', 'Yeast', 'Icing', 'Frost', 'Eggy', 'Fondant', 'Mix', 'Fluffy', 'Whip', 'Chip', 'Honey', 'Eclaire'],
 
   initialize: function initialize() {
@@ -674,7 +673,8 @@ var AppStore = Nori.createStore({
 
   createNullQuestion: function createNullQuestion() {
     return {
-      q_text: 'its a null',
+      q_text: 'Null question',
+      q_difficulty_level: -1,
       q_options_1: '',
       q_options_2: '',
       q_options_3: '',
@@ -695,7 +695,6 @@ var AppStore = Nori.createStore({
   createPlayerResetObject: function createPlayerResetObject() {
     return {
       health: 10,
-      behaviors: [],
       score: 0
     };
   },
@@ -720,16 +719,34 @@ var AppStore = Nori.createStore({
       case _appActionConstants.SET_SESSION_PROPS:
       case _appActionConstants.RESET_GAME:
       case _appActionConstants.SET_GAME_PLAY_STATE:
-      case _appActionConstants.SET_CURRENT_QUESTION:
-      case _appActionConstants.SET_SENT_QUESTION:
         return _.merge({}, state, event.payload.data);
-      case _appActionConstants.CLEAR_QUESTION:
-        state.currentQuestion = null;
-        state.sentQuestion = this.createNullQuestion();
-        return state;
+
+      case _appActionConstants.SET_CURRENT_QUESTION:
+        //if (event.payload.data.currentQuestion) {
+        //  var qDifficulty                = event.payload.data.currentQuestion.question.q_difficulty_level;
+        //  event.payload.data.localPlayer = {questionDifficultyImage: this.difficultyImages[qDifficulty - 1]};
+        //  event.payload.data.remotePlayer = {questionDifficultyImage: 'null.png'};
+        //}
+        return _.merge({}, state, event.payload.data);
+
+      case _appActionConstants.SET_SENT_QUESTION:
+        //if (event.payload.data.sentQuestion) {
+        //  var qDifficulty                 = event.payload.data.sentQuestion.q_difficulty_level;
+        //  event.payload.data.localPlayer = {questionDifficultyImage: 'null.png'};
+        //  event.payload.data.remotePlayer = {questionDifficultyImage: this.difficultyImages[qDifficulty - 1]};
+        //}
+        return _.merge({}, state, event.payload.data);
+
       case _appActionConstants.ANSWERED_CORRECT:
       case _appActionConstants.ANSWERED_INCORRECT:
       case _appActionConstants.OPPONENT_ANSWERED:
+      case _appActionConstants.CLEAR_QUESTION:
+        state.currentQuestion = null;
+        state.sentQuestion = this.createNullQuestion();
+        //state.localPlayer.questionDifficultyImage  = 'null.png';
+        //state.remotePlayer.questionDifficultyImage = 'null.png';
+        return state;
+
       case undefined:
         return state;
       default:
@@ -743,6 +760,7 @@ var AppStore = Nori.createStore({
    */
   handleStateMutation: function handleStateMutation() {
     var state = this.getState();
+
     // Pick out certain events for specific notifications.
     // Rather than blasting out a new store every time
     if (this.lastEventHandled === _appActionConstants.SET_LOCAL_PLAYER_PROPS) {
@@ -941,28 +959,37 @@ var Component = Nori.view().createComponentView({
 
   getHUDState: function getHUDState() {
     var appState = _appStore.getState(),
+        difficultyImages = _appStore.difficultyImages,
         stats;
 
     if (this.getConfigProps().target === 'local') {
       stats = appState.localPlayer;
       stats.playerImage = this.getPlayerHUDImage(appState.currentPlayState, stats.appearance);
+      if (appState.currentQuestion) {
+        var dlevel = appState.currentQuestion.question.q_difficulty_level - 1;
+        stats.questionDifficultyImage = difficultyImages[dlevel];
+      } else {
+        stats.questionDifficultyImage = 'null.png';
+      }
     } else {
       stats = appState.remotePlayer;
       stats.playerImage = this.getPlayerHUDImage(this.getOppositePlayState(appState.currentPlayState), stats.appearance);
+      // there will be a dummy sent question rather than null
+      if (appState.sentQuestion.q_difficulty_level >= 0) {
+        var dlevel = appState.sentQuestion.q_difficulty_level - 1;
+        stats.questionDifficultyImage = difficultyImages[dlevel];
+      } else {
+        stats.questionDifficultyImage = 'null.png';
+      }
     }
-
     return stats;
   },
 
   //'CHOOSE', 'ANSWERING', 'WAITING'
   getOppositePlayState: function getOppositePlayState(playState) {
-    //if(playState === 'CHOOSE') {
-    //  return 'WAITING';
-    //} else if(playState === 'ANSWERING') {
-    //  return 'WAITING';
-    //} else if(playState === 'WAITING') {
-    //  return 'ANSWERING'
-    //}
+    if (playState === 'WAITING') {
+      return 'ANSWERING';
+    }
     return 'WAITING';
   },
 
@@ -3954,8 +3981,8 @@ var MixinNudoruControls = function MixinNudoruControls() {
     _messageBoxView.remove(id);
   }
 
-  function alert(message, title) {
-    _alerts.push(customAlert(message, title || 'Alert', 'danger'));
+  function alert(message) {
+    _alerts.push(customAlert(message, 'Alert', 'danger'));
   }
 
   function positiveAlert(message, title) {

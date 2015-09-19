@@ -36,6 +36,7 @@ var AppStore = Nori.createStore({
   gameStates       : ['TITLE', 'PLAYER_SELECT', 'WAITING_ON_PLAYER', 'MAIN_GAME', 'GAME_OVER'],
   gamePlayStates   : ['CHOOSE', 'ANSWERING', 'WAITING'],
   playerAppearences: ['Biege', 'Blue', 'Green', 'Pink', 'Yellow'],
+  difficultyImages : ['pastry_cookie01.png', 'pastry_poptart01.png', 'pastry_donut.png', 'pastry_pie.png', 'pastry_cupcake.png'],
   mockNames        : ['Bagel', 'Loaf', 'Bready', 'Twist', 'Cupcake', 'Cake', 'Batter', 'Cookie', 'Donut', 'Bun', 'Biscuit', 'Flakey', 'Gluten', 'Croissant', 'Dough', 'Knead', 'Sugar', 'Flour', 'Butter', 'Yeast', 'Icing', 'Frost', 'Eggy', 'Fondant', 'Mix', 'Fluffy', 'Whip', 'Chip', 'Honey', 'Eclaire'],
 
   initialize() {
@@ -118,12 +119,13 @@ var AppStore = Nori.createStore({
 
   createNullQuestion() {
     return {
-      q_text: 'its a null',
-      q_options_1: '',
-      q_options_2: '',
-      q_options_3: '',
-      q_options_4: '',
-      q_correct_option: 0
+      q_text            : 'Null question',
+      q_difficulty_level: -1,
+      q_options_1       : '',
+      q_options_2       : '',
+      q_options_3       : '',
+      q_options_4       : '',
+      q_correct_option  : 0
     }
   },
 
@@ -138,9 +140,8 @@ var AppStore = Nori.createStore({
 
   createPlayerResetObject() {
     return {
-      health   : 10,
-      behaviors: [],
-      score    : 0
+      health: 10,
+      score : 0
     };
   },
 
@@ -154,7 +155,7 @@ var AppStore = Nori.createStore({
    * @returns {*}
    */
     mainStateReducer(state, event) {
-    state = state || {};
+    state                 = state || {};
     this.lastEventHandled = event.type;
 
     switch (event.type) {
@@ -164,16 +165,34 @@ var AppStore = Nori.createStore({
       case _appActionConstants.SET_SESSION_PROPS:
       case _appActionConstants.RESET_GAME:
       case _appActionConstants.SET_GAME_PLAY_STATE:
-      case _appActionConstants.SET_CURRENT_QUESTION:
-      case _appActionConstants.SET_SENT_QUESTION:
         return _.merge({}, state, event.payload.data);
-      case _appActionConstants.CLEAR_QUESTION:
-        state.currentQuestion = null;
-        state.sentQuestion    = this.createNullQuestion();
-        return state;
+
+      case _appActionConstants.SET_CURRENT_QUESTION:
+        //if (event.payload.data.currentQuestion) {
+        //  var qDifficulty                = event.payload.data.currentQuestion.question.q_difficulty_level;
+        //  event.payload.data.localPlayer = {questionDifficultyImage: this.difficultyImages[qDifficulty - 1]};
+        //  event.payload.data.remotePlayer = {questionDifficultyImage: 'null.png'};
+        //}
+        return _.merge({}, state, event.payload.data);
+
+      case _appActionConstants.SET_SENT_QUESTION:
+        //if (event.payload.data.sentQuestion) {
+        //  var qDifficulty                 = event.payload.data.sentQuestion.q_difficulty_level;
+        //  event.payload.data.localPlayer = {questionDifficultyImage: 'null.png'};
+        //  event.payload.data.remotePlayer = {questionDifficultyImage: this.difficultyImages[qDifficulty - 1]};
+        //}
+        return _.merge({}, state, event.payload.data);
+
       case _appActionConstants.ANSWERED_CORRECT:
       case _appActionConstants.ANSWERED_INCORRECT:
       case _appActionConstants.OPPONENT_ANSWERED:
+      case _appActionConstants.CLEAR_QUESTION:
+        state.currentQuestion = null;
+        state.sentQuestion    = this.createNullQuestion();
+        //state.localPlayer.questionDifficultyImage  = 'null.png';
+        //state.remotePlayer.questionDifficultyImage = 'null.png';
+        return state;
+
       case undefined:
         return state;
       default:
@@ -187,6 +206,7 @@ var AppStore = Nori.createStore({
    */
     handleStateMutation() {
     let state = this.getState();
+
     // Pick out certain events for specific notifications.
     // Rather than blasting out a new store every time
     if (this.lastEventHandled === _appActionConstants.SET_LOCAL_PLAYER_PROPS) {
