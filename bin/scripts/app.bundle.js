@@ -172,8 +172,8 @@ var App = Nori.createApplication({
     this.view.removeLoadingMessage();
 
     // View will show based on the current store state
-    //this.store.setState({currentState: 'MAIN_GAME'});
-    this.store.setState({ currentState: 'PLAYER_SELECT' });
+    this.store.setState({ currentState: 'MAIN_GAME' });
+    //this.store.setState({currentState: 'PLAYER_SELECT'});
     //this.store.setState({currentState: 'GAME_OVER'});
   },
 
@@ -3822,7 +3822,7 @@ var MixinEventDelegator = function MixinEventDelegator() {
               eventStr = convertMouseToTouchEventStr(eventStr);
             }
 
-            _eventSubscribers[evtStrings] = createHandler(selector, eventStr, eventHandler, autoForm);
+            _eventSubscribers[evtMap] = createHandler(selector, eventStr, eventHandler, autoForm);
           });
           /* jshint +W083 */
         })();
@@ -3906,7 +3906,6 @@ var MixinEventDelegator = function MixinEventDelegator() {
     }
 
     for (var event in _eventSubscribers) {
-
       if (_eventSubscribers[event]) {
         _eventSubscribers[event].dispose();
       } else {

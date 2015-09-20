@@ -109,8 +109,8 @@ var Component = Nori.view().createComponentView({
     let appState = _appStore.getState();
     return {
       sentQuestion: appState.sentQuestion,
-      local      : appState.localPlayer,
-      remote     : appState.remotePlayer
+      local       : appState.localPlayer,
+      remote      : appState.remotePlayer
     };
   },
 
@@ -121,19 +121,17 @@ var Component = Nori.view().createComponentView({
     let appState = _appStore.getState();
     return {
       sentQuestion: appState.sentQuestion,
-      local      : appState.localPlayer,
-      remote     : appState.remotePlayer
+      local       : appState.localPlayer,
+      remote      : appState.remotePlayer
     };
   },
 
   /**
    * Component HTML was attached to the DOM
    */
-    componentDidMount()
-  {
+    componentDidMount(){
     this.showDifficultyCards();
-  }
-  ,
+  },
 
   /**
    * Component will be removed from the DOM

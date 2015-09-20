@@ -45,7 +45,7 @@ var Component = Nori.view().createComponentView({
     var appState         = _appStore.getState(),
         difficultyImages = _appStore.difficultyImages,
         stats;
-    
+
     if (this.getConfigProps().target === 'local') {
       stats             = appState.localPlayer;
       stats.playerImage = this.getPlayerHUDImage(appState.currentPlayState, stats.appearance);
@@ -72,7 +72,7 @@ var Component = Nori.view().createComponentView({
   //'CHOOSE', 'ANSWERING', 'WAITING'
   getOppositePlayState: function (playState) {
     if (playState === 'WAITING') {
-      return 'ANSWERING'
+      return 'ANSWERING';
     }
     return 'WAITING';
   },

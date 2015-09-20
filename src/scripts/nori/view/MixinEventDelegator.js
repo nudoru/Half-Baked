@@ -67,7 +67,7 @@ let MixinEventDelegator = function () {
             eventStr = convertMouseToTouchEventStr(eventStr);
           }
 
-          _eventSubscribers[evtStrings] = createHandler(selector, eventStr, eventHandler, autoForm);
+          _eventSubscribers[evtMap] = createHandler(selector, eventStr, eventHandler, autoForm);
         });
         /* jshint +W083 */
       }
@@ -139,7 +139,6 @@ let MixinEventDelegator = function () {
     }
 
     for (var event in _eventSubscribers) {
-
       if(_eventSubscribers[event]) {
         _eventSubscribers[event].dispose();
       } else {

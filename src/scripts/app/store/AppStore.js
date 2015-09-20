@@ -126,7 +126,7 @@ var AppStore = Nori.createStore({
       q_options_3       : '',
       q_options_4       : '',
       q_correct_option  : 0
-    }
+    };
   },
 
   createBlankPlayerObject() {

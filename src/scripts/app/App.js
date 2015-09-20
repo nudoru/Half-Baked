@@ -54,8 +54,8 @@ let App = Nori.createApplication({
     this.view.removeLoadingMessage();
 
     // View will show based on the current store state
-    //this.store.setState({currentState: 'MAIN_GAME'});
-    this.store.setState({currentState: 'PLAYER_SELECT'});
+    this.store.setState({currentState: 'MAIN_GAME'});
+    //this.store.setState({currentState: 'PLAYER_SELECT'});
     //this.store.setState({currentState: 'GAME_OVER'});
   },
 
@@ -162,7 +162,7 @@ let App = Nori.createApplication({
 
   handleUpdatedPlayerDetails(payload) {
     let remotePlayer    = this.pluckRemotePlayer(payload.players),
-        setRemotePlayer = _appActions.setRemotePlayerProps(remotePlayer)
+        setRemotePlayer = _appActions.setRemotePlayerProps(remotePlayer);
     this.store.apply(setRemotePlayer);
   },
 
