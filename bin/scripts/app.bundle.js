@@ -1066,10 +1066,16 @@ var _vendorRxjsRxLiteMinJs = require('../../vendor/rxjs/rx.lite.min.js');
 
 var Rxjs = _interopRequireWildcard(_vendorRxjsRxLiteMinJs);
 
+var _noriViewMixinDOMManipulationJs = require('../../nori/view/MixinDOMManipulation.js');
+
+var _mixinDOMManipulation = _interopRequireWildcard(_noriViewMixinDOMManipulationJs);
+
 /**
  * Module for a dynamic application view for a route or a persistent view
  */
 var Component = Nori.view().createComponentView({
+
+  mixins: [_mixinDOMManipulation],
 
   storeQuestionChangeObs: null,
   timerObservable: null,
@@ -1225,9 +1231,29 @@ var Component = Nori.view().createComponentView({
   componentDidMount: function componentDidMount() {
     if (this.hasQuestion()) {
       this.startTimer();
+      this.animateChoices();
     } else {
       this.clearTimer();
     }
+  },
+
+  animateChoices: function animateChoices() {
+    var _this = this;
+
+    var choices = ['#question__choice_1', '#question__choice_2', '#question__choice_3', '#question__choice_4'];
+
+    choices.forEach(function (choice, i) {
+
+      TweenLite.set(choice, {
+        alpha: 0
+      });
+
+      _this.tweenTo(choice, 0.5, {
+        alpha: 1,
+        delay: i * 0.25,
+        ease: Quad.easeOut
+      });
+    });
   },
 
   startTimer: function startTimer() {
@@ -1269,6 +1295,7 @@ var Component = Nori.view().createComponentView({
    */
   componentWillUnmount: function componentWillUnmount() {
     this.clearTimer();
+    this.killTweens();
   },
 
   componentWillDispose: function componentWillDispose() {
@@ -1282,7 +1309,7 @@ var Component = Nori.view().createComponentView({
 exports['default'] = Component;
 module.exports = exports['default'];
 
-},{"../../nori/action/ActionCreator":17,"../../nori/utils/Templating.js":29,"../../vendor/rxjs/rx.lite.min.js":51,"../action/ActionCreator.js":4,"../store/AppStore":5,"./AppView":6}],9:[function(require,module,exports){
+},{"../../nori/action/ActionCreator":17,"../../nori/utils/Templating.js":29,"../../nori/view/MixinDOMManipulation.js":32,"../../vendor/rxjs/rx.lite.min.js":51,"../action/ActionCreator.js":4,"../store/AppStore":5,"./AppView":6}],9:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -1513,23 +1540,10 @@ var Component = Nori.view().createComponentView({
         _appStore.apply(_noriActions.changeStoreState({ currentState: _appStore.gameStates[4] }));
       },
       'click #game_question-difficulty1, click #game_question-difficulty2, click #game_question-difficulty3, click #game_question-difficulty4, click #game_question-difficulty5': this.sendQuestion.bind(this)
-      //'click #game__test': this.testPlayerUpdate.bind(this)
     };
   },
 
-  testPlayerUpdate: function testPlayerUpdate() {
-    var state = _appStore.getState(),
-        localScore = state.localPlayer.score + _numUtils.rndNumber(0, 5),
-        localHealth = state.localPlayer.health - 1;
-
-    _appStore.apply(_appActions.setLocalPlayerProps({
-      health: localHealth,
-      score: localScore
-    }));
-  },
-
   sendQuestion: function sendQuestion(evt) {
-    //console.log('Sending a question ...');
     _appView['default'].closeAllAlerts();
 
     var difficulty = parseInt(evt.target.getAttribute('id').substr(-1, 1));
@@ -1542,8 +1556,27 @@ var Component = Nori.view().createComponentView({
   },
 
   showDifficultyCards: function showDifficultyCards() {
+    var _this = this;
+
     this.hideEl('.game__question-waiting');
     this.showEl('.game__question-difficulty');
+
+    var cards = ['#game_question-difficulty1', '#game_question-difficulty2', '#game_question-difficulty3', '#game_question-difficulty4', '#game_question-difficulty5'];
+
+    cards.forEach(function (card, i) {
+
+      TweenLite.set(card, {
+        alpha: 0,
+        y: 100
+      });
+
+      _this.tweenTo(card, 0.5, {
+        alpha: 1,
+        y: 0,
+        delay: i * 0.25,
+        ease: Quad.easeOut
+      });
+    });
   },
 
   showWaitingMessage: function showWaitingMessage() {
@@ -1589,7 +1622,9 @@ var Component = Nori.view().createComponentView({
   /**
    * Component will be removed from the DOM
    */
-  componentWillUnmount: function componentWillUnmount() {},
+  componentWillUnmount: function componentWillUnmount() {
+    this.killTweens();
+  },
 
   componentWillDispose: function componentWillDispose() {
     if (this.storeQuestionChangeObs) {
@@ -3706,6 +3741,38 @@ Object.defineProperty(exports, '__esModule', {
 });
 var MixinDOMManipulation = function MixinDOMManipulation() {
 
+  var _tweenedEls = [];
+
+  function addTweenedElement(selector) {
+    var el = document.querySelector(selector);
+    if (el) {
+      _tweenedEls.push(el);
+      return el;
+    }
+    console.warn('MixinDOMManipulation, selector not found ' + selector);
+    return null;
+  }
+
+  function tweenTo(selector, dur, props) {
+    var el = addTweenedElement(selector);
+    //TweenLite.killTweensOf(el);
+    return TweenLite.to(el, dur, props);
+  }
+
+  function tweenFrom(selector, dur, props) {
+    var el = addTweenedElement(selector);
+    //TweenLite.killTweensOf(el);
+    return TweenLite.from(el, dur, props);
+  }
+
+  function killTweens() {
+    _tweenedEls.forEach(function (el) {
+      TweenLite.killTweensOf(el);
+    });
+
+    _tweenedEls = [];
+  }
+
   function hideEl(selector) {
     var el = document.querySelector(selector);
     if (el) {
@@ -3728,7 +3795,10 @@ var MixinDOMManipulation = function MixinDOMManipulation() {
 
   return {
     showEl: showEl,
-    hideEl: hideEl
+    hideEl: hideEl,
+    tweenTo: tweenTo,
+    tweenFrom: tweenFrom,
+    killTweens: killTweens
   };
 };
 
@@ -4136,8 +4206,8 @@ var MixinStoreStateViews = function MixinStoreStateViews() {
     this.showViewComponent(_currentViewID);
 
     // Transition new view in
-    TweenLite.set(_stateViewMountPoint, { alpha: 0 });
-    TweenLite.to(_stateViewMountPoint, 0.25, { alpha: 1, ease: Quad.easeIn });
+    //TweenLite.set(_stateViewMountPoint, {alpha: 0});
+    //TweenLite.to(_stateViewMountPoint, 0.25, {alpha: 1, ease: Quad.easeIn});
 
     this.notifySubscribersOf('viewChange', componentID);
   }

@@ -60,23 +60,10 @@ var Component = Nori.view().createComponentView({
         _appStore.apply(_noriActions.changeStoreState({currentState: _appStore.gameStates[4]}));
       },
       'click #game_question-difficulty1, click #game_question-difficulty2, click #game_question-difficulty3, click #game_question-difficulty4, click #game_question-difficulty5': this.sendQuestion.bind(this)
-      //'click #game__test': this.testPlayerUpdate.bind(this)
     };
   },
 
-  testPlayerUpdate() {
-    let state       = _appStore.getState(),
-        localScore  = state.localPlayer.score + _numUtils.rndNumber(0, 5),
-        localHealth = state.localPlayer.health - 1;
-
-    _appStore.apply(_appActions.setLocalPlayerProps({
-      health: localHealth,
-      score : localScore
-    }));
-  },
-
   sendQuestion(evt) {
-    //console.log('Sending a question ...');
     _appView.default.closeAllAlerts();
 
     var difficulty = parseInt(evt.target.getAttribute('id').substr(-1, 1));
@@ -91,6 +78,29 @@ var Component = Nori.view().createComponentView({
   showDifficultyCards() {
     this.hideEl('.game__question-waiting');
     this.showEl('.game__question-difficulty');
+
+    let cards = ['#game_question-difficulty1',
+      '#game_question-difficulty2',
+      '#game_question-difficulty3',
+      '#game_question-difficulty4',
+      '#game_question-difficulty5'];
+
+      cards.forEach((card, i) => {
+
+        TweenLite.set(card, {
+          alpha: 0,
+          y: 100
+        });
+
+        this.tweenTo(card, 0.5, {
+          alpha: 1,
+          y: 0,
+          delay: i * 0.25,
+          ease : Quad.easeOut
+        });
+
+      });
+
   },
 
   showWaitingMessage() {
@@ -136,13 +146,11 @@ var Component = Nori.view().createComponentView({
   /**
    * Component will be removed from the DOM
    */
-    componentWillUnmount()
-  {
-  }
-  ,
+    componentWillUnmount(){
+    this.killTweens();
+  },
 
-  componentWillDispose()
-  {
+  componentWillDispose(){
     if (this.storeQuestionChangeObs) {
       this.storeQuestionChangeObs.dispose();
     }

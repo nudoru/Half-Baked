@@ -4,11 +4,16 @@ import * as _appStore from '../store/AppStore';
 import * as _appActions from '../action/ActionCreator.js';
 import * as _template from '../../nori/utils/Templating.js';
 import * as Rxjs from '../../vendor/rxjs/rx.lite.min.js';
+import * as _mixinDOMManipulation from '../../nori/view/MixinDOMManipulation.js';
 
 /**
  * Module for a dynamic application view for a route or a persistent view
  */
 var Component = Nori.view().createComponentView({
+
+  mixins: [
+    _mixinDOMManipulation
+  ],
 
   storeQuestionChangeObs : null,
   timerObservable        : null,
@@ -166,9 +171,31 @@ var Component = Nori.view().createComponentView({
     componentDidMount() {
     if (this.hasQuestion()) {
       this.startTimer();
+      this.animateChoices();
     } else {
       this.clearTimer();
     }
+  },
+
+  animateChoices() {
+    let choices = ['#question__choice_1',
+      '#question__choice_2',
+      '#question__choice_3',
+      '#question__choice_4'];
+
+    choices.forEach((choice, i) => {
+
+      TweenLite.set(choice, {
+        alpha: 0,
+      });
+
+      this.tweenTo(choice, 0.5, {
+        alpha: 1,
+        delay: i * 0.25,
+        ease : Quad.easeOut
+      });
+
+    });
   },
 
   startTimer() {
@@ -213,6 +240,7 @@ var Component = Nori.view().createComponentView({
    */
     componentWillUnmount() {
     this.clearTimer();
+    this.killTweens();
   },
 
   componentWillDispose() {
