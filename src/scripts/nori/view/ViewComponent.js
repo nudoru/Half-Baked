@@ -197,6 +197,11 @@ var ViewComponent = function () {
   }
 
   function unmount() {
+    // Tweens are present in the MixinDOMManipulation. This is convenience
+    if(this.killTweens) {
+      this.killTweens();
+    }
+
     this.componentWillUnmount();
 
     //this.unmountRegions();

@@ -2464,7 +2464,7 @@ select, textarea, select.spaced {
   margin-bottom: 1.236rem;
 }
 
-.h1-alternate, #question__layer h1, .h2-alternate, .game__sent-question h1, .game__sent-question li, .h3-alternate, #question__layer .question__choice, #game__localplayerstats div > ul li, #game__remoteplayerstats div > ul li, .h4-alternate, .h5-alternate, tr.row-header-inline td, .tooltip__coachmark .tooltip__item-content h1, .tooltip__coachmark .tooltip__item-content p, .h6-alternate {
+.h1-alternate, #question__layer h1, .h2-alternate, .game__sent-question h1, .game__sent-question li, .h3-alternate, #question__layer .question__choice .question__choice-group .question__choice-text, #game__localplayerstats div > ul li, #game__remoteplayerstats div > ul li, .h4-alternate, .h5-alternate, tr.row-header-inline td, .tooltip__coachmark .tooltip__item-content h1, .tooltip__coachmark .tooltip__item-content p, .h6-alternate {
   font-family: "Varela Round", "Helvetica Neue", Helvetica, Arial, sans-serif;
   margin-bottom: 1.236rem;
   padding-bottom: 0;
@@ -2481,7 +2481,7 @@ select, textarea, select.spaced {
   font-weight: 300;
 }
 
-.h3-alternate, #question__layer .question__choice, #game__localplayerstats div > ul li, #game__remoteplayerstats div > ul li {
+.h3-alternate, #question__layer .question__choice .question__choice-group .question__choice-text, #game__localplayerstats div > ul li, #game__remoteplayerstats div > ul li {
   font-size: 1.277rem;
   font-weight: 300;
 }
@@ -4254,11 +4254,7 @@ body {
   list-style: none;
 }
 .game__question-difficulty ul li {
-  -moz-transition: all 0.25s ease-out;
-  -o-transition: all 0.25s ease-out;
-  -webkit-transition: all 0.25s ease-out;
-  -ms-transition: all 0.25s ease-out;
-  transition: all 0.25s ease-out;
+  position: relative;
   list-style: none;
   float: left;
   display: inline;
@@ -4315,10 +4311,35 @@ body {
   line-height: 2.472rem;
 }
 #question__layer ul.question__choices {
-  text-align: center;
+  width: 100%;
 }
 #question__layer .question__choice {
-  padding: 1.236rem;
+  margin: 0 auto 0.309rem auto;
+  width: 70%;
+  background-color: rgba(0, 0, 0, 0.25);
+  border-radius: 0.618rem;
+  cursor: pointer;
+}
+#question__layer .question__choice:hover {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+#question__layer .question__choice .question__choice-group {
+  display: table-row;
+  table-layout: fixed;
+  pointer-events: none;
+}
+#question__layer .question__choice .question__choice-group .question__choice-text {
+  display: table-cell;
+  vertical-align: middle;
+  width: 500px;
+  padding: 0.618rem;
+  padding-left: 1.236rem;
+}
+#question__layer .question__choice .question__choice-group .question__choice-letter {
+  display: table-cell;
+  vertical-align: middle;
+  width: 3.09rem;
+  height: 3.09rem;
 }
 
 #question__difficulty {
@@ -4339,6 +4360,14 @@ body {
   top: 1.545rem;
 }
 
+.game__sent-question {
+  padding-top: 1.854rem;
+}
+.game__sent-question h1, .game__sent-question li {
+  text-shadow: 2px 1px 0px rgba(255, 255, 255, 0.5);
+  color: #512d6d;
+}
+
 #game__localplayerstats, #game__remoteplayerstats {
   text-shadow: 2px 1px 0px #005eb8;
   background-color: rgba(0, 0, 0, 0.1);
@@ -4356,14 +4385,6 @@ body {
   margin: 0;
 }
 
-.game__sent-question {
-  padding-top: 1.854rem;
-}
-.game__sent-question h1, .game__sent-question li {
-  text-shadow: 2px 1px 0px rgba(255, 255, 255, 0.5);
-  color: #512d6d;
-}
-
 #game__localplayerstats {
   position: absolute;
   bottom: 0.618rem;
@@ -4372,14 +4393,14 @@ body {
 #game__localplayerstats .game__playerstats-avatar img.game__playerstats-player {
   position: absolute;
   top: -136px;
-  right: 1.854rem;
+  left: 1.854rem;
   width: 100px;
   height: 138px;
 }
 #game__localplayerstats .game__playerstats-avatar img.game__playerstats-food {
   position: absolute;
   top: -145px;
-  right: -10px;
+  left: 100px;
   transform: rotate(-125deg);
 }
 
@@ -4391,7 +4412,7 @@ body {
 #game__remoteplayerstats .game__playerstats-avatar img.game__playerstats-player {
   position: absolute;
   top: -91px;
-  left: 1.854rem;
+  right: 1.854rem;
   width: 67px;
   height: 92px;
   transform: scaleX(-1);
@@ -4399,7 +4420,7 @@ body {
 #game__remoteplayerstats .game__playerstats-avatar img.game__playerstats-food {
   position: absolute;
   top: -125px;
-  left: -10px;
+  right: 70px;
   transform: rotate(125deg);
 }
 

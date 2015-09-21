@@ -154,32 +154,38 @@ BEGIN Templates for Sub Views
 <script id="game" type="text/template">
     <div>
         <div class="game__question-difficulty">
-            <h4>Choose a question to send to your opponent!</h4>
+            <h4>Quick! Pick a question!</h4>
             <ul>
                 <li id="game_question-difficulty1">
                     <img src="img/pastries/pastry_cookie01.png">
+
                     <p>Difficulty 1</p>
                 </li>
                 <li id="game_question-difficulty2">
                     <img src="img/pastries/pastry_poptart01.png">
+
                     <p>Difficulty 2</p>
                 </li>
                 <li id="game_question-difficulty3">
                     <img src="img/pastries/pastry_donut.png">
+
                     <p>Difficulty 3</p>
                 </li>
                 <li id="game_question-difficulty4">
                     <img src="img/pastries/pastry_pie.png">
+
                     <p>Difficulty 4</p>
                 </li>
                 <li id="game_question-difficulty5">
                     <img src="img/pastries/pastry_cupcake.png">
+
                     <p>Difficulty 5</p>
                 </li>
             </ul>
         </div>
         <div class="game__question-waiting text-center">
-            <h2>Waiting on opponent to answer</h2>
+            <h2>You sent your opponent a question!</h2>
+
             <div class="game__sent-question">
                 <h1>{{sentQuestion.q_text}}</h1>
                 <ul class="list-plain">
@@ -204,8 +210,10 @@ BEGIN Templates for Sub Views
 <script id="game__playerstats" type="text/template">
     <div>
         <div class="game__playerstats-avatar">
-            <img class="game__playerstats-player" src="img/players/{{playerImage}}">
-            <img class="game__playerstats-food" src="img/pastries/{{questionDifficultyImage}}">
+            <img class="game__playerstats-player"
+                 src="img/players/{{playerImage}}">
+            <img class="game__playerstats-food"
+                 src="img/pastries/{{questionDifficultyImage}}">
         </div>
         <ul>
             <li>{{name}}</li>
@@ -235,25 +243,33 @@ BEGIN Templates for Sub Views
 
             <h1>{{question.q_text}}</h1>
             <ul class="list-plain question__choices">
-                <li>
-                    <button id="question__choice_1" class="question__choice">
-                        {{question.q_options_1}}
-                    </button>
+                <li id="question__choice_1" class="question__choice">
+                    <div class="question__choice-group">
+                        <img class="question__choice-letter"
+                             src="img/letter_A.png">
+                        <span class="question__choice-text">{{question.q_options_1}}</span>
+                    </div>
                 </li>
-                <li>
-                    <button id="question__choice_2" class="question__choice">
-                        {{question.q_options_2}}
-                    </button>
+                <li id="question__choice_2" class="question__choice">
+                    <div class="question__choice-group">
+                        <img class="question__choice-letter"
+                             src="img/letter_B.png">
+                        <span class="question__choice-text">{{question.q_options_2}}</span>
+                    </div>
                 </li>
-                <li>
-                    <button id="question__choice_3" class="question__choice">
-                        {{question.q_options_3}}
-                    </button>
+                <li id="question__choice_3" class="question__choice">
+                    <div class="question__choice-group">
+                        <img class="question__choice-letter"
+                             src="img/letter_C.png">
+                        <span class="question__choice-text">{{question.q_options_3}}</span>
+                    </div>
                 </li>
-                <li>
-                    <button id="question__choice_4" class="question__choice">
-                        {{question.q_options_4}}
-                    </button>
+                <li id="question__choice_4" class="question__choice">
+                    <div class="question__choice-group">
+                        <img class="question__choice-letter"
+                             src="img/letter_D.png">
+                        <span class="question__choice-text">{{question.q_options_4}}</span>
+                    </div>
                 </li>
             </ul>
 
@@ -275,8 +291,10 @@ BEGIN Templates for Sub Views
         <div class="game__area-shaded text-center">
             <div class="grid__12-container">
                 <div class="grid__row" style="overflow: visible;">
-                    <div class="grid__col-3 text-center" style="overflow: visible;">
-                        <img class="gameover__score-avatar" src="img/players/{{playerImage}}">
+                    <div class="grid__col-3 text-center"
+                         style="overflow: visible;">
+                        <img class="gameover__score-avatar"
+                             src="img/players/{{playerImage}}">
                     </div>
                     <div class="grid__col-9">
                         <div id="gameover__score">
@@ -293,7 +311,8 @@ BEGIN Templates for Sub Views
                                 </li>
                             </ul>
                         </div>
-                        <button id="gameover__button-replay" class="button-success">Play
+                        <button id="gameover__button-replay"
+                                class="button-success">Play
                             again?
                         </button>
                     </div>

@@ -54,8 +54,8 @@ let App = Nori.createApplication({
     this.view.removeLoadingMessage();
 
     // View will show based on the current store state
-    this.store.setState({currentState: 'MAIN_GAME'});
-    //this.store.setState({currentState: 'PLAYER_SELECT'});
+    //this.store.setState({currentState: 'MAIN_GAME'});
+    this.store.setState({currentState: 'PLAYER_SELECT'});
     //this.store.setState({currentState: 'GAME_OVER'});
   },
 
@@ -85,7 +85,7 @@ let App = Nori.createApplication({
       return;
     }
 
-    console.log("from Socket.IO server", payload);
+    //console.log("from Socket.IO server", payload);
 
     switch (payload.type) {
       case (_socketIOEvents.CONNECT):
@@ -167,7 +167,6 @@ let App = Nori.createApplication({
   },
 
   handleReceivedQuestion(question) {
-    //console.log('received a question!', question);
     let setGamePlayState   = _appActions.setGamePlayState(this.store.gamePlayStates[1]),
         setCurrentQuestion = _appActions.setCurrentQuestion(question);
 

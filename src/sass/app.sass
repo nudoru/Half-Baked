@@ -173,7 +173,7 @@ $button-height: 45px
     position: relative
     list-style: none
     li
-      +transition-all()
+      position: relative
       list-style: none
       float: left
       display: inline
@@ -203,7 +203,6 @@ $button-height: 45px
         text-shadow: none
         font-size: $ms-0
 
-
 #question__layer
   position: absolute
   top: 0
@@ -221,10 +220,31 @@ $button-height: 45px
     font-size: $ms-2
     line-height: $base-line-height*4
   ul.question__choices
-    text-align: center
+    width: 100%
   .question__choice
-    @extend .h3-alternate
-    padding: $double-base-line-height
+    margin: 0 auto $half-base-line-height auto
+    width: 70%
+    background-color: rgba(0,0,0,.25)
+    border-radius: $base-line-height
+    cursor: pointer
+    &:hover
+      background-color: rgba(0,0,0,.5)
+    .question__choice-group
+      display: table-row
+      table-layout: fixed
+      pointer-events: none
+      .question__choice-text
+        @extend .h3-alternate
+        display: table-cell
+        vertical-align: middle
+        width: 500px
+        padding: $base-line-height
+        padding-left: $double-base-line-height
+      .question__choice-letter
+        display: table-cell
+        vertical-align: middle
+        width: $base-line-height * 5
+        height: $base-line-height * 5
 
 #question__difficulty
   position: absolute
@@ -241,6 +261,16 @@ $button-height: 45px
   right: $base-line-height * 5
   top: $base-line-height * 2.5
 
+.game__sent-question
+  padding-top: $triple-base-line-height
+  h1, li
+    +text__shadow(1px, 0px, rgba(255,255,255,.5))
+    color: $dark-purple
+  h1
+    @extend .h2-alternate
+  li
+    @extend .h2-alternate
+
 #game__localplayerstats, #game__remoteplayerstats
   +text__shadow(1px)
   background-color: rgba(0,0,0,.1)
@@ -252,22 +282,11 @@ $button-height: 45px
     top: -3px
     width: 48px
     height: 48px
-  .game__playerstats-food
   div > ul
     @extend .list-plain-horizontal
     li
       @extend .h3-alternate
       margin: 0
-
-.game__sent-question
-  padding-top: $triple-base-line-height
-  h1, li
-    +text__shadow(1px, 0px, rgba(255,255,255,.5))
-    color: $dark-purple
-  h1
-    @extend .h2-alternate
-  li
-    @extend .h2-alternate
 
 #game__localplayerstats
   position: absolute
@@ -277,13 +296,13 @@ $button-height: 45px
     img.game__playerstats-player
       position: absolute
       top: -136px
-      right: $triple-base-line-height
+      left: $triple-base-line-height
       width: 100px
       height: 138px
     img.game__playerstats-food
       position: absolute
       top: -145px
-      right: -10px
+      left: 100px
       transform: rotate(-125deg)
 
 #game__remoteplayerstats
@@ -294,14 +313,14 @@ $button-height: 45px
     img.game__playerstats-player
       position: absolute
       top: -91px
-      left: $triple-base-line-height
+      right: $triple-base-line-height
       width: 67px
       height: 92px
       transform: scaleX(-1)
     img.game__playerstats-food
       position: absolute
       top: -125px
-      left: -10px
+      right: 70px
       transform: rotate(125deg)
 
 .gameover__score-avatar

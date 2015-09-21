@@ -2,11 +2,16 @@ import * as _noriActions from '../../nori/action/ActionCreator';
 import * as _appView from './AppView';
 import * as _appStore from '../store/AppStore';
 import * as _template from '../../nori/utils/Templating.js';
+import * as _mixinDOMManipulation from '../../nori/view/MixinDOMManipulation.js';
 
 /**
  * Module for a dynamic application view for a route or a persistent view
  */
 var Component = Nori.view().createComponentView({
+
+  mixins: [
+    _mixinDOMManipulation
+  ],
 
   /**
    * configProps passed in from region definition on parent View
@@ -42,7 +47,7 @@ var Component = Nori.view().createComponentView({
   },
 
   getHUDState: function () {
-    var appState         = _appStore.getState(),
+    let appState         = _appStore.getState(),
         difficultyImages = _appStore.difficultyImages,
         stats;
 
@@ -104,14 +109,41 @@ var Component = Nori.view().createComponentView({
    * Component HTML was attached to the DOM
    */
     componentDidMount() {
-    //
+    if (this.getState().questionDifficultyImage !== 'null.png') {
+      console.log('Player stats, Animating');
+      let foodImage = this.getDOMElement().querySelector('.game__playerstats-food'),
+          startX,
+          endX      = 0,
+          endRot;
+
+      if (this.getConfigProps().target === 'local') {
+        startX = 700;
+        endRot = -125;
+      } else {
+        startX = -700;
+        endRot = 125;
+      }
+
+      TweenLite.set(foodImage, {
+        x       : startX,
+        rotation: 0,
+        scale   : 2
+      });
+
+      this.tweenTo(foodImage, 1, {
+        scale   : 1,
+        x       : endX,
+        rotation: endRot,
+        ease    : Quad.easeIn
+      });
+      //console.log(this.getID(),this.getConfigProps().target,'tweening',foodImage);
+    }
   },
 
   /**
    * Component will be removed from the DOM
    */
     componentWillUnmount() {
-    //
   }
 
 });

@@ -15,7 +15,7 @@ var Component = Nori.view().createComponentView({
     _mixinDOMManipulation
   ],
 
-  storeQuestionChangeObs : null,
+  opponentAnswered       : null,
   timerObservable        : null,
   baseMaxSeconds         : 10,
   d1MaxSeconds           : 10,
@@ -24,7 +24,6 @@ var Component = Nori.view().createComponentView({
   d4MaxSeconds           : 25,
   d5MaxSeconds           : 30,
   currentSecondTimerValue: 0,
-
 
   // cache this
   correctChoiceText: '',
@@ -36,7 +35,7 @@ var Component = Nori.view().createComponentView({
    * @param configProps
    */
     initialize(configProps) {
-    this.storeQuestionChangeObs = _appStore.subscribe('currentQuestionChange', this.update.bind(this));
+    this.opponentAnswered = _appStore.subscribe('currentQuestionChange', this.update.bind(this));
   },
 
   /**
@@ -78,9 +77,9 @@ var Component = Nori.view().createComponentView({
 
     this.clearTimer();
 
-    _appStore.apply([playerAction, clearQuestion, answeredCorrect]);
+    _appStore.apply([clearQuestion, answeredCorrect, playerAction]);
 
-    if(!_appStore.isGameOver()) {
+    if (!_appStore.isGameOver()) {
       _appView.default.positiveAlert('You got it!', 'Correct!');
     }
   },
@@ -99,9 +98,9 @@ var Component = Nori.view().createComponentView({
 
     this.clearTimer();
 
-    _appStore.apply([playerAction, clearQuestion, answeredIncorrect]);
+    _appStore.apply([clearQuestion, answeredIncorrect, playerAction]);
 
-    if(!_appStore.isGameOver()) {
+    if (!_appStore.isGameOver()) {
       _appView.default.negativeAlert('The correct answer was <span class="correct-answer">' + this.correctChoiceText + '</span>', 'You missed that one!');
     }
 
@@ -185,14 +184,16 @@ var Component = Nori.view().createComponentView({
 
     choices.forEach((choice, i) => {
 
-      TweenLite.set(choice, {
+      this.tweenSet(choice, {
         alpha: 0,
+        y    : -100
       });
 
       this.tweenTo(choice, 0.5, {
         alpha: 1,
+        y    : 0,
         delay: i * 0.25,
-        ease : Quad.easeOut
+        ease : Back.easeOut
       });
 
     });
@@ -203,8 +204,8 @@ var Component = Nori.view().createComponentView({
       this.clearTimer();
     }
 
-    let viewState = this.getState();
-        this.currentSecondTimerValue   = this['d' + viewState.question.q_difficulty_level + 'MaxSeconds'];
+    let viewState                = this.getState();
+    this.currentSecondTimerValue = this['d' + viewState.question.q_difficulty_level + 'MaxSeconds'];
 
     this.updateTimerText(this.currentSecondTimerValue);
 
@@ -233,6 +234,8 @@ var Component = Nori.view().createComponentView({
     if (this.timerObservable) {
       this.timerObservable.dispose();
     }
+    this.currentSecondTimerValue = 0;
+    this.timerObservable         = null;
   },
 
   /**
@@ -244,8 +247,8 @@ var Component = Nori.view().createComponentView({
   },
 
   componentWillDispose() {
-    if (this.storeQuestionChangeObs) {
-      this.storeQuestionChangeObs.dispose();
+    if (this.opponentAnswered) {
+      this.opponentAnswered.dispose();
     }
   }
 

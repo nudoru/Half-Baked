@@ -172,8 +172,8 @@ var App = Nori.createApplication({
     this.view.removeLoadingMessage();
 
     // View will show based on the current store state
-    this.store.setState({ currentState: 'MAIN_GAME' });
-    //this.store.setState({currentState: 'PLAYER_SELECT'});
+    //this.store.setState({currentState: 'MAIN_GAME'});
+    this.store.setState({ currentState: 'PLAYER_SELECT' });
     //this.store.setState({currentState: 'GAME_OVER'});
   },
 
@@ -203,7 +203,7 @@ var App = Nori.createApplication({
       return;
     }
 
-    console.log("from Socket.IO server", payload);
+    //console.log("from Socket.IO server", payload);
 
     switch (payload.type) {
       case _socketIOEvents.CONNECT:
@@ -285,7 +285,6 @@ var App = Nori.createApplication({
   },
 
   handleReceivedQuestion: function handleReceivedQuestion(question) {
-    //console.log('received a question!', question);
     var setGamePlayState = _appActions.setGamePlayState(this.store.gamePlayStates[1]),
         setCurrentQuestion = _appActions.setCurrentQuestion(question);
 
@@ -649,8 +648,6 @@ var AppStore = Nori.createStore({
       return q;
     });
 
-    //updated.forEach(q => console.log(q.q_difficulty_level));
-
     this.setState({ questionBank: updated });
     this.notifySubscribersOf('storeInitialized');
   },
@@ -667,7 +664,6 @@ var AppStore = Nori.createStore({
     });
 
     // TODO set .used to true here
-
     return _arrayUtils.rndElement(possibleQuestions);
   },
 
@@ -722,19 +718,9 @@ var AppStore = Nori.createStore({
         return _.merge({}, state, event.payload.data);
 
       case _appActionConstants.SET_CURRENT_QUESTION:
-        //if (event.payload.data.currentQuestion) {
-        //  var qDifficulty                = event.payload.data.currentQuestion.question.q_difficulty_level;
-        //  event.payload.data.localPlayer = {questionDifficultyImage: this.difficultyImages[qDifficulty - 1]};
-        //  event.payload.data.remotePlayer = {questionDifficultyImage: 'null.png'};
-        //}
         return _.merge({}, state, event.payload.data);
 
       case _appActionConstants.SET_SENT_QUESTION:
-        //if (event.payload.data.sentQuestion) {
-        //  var qDifficulty                 = event.payload.data.sentQuestion.q_difficulty_level;
-        //  event.payload.data.localPlayer = {questionDifficultyImage: 'null.png'};
-        //  event.payload.data.remotePlayer = {questionDifficultyImage: this.difficultyImages[qDifficulty - 1]};
-        //}
         return _.merge({}, state, event.payload.data);
 
       case _appActionConstants.ANSWERED_CORRECT:
@@ -743,8 +729,6 @@ var AppStore = Nori.createStore({
       case _appActionConstants.CLEAR_QUESTION:
         state.currentQuestion = null;
         state.sentQuestion = this.createNullQuestion();
-        //state.localPlayer.questionDifficultyImage  = 'null.png';
-        //state.remotePlayer.questionDifficultyImage = 'null.png';
         return state;
 
       case undefined:
@@ -760,6 +744,8 @@ var AppStore = Nori.createStore({
    */
   handleStateMutation: function handleStateMutation() {
     var state = this.getState();
+
+    console.log(this.lastEventHandled);
 
     // Pick out certain events for specific notifications.
     // Rather than blasting out a new store every time
@@ -920,10 +906,16 @@ var _noriUtilsTemplatingJs = require('../../nori/utils/Templating.js');
 
 var _template = _interopRequireWildcard(_noriUtilsTemplatingJs);
 
+var _noriViewMixinDOMManipulationJs = require('../../nori/view/MixinDOMManipulation.js');
+
+var _mixinDOMManipulation = _interopRequireWildcard(_noriViewMixinDOMManipulationJs);
+
 /**
  * Module for a dynamic application view for a route or a persistent view
  */
 var Component = Nori.view().createComponentView({
+
+  mixins: [_mixinDOMManipulation],
 
   /**
    * configProps passed in from region definition on parent View
@@ -960,7 +952,7 @@ var Component = Nori.view().createComponentView({
   getHUDState: function getHUDState() {
     var appState = _appStore.getState(),
         difficultyImages = _appStore.difficultyImages,
-        stats;
+        stats = undefined;
 
     if (this.getConfigProps().target === 'local') {
       stats = appState.localPlayer;
@@ -1020,22 +1012,48 @@ var Component = Nori.view().createComponentView({
    * Component HTML was attached to the DOM
    */
   componentDidMount: function componentDidMount() {
-    //
+    if (this.getState().questionDifficultyImage !== 'null.png') {
+      console.log('Player stats, Animating');
+      var foodImage = this.getDOMElement().querySelector('.game__playerstats-food'),
+          startX = undefined,
+          endX = 0,
+          endRot = undefined;
+
+      if (this.getConfigProps().target === 'local') {
+        startX = 700;
+        endRot = -125;
+      } else {
+        startX = -700;
+        endRot = 125;
+      }
+
+      TweenLite.set(foodImage, {
+        x: startX,
+        rotation: 0,
+        scale: 2
+      });
+
+      this.tweenTo(foodImage, 1, {
+        scale: 1,
+        x: endX,
+        rotation: endRot,
+        ease: Quad.easeIn
+      });
+      //console.log(this.getID(),this.getConfigProps().target,'tweening',foodImage);
+    }
   },
 
   /**
    * Component will be removed from the DOM
    */
-  componentWillUnmount: function componentWillUnmount() {
-    //
-  }
+  componentWillUnmount: function componentWillUnmount() {}
 
 });
 
 exports['default'] = Component;
 module.exports = exports['default'];
 
-},{"../../nori/action/ActionCreator":17,"../../nori/utils/Templating.js":29,"../store/AppStore":5,"./AppView":6}],8:[function(require,module,exports){
+},{"../../nori/action/ActionCreator":17,"../../nori/utils/Templating.js":29,"../../nori/view/MixinDOMManipulation.js":32,"../store/AppStore":5,"./AppView":6}],8:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -1077,7 +1095,7 @@ var Component = Nori.view().createComponentView({
 
   mixins: [_mixinDOMManipulation],
 
-  storeQuestionChangeObs: null,
+  opponentAnswered: null,
   timerObservable: null,
   baseMaxSeconds: 10,
   d1MaxSeconds: 10,
@@ -1097,7 +1115,7 @@ var Component = Nori.view().createComponentView({
    * @param configProps
    */
   initialize: function initialize(configProps) {
-    this.storeQuestionChangeObs = _appStore.subscribe('currentQuestionChange', this.update.bind(this));
+    this.opponentAnswered = _appStore.subscribe('currentQuestionChange', this.update.bind(this));
   },
 
   /**
@@ -1139,7 +1157,7 @@ var Component = Nori.view().createComponentView({
 
     this.clearTimer();
 
-    _appStore.apply([playerAction, clearQuestion, answeredCorrect]);
+    _appStore.apply([clearQuestion, answeredCorrect, playerAction]);
 
     if (!_appStore.isGameOver()) {
       _appView['default'].positiveAlert('You got it!', 'Correct!');
@@ -1160,7 +1178,7 @@ var Component = Nori.view().createComponentView({
 
     this.clearTimer();
 
-    _appStore.apply([playerAction, clearQuestion, answeredIncorrect]);
+    _appStore.apply([clearQuestion, answeredIncorrect, playerAction]);
 
     if (!_appStore.isGameOver()) {
       _appView['default'].negativeAlert('The correct answer was <span class="correct-answer">' + this.correctChoiceText + '</span>', 'You missed that one!');
@@ -1244,14 +1262,16 @@ var Component = Nori.view().createComponentView({
 
     choices.forEach(function (choice, i) {
 
-      TweenLite.set(choice, {
-        alpha: 0
+      _this.tweenSet(choice, {
+        alpha: 0,
+        y: -100
       });
 
       _this.tweenTo(choice, 0.5, {
         alpha: 1,
+        y: 0,
         delay: i * 0.25,
-        ease: Quad.easeOut
+        ease: Back.easeOut
       });
     });
   },
@@ -1288,6 +1308,8 @@ var Component = Nori.view().createComponentView({
     if (this.timerObservable) {
       this.timerObservable.dispose();
     }
+    this.currentSecondTimerValue = 0;
+    this.timerObservable = null;
   },
 
   /**
@@ -1299,8 +1321,8 @@ var Component = Nori.view().createComponentView({
   },
 
   componentWillDispose: function componentWillDispose() {
-    if (this.storeQuestionChangeObs) {
-      this.storeQuestionChangeObs.dispose();
+    if (this.opponentAnswered) {
+      this.opponentAnswered.dispose();
     }
   }
 
@@ -1487,6 +1509,10 @@ var _nudoruCoreNumberUtilsJs = require('../../nudoru/core/NumberUtils.js');
 
 var _numUtils = _interopRequireWildcard(_nudoruCoreNumberUtilsJs);
 
+var _nudoruBrowserDOMUtilsJs = require('../../nudoru/browser/DOMUtils.js');
+
+var _domUtils = _interopRequireWildcard(_nudoruBrowserDOMUtilsJs);
+
 var _noriViewMixinDOMManipulationJs = require('../../nori/view/MixinDOMManipulation.js');
 
 var _mixinDOMManipulation = _interopRequireWildcard(_noriViewMixinDOMManipulationJs);
@@ -1498,7 +1524,8 @@ var Component = Nori.view().createComponentView({
 
   mixins: [_mixinDOMManipulation],
 
-  storeQuestionChangeObs: null,
+  currentQuestionChanged: null,
+  difficultyCardElIDs: ['#game_question-difficulty1', '#game_question-difficulty2', '#game_question-difficulty3', '#game_question-difficulty4', '#game_question-difficulty5'],
 
   /**
    * Initialize and bind, called once on first render. Parent component is
@@ -1506,9 +1533,8 @@ var Component = Nori.view().createComponentView({
    * @param configProps
    */
   initialize: function initialize(configProps) {
-    //this.storeQuestionChangeObs = _appStore.subscribe('currentQuestionChange', this.handleQuestionChange.bind(this));
     this.bindMap(_appStore);
-    this.storeQuestionChangeObs = _appStore.subscribe('opponentAnswered', this.handleOpponentAnswered.bind(this));
+    this.currentQuestionChanged = _appStore.subscribe('currentQuestionChange', this.handleOpponentAnswered.bind(this));
   },
 
   defineRegions: function defineRegions() {
@@ -1543,51 +1569,6 @@ var Component = Nori.view().createComponentView({
     };
   },
 
-  sendQuestion: function sendQuestion(evt) {
-    _appView['default'].closeAllAlerts();
-
-    var difficulty = parseInt(evt.target.getAttribute('id').substr(-1, 1));
-    _app['default'].sendQuestion(difficulty);
-    this.showWaitingMessage();
-  },
-
-  handleOpponentAnswered: function handleOpponentAnswered() {
-    this.showDifficultyCards();
-  },
-
-  showDifficultyCards: function showDifficultyCards() {
-    var _this = this;
-
-    this.hideEl('.game__question-waiting');
-    this.showEl('.game__question-difficulty');
-
-    var cards = ['#game_question-difficulty1', '#game_question-difficulty2', '#game_question-difficulty3', '#game_question-difficulty4', '#game_question-difficulty5'];
-
-    cards.forEach(function (card, i) {
-
-      TweenLite.set(card, {
-        alpha: 0,
-        y: 100
-      });
-
-      _this.tweenTo(card, 0.5, {
-        alpha: 1,
-        y: 0,
-        delay: i * 0.25,
-        ease: Quad.easeOut
-      });
-    });
-  },
-
-  showWaitingMessage: function showWaitingMessage() {
-    this.showEl('.game__question-waiting');
-    this.hideEl('.game__question-difficulty');
-  },
-
-  receiveQuestion: function receiveQuestion(questionObj) {
-    console.log('Main game view received question', questionObj);
-  },
-
   /**
    * Set initial state properties. Call once on first render
    */
@@ -1612,23 +1593,70 @@ var Component = Nori.view().createComponentView({
     };
   },
 
+  sendQuestion: function sendQuestion(evt) {
+    _appView['default'].closeAllAlerts();
+
+    var difficulty = parseInt(evt.target.getAttribute('id').substr(-1, 1));
+    _app['default'].sendQuestion(difficulty);
+    this.showWaitingMessage();
+  },
+
+  handleOpponentAnswered: function handleOpponentAnswered() {
+    this.showDifficultyCards();
+  },
+
   /**
    * Component HTML was attached to the DOM
    */
   componentDidMount: function componentDidMount() {
+    console.log('Main game did mount');
     this.showDifficultyCards();
+  },
+
+  showWaitingMessage: function showWaitingMessage() {
+    console.log('Main game, show waiting');
+    this.showEl('.game__question-waiting');
+    this.hideEl('.game__question-difficulty');
+  },
+
+  showDifficultyCards: function showDifficultyCards() {
+    console.log('Main game, Show cards');
+    this.hideEl('.game__question-waiting');
+    this.showEl('.game__question-difficulty');
+
+    this.animateDifficultyCards();
+  },
+
+  animateDifficultyCards: function animateDifficultyCards() {
+    var _this = this;
+
+    console.log('Animating difficulty cards');
+    this.difficultyCardElIDs.forEach(function (cardID, i) {
+
+      _this.tweenSet(cardID, {
+        alpha: 0,
+        y: 300
+      });
+
+      _this.tweenTo(cardID, 1, {
+        alpha: 1,
+        y: 0,
+        delay: i * 0.15,
+        ease: Back.easeOut
+      });
+    });
   },
 
   /**
    * Component will be removed from the DOM
    */
   componentWillUnmount: function componentWillUnmount() {
-    this.killTweens();
+    console.log('Main game will UNMOUNT');
   },
 
   componentWillDispose: function componentWillDispose() {
-    if (this.storeQuestionChangeObs) {
-      this.storeQuestionChangeObs.dispose();
+    if (this.currentQuestionChanged) {
+      this.currentQuestionChanged.dispose();
     }
   }
 
@@ -1637,7 +1665,7 @@ var Component = Nori.view().createComponentView({
 exports['default'] = Component;
 module.exports = exports['default'];
 
-},{"../../nori/action/ActionCreator":17,"../../nori/utils/Templating.js":29,"../../nori/view/MixinDOMManipulation.js":32,"../../nudoru/core/NumberUtils.js":46,"../App":2,"../action/ActionCreator.js":4,"../store/AppStore":5,"./AppView":6,"./Region.PlayerStats.js":7,"./Region.Question.js":8}],11:[function(require,module,exports){
+},{"../../nori/action/ActionCreator":17,"../../nori/utils/Templating.js":29,"../../nori/view/MixinDOMManipulation.js":32,"../../nudoru/browser/DOMUtils.js":38,"../../nudoru/core/NumberUtils.js":46,"../App":2,"../action/ActionCreator.js":4,"../store/AppStore":5,"./AppView":6,"./Region.PlayerStats.js":7,"./Region.Question.js":8}],11:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -3739,29 +3767,70 @@ module.exports = exports['default'];
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj['default'] = obj; return newObj; } }
+
+var _nudoruUtilIsJs = require('../../nudoru/util/is.js');
+
+var is = _interopRequireWildcard(_nudoruUtilIsJs);
+
 var MixinDOMManipulation = function MixinDOMManipulation() {
 
-  var _tweenedEls = [];
+  var _tweenedEls = [],
+      _zIndex = 1000;
+
+  function toTop(selector) {
+    var el = document.querySelector(selector);
+    if (el) {
+      el.style.zIndex = _zIndex++;
+    }
+    console.warn('MixinDOMManipulation, to top, selector not found ' + selector);
+  }
+
+  function getElement(selector) {
+    var el = undefined;
+
+    if (is.string(selector)) {
+      el = document.querySelector(selector);
+    } else {
+      el = selector;
+    }
+
+    if (!el) {
+      console.warn('MixinDOMManipulation, selector not found ' + selector);
+    }
+
+    return el;
+  }
 
   function addTweenedElement(selector) {
-    var el = document.querySelector(selector);
+    var el = getElement(selector);
+
     if (el) {
       _tweenedEls.push(el);
       return el;
     }
-    console.warn('MixinDOMManipulation, selector not found ' + selector);
+
     return null;
   }
 
   function tweenTo(selector, dur, props) {
     var el = addTweenedElement(selector);
-    //TweenLite.killTweensOf(el);
+
+    if (!el) {
+      return;
+    }
+    TweenLite.killTweensOf(el);
     return TweenLite.to(el, dur, props);
   }
 
   function tweenFrom(selector, dur, props) {
     var el = addTweenedElement(selector);
-    //TweenLite.killTweensOf(el);
+
+    if (!el) {
+      return;
+    }
+    TweenLite.killTweensOf(el);
     return TweenLite.from(el, dur, props);
   }
 
@@ -3774,28 +3843,31 @@ var MixinDOMManipulation = function MixinDOMManipulation() {
   }
 
   function hideEl(selector) {
-    var el = document.querySelector(selector);
-    if (el) {
-      TweenLite.set(el, {
-        alpha: 0,
-        display: 'none'
-      });
-    }
+    tweenSet(selector, {
+      alpha: 0,
+      display: 'none'
+    });
   }
 
   function showEl(selector) {
-    var el = document.querySelector(selector);
+    tweenSet(selector, {
+      alpha: 1,
+      display: 'block'
+    });
+  }
+
+  function tweenSet(selector, props) {
+    var el = getElement(selector);
     if (el) {
-      TweenLite.set(el, {
-        alpha: 1,
-        display: 'block'
-      });
+      TweenLite.set(el, props);
     }
   }
 
   return {
+    toTop: toTop,
     showEl: showEl,
     hideEl: hideEl,
+    tweenSet: tweenSet,
     tweenTo: tweenTo,
     tweenFrom: tweenFrom,
     killTweens: killTweens
@@ -3805,7 +3877,7 @@ var MixinDOMManipulation = function MixinDOMManipulation() {
 exports['default'] = MixinDOMManipulation();
 module.exports = exports['default'];
 
-},{}],33:[function(require,module,exports){
+},{"../../nudoru/util/is.js":49}],33:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -4447,6 +4519,11 @@ var ViewComponent = function ViewComponent() {
   }
 
   function unmount() {
+    // Tweens are present in the MixinDOMManipulation. This is convenience
+    if (this.killTweens) {
+      this.killTweens();
+    }
+
     this.componentWillUnmount();
 
     //this.unmountRegions();

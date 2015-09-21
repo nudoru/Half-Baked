@@ -7,6 +7,7 @@ import * as _appActions from '../action/ActionCreator.js';
 import * as _regionPlayerStats from './Region.PlayerStats.js';
 import * as _regionQuestion from './Region.Question.js';
 import * as _numUtils from '../../nudoru/core/NumberUtils.js';
+import * as _domUtils from '../../nudoru/browser/DOMUtils.js';
 import * as _mixinDOMManipulation from '../../nori/view/MixinDOMManipulation.js';
 
 /**
@@ -18,7 +19,8 @@ var Component = Nori.view().createComponentView({
     _mixinDOMManipulation
   ],
 
-  storeQuestionChangeObs: null,
+  currentQuestionChanged: null,
+  difficultyCardElIDs   : ['#game_question-difficulty1', '#game_question-difficulty2', '#game_question-difficulty3', '#game_question-difficulty4', '#game_question-difficulty5'],
 
   /**
    * Initialize and bind, called once on first render. Parent component is
@@ -26,9 +28,8 @@ var Component = Nori.view().createComponentView({
    * @param configProps
    */
     initialize (configProps) {
-    //this.storeQuestionChangeObs = _appStore.subscribe('currentQuestionChange', this.handleQuestionChange.bind(this));
     this.bindMap(_appStore);
-    this.storeQuestionChangeObs = _appStore.subscribe('opponentAnswered', this.handleOpponentAnswered.bind(this));
+    this.currentQuestionChanged = _appStore.subscribe('currentQuestionChange', this.handleOpponentAnswered.bind(this));
   },
 
   defineRegions () {
@@ -63,55 +64,6 @@ var Component = Nori.view().createComponentView({
     };
   },
 
-  sendQuestion(evt) {
-    _appView.default.closeAllAlerts();
-
-    var difficulty = parseInt(evt.target.getAttribute('id').substr(-1, 1));
-    _app.default.sendQuestion(difficulty);
-    this.showWaitingMessage();
-  },
-
-  handleOpponentAnswered() {
-    this.showDifficultyCards();
-  },
-
-  showDifficultyCards() {
-    this.hideEl('.game__question-waiting');
-    this.showEl('.game__question-difficulty');
-
-    let cards = ['#game_question-difficulty1',
-      '#game_question-difficulty2',
-      '#game_question-difficulty3',
-      '#game_question-difficulty4',
-      '#game_question-difficulty5'];
-
-      cards.forEach((card, i) => {
-
-        TweenLite.set(card, {
-          alpha: 0,
-          y: 100
-        });
-
-        this.tweenTo(card, 0.5, {
-          alpha: 1,
-          y: 0,
-          delay: i * 0.25,
-          ease : Quad.easeOut
-        });
-
-      });
-
-  },
-
-  showWaitingMessage() {
-    this.showEl('.game__question-waiting');
-    this.hideEl('.game__question-difficulty');
-  },
-
-  receiveQuestion(questionObj) {
-    console.log('Main game view received question', questionObj);
-  },
-
   /**
    * Set initial state properties. Call once on first render
    */
@@ -136,23 +88,70 @@ var Component = Nori.view().createComponentView({
     };
   },
 
+  sendQuestion(evt) {
+    _appView.default.closeAllAlerts();
+
+    var difficulty = parseInt(evt.target.getAttribute('id').substr(-1, 1));
+    _app.default.sendQuestion(difficulty);
+    this.showWaitingMessage();
+  },
+
+  handleOpponentAnswered() {
+    this.showDifficultyCards();
+  },
+
   /**
    * Component HTML was attached to the DOM
    */
     componentDidMount(){
+    console.log('Main game did mount');
     this.showDifficultyCards();
+  },
+
+  showWaitingMessage() {
+    console.log('Main game, show waiting');
+    this.showEl('.game__question-waiting');
+    this.hideEl('.game__question-difficulty');
+  },
+
+  showDifficultyCards() {
+    console.log('Main game, Show cards');
+    this.hideEl('.game__question-waiting');
+    this.showEl('.game__question-difficulty');
+
+    this.animateDifficultyCards();
+
+  },
+
+  animateDifficultyCards() {
+    console.log('Animating difficulty cards');
+    this.difficultyCardElIDs.forEach((cardID, i) => {
+
+      this.tweenSet(cardID, {
+        alpha: 0,
+        y    : 300
+      });
+
+      this.tweenTo(cardID, 1, {
+        alpha: 1,
+        y    : 0,
+        delay: i * 0.15,
+        ease : Back.easeOut
+      });
+
+    });
   },
 
   /**
    * Component will be removed from the DOM
    */
     componentWillUnmount(){
-    this.killTweens();
+    console.log('Main game will UNMOUNT');
   },
 
   componentWillDispose(){
-    if (this.storeQuestionChangeObs) {
-      this.storeQuestionChangeObs.dispose();
+    if (this.currentQuestionChanged) {
+      this.currentQuestionChanged.dispose();
     }
   }
 

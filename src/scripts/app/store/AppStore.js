@@ -93,8 +93,6 @@ var AppStore = Nori.createStore({
       return q;
     });
 
-    //updated.forEach(q => console.log(q.q_difficulty_level));
-
     this.setState({questionBank: updated});
     this.notifySubscribersOf('storeInitialized');
   },
@@ -113,7 +111,6 @@ var AppStore = Nori.createStore({
       });
 
     // TODO set .used to true here
-
     return _arrayUtils.rndElement(possibleQuestions);
   },
 
@@ -168,19 +165,9 @@ var AppStore = Nori.createStore({
         return _.merge({}, state, event.payload.data);
 
       case _appActionConstants.SET_CURRENT_QUESTION:
-        //if (event.payload.data.currentQuestion) {
-        //  var qDifficulty                = event.payload.data.currentQuestion.question.q_difficulty_level;
-        //  event.payload.data.localPlayer = {questionDifficultyImage: this.difficultyImages[qDifficulty - 1]};
-        //  event.payload.data.remotePlayer = {questionDifficultyImage: 'null.png'};
-        //}
         return _.merge({}, state, event.payload.data);
 
       case _appActionConstants.SET_SENT_QUESTION:
-        //if (event.payload.data.sentQuestion) {
-        //  var qDifficulty                 = event.payload.data.sentQuestion.q_difficulty_level;
-        //  event.payload.data.localPlayer = {questionDifficultyImage: 'null.png'};
-        //  event.payload.data.remotePlayer = {questionDifficultyImage: this.difficultyImages[qDifficulty - 1]};
-        //}
         return _.merge({}, state, event.payload.data);
 
       case _appActionConstants.ANSWERED_CORRECT:
@@ -189,8 +176,6 @@ var AppStore = Nori.createStore({
       case _appActionConstants.CLEAR_QUESTION:
         state.currentQuestion = null;
         state.sentQuestion    = this.createNullQuestion();
-        //state.localPlayer.questionDifficultyImage  = 'null.png';
-        //state.remotePlayer.questionDifficultyImage = 'null.png';
         return state;
 
       case undefined:
@@ -206,6 +191,8 @@ var AppStore = Nori.createStore({
    */
     handleStateMutation() {
     let state = this.getState();
+
+    console.log(this.lastEventHandled);
 
     // Pick out certain events for specific notifications.
     // Rather than blasting out a new store every time
