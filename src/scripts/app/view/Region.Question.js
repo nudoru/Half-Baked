@@ -5,7 +5,6 @@ import * as _appActions from '../action/ActionCreator.js';
 import * as _template from '../../nori/utils/Templating.js';
 import * as Rxjs from '../../vendor/rxjs/rx.lite.min.js';
 import * as _mixinDOMManipulation from '../../nori/view/MixinDOMManipulation.js';
-
 /**
  * Module for a dynamic application view for a route or a persistent view
  */
@@ -79,6 +78,7 @@ var Component = Nori.view().createComponentView({
 
     _appStore.apply([clearQuestion, answeredCorrect, playerAction]);
 
+    // TODO not working
     if (!_appStore.isGameOver()) {
       _appView.default.positiveAlert('You got it!', 'Correct!');
     }
@@ -100,6 +100,7 @@ var Component = Nori.view().createComponentView({
 
     _appStore.apply([clearQuestion, answeredIncorrect, playerAction]);
 
+    // TODO not working
     if (!_appStore.isGameOver()) {
       _appView.default.negativeAlert('The correct answer was <span class="correct-answer">' + this.correctChoiceText + '</span>', 'You missed that one!');
     }

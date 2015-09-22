@@ -98,7 +98,6 @@ var ViewComponent = function () {
    * @returns {*}
    */
   function shouldComponentUpdate(nextState) {
-    //console.log('Should update '+this.getID(),(_.isEqual(this.getState(), nextState) !== true));
     return _.isEqual(this.getState(), nextState) !== true;
   }
 

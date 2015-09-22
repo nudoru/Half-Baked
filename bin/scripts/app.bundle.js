@@ -910,12 +910,18 @@ var _noriViewMixinDOMManipulationJs = require('../../nori/view/MixinDOMManipulat
 
 var _mixinDOMManipulation = _interopRequireWildcard(_noriViewMixinDOMManipulationJs);
 
+var _nudoruBrowserDOMUtilsJs = require('../../nudoru/browser/DOMUtils.js');
+
+var _domUtils = _interopRequireWildcard(_nudoruBrowserDOMUtilsJs);
+
 /**
  * Module for a dynamic application view for a route or a persistent view
  */
 var Component = Nori.view().createComponentView({
 
   mixins: [_mixinDOMManipulation],
+
+  isAnimating: false,
 
   /**
    * configProps passed in from region definition on parent View
@@ -1012,12 +1018,26 @@ var Component = Nori.view().createComponentView({
    * Component HTML was attached to the DOM
    */
   componentDidMount: function componentDidMount() {
-    if (this.getState().questionDifficultyImage !== 'null.png') {
+    this.animateFoodToss();
+  },
+
+  // TODO will not animate to local player
+  animateFoodToss: function animateFoodToss() {
+    if (this.getState().questionDifficultyImage !== 'null.png' && this.getConfigProps().target === 'remote') {
+
+      if (this.isAnimating) {
+        return;
+      }
+
       console.log('Player stats, Animating');
+      this.isAnimating = true;
+
       var foodImage = this.getDOMElement().querySelector('.game__playerstats-food'),
           startX = undefined,
-          endX = 0,
+          endX = undefined,
           endRot = undefined;
+
+      endX = _domUtils.position(foodImage).left;
 
       if (this.getConfigProps().target === 'local') {
         startX = 700;
@@ -1027,19 +1047,20 @@ var Component = Nori.view().createComponentView({
         endRot = 125;
       }
 
-      TweenLite.set(foodImage, {
+      this.tweenSet(foodImage, {
         x: startX,
-        rotation: 0,
+        rotation: -360,
         scale: 2
       });
 
       this.tweenTo(foodImage, 1, {
         scale: 1,
-        x: endX,
+        x: 0,
         rotation: endRot,
-        ease: Quad.easeIn
+        ease: Quad.easeOut
       });
-      //console.log(this.getID(),this.getConfigProps().target,'tweening',foodImage);
+    } else {
+      this.isAnimating = false;
     }
   },
 
@@ -1053,7 +1074,7 @@ var Component = Nori.view().createComponentView({
 exports['default'] = Component;
 module.exports = exports['default'];
 
-},{"../../nori/action/ActionCreator":17,"../../nori/utils/Templating.js":29,"../../nori/view/MixinDOMManipulation.js":32,"../store/AppStore":5,"./AppView":6}],8:[function(require,module,exports){
+},{"../../nori/action/ActionCreator":17,"../../nori/utils/Templating.js":29,"../../nori/view/MixinDOMManipulation.js":32,"../../nudoru/browser/DOMUtils.js":38,"../store/AppStore":5,"./AppView":6}],8:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -1159,6 +1180,7 @@ var Component = Nori.view().createComponentView({
 
     _appStore.apply([clearQuestion, answeredCorrect, playerAction]);
 
+    // TODO not working
     if (!_appStore.isGameOver()) {
       _appView['default'].positiveAlert('You got it!', 'Correct!');
     }
@@ -1180,6 +1202,7 @@ var Component = Nori.view().createComponentView({
 
     _appStore.apply([clearQuestion, answeredIncorrect, playerAction]);
 
+    // TODO not working
     if (!_appStore.isGameOver()) {
       _appView['default'].negativeAlert('The correct answer was <span class="correct-answer">' + this.correctChoiceText + '</span>', 'You missed that one!');
     }
@@ -1609,18 +1632,15 @@ var Component = Nori.view().createComponentView({
    * Component HTML was attached to the DOM
    */
   componentDidMount: function componentDidMount() {
-    console.log('Main game did mount');
     this.showDifficultyCards();
   },
 
   showWaitingMessage: function showWaitingMessage() {
-    console.log('Main game, show waiting');
     this.showEl('.game__question-waiting');
     this.hideEl('.game__question-difficulty');
   },
 
   showDifficultyCards: function showDifficultyCards() {
-    console.log('Main game, Show cards');
     this.hideEl('.game__question-waiting');
     this.showEl('.game__question-difficulty');
 
@@ -1630,7 +1650,6 @@ var Component = Nori.view().createComponentView({
   animateDifficultyCards: function animateDifficultyCards() {
     var _this = this;
 
-    console.log('Animating difficulty cards');
     this.difficultyCardElIDs.forEach(function (cardID, i) {
 
       _this.tweenSet(cardID, {
@@ -1650,9 +1669,7 @@ var Component = Nori.view().createComponentView({
   /**
    * Component will be removed from the DOM
    */
-  componentWillUnmount: function componentWillUnmount() {
-    console.log('Main game will UNMOUNT');
-  },
+  componentWillUnmount: function componentWillUnmount() {},
 
   componentWillDispose: function componentWillDispose() {
     if (this.currentQuestionChanged) {
@@ -3820,7 +3837,7 @@ var MixinDOMManipulation = function MixinDOMManipulation() {
     if (!el) {
       return;
     }
-    TweenLite.killTweensOf(el);
+    //TweenLite.killTweensOf(el);
     return TweenLite.to(el, dur, props);
   }
 
@@ -3830,7 +3847,7 @@ var MixinDOMManipulation = function MixinDOMManipulation() {
     if (!el) {
       return;
     }
-    TweenLite.killTweensOf(el);
+    //TweenLite.killTweensOf(el);
     return TweenLite.from(el, dur, props);
   }
 
@@ -4422,7 +4439,6 @@ var ViewComponent = function ViewComponent() {
    * @returns {*}
    */
   function shouldComponentUpdate(nextState) {
-    //console.log('Should update '+this.getID(),(_.isEqual(this.getState(), nextState) !== true));
     return _.isEqual(this.getState(), nextState) !== true;
   }
 

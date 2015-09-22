@@ -3,6 +3,7 @@ import * as _appView from './AppView';
 import * as _appStore from '../store/AppStore';
 import * as _template from '../../nori/utils/Templating.js';
 import * as _mixinDOMManipulation from '../../nori/view/MixinDOMManipulation.js';
+import * as _domUtils from '../../nudoru/browser/DOMUtils.js';
 
 /**
  * Module for a dynamic application view for a route or a persistent view
@@ -12,6 +13,8 @@ var Component = Nori.view().createComponentView({
   mixins: [
     _mixinDOMManipulation
   ],
+
+  isAnimating: false,
 
   /**
    * configProps passed in from region definition on parent View
@@ -109,35 +112,47 @@ var Component = Nori.view().createComponentView({
    * Component HTML was attached to the DOM
    */
     componentDidMount() {
-    if (this.getState().questionDifficultyImage !== 'null.png') {
-      console.log('Player stats, Animating');
-      let foodImage = this.getDOMElement().querySelector('.game__playerstats-food'),
-          startX,
-          endX      = 0,
-          endRot;
+    this.animateFoodToss();
+  },
 
-      if (this.getConfigProps().target === 'local') {
-        startX = 700;
-        endRot = -125;
-      } else {
+  // TODO will not animate to local player
+  animateFoodToss() {
+    if (this.getState().questionDifficultyImage !== 'null.png' && this.getConfigProps().target === 'remote') {
+
+      //if (this.isAnimating) {
+      //  return;
+      //}
+      //
+      //this.isAnimating = true;
+
+      let foodImage = this.getDOMElement().querySelector('.game__playerstats-food'),
+          startX, endX, endRot;
+
+      endX = _domUtils.position(foodImage).left;
+
+      //if (this.getConfigProps().target === 'local') {
+      //  startX = 700;
+      //  endRot = -125;
+      //} else {
         startX = -700;
         endRot = 125;
-      }
+      //}
 
-      TweenLite.set(foodImage, {
+      this.tweenSet(foodImage, {
         x       : startX,
-        rotation: 0,
+        rotation: -360,
         scale   : 2
       });
 
       this.tweenTo(foodImage, 1, {
         scale   : 1,
-        x       : endX,
+        x       : 0,
         rotation: endRot,
-        ease    : Quad.easeIn
+        ease    : Quad.easeOut
       });
-      //console.log(this.getID(),this.getConfigProps().target,'tweening',foodImage);
-    }
+    //} else {
+    //  this.isAnimating = false;
+    //}
   },
 
   /**

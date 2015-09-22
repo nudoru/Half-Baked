@@ -46,7 +46,7 @@ let MixinDOMManipulation = function () {
     if (!el) {
       return;
     }
-    TweenLite.killTweensOf(el)
+    //TweenLite.killTweensOf(el);
     return TweenLite.to(el, dur, props);
   }
 
@@ -56,7 +56,7 @@ let MixinDOMManipulation = function () {
     if (!el) {
       return;
     }
-    TweenLite.killTweensOf(el)
+    //TweenLite.killTweensOf(el);
     return TweenLite.from(el, dur, props);
   }
 

@@ -104,18 +104,15 @@ var Component = Nori.view().createComponentView({
    * Component HTML was attached to the DOM
    */
     componentDidMount(){
-    console.log('Main game did mount');
     this.showDifficultyCards();
   },
 
   showWaitingMessage() {
-    console.log('Main game, show waiting');
     this.showEl('.game__question-waiting');
     this.hideEl('.game__question-difficulty');
   },
 
   showDifficultyCards() {
-    console.log('Main game, Show cards');
     this.hideEl('.game__question-waiting');
     this.showEl('.game__question-difficulty');
 
@@ -124,7 +121,6 @@ var Component = Nori.view().createComponentView({
   },
 
   animateDifficultyCards() {
-    console.log('Animating difficulty cards');
     this.difficultyCardElIDs.forEach((cardID, i) => {
 
       this.tweenSet(cardID, {
@@ -146,7 +142,6 @@ var Component = Nori.view().createComponentView({
    * Component will be removed from the DOM
    */
     componentWillUnmount(){
-    console.log('Main game will UNMOUNT');
   },
 
   componentWillDispose(){
