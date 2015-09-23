@@ -16,7 +16,7 @@ let SimpleStore = function () {
    * @param nextState
    */
   function setState(nextState) {
-    _internalState = _.assign(_internalState, nextState);
+    _internalState = _.assign({}, _internalState, nextState);
   }
 
   return {

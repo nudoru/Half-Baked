@@ -83,19 +83,37 @@ var ActionCreator = {
   },
 
   answeredCorrect: function (points) {
+    var state  = _appStore.getState(),
+        health = state.localPlayer.health,
+        score  = state.localPlayer.score + points;
+
     return {
       type   : _actionConstants.ANSWERED_CORRECT,
       payload: {
-        data: points
+        data: {
+          localPlayer: {
+            health: health,
+            score : score
+          }
+        }
       }
     };
   },
 
   answeredIncorrect: function (points) {
+    var state  = _appStore.getState(),
+        health = state.localPlayer.health - points,
+        score  = state.localPlayer.score;
+
     return {
       type   : _actionConstants.ANSWERED_INCORRECT,
       payload: {
-        data: points
+        data: {
+          localPlayer: {
+            health: health,
+            score : score
+          }
+        }
       }
     };
   },

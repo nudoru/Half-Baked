@@ -68,18 +68,17 @@ var Component = Nori.view().createComponentView({
    * Set initial state properties. Call once on first render
    */
     getInitialState () {
-    let appState = _appStore.getState();
-    return {
-      sentQuestion: appState.sentQuestion,
-      local       : appState.localPlayer,
-      remote      : appState.remotePlayer
-    };
+    return this.getGameState();
   },
 
   /**
    * State change on bound stores (map, etc.) Return nextState object
    */
     componentWillUpdate () {
+    return this.getGameState();
+  },
+
+  getGameState() {
     let appState = _appStore.getState();
     return {
       sentQuestion: appState.sentQuestion,

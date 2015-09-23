@@ -51,12 +51,8 @@ var AppStore = Nori.createStore({
     this.createSubject('answeredIncorrect');
   },
 
-  /**
-   * Set or load any necessary data and then broadcast a initialized event.
-   */
-    loadStore() {
-    // Set initial state
-    this.setState({
+  initialState() {
+    return  {
       lastEventHandled: '',
       gameStates      : ['TITLE', 'PLAYER_SELECT', 'WAITING_ON_PLAYER', 'MAIN_GAME', 'GAME_OVER'],
       gamePlayStates  : ['CHOOSE', 'ANSWERING', 'WAITING'],
@@ -71,7 +67,14 @@ var AppStore = Nori.createStore({
       localPlayer     : _.merge(this.createBlankPlayerObject(), this.createPlayerResetObject()),
       remotePlayer    : _.merge(this.createBlankPlayerObject(), this.createPlayerResetObject()),
       questionBank    : []
-    });
+    };
+  },
+
+  /**
+   * Set or load any necessary data and then broadcast a initialized event.
+   */
+    loadStore() {
+    this.setState(this.initialState());
 
     //https://market.mashape.com/pareshchouhan/trivia
     var getQuestions = _rest.request({
@@ -84,7 +87,7 @@ var AppStore = Nori.createStore({
   },
 
   onQuestionsSuccess(data) {
-    console.log('Questions fetched', data[0]);
+    //console.log('Questions fetched', data[0]);
     let updated = data.map(q => {
       // Strip tags from text
       q.q_text = _stringUtils.stripTags(_stringUtils.unescapeHTML(q.q_text));
@@ -157,6 +160,8 @@ var AppStore = Nori.createStore({
 
     state.lastEventHandled = event.type;
 
+    console.log(event);
+
     switch (event.type) {
       case _noriActionConstants.CHANGE_STORE_STATE:
       case _appActionConstants.SET_LOCAL_PLAYER_PROPS:
@@ -164,16 +169,12 @@ var AppStore = Nori.createStore({
       case _appActionConstants.SET_SESSION_PROPS:
       case _appActionConstants.RESET_GAME:
       case _appActionConstants.SET_GAME_PLAY_STATE:
-        return _.merge({}, state, event.payload.data);
-
       case _appActionConstants.SET_CURRENT_QUESTION:
-        return _.merge({}, state, event.payload.data);
-
       case _appActionConstants.SET_SENT_QUESTION:
-        return _.merge({}, state, event.payload.data);
-
       case _appActionConstants.ANSWERED_CORRECT:
       case _appActionConstants.ANSWERED_INCORRECT:
+        return _.merge({}, state, event.payload.data);
+
       case _appActionConstants.OPPONENT_ANSWERED:
       case _appActionConstants.CLEAR_QUESTION:
         state.currentQuestion = null;
@@ -181,7 +182,6 @@ var AppStore = Nori.createStore({
         return state;
 
       case undefined:
-        return state;
       default:
         console.warn('Reducer store, unhandled event type: ' + event.type);
         return state;
@@ -215,7 +215,7 @@ var AppStore = Nori.createStore({
 
     // Check if player health is 0
     if (this.shouldGameEnd(state)) {
-      this.setState({currentState: this.gameStates[4]});
+      this.setState({currentState: this.getState().gameStates[4]});
     }
 
     // update everyone

@@ -12,6 +12,7 @@
  */
 
 import * as is from '../../nudoru/util/is.js';
+import * as _stateObjFactory from './SimpleStore.js'
 
 let MixinReducerStore = function () {
   let _this,
@@ -60,7 +61,7 @@ let MixinReducerStore = function () {
     }
 
     _this  = this;
-    _state = require('./ImmutableMap.js')();
+    _state = _stateObjFactory.default(); //require('./ImmutableMap.js')();
 
     if (!_stateReducers) {
       throw new Error('ReducerStore, must set a reducer before initialization');
@@ -121,7 +122,6 @@ let MixinReducerStore = function () {
             // return _.merge({}, state, otherStateTransformer(state));
             return _.merge({}, state, {prop: event.payload.value});
           case undefined:
-            return state;
           default:
             console.warn('Reducer store, unhandled event type: '+event.type);
             return state;

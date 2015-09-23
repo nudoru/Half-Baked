@@ -6,11 +6,10 @@ import * as _template from '../../nori/utils/Templating.js';
 import * as Rxjs from '../../vendor/rxjs/rx.lite.min.js';
 import * as _mixinDOMManipulation from '../../nori/view/MixinDOMManipulation.js';
 
-let _opponentAnswered        = null,
+let _questionChangeObs        = null,
     _timerObservable         = null,
     _baseMaxSeconds          = 10,
-    _currentSecondTimerValue = 0,
-    _correctChoiceText       = '';
+    _currentSecondTimerValue = 0;
 
 /**
  * Module for a dynamic application view for a route or a persistent view
@@ -29,7 +28,7 @@ var Component = Nori.view().createComponentView({
    * @param configProps
    */
     initialize(configProps) {
-    _opponentAnswered = _appStore.subscribe('currentQuestionChange', this.update.bind(this));
+    _questionChangeObs = _appStore.subscribe('currentQuestionChange', this.update.bind(this));
   },
 
   /**
@@ -43,10 +42,9 @@ var Component = Nori.view().createComponentView({
   },
 
   pickChoice(evt) {
-    let choice  = parseInt(evt.target.getAttribute('id').substr(-1, 1)),
-        correct = this.isCorrect(choice);
+    let choice  = parseInt(evt.target.getAttribute('id').substr(-1, 1));
 
-    if (correct) {
+    if (this.isCorrect(choice)) {
       this.scoreCorrect();
     } else {
       this.scoreIncorrect();
@@ -58,60 +56,43 @@ var Component = Nori.view().createComponentView({
   },
 
   scoreCorrect() {
-    let state           = _appStore.getState(),
-        qPoints         = this.getState().question.q_difficulty_level,
-        localScore      = state.localPlayer.score + qPoints,
-        localHealth     = state.localPlayer.health,
-        playerAction    = _appActions.setLocalPlayerProps({
-          health: localHealth,
-          score : localScore
-        }),
+    let qPoints         = this.getState().question.q_difficulty_level,
         answeredCorrect = _appActions.answeredCorrect(qPoints),
         clearQuestion   = _appActions.clearQuestion();
 
     this.clearTimer();
 
-    _appStore.apply([clearQuestion, answeredCorrect, playerAction]);
+    _appStore.apply([answeredCorrect, clearQuestion]);
 
-    // TODO not working
-    if (!_appStore.isGameOver()) {
-      _appView.default.positiveAlert('You got it!', 'Correct!');
-    }
+    _appView.default.positiveAlert('You got it!', 'Correct!');
   },
 
   scoreIncorrect() {
     let state             = _appStore.getState(),
-        qPoints           = this.getState().question.q_difficulty_level,
-        localScore        = state.localPlayer.score,
-        localHealth       = state.localPlayer.health - qPoints,
-        playerAction      = _appActions.setLocalPlayerProps({
-          health: localHealth,
-          score : localScore
-        }),
+        question          = state.currentQuestion.question,
+        qPoints           = question.q_difficulty_level,
+        caText            = question['q_options_' + question.q_correct_option],
         answeredIncorrect = _appActions.answeredIncorrect(qPoints),
         clearQuestion     = _appActions.clearQuestion();
 
     this.clearTimer();
 
-    _appStore.apply([clearQuestion, answeredIncorrect, playerAction]);
+    _appStore.apply([answeredIncorrect, clearQuestion]);
 
-    // TODO not working
-    if (!_appStore.isGameOver()) {
-      _appView.default.negativeAlert('The correct answer was <span class="correct-answer">' + _correctChoiceText + '</span>', 'You missed that one!');
-    }
-
+    _appView.default.negativeAlert('The correct answer was <span class="correct-answer">' + caText + '</span>', 'You missed that one!');
   },
 
-  getQuestion() {
+  getQuestionState() {
     let state     = _appStore.getState(),
         viewState = {question: null};
 
     if (state.currentQuestion) {
       if (state.currentQuestion.hasOwnProperty('question')) {
+
         let question       = state.currentQuestion.question;
         viewState.question = question;
-        _correctChoiceText = question['q_options_' + question.q_correct_option];
-        console.log('Correct choice: ', _correctChoiceText);
+
+        console.log('Correct choice: ', question['q_options_' + question.q_correct_option]);
       }
     }
 
@@ -122,14 +103,14 @@ var Component = Nori.view().createComponentView({
    * Set initial state properties. Call once on first render
    */
     getInitialState() {
-    return this.getQuestion();
+    return this.getQuestionState();
   },
 
   /**
    * State change on bound stores (map, etc.) Return nextState object
    */
     componentWillUpdate() {
-    return this.getQuestion();
+    return this.getQuestionState();
   },
 
   template() {
@@ -243,8 +224,8 @@ var Component = Nori.view().createComponentView({
   },
 
   componentWillDispose() {
-    if (_opponentAnswered) {
-      _opponentAnswered.dispose();
+    if (_questionChangeObs) {
+      _questionChangeObs.dispose();
     }
   }
 
