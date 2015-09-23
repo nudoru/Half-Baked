@@ -32,6 +32,7 @@ var paths = {
 // .on('error', errorLog)
 function errorLog(error) {
   console.error.bind(error);
+  console.log(error);
   this.emit('end');
 }
 
@@ -67,7 +68,7 @@ gulp.task('compass', function () {
       image: 'bin/img',
       style: 'expanded'
     }))
-    //.on('error', errorLog)
+    .on('error', errorLog)
     //.pipe(minifyCSS())
     .pipe(gulp.dest('bin/css'))
     .pipe(livereload());
@@ -109,6 +110,7 @@ gulp.task('jshint', function () {
 gulp.task('browserify', function () {
   return browserify('src/scripts/main.js', {debug: false})
     .transform(babelify.configure({blacklist: ["strict"], modules: "common"}))
+    .on('error', errorLog)
     .bundle()
     .on('error', errorLog)
     .pipe(source('app.bundle.js'))

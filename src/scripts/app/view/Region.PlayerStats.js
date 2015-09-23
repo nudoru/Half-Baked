@@ -118,25 +118,13 @@ var Component = Nori.view().createComponentView({
   // TODO will not animate to local player
   animateFoodToss() {
     if (this.getState().questionDifficultyImage !== 'null.png' && this.getConfigProps().target === 'remote') {
-
-      //if (this.isAnimating) {
-      //  return;
-      //}
-      //
-      //this.isAnimating = true;
-
       let foodImage = this.getDOMElement().querySelector('.game__playerstats-food'),
           startX, endX, endRot;
 
       endX = _domUtils.position(foodImage).left;
 
-      //if (this.getConfigProps().target === 'local') {
-      //  startX = 700;
-      //  endRot = -125;
-      //} else {
-        startX = -700;
-        endRot = 125;
-      //}
+      startX = -700;
+      endRot = 125;
 
       this.tweenSet(foodImage, {
         x       : startX,
@@ -150,9 +138,7 @@ var Component = Nori.view().createComponentView({
         rotation: endRot,
         ease    : Quad.easeOut
       });
-    //} else {
-    //  this.isAnimating = false;
-    //}
+    }
   },
 
   /**
