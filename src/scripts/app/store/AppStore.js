@@ -160,7 +160,7 @@ var AppStore = Nori.createStore({
 
     state.lastEventHandled = event.type;
 
-    console.log(event);
+    console.log(event.type, event.payload);
 
     switch (event.type) {
       case _noriActionConstants.CHANGE_STORE_STATE:
@@ -168,7 +168,7 @@ var AppStore = Nori.createStore({
       case _appActionConstants.SET_REMOTE_PLAYER_PROPS:
       case _appActionConstants.SET_SESSION_PROPS:
       case _appActionConstants.RESET_GAME:
-      case _appActionConstants.SET_GAME_PLAY_STATE:
+      //case _appActionConstants.SET_GAME_PLAY_STATE:
       case _appActionConstants.SET_CURRENT_QUESTION:
       case _appActionConstants.SET_SENT_QUESTION:
       case _appActionConstants.ANSWERED_CORRECT:
@@ -193,8 +193,6 @@ var AppStore = Nori.createStore({
    */
     handleStateMutation() {
     let state = this.getState();
-
-    console.log(state.lastEventHandled);
 
     // Pick out certain events for specific notifications.
     // Rather than blasting out a new store every time

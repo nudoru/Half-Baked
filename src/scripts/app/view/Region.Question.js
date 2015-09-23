@@ -6,10 +6,10 @@ import * as _template from '../../nori/utils/Templating.js';
 import * as Rxjs from '../../vendor/rxjs/rx.lite.min.js';
 import * as _mixinDOMManipulation from '../../nori/view/MixinDOMManipulation.js';
 
-let _questionChangeObs        = null,
-    _timerObservable         = null,
-    _baseMaxSeconds          = 10,
-    _currentSecondTimerValue = 0;
+let _questionChangeObs = null,
+    _timerObservable   = null,
+    _baseMaxSeconds    = 10,
+    _timerValue        = 0;
 
 /**
  * Module for a dynamic application view for a route or a persistent view
@@ -42,7 +42,7 @@ var Component = Nori.view().createComponentView({
   },
 
   pickChoice(evt) {
-    let choice  = parseInt(evt.target.getAttribute('id').substr(-1, 1));
+    let choice = parseInt(evt.target.getAttribute('id').substr(-1, 1));
 
     if (this.isCorrect(choice)) {
       this.scoreCorrect();
@@ -161,14 +161,12 @@ var Component = Nori.view().createComponentView({
 
     choices.forEach((choice, i) => {
 
-      this.tweenSet(choice, {
+      this.tweenFromTo(choice, 0.5, {
         alpha: 0,
-        y    : -100
-      });
-
-      this.tweenTo(choice, 0.5, {
+        x    : -200
+      }, {
         alpha: 1,
-        y    : 0,
+        x    : 0,
         delay: i * 0.25,
         ease : Back.easeOut
       });
@@ -181,19 +179,19 @@ var Component = Nori.view().createComponentView({
       this.clearTimer();
     }
 
-    let viewState            = this.getState();
-    _currentSecondTimerValue = _baseMaxSeconds + ((parseInt(viewState.question.q_difficulty_level) - 1) * 5);
+    let viewState = this.getState();
+    _timerValue   = _baseMaxSeconds + ((parseInt(viewState.question.q_difficulty_level) - 1) * 5);
 
-    this.updateTimerText(_currentSecondTimerValue);
+    this.updateTimerText(_timerValue);
 
-    _timerObservable = Rxjs.Observable.interval(1000).take(_currentSecondTimerValue).subscribe(this.onTimerTick.bind(this),
+    _timerObservable = Rxjs.Observable.interval(1000).take(_timerValue).subscribe(this.onTimerTick.bind(this),
       function onErr() {
       },
       this.onTimerComplete.bind(this));
   },
 
   onTimerTick(second) {
-    this.updateTimerText(_currentSecondTimerValue - (second + 1));
+    this.updateTimerText(_timerValue - (second + 1));
   },
 
   updateTimerText(number) {
@@ -211,8 +209,8 @@ var Component = Nori.view().createComponentView({
     if (_timerObservable) {
       _timerObservable.dispose();
     }
-    _currentSecondTimerValue = 0;
-    _timerObservable         = null;
+    _timerValue      = 0;
+    _timerObservable = null;
   },
 
   /**

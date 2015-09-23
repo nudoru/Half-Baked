@@ -10,9 +10,6 @@ import * as _numUtils from '../../nudoru/core/NumberUtils.js';
 import * as _domUtils from '../../nudoru/browser/DOMUtils.js';
 import * as _mixinDOMManipulation from '../../nori/view/MixinDOMManipulation.js';
 
-let _currentQuestionChanged = null,
-    _difficultyCardElIDs    = ['#game_question-difficulty1', '#game_question-difficulty2', '#game_question-difficulty3', '#game_question-difficulty4', '#game_question-difficulty5'];
-
 /**
  * Module for a dynamic application view for a route or a persistent view
  */
@@ -29,7 +26,6 @@ var Component = Nori.view().createComponentView({
    */
     initialize (configProps) {
     this.bindMap(_appStore);
-    _currentQuestionChanged = _appStore.subscribe('currentQuestionChange', this.handleOpponentAnswered.bind(this));
   },
 
   defineRegions () {
@@ -79,11 +75,10 @@ var Component = Nori.view().createComponentView({
   },
 
   getGameState() {
+    console.log('updating main game state');
     let appState = _appStore.getState();
     return {
-      sentQuestion: appState.sentQuestion,
-      local       : appState.localPlayer,
-      remote      : appState.remotePlayer
+      sentQuestion: appState.sentQuestion
     };
   },
 
@@ -92,46 +87,41 @@ var Component = Nori.view().createComponentView({
 
     var difficulty = parseInt(evt.target.getAttribute('id').substr(-1, 1));
     _app.default.sendQuestion(difficulty);
-    this.showWaitingMessage();
   },
 
-  handleOpponentAnswered() {
-    this.showDifficultyCards();
+  shouldDelegateEvents() {
+    return this.isShowingCards();
   },
 
   /**
    * Component HTML was attached to the DOM
    */
     componentDidMount(){
-    this.showDifficultyCards();
+    if (this.isShowingCards()) {
+      this.animateDifficultyCards();
+    }
   },
 
-  showWaitingMessage() {
-    this.showEl('.game__question-waiting');
-    this.hideEl('.game__question-difficulty');
-  },
-
-  showDifficultyCards() {
-    this.hideEl('.game__question-waiting');
-    this.showEl('.game__question-difficulty');
-
-    this.animateDifficultyCards();
-
+  isShowingCards() {
+    return (this.getState().sentQuestion.q_difficulty_level === -1);
   },
 
   animateDifficultyCards() {
-    _difficultyCardElIDs.forEach((cardID, i) => {
+    let difficultyCardElIDs = ['#game_question-difficulty1', '#game_question-difficulty2', '#game_question-difficulty3', '#game_question-difficulty4', '#game_question-difficulty5'];
 
-      this.tweenSet(cardID, {
+    difficultyCardElIDs.forEach((cardID, i) => {
+
+      this.tweenFromTo(cardID, 1, {
         alpha: 0,
         y    : 300
-      });
-
-      this.tweenTo(cardID, 1, {
-        alpha: 1,
-        y    : 0,
-        delay: i * 0.15,
-        ease : Back.easeOut
+      }, {
+        alpha     : 1,
+        y         : 0,
+        delay     : i * 0.15,
+        ease      : Back.easeOut,
+        onComplete: function () {
+          console.log('done rendering card');
+        }
       });
 
     });
@@ -143,13 +133,26 @@ var Component = Nori.view().createComponentView({
     componentWillUnmount(){
   },
 
+  /**
+   * Only renders if there is a current question
+   */
+    render(state) {
+    console.log('rendering main game')
+    if (state.sentQuestion.q_difficulty_level === -1) {
+      var cardsHTML = _template.getSource('game__choose');
+      return _.template(cardsHTML)(state);
+    } else {
+      var remoteHTML = _template.getSource('game__remote');
+      return _.template(remoteHTML)(state);
+    }
+  },
+
   componentWillDispose(){
     if (_currentQuestionChanged) {
       _currentQuestionChanged.dispose();
     }
   }
 
-})
-  ;
+});
 
 export default Component;

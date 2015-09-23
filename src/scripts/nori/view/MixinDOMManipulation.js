@@ -60,6 +60,16 @@ let MixinDOMManipulation = function () {
     return TweenLite.from(el, dur, props);
   }
 
+  function tweenFromTo(selector, dur, startprops, endprops) {
+    let el = addTweenedElement(selector);
+
+    if (!el) {
+      return;
+    }
+    //TweenLite.killTweensOf(el);
+    return TweenLite.fromTo(el, dur, startprops, endprops);
+  }
+
   function killTweens() {
     _tweenedEls.forEach(el => {
       TweenLite.killTweensOf(el);
@@ -90,13 +100,14 @@ let MixinDOMManipulation = function () {
   }
 
   return {
-    toTop     : toTop,
-    showEl    : showEl,
-    hideEl    : hideEl,
-    tweenSet  : tweenSet,
-    tweenTo   : tweenTo,
-    tweenFrom : tweenFrom,
-    killTweens: killTweens
+    toTop      : toTop,
+    showEl     : showEl,
+    hideEl     : hideEl,
+    tweenSet   : tweenSet,
+    tweenTo    : tweenTo,
+    tweenFrom  : tweenFrom,
+    tweenFromTo: tweenFromTo,
+    killTweens : killTweens
   };
 
 };

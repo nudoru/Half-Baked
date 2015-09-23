@@ -732,7 +732,7 @@ var AppStore = Nori.createStore({
 
     state.lastEventHandled = event.type;
 
-    console.log(event);
+    console.log(event.type, event.payload);
 
     switch (event.type) {
       case _noriActionConstants.CHANGE_STORE_STATE:
@@ -740,7 +740,7 @@ var AppStore = Nori.createStore({
       case _appActionConstants.SET_REMOTE_PLAYER_PROPS:
       case _appActionConstants.SET_SESSION_PROPS:
       case _appActionConstants.RESET_GAME:
-      case _appActionConstants.SET_GAME_PLAY_STATE:
+      //case _appActionConstants.SET_GAME_PLAY_STATE:
       case _appActionConstants.SET_CURRENT_QUESTION:
       case _appActionConstants.SET_SENT_QUESTION:
       case _appActionConstants.ANSWERED_CORRECT:
@@ -765,8 +765,6 @@ var AppStore = Nori.createStore({
    */
   handleStateMutation: function handleStateMutation() {
     var state = this.getState();
-
-    console.log(state.lastEventHandled);
 
     // Pick out certain events for specific notifications.
     // Rather than blasting out a new store every time
@@ -1118,7 +1116,7 @@ var _mixinDOMManipulation = _interopRequireWildcard(_noriViewMixinDOMManipulatio
 var _questionChangeObs = null,
     _timerObservable = null,
     _baseMaxSeconds = 10,
-    _currentSecondTimerValue = 0;
+    _timerValue = 0;
 
 /**
  * Module for a dynamic application view for a route or a persistent view
@@ -1266,14 +1264,12 @@ var Component = Nori.view().createComponentView({
 
     choices.forEach(function (choice, i) {
 
-      _this.tweenSet(choice, {
+      _this.tweenFromTo(choice, 0.5, {
         alpha: 0,
-        y: -100
-      });
-
-      _this.tweenTo(choice, 0.5, {
+        x: -200
+      }, {
         alpha: 1,
-        y: 0,
+        x: 0,
         delay: i * 0.25,
         ease: Back.easeOut
       });
@@ -1286,15 +1282,15 @@ var Component = Nori.view().createComponentView({
     }
 
     var viewState = this.getState();
-    _currentSecondTimerValue = _baseMaxSeconds + (parseInt(viewState.question.q_difficulty_level) - 1) * 5;
+    _timerValue = _baseMaxSeconds + (parseInt(viewState.question.q_difficulty_level) - 1) * 5;
 
-    this.updateTimerText(_currentSecondTimerValue);
+    this.updateTimerText(_timerValue);
 
-    _timerObservable = Rxjs.Observable.interval(1000).take(_currentSecondTimerValue).subscribe(this.onTimerTick.bind(this), function onErr() {}, this.onTimerComplete.bind(this));
+    _timerObservable = Rxjs.Observable.interval(1000).take(_timerValue).subscribe(this.onTimerTick.bind(this), function onErr() {}, this.onTimerComplete.bind(this));
   },
 
   onTimerTick: function onTimerTick(second) {
-    this.updateTimerText(_currentSecondTimerValue - (second + 1));
+    this.updateTimerText(_timerValue - (second + 1));
   },
 
   updateTimerText: function updateTimerText(number) {
@@ -1312,7 +1308,7 @@ var Component = Nori.view().createComponentView({
     if (_timerObservable) {
       _timerObservable.dispose();
     }
-    _currentSecondTimerValue = 0;
+    _timerValue = 0;
     _timerObservable = null;
   },
 
@@ -1521,9 +1517,6 @@ var _noriViewMixinDOMManipulationJs = require('../../nori/view/MixinDOMManipulat
 
 var _mixinDOMManipulation = _interopRequireWildcard(_noriViewMixinDOMManipulationJs);
 
-var _currentQuestionChanged = null,
-    _difficultyCardElIDs = ['#game_question-difficulty1', '#game_question-difficulty2', '#game_question-difficulty3', '#game_question-difficulty4', '#game_question-difficulty5'];
-
 /**
  * Module for a dynamic application view for a route or a persistent view
  */
@@ -1538,7 +1531,6 @@ var Component = Nori.view().createComponentView({
    */
   initialize: function initialize(configProps) {
     this.bindMap(_appStore);
-    _currentQuestionChanged = _appStore.subscribe('currentQuestionChange', this.handleOpponentAnswered.bind(this));
   },
 
   defineRegions: function defineRegions() {
@@ -1588,11 +1580,10 @@ var Component = Nori.view().createComponentView({
   },
 
   getGameState: function getGameState() {
+    console.log('updating main game state');
     var appState = _appStore.getState();
     return {
-      sentQuestion: appState.sentQuestion,
-      local: appState.localPlayer,
-      remote: appState.remotePlayer
+      sentQuestion: appState.sentQuestion
     };
   },
 
@@ -1601,47 +1592,43 @@ var Component = Nori.view().createComponentView({
 
     var difficulty = parseInt(evt.target.getAttribute('id').substr(-1, 1));
     _app['default'].sendQuestion(difficulty);
-    this.showWaitingMessage();
   },
 
-  handleOpponentAnswered: function handleOpponentAnswered() {
-    this.showDifficultyCards();
+  shouldDelegateEvents: function shouldDelegateEvents() {
+    return this.isShowingCards();
   },
 
   /**
    * Component HTML was attached to the DOM
    */
   componentDidMount: function componentDidMount() {
-    this.showDifficultyCards();
+    if (this.isShowingCards()) {
+      this.animateDifficultyCards();
+    }
   },
 
-  showWaitingMessage: function showWaitingMessage() {
-    this.showEl('.game__question-waiting');
-    this.hideEl('.game__question-difficulty');
-  },
-
-  showDifficultyCards: function showDifficultyCards() {
-    this.hideEl('.game__question-waiting');
-    this.showEl('.game__question-difficulty');
-
-    this.animateDifficultyCards();
+  isShowingCards: function isShowingCards() {
+    return this.getState().sentQuestion.q_difficulty_level === -1;
   },
 
   animateDifficultyCards: function animateDifficultyCards() {
     var _this = this;
 
-    _difficultyCardElIDs.forEach(function (cardID, i) {
+    var difficultyCardElIDs = ['#game_question-difficulty1', '#game_question-difficulty2', '#game_question-difficulty3', '#game_question-difficulty4', '#game_question-difficulty5'];
 
-      _this.tweenSet(cardID, {
+    difficultyCardElIDs.forEach(function (cardID, i) {
+
+      _this.tweenFromTo(cardID, 1, {
         alpha: 0,
         y: 300
-      });
-
-      _this.tweenTo(cardID, 1, {
+      }, {
         alpha: 1,
         y: 0,
         delay: i * 0.15,
-        ease: Back.easeOut
+        ease: Back.easeOut,
+        onComplete: function onComplete() {
+          console.log('done rendering card');
+        }
       });
     });
   },
@@ -1650,6 +1637,20 @@ var Component = Nori.view().createComponentView({
    * Component will be removed from the DOM
    */
   componentWillUnmount: function componentWillUnmount() {},
+
+  /**
+   * Only renders if there is a current question
+   */
+  render: function render(state) {
+    console.log('rendering main game');
+    if (state.sentQuestion.q_difficulty_level === -1) {
+      var cardsHTML = _template.getSource('game__choose');
+      return _.template(cardsHTML)(state);
+    } else {
+      var remoteHTML = _template.getSource('game__remote');
+      return _.template(remoteHTML)(state);
+    }
+  },
 
   componentWillDispose: function componentWillDispose() {
     if (_currentQuestionChanged) {
@@ -3778,6 +3779,16 @@ var MixinDOMManipulation = function MixinDOMManipulation() {
     return TweenLite.from(el, dur, props);
   }
 
+  function tweenFromTo(selector, dur, startprops, endprops) {
+    var el = addTweenedElement(selector);
+
+    if (!el) {
+      return;
+    }
+    //TweenLite.killTweensOf(el);
+    return TweenLite.fromTo(el, dur, startprops, endprops);
+  }
+
   function killTweens() {
     _tweenedEls.forEach(function (el) {
       TweenLite.killTweensOf(el);
@@ -3814,6 +3825,7 @@ var MixinDOMManipulation = function MixinDOMManipulation() {
     tweenSet: tweenSet,
     tweenTo: tweenTo,
     tweenFrom: tweenFrom,
+    tweenFromTo: tweenFromTo,
     killTweens: killTweens
   };
 };
