@@ -58,7 +58,7 @@ var Component = Nori.view().createComponentView({
     defineEvents () {
     return {
       'click #game__button-skip' () {
-        _appStore.apply(_noriActions.changeStoreState({currentState: _appStore.gameStates[4]}));
+        _appStore.apply(_noriActions.changeStoreState({currentState: _appStore.getState().gameStates[4]}));
       },
       'click #game_question-difficulty1, click #game_question-difficulty2, click #game_question-difficulty3, click #game_question-difficulty4, click #game_question-difficulty5': this.sendQuestion.bind(this)
     };

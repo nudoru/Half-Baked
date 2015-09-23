@@ -30,7 +30,8 @@ let AppView = Nori.createView({
   },
 
   configureViews() {
-    var gameStates = _appStore.gameStates;
+    // TODO need to init this aspect of the store before here
+    var gameStates = ['TITLE', 'PLAYER_SELECT', 'WAITING_ON_PLAYER', 'MAIN_GAME', 'GAME_OVER']; //_appStore.getState().gameStates;
 
     this.setViewMountPoint('#contents');
 

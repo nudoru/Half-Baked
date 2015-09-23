@@ -32,7 +32,7 @@ var Component = Nori.view().createComponentView({
       'click #select__button-joinroom'  : this.onJoinRoom.bind(this),
       'click #select__button-createroom': this.onCreateRoom.bind(this),
       'click #select__button-go'        () {
-        _appStore.apply(_noriActions.changeStoreState({currentState: _appStore.gameStates[2]}));
+        _appStore.apply(_noriActions.changeStoreState({currentState: _appStore.getState().gameStates[2]}));
       }
     };
   },

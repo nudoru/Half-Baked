@@ -5,6 +5,8 @@ import * as _template from '../../nori/utils/Templating.js';
 import * as _mixinDOMManipulation from '../../nori/view/MixinDOMManipulation.js';
 import * as _domUtils from '../../nudoru/browser/DOMUtils.js';
 
+let _difficultyImages = ['pastry_cookie01.png', 'pastry_poptart01.png', 'pastry_donut.png', 'pastry_pie.png', 'pastry_cupcake.png'];
+
 /**
  * Module for a dynamic application view for a route or a persistent view
  */
@@ -49,7 +51,6 @@ var Component = Nori.view().createComponentView({
 
   getHUDState: function () {
     let appState         = _appStore.getState(),
-        difficultyImages = _appStore.difficultyImages,
         stats;
 
     if (this.getConfigProps().target === 'local') {
@@ -57,7 +58,7 @@ var Component = Nori.view().createComponentView({
       stats.playerImage = this.getPlayerHUDImage(appState.currentPlayState, stats.appearance);
       if (appState.currentQuestion) {
         let dlevel                    = appState.currentQuestion.question.q_difficulty_level - 1;
-        stats.questionDifficultyImage = difficultyImages[dlevel];
+        stats.questionDifficultyImage = _difficultyImages[dlevel];
       } else {
         stats.questionDifficultyImage = 'null.png';
       }
@@ -67,7 +68,7 @@ var Component = Nori.view().createComponentView({
       // there will be a dummy sent question rather than null
       if (appState.sentQuestion.q_difficulty_level >= 0) {
         let dlevel                    = appState.sentQuestion.q_difficulty_level - 1;
-        stats.questionDifficultyImage = difficultyImages[dlevel];
+        stats.questionDifficultyImage = _difficultyImages[dlevel];
       } else {
         stats.questionDifficultyImage = 'null.png';
       }

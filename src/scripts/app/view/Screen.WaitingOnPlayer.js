@@ -24,7 +24,7 @@ var Component = Nori.view().createComponentView({
   defineEvents() {
     return {
       'click #waiting__button-skip'() {
-        _appStore.apply(_noriActions.changeStoreState({currentState: _appStore.gameStates[3]}));
+        _appStore.apply(_noriActions.changeStoreState({currentState: _appStore.getState().gameStates[3]}));
       }
     };
   },

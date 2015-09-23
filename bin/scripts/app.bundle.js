@@ -250,17 +250,19 @@ var App = Nori.createApplication({
   },
 
   handleJoinNewlyCreatedRoom: function handleJoinNewlyCreatedRoom(roomID) {
-    var setRoom = _appActions.setSessionProps({ roomID: roomID }),
-        setWaitingScreenState = _noriActions.changeStoreState({ currentState: this.store.gameStates[2] });
+    var appState = this.store.getState(),
+        setRoom = _appActions.setSessionProps({ roomID: roomID }),
+        setWaitingScreenState = _noriActions.changeStoreState({ currentState: appState.gameStates[2] });
 
     this.store.apply([setRoom, setWaitingScreenState]);
   },
 
   handleGameStart: function handleGameStart(payload) {
-    var remotePlayer = this.pluckRemotePlayer(payload.players),
+    var appState = this.store.getState(),
+        remotePlayer = this.pluckRemotePlayer(payload.players),
         setRemotePlayer = _appActions.setRemotePlayerProps(remotePlayer),
-        setGameState = _noriActions.changeStoreState({ currentState: this.store.gameStates[3] }),
-        setGamePlayState = _appActions.setGamePlayState(this.store.gamePlayStates[0]),
+        setGameState = _noriActions.changeStoreState({ currentState: appState.gameStates[3] }),
+        setGamePlayState = _appActions.setGamePlayState(appState.gamePlayStates[0]),
         setCurrentQuestion = _appActions.setCurrentQuestion(null);
 
     this.store.apply([setRemotePlayer, setGameState, setGamePlayState, setCurrentQuestion]);
@@ -285,7 +287,8 @@ var App = Nori.createApplication({
   },
 
   handleReceivedQuestion: function handleReceivedQuestion(question) {
-    var setGamePlayState = _appActions.setGamePlayState(this.store.gamePlayStates[1]),
+    var appState = this.store.getState(),
+        setGamePlayState = _appActions.setGamePlayState(appState.gamePlayStates[1]),
         setCurrentQuestion = _appActions.setCurrentQuestion(question);
 
     this.store.apply([setGamePlayState, setCurrentQuestion]);
@@ -323,7 +326,7 @@ var App = Nori.createApplication({
   sendQuestion: function sendQuestion(difficulty) {
     var appState = this.store.getState(),
         question = this.store.getQuestionOfDifficulty(difficulty),
-        setGamePlayState = _appActions.setGamePlayState(this.store.gamePlayStates[2]),
+        setGamePlayState = _appActions.setGamePlayState(appState.gamePlayStates[2]),
         setSentQuestion = _appActions.setSentQuestion(question);
 
     this.socket.notifyServer(_socketIOEvents.SEND_QUESTION, {
@@ -513,7 +516,7 @@ var ActionCreator = {
       type: _actionConstants.RESET_GAME,
       payload: {
         data: {
-          currentState: _appStore.gameStates[1],
+          currentState: _appStore.getState().gameStates[1],
           session: {
             roomID: ''
           },
@@ -561,7 +564,9 @@ var _nudoruCoreArrayUtilsJs = require('../../nudoru/core/ArrayUtils.js');
 var _arrayUtils = _interopRequireWildcard(_nudoruCoreArrayUtilsJs);
 
 var _restNumQuestions = 300,
-    _restQuestionCategory = 117;
+    _restQuestionCategory = 117,
+    _mockAppearence = ['Biege', 'Blue', 'Green', 'Pink', 'Yellow'],
+    _mockNames = ['Bagel', 'Loaf', 'Bready', 'Twist', 'Cupcake', 'Cake', 'Batter', 'Cookie', 'Donut', 'Bun', 'Biscuit', 'Flakey', 'Gluten', 'Croissant', 'Dough', 'Knead', 'Sugar', 'Flour', 'Butter', 'Yeast', 'Icing', 'Frost', 'Eggy', 'Fondant', 'Mix', 'Fluffy', 'Whip', 'Chip', 'Honey', 'Eclaire'];
 
 /*
  SCI/TECh 24,
@@ -587,12 +592,7 @@ var AppStore = Nori.createStore({
 
   mixins: [],
 
-  lastEventHandled: '',
-  gameStates: ['TITLE', 'PLAYER_SELECT', 'WAITING_ON_PLAYER', 'MAIN_GAME', 'GAME_OVER'],
-  gamePlayStates: ['CHOOSE', 'ANSWERING', 'WAITING'],
-  playerAppearences: ['Biege', 'Blue', 'Green', 'Pink', 'Yellow'],
-  difficultyImages: ['pastry_cookie01.png', 'pastry_poptart01.png', 'pastry_donut.png', 'pastry_pie.png', 'pastry_cupcake.png'],
-  mockNames: ['Bagel', 'Loaf', 'Bready', 'Twist', 'Cupcake', 'Cake', 'Batter', 'Cookie', 'Donut', 'Bun', 'Biscuit', 'Flakey', 'Gluten', 'Croissant', 'Dough', 'Knead', 'Sugar', 'Flour', 'Butter', 'Yeast', 'Icing', 'Frost', 'Eggy', 'Fondant', 'Mix', 'Fluffy', 'Whip', 'Chip', 'Honey', 'Eclaire'],
+  //gameStates    : ['TITLE', 'PLAYER_SELECT', 'WAITING_ON_PLAYER', 'MAIN_GAME', 'GAME_OVER'],
 
   initialize: function initialize() {
     this.addReducer(this.mainStateReducer.bind(this));
@@ -614,8 +614,11 @@ var AppStore = Nori.createStore({
   loadStore: function loadStore() {
     // Set initial state
     this.setState({
-      currentState: this.gameStates[0],
-      currentPlayState: this.gamePlayStates[0],
+      lastEventHandled: '',
+      gameStates: ['TITLE', 'PLAYER_SELECT', 'WAITING_ON_PLAYER', 'MAIN_GAME', 'GAME_OVER'],
+      gamePlayStates: ['CHOOSE', 'ANSWERING', 'WAITING'],
+      currentState: '',
+      currentPlayState: '',
       currentQuestion: null,
       sentQuestion: this.createNullQuestion(),
       session: {
@@ -683,8 +686,8 @@ var AppStore = Nori.createStore({
     return {
       id: '',
       type: '',
-      name: _arrayUtils.rndElement(this.mockNames) + _numUtils.rndNumber(100, 999),
-      appearance: _arrayUtils.rndElement(this.playerAppearences)
+      name: _arrayUtils.rndElement(_mockNames) + _numUtils.rndNumber(100, 999),
+      appearance: _arrayUtils.rndElement(_mockAppearence)
     };
   },
 
@@ -706,7 +709,8 @@ var AppStore = Nori.createStore({
    */
   mainStateReducer: function mainStateReducer(state, event) {
     state = state || {};
-    this.lastEventHandled = event.type;
+
+    state.lastEventHandled = event.type;
 
     switch (event.type) {
       case _noriActionConstants.CHANGE_STORE_STATE:
@@ -745,21 +749,21 @@ var AppStore = Nori.createStore({
   handleStateMutation: function handleStateMutation() {
     var state = this.getState();
 
-    console.log(this.lastEventHandled);
+    console.log(state.lastEventHandled);
 
     // Pick out certain events for specific notifications.
     // Rather than blasting out a new store every time
-    if (this.lastEventHandled === _appActionConstants.SET_LOCAL_PLAYER_PROPS) {
+    if (state.lastEventHandled === _appActionConstants.SET_LOCAL_PLAYER_PROPS) {
       this.notifySubscribersOf('localPlayerDataUpdated');
-    } else if (this.lastEventHandled === _appActionConstants.SET_GAME_PLAY_STATE) {
+    } else if (state.lastEventHandled === _appActionConstants.SET_GAME_PLAY_STATE) {
       this.notifySubscribersOf('gamePlayStateUpdated');
-    } else if (this.lastEventHandled === _appActionConstants.SET_CURRENT_QUESTION || this.lastEventHandled === _appActionConstants.CLEAR_QUESTION) {
+    } else if (state.lastEventHandled === _appActionConstants.SET_CURRENT_QUESTION || state.lastEventHandled === _appActionConstants.CLEAR_QUESTION) {
       this.notifySubscribersOf('currentQuestionChange');
-    } else if (this.lastEventHandled === _appActionConstants.ANSWERED_CORRECT) {
+    } else if (state.lastEventHandled === _appActionConstants.ANSWERED_CORRECT) {
       this.notifySubscribersOf('answeredCorrect');
-    } else if (this.lastEventHandled === _appActionConstants.ANSWERED_INCORRECT) {
+    } else if (state.lastEventHandled === _appActionConstants.ANSWERED_INCORRECT) {
       this.notifySubscribersOf('answeredIncorrect');
-    } else if (this.lastEventHandled === _appActionConstants.OPPONENT_ANSWERED) {
+    } else if (state.lastEventHandled === _appActionConstants.OPPONENT_ANSWERED) {
       this.notifySubscribersOf('opponentAnswered');
     }
 
@@ -863,7 +867,8 @@ var AppView = Nori.createView({
   },
 
   configureViews: function configureViews() {
-    var gameStates = _appStore.gameStates;
+    // TODO need to init this aspect of the store before here
+    var gameStates = ['TITLE', 'PLAYER_SELECT', 'WAITING_ON_PLAYER', 'MAIN_GAME', 'GAME_OVER']; //_appStore.getState().gameStates;
 
     this.setViewMountPoint('#contents');
 
@@ -914,6 +919,8 @@ var _nudoruBrowserDOMUtilsJs = require('../../nudoru/browser/DOMUtils.js');
 
 var _domUtils = _interopRequireWildcard(_nudoruBrowserDOMUtilsJs);
 
+var _difficultyImages = ['pastry_cookie01.png', 'pastry_poptart01.png', 'pastry_donut.png', 'pastry_pie.png', 'pastry_cupcake.png'];
+
 /**
  * Module for a dynamic application view for a route or a persistent view
  */
@@ -955,7 +962,6 @@ var Component = Nori.view().createComponentView({
 
   getHUDState: function getHUDState() {
     var appState = _appStore.getState(),
-        difficultyImages = _appStore.difficultyImages,
         stats = undefined;
 
     if (this.getConfigProps().target === 'local') {
@@ -963,7 +969,7 @@ var Component = Nori.view().createComponentView({
       stats.playerImage = this.getPlayerHUDImage(appState.currentPlayState, stats.appearance);
       if (appState.currentQuestion) {
         var dlevel = appState.currentQuestion.question.q_difficulty_level - 1;
-        stats.questionDifficultyImage = difficultyImages[dlevel];
+        stats.questionDifficultyImage = _difficultyImages[dlevel];
       } else {
         stats.questionDifficultyImage = 'null.png';
       }
@@ -973,7 +979,7 @@ var Component = Nori.view().createComponentView({
       // there will be a dummy sent question rather than null
       if (appState.sentQuestion.q_difficulty_level >= 0) {
         var dlevel = appState.sentQuestion.q_difficulty_level - 1;
-        stats.questionDifficultyImage = difficultyImages[dlevel];
+        stats.questionDifficultyImage = _difficultyImages[dlevel];
       } else {
         stats.questionDifficultyImage = 'null.png';
       }
@@ -1562,7 +1568,7 @@ var Component = Nori.view().createComponentView({
   defineEvents: function defineEvents() {
     return {
       'click #game__button-skip': function clickGame__buttonSkip() {
-        _appStore.apply(_noriActions.changeStoreState({ currentState: _appStore.gameStates[4] }));
+        _appStore.apply(_noriActions.changeStoreState({ currentState: _appStore.getState().gameStates[4] }));
       },
       'click #game_question-difficulty1, click #game_question-difficulty2, click #game_question-difficulty3, click #game_question-difficulty4, click #game_question-difficulty5': this.sendQuestion.bind(this)
     };
@@ -1716,7 +1722,7 @@ var Component = Nori.view().createComponentView({
       'click #select__button-joinroom': this.onJoinRoom.bind(this),
       'click #select__button-createroom': this.onCreateRoom.bind(this),
       'click #select__button-go': function clickSelect__buttonGo() {
-        _appStore.apply(_noriActions.changeStoreState({ currentState: _appStore.gameStates[2] }));
+        _appStore.apply(_noriActions.changeStoreState({ currentState: _appStore.getState().gameStates[2] }));
       }
     };
   },
@@ -1856,7 +1862,7 @@ var Component = Nori.view().createComponentView({
   defineEvents: function defineEvents() {
     return {
       'click #title__button-start': function clickTitle__buttonStart() {
-        _appStore.apply(_noriActions.changeStoreState({ currentState: _appStore.gameStates[1] }));
+        _appStore.apply(_noriActions.changeStoreState({ currentState: _appStore.getState().gameStates[1] }));
       }
     };
   },
@@ -1938,7 +1944,7 @@ var Component = Nori.view().createComponentView({
   defineEvents: function defineEvents() {
     return {
       'click #waiting__button-skip': function clickWaiting__buttonSkip() {
-        _appStore.apply(_noriActions.changeStoreState({ currentState: _appStore.gameStates[3] }));
+        _appStore.apply(_noriActions.changeStoreState({ currentState: _appStore.getState().gameStates[3] }));
       }
     };
   },

@@ -132,17 +132,19 @@ let App = Nori.createApplication({
   },
 
   handleJoinNewlyCreatedRoom(roomID) {
-    let setRoom               = _appActions.setSessionProps({roomID: roomID}),
-        setWaitingScreenState = _noriActions.changeStoreState({currentState: this.store.gameStates[2]});
+    let appState           = this.store.getState(),
+      setRoom               = _appActions.setSessionProps({roomID: roomID}),
+        setWaitingScreenState = _noriActions.changeStoreState({currentState: appState.gameStates[2]});
 
     this.store.apply([setRoom, setWaitingScreenState]);
   },
 
   handleGameStart(payload) {
-    let remotePlayer       = this.pluckRemotePlayer(payload.players),
+    let appState           = this.store.getState(),
+        remotePlayer       = this.pluckRemotePlayer(payload.players),
         setRemotePlayer    = _appActions.setRemotePlayerProps(remotePlayer),
-        setGameState       = _noriActions.changeStoreState({currentState: this.store.gameStates[3]}),
-        setGamePlayState   = _appActions.setGamePlayState(this.store.gamePlayStates[0]),
+        setGameState       = _noriActions.changeStoreState({currentState: appState.gameStates[3]}),
+        setGamePlayState   = _appActions.setGamePlayState(appState.gamePlayStates[0]),
         setCurrentQuestion = _appActions.setCurrentQuestion(null);
 
     this.store.apply([setRemotePlayer, setGameState, setGamePlayState, setCurrentQuestion]);
@@ -167,7 +169,8 @@ let App = Nori.createApplication({
   },
 
   handleReceivedQuestion(question) {
-    let setGamePlayState   = _appActions.setGamePlayState(this.store.gamePlayStates[1]),
+    let appState           = this.store.getState(),
+        setGamePlayState   = _appActions.setGamePlayState(appState.gamePlayStates[1]),
         setCurrentQuestion = _appActions.setCurrentQuestion(question);
 
     this.store.apply([setGamePlayState, setCurrentQuestion]);
@@ -205,7 +208,7 @@ let App = Nori.createApplication({
   sendQuestion(difficulty) {
     let appState         = this.store.getState(),
         question         = this.store.getQuestionOfDifficulty(difficulty),
-        setGamePlayState = _appActions.setGamePlayState(this.store.gamePlayStates[2]),
+        setGamePlayState = _appActions.setGamePlayState(appState.gamePlayStates[2]),
         setSentQuestion  = _appActions.setSentQuestion(question);
 
     this.socket.notifyServer(_socketIOEvents.SEND_QUESTION, {

@@ -6,7 +6,9 @@ import * as _numUtils from '../../nudoru/core/NumberUtils.js';
 import * as _arrayUtils from '../../nudoru/core/ArrayUtils.js';
 
 const _restNumQuestions     = 300,
-      _restQuestionCategory = 117;
+      _restQuestionCategory = 117,
+      _mockAppearence       = ['Biege', 'Blue', 'Green', 'Pink', 'Yellow'],
+      _mockNames            = ['Bagel', 'Loaf', 'Bready', 'Twist', 'Cupcake', 'Cake', 'Batter', 'Cookie', 'Donut', 'Bun', 'Biscuit', 'Flakey', 'Gluten', 'Croissant', 'Dough', 'Knead', 'Sugar', 'Flour', 'Butter', 'Yeast', 'Icing', 'Frost', 'Eggy', 'Fondant', 'Mix', 'Fluffy', 'Whip', 'Chip', 'Honey', 'Eclaire'];
 
 /*
  SCI/TECh 24,
@@ -17,6 +19,7 @@ const _restNumQuestions     = 300,
  158 puzzle, contains HTML encoded
  166 comp intro
  */
+
 
 /**
  * This application store contains "reducer store" functionality based on Redux.
@@ -32,12 +35,7 @@ var AppStore = Nori.createStore({
 
   mixins: [],
 
-  lastEventHandled : '',
-  gameStates       : ['TITLE', 'PLAYER_SELECT', 'WAITING_ON_PLAYER', 'MAIN_GAME', 'GAME_OVER'],
-  gamePlayStates   : ['CHOOSE', 'ANSWERING', 'WAITING'],
-  playerAppearences: ['Biege', 'Blue', 'Green', 'Pink', 'Yellow'],
-  difficultyImages : ['pastry_cookie01.png', 'pastry_poptart01.png', 'pastry_donut.png', 'pastry_pie.png', 'pastry_cupcake.png'],
-  mockNames        : ['Bagel', 'Loaf', 'Bready', 'Twist', 'Cupcake', 'Cake', 'Batter', 'Cookie', 'Donut', 'Bun', 'Biscuit', 'Flakey', 'Gluten', 'Croissant', 'Dough', 'Knead', 'Sugar', 'Flour', 'Butter', 'Yeast', 'Icing', 'Frost', 'Eggy', 'Fondant', 'Mix', 'Fluffy', 'Whip', 'Chip', 'Honey', 'Eclaire'],
+  //gameStates    : ['TITLE', 'PLAYER_SELECT', 'WAITING_ON_PLAYER', 'MAIN_GAME', 'GAME_OVER'],
 
   initialize() {
     this.addReducer(this.mainStateReducer.bind(this));
@@ -59,8 +57,11 @@ var AppStore = Nori.createStore({
     loadStore() {
     // Set initial state
     this.setState({
-      currentState    : this.gameStates[0],
-      currentPlayState: this.gamePlayStates[0],
+      lastEventHandled: '',
+      gameStates      : ['TITLE', 'PLAYER_SELECT', 'WAITING_ON_PLAYER', 'MAIN_GAME', 'GAME_OVER'],
+      gamePlayStates  : ['CHOOSE', 'ANSWERING', 'WAITING'],
+      currentState    : '',
+      currentPlayState: '',
       currentQuestion : null,
       sentQuestion    : this.createNullQuestion(),
       session         : {
@@ -130,8 +131,8 @@ var AppStore = Nori.createStore({
     return {
       id        : '',
       type      : '',
-      name      : _arrayUtils.rndElement(this.mockNames) + _numUtils.rndNumber(100, 999),
-      appearance: _arrayUtils.rndElement(this.playerAppearences)
+      name      : _arrayUtils.rndElement(_mockNames) + _numUtils.rndNumber(100, 999),
+      appearance: _arrayUtils.rndElement(_mockAppearence)
     };
   },
 
@@ -152,8 +153,9 @@ var AppStore = Nori.createStore({
    * @returns {*}
    */
     mainStateReducer(state, event) {
-    state                 = state || {};
-    this.lastEventHandled = event.type;
+    state = state || {};
+
+    state.lastEventHandled = event.type;
 
     switch (event.type) {
       case _noriActionConstants.CHANGE_STORE_STATE:
@@ -192,22 +194,22 @@ var AppStore = Nori.createStore({
     handleStateMutation() {
     let state = this.getState();
 
-    console.log(this.lastEventHandled);
+    console.log(state.lastEventHandled);
 
     // Pick out certain events for specific notifications.
     // Rather than blasting out a new store every time
-    if (this.lastEventHandled === _appActionConstants.SET_LOCAL_PLAYER_PROPS) {
+    if (state.lastEventHandled === _appActionConstants.SET_LOCAL_PLAYER_PROPS) {
       this.notifySubscribersOf('localPlayerDataUpdated');
-    } else if (this.lastEventHandled === _appActionConstants.SET_GAME_PLAY_STATE) {
+    } else if (state.lastEventHandled === _appActionConstants.SET_GAME_PLAY_STATE) {
       this.notifySubscribersOf('gamePlayStateUpdated');
-    } else if (this.lastEventHandled === _appActionConstants.SET_CURRENT_QUESTION ||
-      this.lastEventHandled === _appActionConstants.CLEAR_QUESTION) {
+    } else if (state.lastEventHandled === _appActionConstants.SET_CURRENT_QUESTION ||
+      state.lastEventHandled === _appActionConstants.CLEAR_QUESTION) {
       this.notifySubscribersOf('currentQuestionChange');
-    } else if (this.lastEventHandled === _appActionConstants.ANSWERED_CORRECT) {
+    } else if (state.lastEventHandled === _appActionConstants.ANSWERED_CORRECT) {
       this.notifySubscribersOf('answeredCorrect');
-    } else if (this.lastEventHandled === _appActionConstants.ANSWERED_INCORRECT) {
+    } else if (state.lastEventHandled === _appActionConstants.ANSWERED_INCORRECT) {
       this.notifySubscribersOf('answeredIncorrect');
-    } else if (this.lastEventHandled === _appActionConstants.OPPONENT_ANSWERED) {
+    } else if (state.lastEventHandled === _appActionConstants.OPPONENT_ANSWERED) {
       this.notifySubscribersOf('opponentAnswered');
     }
 

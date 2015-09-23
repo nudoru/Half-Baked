@@ -24,7 +24,7 @@ var Component = Nori.view().createComponentView({
   defineEvents() {
     return {
       'click #title__button-start'() {
-        _appStore.apply(_noriActions.changeStoreState({currentState: _appStore.gameStates[1]}));
+        _appStore.apply(_noriActions.changeStoreState({currentState: _appStore.getState().gameStates[1]}));
       }
     };
   },

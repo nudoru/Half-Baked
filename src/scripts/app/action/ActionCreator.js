@@ -114,7 +114,7 @@ var ActionCreator = {
       type   : _actionConstants.RESET_GAME,
       payload: {
         data: {
-          currentState: _appStore.gameStates[1],
+          currentState: _appStore.getState().gameStates[1],
           session     : {
             roomID: ''
           },
