@@ -5,6 +5,13 @@ import * as _appActions from '../action/ActionCreator.js';
 import * as _template from '../../nori/utils/Templating.js';
 import * as Rxjs from '../../vendor/rxjs/rx.lite.min.js';
 import * as _mixinDOMManipulation from '../../nori/view/MixinDOMManipulation.js';
+
+let _opponentAnswered        = null,
+    _timerObservable         = null,
+    _baseMaxSeconds          = 10,
+    _currentSecondTimerValue = 0,
+    _correctChoiceText       = '';
+
 /**
  * Module for a dynamic application view for a route or a persistent view
  */
@@ -14,18 +21,6 @@ var Component = Nori.view().createComponentView({
     _mixinDOMManipulation
   ],
 
-  opponentAnswered       : null,
-  timerObservable        : null,
-  baseMaxSeconds         : 10,
-  d1MaxSeconds           : 10,
-  d2MaxSeconds           : 15,
-  d3MaxSeconds           : 20,
-  d4MaxSeconds           : 25,
-  d5MaxSeconds           : 30,
-  currentSecondTimerValue: 0,
-
-  // cache this
-  correctChoiceText: '',
 
   /**
    * configProps passed in from region definition on parent View
@@ -34,7 +29,7 @@ var Component = Nori.view().createComponentView({
    * @param configProps
    */
     initialize(configProps) {
-    this.opponentAnswered = _appStore.subscribe('currentQuestionChange', this.update.bind(this));
+    _opponentAnswered = _appStore.subscribe('currentQuestionChange', this.update.bind(this));
   },
 
   /**
@@ -102,7 +97,7 @@ var Component = Nori.view().createComponentView({
 
     // TODO not working
     if (!_appStore.isGameOver()) {
-      _appView.default.negativeAlert('The correct answer was <span class="correct-answer">' + this.correctChoiceText + '</span>', 'You missed that one!');
+      _appView.default.negativeAlert('The correct answer was <span class="correct-answer">' + _correctChoiceText + '</span>', 'You missed that one!');
     }
 
   },
@@ -113,10 +108,10 @@ var Component = Nori.view().createComponentView({
 
     if (state.currentQuestion) {
       if (state.currentQuestion.hasOwnProperty('question')) {
-        let question           = state.currentQuestion.question;
-        viewState.question     = question;
-        this.correctChoiceText = question['q_options_' + question.q_correct_option];
-        console.log('Correct choice: ', this.correctChoiceText);
+        let question       = state.currentQuestion.question;
+        viewState.question = question;
+        _correctChoiceText = question['q_options_' + question.q_correct_option];
+        console.log('Correct choice: ', _correctChoiceText);
       }
     }
 
@@ -201,23 +196,23 @@ var Component = Nori.view().createComponentView({
   },
 
   startTimer() {
-    if (this.timerObservable) {
+    if (_timerObservable) {
       this.clearTimer();
     }
 
-    let viewState                = this.getState();
-    this.currentSecondTimerValue = this['d' + viewState.question.q_difficulty_level + 'MaxSeconds'];
+    let viewState            = this.getState();
+    _currentSecondTimerValue = _baseMaxSeconds + ((parseInt(viewState.question.q_difficulty_level) - 1) * 5);
 
-    this.updateTimerText(this.currentSecondTimerValue);
+    this.updateTimerText(_currentSecondTimerValue);
 
-    this.timerObservable = Rxjs.Observable.interval(1000).take(this.currentSecondTimerValue).subscribe(this.onTimerTick.bind(this),
+    _timerObservable = Rxjs.Observable.interval(1000).take(_currentSecondTimerValue).subscribe(this.onTimerTick.bind(this),
       function onErr() {
       },
       this.onTimerComplete.bind(this));
   },
 
   onTimerTick(second) {
-    this.updateTimerText(this.currentSecondTimerValue - (second + 1));
+    this.updateTimerText(_currentSecondTimerValue - (second + 1));
   },
 
   updateTimerText(number) {
@@ -232,11 +227,11 @@ var Component = Nori.view().createComponentView({
   },
 
   clearTimer() {
-    if (this.timerObservable) {
-      this.timerObservable.dispose();
+    if (_timerObservable) {
+      _timerObservable.dispose();
     }
-    this.currentSecondTimerValue = 0;
-    this.timerObservable         = null;
+    _currentSecondTimerValue = 0;
+    _timerObservable         = null;
   },
 
   /**
@@ -248,8 +243,8 @@ var Component = Nori.view().createComponentView({
   },
 
   componentWillDispose() {
-    if (this.opponentAnswered) {
-      this.opponentAnswered.dispose();
+    if (_opponentAnswered) {
+      _opponentAnswered.dispose();
     }
   }
 

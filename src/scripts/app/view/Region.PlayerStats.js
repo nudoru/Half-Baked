@@ -14,8 +14,6 @@ var Component = Nori.view().createComponentView({
     _mixinDOMManipulation
   ],
 
-  isAnimating: false,
-
   /**
    * configProps passed in from region definition on parent View
    * Initialize and bind, called once on first render. Parent component is

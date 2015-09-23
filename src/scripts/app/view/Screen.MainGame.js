@@ -10,6 +10,9 @@ import * as _numUtils from '../../nudoru/core/NumberUtils.js';
 import * as _domUtils from '../../nudoru/browser/DOMUtils.js';
 import * as _mixinDOMManipulation from '../../nori/view/MixinDOMManipulation.js';
 
+let _currentQuestionChanged = null,
+    _difficultyCardElIDs    = ['#game_question-difficulty1', '#game_question-difficulty2', '#game_question-difficulty3', '#game_question-difficulty4', '#game_question-difficulty5'];
+
 /**
  * Module for a dynamic application view for a route or a persistent view
  */
@@ -19,9 +22,6 @@ var Component = Nori.view().createComponentView({
     _mixinDOMManipulation
   ],
 
-  currentQuestionChanged: null,
-  difficultyCardElIDs   : ['#game_question-difficulty1', '#game_question-difficulty2', '#game_question-difficulty3', '#game_question-difficulty4', '#game_question-difficulty5'],
-
   /**
    * Initialize and bind, called once on first render. Parent component is
    * initialized from app view
@@ -29,7 +29,7 @@ var Component = Nori.view().createComponentView({
    */
     initialize (configProps) {
     this.bindMap(_appStore);
-    this.currentQuestionChanged = _appStore.subscribe('currentQuestionChange', this.handleOpponentAnswered.bind(this));
+    _currentQuestionChanged = _appStore.subscribe('currentQuestionChange', this.handleOpponentAnswered.bind(this));
   },
 
   defineRegions () {
@@ -121,7 +121,7 @@ var Component = Nori.view().createComponentView({
   },
 
   animateDifficultyCards() {
-    this.difficultyCardElIDs.forEach((cardID, i) => {
+    _difficultyCardElIDs.forEach((cardID, i) => {
 
       this.tweenSet(cardID, {
         alpha: 0,
@@ -145,8 +145,8 @@ var Component = Nori.view().createComponentView({
   },
 
   componentWillDispose(){
-    if (this.currentQuestionChanged) {
-      this.currentQuestionChanged.dispose();
+    if (_currentQuestionChanged) {
+      _currentQuestionChanged.dispose();
     }
   }
 

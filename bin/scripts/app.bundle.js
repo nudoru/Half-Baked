@@ -921,8 +921,6 @@ var Component = Nori.view().createComponentView({
 
   mixins: [_mixinDOMManipulation],
 
-  isAnimating: false,
-
   /**
    * configProps passed in from region definition on parent View
    * Initialize and bind, called once on first render. Parent component is
@@ -1094,25 +1092,18 @@ var _noriViewMixinDOMManipulationJs = require('../../nori/view/MixinDOMManipulat
 
 var _mixinDOMManipulation = _interopRequireWildcard(_noriViewMixinDOMManipulationJs);
 
+var _opponentAnswered = null,
+    _timerObservable = null,
+    _baseMaxSeconds = 10,
+    _currentSecondTimerValue = 0,
+    _correctChoiceText = '';
+
 /**
  * Module for a dynamic application view for a route or a persistent view
  */
 var Component = Nori.view().createComponentView({
 
   mixins: [_mixinDOMManipulation],
-
-  opponentAnswered: null,
-  timerObservable: null,
-  baseMaxSeconds: 10,
-  d1MaxSeconds: 10,
-  d2MaxSeconds: 15,
-  d3MaxSeconds: 20,
-  d4MaxSeconds: 25,
-  d5MaxSeconds: 30,
-  currentSecondTimerValue: 0,
-
-  // cache this
-  correctChoiceText: '',
 
   /**
    * configProps passed in from region definition on parent View
@@ -1121,7 +1112,7 @@ var Component = Nori.view().createComponentView({
    * @param configProps
    */
   initialize: function initialize(configProps) {
-    this.opponentAnswered = _appStore.subscribe('currentQuestionChange', this.update.bind(this));
+    _opponentAnswered = _appStore.subscribe('currentQuestionChange', this.update.bind(this));
   },
 
   /**
@@ -1189,7 +1180,7 @@ var Component = Nori.view().createComponentView({
 
     // TODO not working
     if (!_appStore.isGameOver()) {
-      _appView['default'].negativeAlert('The correct answer was <span class="correct-answer">' + this.correctChoiceText + '</span>', 'You missed that one!');
+      _appView['default'].negativeAlert('The correct answer was <span class="correct-answer">' + _correctChoiceText + '</span>', 'You missed that one!');
     }
   },
 
@@ -1201,8 +1192,8 @@ var Component = Nori.view().createComponentView({
       if (state.currentQuestion.hasOwnProperty('question')) {
         var question = state.currentQuestion.question;
         viewState.question = question;
-        this.correctChoiceText = question['q_options_' + question.q_correct_option];
-        console.log('Correct choice: ', this.correctChoiceText);
+        _correctChoiceText = question['q_options_' + question.q_correct_option];
+        console.log('Correct choice: ', _correctChoiceText);
       }
     }
 
@@ -1285,20 +1276,20 @@ var Component = Nori.view().createComponentView({
   },
 
   startTimer: function startTimer() {
-    if (this.timerObservable) {
+    if (_timerObservable) {
       this.clearTimer();
     }
 
     var viewState = this.getState();
-    this.currentSecondTimerValue = this['d' + viewState.question.q_difficulty_level + 'MaxSeconds'];
+    _currentSecondTimerValue = _baseMaxSeconds + (parseInt(viewState.question.q_difficulty_level) - 1) * 5;
 
-    this.updateTimerText(this.currentSecondTimerValue);
+    this.updateTimerText(_currentSecondTimerValue);
 
-    this.timerObservable = Rxjs.Observable.interval(1000).take(this.currentSecondTimerValue).subscribe(this.onTimerTick.bind(this), function onErr() {}, this.onTimerComplete.bind(this));
+    _timerObservable = Rxjs.Observable.interval(1000).take(_currentSecondTimerValue).subscribe(this.onTimerTick.bind(this), function onErr() {}, this.onTimerComplete.bind(this));
   },
 
   onTimerTick: function onTimerTick(second) {
-    this.updateTimerText(this.currentSecondTimerValue - (second + 1));
+    this.updateTimerText(_currentSecondTimerValue - (second + 1));
   },
 
   updateTimerText: function updateTimerText(number) {
@@ -1313,11 +1304,11 @@ var Component = Nori.view().createComponentView({
   },
 
   clearTimer: function clearTimer() {
-    if (this.timerObservable) {
-      this.timerObservable.dispose();
+    if (_timerObservable) {
+      _timerObservable.dispose();
     }
-    this.currentSecondTimerValue = 0;
-    this.timerObservable = null;
+    _currentSecondTimerValue = 0;
+    _timerObservable = null;
   },
 
   /**
@@ -1329,8 +1320,8 @@ var Component = Nori.view().createComponentView({
   },
 
   componentWillDispose: function componentWillDispose() {
-    if (this.opponentAnswered) {
-      this.opponentAnswered.dispose();
+    if (_opponentAnswered) {
+      _opponentAnswered.dispose();
     }
   }
 
@@ -1525,15 +1516,15 @@ var _noriViewMixinDOMManipulationJs = require('../../nori/view/MixinDOMManipulat
 
 var _mixinDOMManipulation = _interopRequireWildcard(_noriViewMixinDOMManipulationJs);
 
+var _currentQuestionChanged = null,
+    _difficultyCardElIDs = ['#game_question-difficulty1', '#game_question-difficulty2', '#game_question-difficulty3', '#game_question-difficulty4', '#game_question-difficulty5'];
+
 /**
  * Module for a dynamic application view for a route or a persistent view
  */
 var Component = Nori.view().createComponentView({
 
   mixins: [_mixinDOMManipulation],
-
-  currentQuestionChanged: null,
-  difficultyCardElIDs: ['#game_question-difficulty1', '#game_question-difficulty2', '#game_question-difficulty3', '#game_question-difficulty4', '#game_question-difficulty5'],
 
   /**
    * Initialize and bind, called once on first render. Parent component is
@@ -1542,7 +1533,7 @@ var Component = Nori.view().createComponentView({
    */
   initialize: function initialize(configProps) {
     this.bindMap(_appStore);
-    this.currentQuestionChanged = _appStore.subscribe('currentQuestionChange', this.handleOpponentAnswered.bind(this));
+    _currentQuestionChanged = _appStore.subscribe('currentQuestionChange', this.handleOpponentAnswered.bind(this));
   },
 
   defineRegions: function defineRegions() {
@@ -1635,7 +1626,7 @@ var Component = Nori.view().createComponentView({
   animateDifficultyCards: function animateDifficultyCards() {
     var _this = this;
 
-    this.difficultyCardElIDs.forEach(function (cardID, i) {
+    _difficultyCardElIDs.forEach(function (cardID, i) {
 
       _this.tweenSet(cardID, {
         alpha: 0,
@@ -1657,8 +1648,8 @@ var Component = Nori.view().createComponentView({
   componentWillUnmount: function componentWillUnmount() {},
 
   componentWillDispose: function componentWillDispose() {
-    if (this.currentQuestionChanged) {
-      this.currentQuestionChanged.dispose();
+    if (_currentQuestionChanged) {
+      _currentQuestionChanged.dispose();
     }
   }
 
