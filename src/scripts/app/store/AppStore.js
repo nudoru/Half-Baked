@@ -41,13 +41,17 @@ var AppStore = Nori.createStore({
     this.addReducer(this.mainStateReducer.bind(this));
     this.initializeReducerStore();
     this.setState(Nori.config());
+
     this.createSubject('storeInitialized');
+
     this.createSubject('localPlayerDataUpdated');
-    this.createSubject('remotePlayerDataUpdated');
-    this.createSubject('currentQuestionChange');
-    this.createSubject('opponentAnswered');
     this.createSubject('answeredCorrect');
     this.createSubject('answeredIncorrect');
+    this.createSubject('reset');
+
+    //this.createSubject('remotePlayerDataUpdated');
+    //this.createSubject('currentQuestionChange');
+    //this.createSubject('opponentAnswered');
   },
 
   initialState() {
@@ -202,6 +206,8 @@ var AppStore = Nori.createStore({
     } else if (state.lastEventHandled === _appActionConstants.ANSWERED_INCORRECT) {
       this.notifySubscribersOf('answeredIncorrect');
       this.notifySubscribersOf('localPlayerDataUpdated');
+    } else if (state.lastEventHandled === _appActionConstants.RESET_GAME) {
+      this.notifySubscribersOf('reset');
     }
 
     // Check if player health is 0

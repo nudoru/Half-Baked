@@ -122,9 +122,9 @@ var ActionCreator = {
       payload: {
         data: {
           currentState: _appStore.getState().gameStates[1],
-          session     : {
-            roomID: ''
-          },
+          //session     : {
+          //  roomID: ''
+          //},
           localPlayer : _appStore.createPlayerResetObject(),
           remotePlayer: _appStore.createPlayerResetObject()
         }

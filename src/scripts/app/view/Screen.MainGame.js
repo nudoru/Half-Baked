@@ -105,7 +105,7 @@ var Component = Nori.view().createComponentView({
       }
 
       // Needs a 1ms delay
-      _cardAnimationSub = _rx.doEvery(1, 1, this.animateDifficultyCards.bind(this));
+      _cardAnimationSub = _rx.doEvery(10, 1, this.animateDifficultyCards.bind(this));
       //this.animateDifficultyCards();
     }
   },

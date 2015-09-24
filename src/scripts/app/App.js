@@ -51,6 +51,7 @@ let App = Nori.createApplication({
     this.store.subscribe('localPlayerDataUpdated', this.handleLocalPlayerPropsUpdate.bind(this));
     this.store.subscribe('answeredCorrect', this.handleAnswerCorrect.bind(this));
     this.store.subscribe('answeredIncorrect', this.handleAnswerIncorrect.bind(this));
+    this.store.subscribe('reset', this.handleGameReset.bind(this));
 
     this.runApplication();
   },
@@ -119,9 +120,11 @@ let App = Nori.createApplication({
         this.handleOpponentAnswered(payload.payload);
         return;
       case (_socketIOEvents.SYSTEM_MESSAGE):
+        this.view.notify(payload.payload, payload.type, 'success');
+        return;
       case (_socketIOEvents.BROADCAST):
       case (_socketIOEvents.MESSAGE):
-        this.view.alert(payload.payload, payload.type);
+        this.view.notify(payload.payload, payload.type, 'warning');
         return;
       case (_socketIOEvents.USER_DISCONNECTED):
         return;
@@ -139,8 +142,8 @@ let App = Nori.createApplication({
   },
 
   handleJoinNewlyCreatedRoom(roomID) {
-    let appState           = this.store.getState(),
-      setRoom               = _appActions.setSessionProps({roomID: roomID}),
+    let appState              = this.store.getState(),
+        setRoom               = _appActions.setSessionProps({roomID: roomID}),
         setWaitingScreenState = _noriActions.changeStoreState({currentState: appState.gameStates[2]});
 
     this.store.apply([setRoom, setWaitingScreenState]);
@@ -208,10 +211,18 @@ let App = Nori.createApplication({
     });
   },
 
+  leaveRoom: function (roomID) {
+    this.socket.notifyServer(_socketIOEvents.LEAVE_ROOM, {
+      roomID: roomID
+    });
+
+    this.store.apply(_appActions.setSessionProps({roomID: '0000'}));
+  },
+
   sendQuestion(difficulty) {
-    let appState         = this.store.getState(),
-        question         = this.store.getQuestionOfDifficulty(difficulty),
-        setSentQuestion  = _appActions.setSentQuestion(question);
+    let appState        = this.store.getState(),
+        question        = this.store.getQuestionOfDifficulty(difficulty),
+        setSentQuestion = _appActions.setSentQuestion(question);
 
     this.socket.notifyServer(_socketIOEvents.SEND_QUESTION, {
       roomID  : appState.session.roomID,
@@ -219,6 +230,13 @@ let App = Nori.createApplication({
     });
 
     this.store.apply(setSentQuestion);
+  },
+
+  handleGameReset() {
+    console.log('Game reset');
+    let appState = this.store.getState();
+
+    this.leaveRoom(appState.session.roomID);
   },
 
   handleAnswerCorrect() {

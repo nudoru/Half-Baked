@@ -169,6 +169,7 @@ var App = Nori.createApplication({
     this.store.subscribe('localPlayerDataUpdated', this.handleLocalPlayerPropsUpdate.bind(this));
     this.store.subscribe('answeredCorrect', this.handleAnswerCorrect.bind(this));
     this.store.subscribe('answeredIncorrect', this.handleAnswerIncorrect.bind(this));
+    this.store.subscribe('reset', this.handleGameReset.bind(this));
 
     this.runApplication();
   },
@@ -237,9 +238,11 @@ var App = Nori.createApplication({
         this.handleOpponentAnswered(payload.payload);
         return;
       case _socketIOEvents.SYSTEM_MESSAGE:
+        this.view.notify(payload.payload, payload.type, 'success');
+        return;
       case _socketIOEvents.BROADCAST:
       case _socketIOEvents.MESSAGE:
-        this.view.alert(payload.payload, payload.type);
+        this.view.notify(payload.payload, payload.type, 'warning');
         return;
       case _socketIOEvents.USER_DISCONNECTED:
         return;
@@ -326,6 +329,14 @@ var App = Nori.createApplication({
     });
   },
 
+  leaveRoom: function leaveRoom(roomID) {
+    this.socket.notifyServer(_socketIOEvents.LEAVE_ROOM, {
+      roomID: roomID
+    });
+
+    this.store.apply(_appActions.setSessionProps({ roomID: '0000' }));
+  },
+
   sendQuestion: function sendQuestion(difficulty) {
     var appState = this.store.getState(),
         question = this.store.getQuestionOfDifficulty(difficulty),
@@ -337,6 +348,13 @@ var App = Nori.createApplication({
     });
 
     this.store.apply(setSentQuestion);
+  },
+
+  handleGameReset: function handleGameReset() {
+    console.log('Game reset');
+    var appState = this.store.getState();
+
+    this.leaveRoom(appState.session.roomID);
   },
 
   handleAnswerCorrect: function handleAnswerCorrect() {
@@ -525,9 +543,9 @@ var ActionCreator = {
       payload: {
         data: {
           currentState: _appStore.getState().gameStates[1],
-          session: {
-            roomID: ''
-          },
+          //session     : {
+          //  roomID: ''
+          //},
           localPlayer: _appStore.createPlayerResetObject(),
           remotePlayer: _appStore.createPlayerResetObject()
         }
@@ -606,13 +624,17 @@ var AppStore = Nori.createStore({
     this.addReducer(this.mainStateReducer.bind(this));
     this.initializeReducerStore();
     this.setState(Nori.config());
+
     this.createSubject('storeInitialized');
+
     this.createSubject('localPlayerDataUpdated');
-    this.createSubject('remotePlayerDataUpdated');
-    this.createSubject('currentQuestionChange');
-    this.createSubject('opponentAnswered');
     this.createSubject('answeredCorrect');
     this.createSubject('answeredIncorrect');
+    this.createSubject('reset');
+
+    //this.createSubject('remotePlayerDataUpdated');
+    //this.createSubject('currentQuestionChange');
+    //this.createSubject('opponentAnswered');
   },
 
   initialState: function initialState() {
@@ -765,6 +787,8 @@ var AppStore = Nori.createStore({
     } else if (state.lastEventHandled === _appActionConstants.ANSWERED_INCORRECT) {
       this.notifySubscribersOf('answeredIncorrect');
       this.notifySubscribersOf('localPlayerDataUpdated');
+    } else if (state.lastEventHandled === _appActionConstants.RESET_GAME) {
+      this.notifySubscribersOf('reset');
     }
 
     // Check if player health is 0
@@ -1647,7 +1671,7 @@ var Component = Nori.view().createComponentView({
       }
 
       // Needs a 1ms delay
-      _cardAnimationSub = _rx.doEvery(1, 1, this.animateDifficultyCards.bind(this));
+      _cardAnimationSub = _rx.doEvery(10, 1, this.animateDifficultyCards.bind(this));
       //this.animateDifficultyCards();
     }
   },
