@@ -86,7 +86,6 @@ var Component = Nori.view().createComponentView({
 
   sendQuestion(evt) {
     _appView.default.closeAllAlerts();
-
     var difficulty = parseInt(evt.target.getAttribute('id').substr(-1, 1));
     _app.default.sendQuestion(difficulty);
   },
@@ -99,15 +98,15 @@ var Component = Nori.view().createComponentView({
    * Component HTML was attached to the DOM
    */
     componentDidMount(){
-    if (this.isShowingCards()) {
-      if (_cardAnimationSub) {
-        _cardAnimationSub.dispose();
-      }
-
-      // Needs a 1ms delay
-      _cardAnimationSub = _rx.doEvery(10, 1, this.animateDifficultyCards.bind(this));
-      //this.animateDifficultyCards();
-    }
+    //if (this.isShowingCards()) {
+    //  if (_cardAnimationSub) {
+    //    _cardAnimationSub.dispose();
+    //  }
+    //
+    //  // Needs a 1ms delay
+    //  _cardAnimationSub = _rx.doEvery(10, 1, this.animateDifficultyCards.bind(this));
+    //  //this.animateDifficultyCards();
+    //}
   },
 
   isShowingCards() {
