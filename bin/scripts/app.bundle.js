@@ -145,23 +145,31 @@ var App = Nori.createApplication({
    * Intialize the appilcation, view and store
    */
   initialize: function initialize() {
+    console.log('ap, initialize');
     this.socket.initialize();
     this.socket.subscribe(this.handleSocketMessage.bind(this));
 
     this.view.initialize();
+    this.view.subscribe('viewInitialized', this.onViewInitialized.bind(this));
 
     this.store.initialize(); // store will acquire data dispatch event when complete
     this.store.subscribe('storeInitialized', this.onStoreInitialized.bind(this));
     this.store.loadStore();
   },
 
+  onViewInitialized: function onViewInitialized() {
+    console.log('app, onview initialized');
+  },
+
   /**
    * After the store data is ready
    */
   onStoreInitialized: function onStoreInitialized() {
+    console.log('app, onstore initialized');
     this.store.subscribe('localPlayerDataUpdated', this.handleLocalPlayerPropsUpdate.bind(this));
     this.store.subscribe('answeredCorrect', this.handleAnswerCorrect.bind(this));
     this.store.subscribe('answeredIncorrect', this.handleAnswerIncorrect.bind(this));
+
     this.runApplication();
   },
 
@@ -202,7 +210,7 @@ var App = Nori.createApplication({
       return;
     }
 
-    //console.log("from Socket.IO server", payload);
+    console.log("from Socket.IO server", payload);
 
     switch (payload.type) {
       case _socketIOEvents.CONNECT:
@@ -838,22 +846,35 @@ var _ScreenGameOverJs = require('./Screen.GameOver.js');
 
 var _screenGameOverFactory = _interopRequireWildcard(_ScreenGameOverJs);
 
-/**
- * View for an application.
- */
+var _imagesLoadedInst = undefined,
+    _preloadImages = ['img/pastries/null.png', 'img/pastries/pastry_cookie01.png', 'img/pastries/pastry_cookie02.png', 'img/pastries/pastry_croissant.png', 'img/pastries/pastry_cupcake.png', 'img/pastries/pastry_donut.png', 'img/pastries/pastry_eclair.png', 'img/pastries/pastry_macaroon.png', 'img/pastries/pastry_pie.png', 'img/pastries/pastry_poptart01.png', 'img/pastries/pastry_poptart02.png', 'img/pastries/pastry_starcookie01.png', 'img/pastries/pastry_starcookie02.png', 'img/players/alienBiege_climb1.png', 'img/players/alienBiege_climb2.png', 'img/players/alienBiege_duck.png', 'img/players/alienBiege_front.png', 'img/players/alienBiege_hit.png', 'img/players/alienBiege_jump.png', 'img/players/alienBiege_stand.png', 'img/players/alienBiege_swim1.png', 'img/players/alienBiege_swim2.png', 'img/players/alienBiege_walk1.png', 'img/players/alienBiege_walk2.png', 'img/players/alienBlue_climb1.png', 'img/players/alienBlue_climb2.png', 'img/players/alienBlue_duck.png', 'img/players/alienBlue_front.png', 'img/players/alienBlue_hit.png', 'img/players/alienBlue_jump.png', 'img/players/alienBlue_stand.png', 'img/players/alienBlue_swim1.png', 'img/players/alienBlue_swim2.png', 'img/players/alienBlue_walk1.png', 'img/players/alienBlue_walk2.png', 'img/players/alienGreen_climb1.png', 'img/players/alienGreen_climb2.png', 'img/players/alienGreen_duck.png', 'img/players/alienGreen_front.png', 'img/players/alienGreen_hit.png', 'img/players/alienGreen_jump.png', 'img/players/alienGreen_stand.png', 'img/players/alienGreen_swim1.png', 'img/players/alienGreen_swim2.png', 'img/players/alienGreen_walk1.png', 'img/players/alienGreen_walk2.png', 'img/players/alienPink_climb1.png', 'img/players/alienPink_climb2.png', 'img/players/alienPink_duck.png', 'img/players/alienPink_front.png', 'img/players/alienPink_hit.png', 'img/players/alienPink_jump.png', 'img/players/alienPink_stand.png', 'img/players/alienPink_swim1.png', 'img/players/alienPink_swim2.png', 'img/players/alienPink_walk1.png', 'img/players/alienPink_walk2.png', 'img/players/alienYellow_climb1.png', 'img/players/alienYellow_climb2.png', 'img/players/alienYellow_duck.png', 'img/players/alienYellow_front.png', 'img/players/alienYellow_hit.png', 'img/players/alienYellow_jump.png', 'img/players/alienYellow_stand.png', 'img/players/alienYellow_swim1.png', 'img/players/alienYellow_swim2.png', 'img/players/alienYellow_walk1.png', 'img/players/alienYellow_walk2.png'];
 
 var AppView = Nori.createView({
 
   mixins: [_mixinApplicationView, _mixinNudoruControls, _mixinStoreStateViews],
 
   initialize: function initialize() {
+    this.createSubject('viewInitialized');
+    this.preloadImages();
+  },
+
+  preloadImages: function preloadImages() {
+    console.log('appview, preload images');
+    // refer to docs http://desandro.github.io/imagesloaded/
+    imagesLoadedInst = new imagesLoaded(_preloadImages, this.imagesPreloaded.bind(this));
+  },
+
+  imagesPreloaded: function imagesPreloaded() {
+    console.log('appview, images preloaded OK');
+
     this.initializeApplicationView(['applicationscaffold', 'applicationcomponentsscaffold']);
     this.initializeStateViews(_appStore);
     this.initializeNudoruControls();
 
     this.configureViews();
-
     this.subscribe('viewChange', this.handleViewChange.bind(this));
+
+    this.notifySubscribersOf('viewInitialized');
   },
 
   configureViews: function configureViews() {

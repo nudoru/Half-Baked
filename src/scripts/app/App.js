@@ -27,23 +27,31 @@ let App = Nori.createApplication({
    * Intialize the appilcation, view and store
    */
     initialize() {
+    console.log('ap, initialize');
     this.socket.initialize();
     this.socket.subscribe(this.handleSocketMessage.bind(this));
 
     this.view.initialize();
+    this.view.subscribe('viewInitialized', this.onViewInitialized.bind(this));
 
     this.store.initialize(); // store will acquire data dispatch event when complete
     this.store.subscribe('storeInitialized', this.onStoreInitialized.bind(this));
     this.store.loadStore();
   },
 
+  onViewInitialized() {
+    console.log('app, onview initialized');
+  },
+
   /**
    * After the store data is ready
    */
     onStoreInitialized() {
+    console.log('app, onstore initialized');
     this.store.subscribe('localPlayerDataUpdated', this.handleLocalPlayerPropsUpdate.bind(this));
     this.store.subscribe('answeredCorrect', this.handleAnswerCorrect.bind(this));
     this.store.subscribe('answeredIncorrect', this.handleAnswerIncorrect.bind(this));
+
     this.runApplication();
   },
 
@@ -84,7 +92,7 @@ let App = Nori.createApplication({
       return;
     }
 
-    //console.log("from Socket.IO server", payload);
+    console.log("from Socket.IO server", payload);
 
     switch (payload.type) {
       case (_socketIOEvents.CONNECT):
