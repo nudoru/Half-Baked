@@ -721,7 +721,6 @@ var AppStore = Nori.createStore({
       case _appActionConstants.SET_REMOTE_PLAYER_PROPS:
       case _appActionConstants.SET_SESSION_PROPS:
       case _appActionConstants.RESET_GAME:
-      //case _appActionConstants.SET_GAME_PLAY_STATE:
       case _appActionConstants.SET_CURRENT_QUESTION:
       case _appActionConstants.SET_SENT_QUESTION:
       case _appActionConstants.ANSWERED_CORRECT:
@@ -730,6 +729,7 @@ var AppStore = Nori.createStore({
 
       case _appActionConstants.OPPONENT_ANSWERED:
       case _appActionConstants.CLEAR_QUESTION:
+        console.log('clearing question');
         state.currentQuestion = null;
         state.sentQuestion = this.createNullQuestion();
         return state;
@@ -748,18 +748,13 @@ var AppStore = Nori.createStore({
   handleStateMutation: function handleStateMutation() {
     var state = this.getState();
 
-    // Pick out certain events for specific notifications.
-    // Rather than blasting out a new store every time
+    // These are listened to by the controller to send data to server
     if (state.lastEventHandled === _appActionConstants.SET_LOCAL_PLAYER_PROPS) {
       this.notifySubscribersOf('localPlayerDataUpdated');
-    } else if (state.lastEventHandled === _appActionConstants.SET_CURRENT_QUESTION || state.lastEventHandled === _appActionConstants.CLEAR_QUESTION) {
-      this.notifySubscribersOf('currentQuestionChange');
     } else if (state.lastEventHandled === _appActionConstants.ANSWERED_CORRECT) {
       this.notifySubscribersOf('answeredCorrect');
     } else if (state.lastEventHandled === _appActionConstants.ANSWERED_INCORRECT) {
       this.notifySubscribersOf('answeredIncorrect');
-    } else if (state.lastEventHandled === _appActionConstants.OPPONENT_ANSWERED) {
-      this.notifySubscribersOf('opponentAnswered');
     }
 
     // Check if player health is 0
@@ -914,8 +909,13 @@ var _nudoruBrowserDOMUtilsJs = require('../../nudoru/browser/DOMUtils.js');
 
 var _domUtils = _interopRequireWildcard(_nudoruBrowserDOMUtilsJs);
 
+var _noriUtilsRxJs = require('../../nori/utils/Rx.js');
+
+var _rx = _interopRequireWildcard(_noriUtilsRxJs);
+
 var _difficultyImages = ['pastry_cookie01.png', 'pastry_poptart01.png', 'pastry_donut.png', 'pastry_pie.png', 'pastry_cupcake.png'],
-    gamePlayStates = ['CHOOSE', 'ANSWERING', 'WAITING'];
+    _gamePlayStates = ['CHOOSE', 'ANSWERING', 'WAITING'],
+    _foodAnimationSub = null;
 
 /**
  * Module for a dynamic application view for a route or a persistent view
@@ -958,28 +958,35 @@ var Component = Nori.view().createComponentView({
 
   getHUDState: function getHUDState() {
     var appState = _appStore.getState(),
-        stats = undefined;
+        stats = undefined,
+        localQ = false,
+        remoteQ = false,
+        dlevel = undefined,
+        dimage = 'null.png';
 
     if (this.getConfigProps().target === 'local') {
       stats = appState.localPlayer;
-      stats.playerImage = this.getPlayerHUDImage(appState.currentPlayState, stats.appearance);
       if (appState.currentQuestion) {
-        var dlevel = appState.currentQuestion.question.q_difficulty_level - 1;
-        stats.questionDifficultyImage = _difficultyImages[dlevel];
-      } else {
-        stats.questionDifficultyImage = 'null.png';
+        localQ = true;
+        dlevel = appState.currentQuestion.question.q_difficulty_level - 1;
+        dimage = _difficultyImages[dlevel];
       }
     } else {
       stats = appState.remotePlayer;
-      stats.playerImage = this.getPlayerHUDImage(this.getOppositePlayState(appState.currentPlayState), stats.appearance);
-      // there will be a dummy sent question rather than null
       if (appState.sentQuestion.q_difficulty_level >= 0) {
-        var dlevel = appState.sentQuestion.q_difficulty_level - 1;
-        stats.questionDifficultyImage = _difficultyImages[dlevel];
-      } else {
-        stats.questionDifficultyImage = 'null.png';
+        remoteQ = true;
+        dlevel = appState.sentQuestion.q_difficulty_level - 1;
+        dimage = _difficultyImages[dlevel];
       }
     }
+
+    // TODO determine state from questions, present or not
+    // TODO remote needs to be opposite local
+    stats.playerImage = this.getPlayerHUDImage('CHOOSE', stats.appearance);
+    stats.questionDifficultyImage = dimage;
+    stats.localQ = localQ;
+    stats.remoteQ = remoteQ;
+
     return stats;
   },
 
@@ -1009,49 +1016,25 @@ var Component = Nori.view().createComponentView({
     return prefix + color + statePart + postfix;
   },
 
-  template: function template() {
-    var html = _template.getSource('game__playerstats');
-    return _.template(html);
-  },
-
   /**
    * Component HTML was attached to the DOM
    */
   componentDidMount: function componentDidMount() {
-    this.animateFoodToss();
+    if (_foodAnimationSub) {
+      _foodAnimationSub.dispose();
+    }
+
+    // Needs a 1ms delay
+    _foodAnimationSub = _rx.doEvery(1, 1, this.animateFoodToss.bind(this));
   },
 
   // TODO will not animate to local player
-  //animateFoodToss() {
-  //  if (this.getState().questionDifficultyImage !== 'null.png' && this.getConfigProps().target === 'remote') {
-  //    let foodImage = this.getDOMElement().querySelector('.game__playerstats-food'),
-  //        startX, endX, endRot;
-  //
-  //    endX = _domUtils.position(foodImage).left;
-  //
-  //    startX = -700;
-  //    endRot = 125;
-  //
-  //    this.tweenSet(foodImage, {
-  //      x       : startX,
-  //      rotation: -360,
-  //      scale   : 2
-  //    });
-  //
-  //    this.tweenTo(foodImage, 1, {
-  //      scale   : 1,
-  //      x       : 0,
-  //      rotation: endRot,
-  //      ease    : Quad.easeOut
-  //    });
-  //  }
-  //},
-
-  // TODO will not animate to local player
   animateFoodToss: function animateFoodToss() {
-    //
-    if (this.getState().questionDifficultyImage !== 'null.png' && this.getConfigProps().target === 'remote') {
+    // && this.getConfigProps().target === 'remote'
+    if (this.getState().questionDifficultyImage !== 'null.png') {
+
       var foodImage = this.getDOMElement().querySelector('.game__playerstats-food'),
+          startS = undefined,
           startX = undefined,
           endRot = undefined;
 
@@ -1060,24 +1043,28 @@ var Component = Nori.view().createComponentView({
       if (this.getConfigProps().target === 'local') {
         startX = 700;
         endRot = -125;
+        startS = 15;
       } else {
         startX = -700;
         endRot = 125;
+        startS = 2;
       }
 
       this.tweenFromTo(foodImage, 1, {
         x: startX,
-        rotation: -360,
-        scale: 2
+        rotation: -720,
+        scale: startS
       }, {
         scale: 1,
         x: 0,
         rotation: endRot,
-        ease: Quad.easeOut
+        ease: Circ.easeOut
       });
     } else {
       //
     }
+
+    _foodAnimationSub.dispose();
   },
 
   /**
@@ -1090,7 +1077,7 @@ var Component = Nori.view().createComponentView({
 exports['default'] = Component;
 module.exports = exports['default'];
 
-},{"../../nori/action/ActionCreator":17,"../../nori/utils/Templating.js":28,"../../nori/view/MixinDOMManipulation.js":31,"../../nudoru/browser/DOMUtils.js":37,"../store/AppStore":5,"./AppView":6}],8:[function(require,module,exports){
+},{"../../nori/action/ActionCreator":17,"../../nori/utils/Rx.js":27,"../../nori/utils/Templating.js":28,"../../nori/view/MixinDOMManipulation.js":31,"../../nudoru/browser/DOMUtils.js":37,"../store/AppStore":5,"./AppView":6}],8:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -1332,11 +1319,7 @@ var Component = Nori.view().createComponentView({
     this.killTweens();
   },
 
-  componentWillDispose: function componentWillDispose() {
-    if (_questionChangeObs) {
-      _questionChangeObs.dispose();
-    }
-  }
+  componentWillDispose: function componentWillDispose() {}
 
 });
 
@@ -3286,6 +3269,10 @@ var _vendorRxjsRxLiteMinJs = require('../../vendor/rxjs/rx.lite.min.js');
 
 var Rxjs = _interopRequireWildcard(_vendorRxjsRxLiteMinJs);
 
+var _nudoruUtilIsJs = require('../../nudoru/util/is.js');
+
+var is = _interopRequireWildcard(_nudoruUtilIsJs);
+
 exports['default'] = {
   dom: function dom(selector, event) {
     var el = document.querySelector(selector);
@@ -3305,7 +3292,7 @@ exports['default'] = {
   },
 
   doEvery: function doEvery(ms) {
-    if (is['function'](arguments[1])) {
+    if (is.func(arguments[1])) {
       return this.interval(ms).subscribe(arguments[1]);
     }
     return this.interval(ms).take(arguments[1]).subscribe(arguments[2]);
@@ -3322,7 +3309,7 @@ exports['default'] = {
 };
 module.exports = exports['default'];
 
-},{"../../vendor/rxjs/rx.lite.min.js":49}],28:[function(require,module,exports){
+},{"../../nudoru/util/is.js":48,"../../vendor/rxjs/rx.lite.min.js":49}],28:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });

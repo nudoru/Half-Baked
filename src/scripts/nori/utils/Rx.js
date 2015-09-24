@@ -6,6 +6,7 @@
  */
 
 import * as Rxjs from '../../vendor/rxjs/rx.lite.min.js';
+import * as is from '../../nudoru/util/is.js';
 
 export default {
   dom: function (selector, event) {
@@ -26,7 +27,7 @@ export default {
   },
 
   doEvery: function (ms, ...args) {
-    if(is.function(args[0])) {
+    if(is.func(args[0])) {
       return this.interval(ms).subscribe(args[0]);
     }
     return this.interval(ms).take(args[0]).subscribe(args[1]);

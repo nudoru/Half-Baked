@@ -166,7 +166,6 @@ var AppStore = Nori.createStore({
       case _appActionConstants.SET_REMOTE_PLAYER_PROPS:
       case _appActionConstants.SET_SESSION_PROPS:
       case _appActionConstants.RESET_GAME:
-      //case _appActionConstants.SET_GAME_PLAY_STATE:
       case _appActionConstants.SET_CURRENT_QUESTION:
       case _appActionConstants.SET_SENT_QUESTION:
       case _appActionConstants.ANSWERED_CORRECT:
@@ -175,6 +174,7 @@ var AppStore = Nori.createStore({
 
       case _appActionConstants.OPPONENT_ANSWERED:
       case _appActionConstants.CLEAR_QUESTION:
+        console.log('clearing question');
         state.currentQuestion = null;
         state.sentQuestion    = this.createNullQuestion();
         return state;
@@ -193,19 +193,13 @@ var AppStore = Nori.createStore({
     handleStateMutation() {
     let state = this.getState();
 
-    // Pick out certain events for specific notifications.
-    // Rather than blasting out a new store every time
+    // These are listened to by the controller to send data to server
     if (state.lastEventHandled === _appActionConstants.SET_LOCAL_PLAYER_PROPS) {
       this.notifySubscribersOf('localPlayerDataUpdated');
-    } else if (state.lastEventHandled === _appActionConstants.SET_CURRENT_QUESTION ||
-      state.lastEventHandled === _appActionConstants.CLEAR_QUESTION) {
-      this.notifySubscribersOf('currentQuestionChange');
     } else if (state.lastEventHandled === _appActionConstants.ANSWERED_CORRECT) {
       this.notifySubscribersOf('answeredCorrect');
     } else if (state.lastEventHandled === _appActionConstants.ANSWERED_INCORRECT) {
       this.notifySubscribersOf('answeredIncorrect');
-    } else if (state.lastEventHandled === _appActionConstants.OPPONENT_ANSWERED) {
-      this.notifySubscribersOf('opponentAnswered');
     }
 
     // Check if player health is 0

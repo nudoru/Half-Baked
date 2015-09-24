@@ -222,9 +222,7 @@ var Component = Nori.view().createComponentView({
   },
 
   componentWillDispose() {
-    if (_questionChangeObs) {
-      _questionChangeObs.dispose();
-    }
+
   }
 
 

@@ -4,9 +4,11 @@ import * as _appStore from '../store/AppStore';
 import * as _template from '../../nori/utils/Templating.js';
 import * as _mixinDOMManipulation from '../../nori/view/MixinDOMManipulation.js';
 import * as _domUtils from '../../nudoru/browser/DOMUtils.js';
+import * as _rx from '../../nori/utils/Rx.js';
 
 let _difficultyImages = ['pastry_cookie01.png', 'pastry_poptart01.png', 'pastry_donut.png', 'pastry_pie.png', 'pastry_cupcake.png'],
-    gamePlayStates    = ['CHOOSE', 'ANSWERING', 'WAITING'];
+    _gamePlayStates   = ['CHOOSE', 'ANSWERING', 'WAITING'],
+    _foodAnimationSub = null;
 
 /**
  * Module for a dynamic application view for a route or a persistent view
@@ -52,28 +54,35 @@ var Component = Nori.view().createComponentView({
 
   getHUDState: function () {
     let appState = _appStore.getState(),
-        stats;
+        stats,
+        localQ   = false,
+        remoteQ  = false,
+        dlevel,
+        dimage   = 'null.png';
 
     if (this.getConfigProps().target === 'local') {
-      stats             = appState.localPlayer;
-      stats.playerImage = this.getPlayerHUDImage(appState.currentPlayState, stats.appearance);
+      stats = appState.localPlayer;
       if (appState.currentQuestion) {
-        let dlevel                    = appState.currentQuestion.question.q_difficulty_level - 1;
-        stats.questionDifficultyImage = _difficultyImages[dlevel];
-      } else {
-        stats.questionDifficultyImage = 'null.png';
+        localQ = true;
+        dlevel = appState.currentQuestion.question.q_difficulty_level - 1;
+        dimage = _difficultyImages[dlevel];
       }
     } else {
-      stats             = appState.remotePlayer;
-      stats.playerImage = this.getPlayerHUDImage(this.getOppositePlayState(appState.currentPlayState), stats.appearance);
-      // there will be a dummy sent question rather than null
+      stats = appState.remotePlayer;
       if (appState.sentQuestion.q_difficulty_level >= 0) {
-        let dlevel                    = appState.sentQuestion.q_difficulty_level - 1;
-        stats.questionDifficultyImage = _difficultyImages[dlevel];
-      } else {
-        stats.questionDifficultyImage = 'null.png';
+        remoteQ = true;
+        dlevel  = appState.sentQuestion.q_difficulty_level - 1;
+        dimage  = _difficultyImages[dlevel];
       }
     }
+
+    // TODO determine state from questions, present or not
+    // TODO remote needs to be opposite local
+    stats.playerImage             = this.getPlayerHUDImage('CHOOSE', stats.appearance);
+    stats.questionDifficultyImage = dimage;
+    stats.localQ                  = localQ;
+    stats.remoteQ                 = remoteQ;
+
     return stats;
   },
 
@@ -103,74 +112,53 @@ var Component = Nori.view().createComponentView({
     return prefix + color + statePart + postfix;
   },
 
-  template() {
-    var html = _template.getSource('game__playerstats');
-    return _.template(html);
-  },
-
   /**
    * Component HTML was attached to the DOM
    */
     componentDidMount() {
-    this.animateFoodToss();
+    if (_foodAnimationSub) {
+      _foodAnimationSub.dispose();
+    }
+
+    // Needs a 1ms delay
+    _foodAnimationSub = _rx.doEvery(1, 1, this.animateFoodToss.bind(this));
   },
 
   // TODO will not animate to local player
-  //animateFoodToss() {
-  //  if (this.getState().questionDifficultyImage !== 'null.png' && this.getConfigProps().target === 'remote') {
-  //    let foodImage = this.getDOMElement().querySelector('.game__playerstats-food'),
-  //        startX, endX, endRot;
-  //
-  //    endX = _domUtils.position(foodImage).left;
-  //
-  //    startX = -700;
-  //    endRot = 125;
-  //
-  //    this.tweenSet(foodImage, {
-  //      x       : startX,
-  //      rotation: -360,
-  //      scale   : 2
-  //    });
-  //
-  //    this.tweenTo(foodImage, 1, {
-  //      scale   : 1,
-  //      x       : 0,
-  //      rotation: endRot,
-  //      ease    : Quad.easeOut
-  //    });
-  //  }
-  //},
-
-  // TODO will not animate to local player
   animateFoodToss() {
-    //
-    if (this.getState().questionDifficultyImage !== 'null.png' && this.getConfigProps().target === 'remote') {
+    // && this.getConfigProps().target === 'remote'
+    if (this.getState().questionDifficultyImage !== 'null.png') {
+
       let foodImage = this.getDOMElement().querySelector('.game__playerstats-food'),
-          startX, endRot;
+          startS, startX, endRot;
 
       endX = _domUtils.position(foodImage).left;
 
       if (this.getConfigProps().target === 'local') {
         startX = 700;
         endRot = -125;
+        startS = 15;
       } else {
         startX = -700;
         endRot = 125;
+        startS = 2;
       }
 
       this.tweenFromTo(foodImage, 1, {
         x       : startX,
-        rotation: -360,
-        scale   : 2
+        rotation: -720,
+        scale   : startS
       }, {
         scale   : 1,
         x       : 0,
         rotation: endRot,
-        ease    : Quad.easeOut
+        ease    : Circ.easeOut
       });
     } else {
       //
     }
+
+    _foodAnimationSub.dispose();
   },
 
   /**
