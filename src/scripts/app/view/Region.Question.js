@@ -28,7 +28,7 @@ var Component = Nori.view().createComponentView({
    * @param configProps
    */
     initialize(configProps) {
-    _questionChangeObs = _appStore.subscribe('currentQuestionChange', this.update.bind(this));
+    this.bindMap(_appStore);
   },
 
   /**

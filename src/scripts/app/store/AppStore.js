@@ -44,7 +44,6 @@ var AppStore = Nori.createStore({
     this.createSubject('storeInitialized');
     this.createSubject('localPlayerDataUpdated');
     this.createSubject('remotePlayerDataUpdated');
-    this.createSubject('gamePlayStateUpdated');
     this.createSubject('currentQuestionChange');
     this.createSubject('opponentAnswered');
     this.createSubject('answeredCorrect');
@@ -55,7 +54,6 @@ var AppStore = Nori.createStore({
     return  {
       lastEventHandled: '',
       gameStates      : ['TITLE', 'PLAYER_SELECT', 'WAITING_ON_PLAYER', 'MAIN_GAME', 'GAME_OVER'],
-      gamePlayStates  : ['CHOOSE', 'ANSWERING', 'WAITING'],
       currentState    : '',
       currentPlayState: '',
       currentQuestion : null,
@@ -182,6 +180,7 @@ var AppStore = Nori.createStore({
         return state;
 
       case undefined:
+        return state;
       default:
         console.warn('Reducer store, unhandled event type: ' + event.type);
         return state;
@@ -198,8 +197,6 @@ var AppStore = Nori.createStore({
     // Rather than blasting out a new store every time
     if (state.lastEventHandled === _appActionConstants.SET_LOCAL_PLAYER_PROPS) {
       this.notifySubscribersOf('localPlayerDataUpdated');
-    } else if (state.lastEventHandled === _appActionConstants.SET_GAME_PLAY_STATE) {
-      this.notifySubscribersOf('gamePlayStateUpdated');
     } else if (state.lastEventHandled === _appActionConstants.SET_CURRENT_QUESTION ||
       state.lastEventHandled === _appActionConstants.CLEAR_QUESTION) {
       this.notifySubscribersOf('currentQuestionChange');

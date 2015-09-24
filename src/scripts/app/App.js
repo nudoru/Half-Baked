@@ -143,10 +143,9 @@ let App = Nori.createApplication({
         remotePlayer       = this.pluckRemotePlayer(payload.players),
         setRemotePlayer    = _appActions.setRemotePlayerProps(remotePlayer),
         setGameState       = _noriActions.changeStoreState({currentState: appState.gameStates[3]}),
-        setGamePlayState   = _appActions.setGamePlayState(appState.gamePlayStates[0]),
         setCurrentQuestion = _appActions.setCurrentQuestion(null);
 
-    this.store.apply([setRemotePlayer, setGameState, setGamePlayState, setCurrentQuestion]);
+    this.store.apply([setRemotePlayer, setGameState, setCurrentQuestion]);
   },
 
   pluckRemotePlayer(playersArry) {
@@ -168,11 +167,8 @@ let App = Nori.createApplication({
   },
 
   handleReceivedQuestion(question) {
-    let appState           = this.store.getState(),
-        setGamePlayState   = _appActions.setGamePlayState(appState.gamePlayStates[1]),
-        setCurrentQuestion = _appActions.setCurrentQuestion(question);
-
-    this.store.apply([setGamePlayState, setCurrentQuestion]);
+    let setCurrentQuestion = _appActions.setCurrentQuestion(question);
+    this.store.apply(setCurrentQuestion);
   },
 
   handleOpponentAnswered(payload) {
@@ -207,7 +203,6 @@ let App = Nori.createApplication({
   sendQuestion(difficulty) {
     let appState         = this.store.getState(),
         question         = this.store.getQuestionOfDifficulty(difficulty),
-        setGamePlayState = _appActions.setGamePlayState(appState.gamePlayStates[2]),
         setSentQuestion  = _appActions.setSentQuestion(question);
 
     this.socket.notifyServer(_socketIOEvents.SEND_QUESTION, {
@@ -215,7 +210,7 @@ let App = Nori.createApplication({
       question: question
     });
 
-    this.store.apply([setGamePlayState, setSentQuestion]);
+    this.store.apply(setSentQuestion);
   },
 
   handleAnswerCorrect() {

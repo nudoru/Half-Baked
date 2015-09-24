@@ -12,7 +12,7 @@
  */
 
 import * as is from '../../nudoru/util/is.js';
-import * as _stateObjFactory from './SimpleStore.js'
+import * as _stateObjFactory from './SimpleStore.js';
 
 let MixinReducerStore = function () {
   let _this,

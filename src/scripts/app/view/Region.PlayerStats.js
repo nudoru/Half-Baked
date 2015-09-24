@@ -5,7 +5,8 @@ import * as _template from '../../nori/utils/Templating.js';
 import * as _mixinDOMManipulation from '../../nori/view/MixinDOMManipulation.js';
 import * as _domUtils from '../../nudoru/browser/DOMUtils.js';
 
-let _difficultyImages = ['pastry_cookie01.png', 'pastry_poptart01.png', 'pastry_donut.png', 'pastry_pie.png', 'pastry_cupcake.png'];
+let _difficultyImages = ['pastry_cookie01.png', 'pastry_poptart01.png', 'pastry_donut.png', 'pastry_pie.png', 'pastry_cupcake.png'],
+    gamePlayStates    = ['CHOOSE', 'ANSWERING', 'WAITING'];
 
 /**
  * Module for a dynamic application view for a route or a persistent view
@@ -50,7 +51,7 @@ var Component = Nori.view().createComponentView({
   },
 
   getHUDState: function () {
-    let appState         = _appStore.getState(),
+    let appState = _appStore.getState(),
         stats;
 
     if (this.getConfigProps().target === 'local') {
@@ -115,28 +116,60 @@ var Component = Nori.view().createComponentView({
   },
 
   // TODO will not animate to local player
+  //animateFoodToss() {
+  //  if (this.getState().questionDifficultyImage !== 'null.png' && this.getConfigProps().target === 'remote') {
+  //    let foodImage = this.getDOMElement().querySelector('.game__playerstats-food'),
+  //        startX, endX, endRot;
+  //
+  //    endX = _domUtils.position(foodImage).left;
+  //
+  //    startX = -700;
+  //    endRot = 125;
+  //
+  //    this.tweenSet(foodImage, {
+  //      x       : startX,
+  //      rotation: -360,
+  //      scale   : 2
+  //    });
+  //
+  //    this.tweenTo(foodImage, 1, {
+  //      scale   : 1,
+  //      x       : 0,
+  //      rotation: endRot,
+  //      ease    : Quad.easeOut
+  //    });
+  //  }
+  //},
+
+  // TODO will not animate to local player
   animateFoodToss() {
+    //
     if (this.getState().questionDifficultyImage !== 'null.png' && this.getConfigProps().target === 'remote') {
       let foodImage = this.getDOMElement().querySelector('.game__playerstats-food'),
-          startX, endX, endRot;
+          startX, endRot;
 
       endX = _domUtils.position(foodImage).left;
 
-      startX = -700;
-      endRot = 125;
+      if (this.getConfigProps().target === 'local') {
+        startX = 700;
+        endRot = -125;
+      } else {
+        startX = -700;
+        endRot = 125;
+      }
 
-      this.tweenSet(foodImage, {
+      this.tweenFromTo(foodImage, 1, {
         x       : startX,
         rotation: -360,
         scale   : 2
-      });
-
-      this.tweenTo(foodImage, 1, {
+      }, {
         scale   : 1,
         x       : 0,
         rotation: endRot,
         ease    : Quad.easeOut
       });
+    } else {
+      //
     }
   },
 

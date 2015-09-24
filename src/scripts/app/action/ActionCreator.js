@@ -40,17 +40,6 @@ var ActionCreator = {
     };
   },
 
-  setGamePlayState: function (data) {
-    return {
-      type   : _actionConstants.SET_GAME_PLAY_STATE,
-      payload: {
-        data: {
-          currentPlayState: data
-        }
-      }
-    };
-  },
-
   setCurrentQuestion: function (data) {
     return {
       type   : _actionConstants.SET_CURRENT_QUESTION,

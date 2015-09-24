@@ -107,7 +107,7 @@ var ViewComponent = function () {
    */
   function componentRender() {
     if (!_templateObjCache) {
-      _templateObjCache = this.template();
+      _templateObjCache = this.template(this.getState());
     }
 
     _html = this.render(this.getState());
@@ -124,7 +124,7 @@ var ViewComponent = function () {
    *
    * @returns {Function}
    */
-  function template() {
+  function template(state) {
     // assumes the template ID matches the component's ID as passed on initialize
     let html = _template.getSource(this.getID());
     return _.template(html);

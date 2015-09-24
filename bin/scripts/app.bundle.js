@@ -261,10 +261,9 @@ var App = Nori.createApplication({
         remotePlayer = this.pluckRemotePlayer(payload.players),
         setRemotePlayer = _appActions.setRemotePlayerProps(remotePlayer),
         setGameState = _noriActions.changeStoreState({ currentState: appState.gameStates[3] }),
-        setGamePlayState = _appActions.setGamePlayState(appState.gamePlayStates[0]),
         setCurrentQuestion = _appActions.setCurrentQuestion(null);
 
-    this.store.apply([setRemotePlayer, setGameState, setGamePlayState, setCurrentQuestion]);
+    this.store.apply([setRemotePlayer, setGameState, setCurrentQuestion]);
   },
 
   pluckRemotePlayer: function pluckRemotePlayer(playersArry) {
@@ -286,11 +285,8 @@ var App = Nori.createApplication({
   },
 
   handleReceivedQuestion: function handleReceivedQuestion(question) {
-    var appState = this.store.getState(),
-        setGamePlayState = _appActions.setGamePlayState(appState.gamePlayStates[1]),
-        setCurrentQuestion = _appActions.setCurrentQuestion(question);
-
-    this.store.apply([setGamePlayState, setCurrentQuestion]);
+    var setCurrentQuestion = _appActions.setCurrentQuestion(question);
+    this.store.apply(setCurrentQuestion);
   },
 
   handleOpponentAnswered: function handleOpponentAnswered(payload) {
@@ -325,7 +321,6 @@ var App = Nori.createApplication({
   sendQuestion: function sendQuestion(difficulty) {
     var appState = this.store.getState(),
         question = this.store.getQuestionOfDifficulty(difficulty),
-        setGamePlayState = _appActions.setGamePlayState(appState.gamePlayStates[2]),
         setSentQuestion = _appActions.setSentQuestion(question);
 
     this.socket.notifyServer(_socketIOEvents.SEND_QUESTION, {
@@ -333,7 +328,7 @@ var App = Nori.createApplication({
       question: question
     });
 
-    this.store.apply([setGamePlayState, setSentQuestion]);
+    this.store.apply(setSentQuestion);
   },
 
   handleAnswerCorrect: function handleAnswerCorrect() {
@@ -369,7 +364,6 @@ exports['default'] = {
   SET_LOCAL_PLAYER_APPEARANCE: 'SET_LOCAL_PLAYER_APPEARANCE',
   SET_REMOTE_PLAYER_PROPS: 'SET_REMOTE_PLAYER_PROPS',
   RESET_GAME: 'RESET_GAME',
-  SET_GAME_PLAY_STATE: 'SET_GAME_PLAY_STATE',
   SET_SENT_QUESTION: 'SET_SENT_QUESTION',
   SET_CURRENT_QUESTION: 'SET_CURRENT_QUESTION',
   CLEAR_QUESTION: 'CLEAR_QUESTION',
@@ -436,17 +430,6 @@ var ActionCreator = {
       payload: {
         data: {
           session: data
-        }
-      }
-    };
-  },
-
-  setGamePlayState: function setGamePlayState(data) {
-    return {
-      type: _actionConstants.SET_GAME_PLAY_STATE,
-      payload: {
-        data: {
-          currentPlayState: data
         }
       }
     };
@@ -618,7 +601,6 @@ var AppStore = Nori.createStore({
     this.createSubject('storeInitialized');
     this.createSubject('localPlayerDataUpdated');
     this.createSubject('remotePlayerDataUpdated');
-    this.createSubject('gamePlayStateUpdated');
     this.createSubject('currentQuestionChange');
     this.createSubject('opponentAnswered');
     this.createSubject('answeredCorrect');
@@ -629,7 +611,6 @@ var AppStore = Nori.createStore({
     return {
       lastEventHandled: '',
       gameStates: ['TITLE', 'PLAYER_SELECT', 'WAITING_ON_PLAYER', 'MAIN_GAME', 'GAME_OVER'],
-      gamePlayStates: ['CHOOSE', 'ANSWERING', 'WAITING'],
       currentState: '',
       currentPlayState: '',
       currentQuestion: null,
@@ -754,6 +735,7 @@ var AppStore = Nori.createStore({
         return state;
 
       case undefined:
+        return state;
       default:
         console.warn('Reducer store, unhandled event type: ' + event.type);
         return state;
@@ -770,8 +752,6 @@ var AppStore = Nori.createStore({
     // Rather than blasting out a new store every time
     if (state.lastEventHandled === _appActionConstants.SET_LOCAL_PLAYER_PROPS) {
       this.notifySubscribersOf('localPlayerDataUpdated');
-    } else if (state.lastEventHandled === _appActionConstants.SET_GAME_PLAY_STATE) {
-      this.notifySubscribersOf('gamePlayStateUpdated');
     } else if (state.lastEventHandled === _appActionConstants.SET_CURRENT_QUESTION || state.lastEventHandled === _appActionConstants.CLEAR_QUESTION) {
       this.notifySubscribersOf('currentQuestionChange');
     } else if (state.lastEventHandled === _appActionConstants.ANSWERED_CORRECT) {
@@ -934,7 +914,8 @@ var _nudoruBrowserDOMUtilsJs = require('../../nudoru/browser/DOMUtils.js');
 
 var _domUtils = _interopRequireWildcard(_nudoruBrowserDOMUtilsJs);
 
-var _difficultyImages = ['pastry_cookie01.png', 'pastry_poptart01.png', 'pastry_donut.png', 'pastry_pie.png', 'pastry_cupcake.png'];
+var _difficultyImages = ['pastry_cookie01.png', 'pastry_poptart01.png', 'pastry_donut.png', 'pastry_pie.png', 'pastry_cupcake.png'],
+    gamePlayStates = ['CHOOSE', 'ANSWERING', 'WAITING'];
 
 /**
  * Module for a dynamic application view for a route or a persistent view
@@ -1041,30 +1022,61 @@ var Component = Nori.view().createComponentView({
   },
 
   // TODO will not animate to local player
+  //animateFoodToss() {
+  //  if (this.getState().questionDifficultyImage !== 'null.png' && this.getConfigProps().target === 'remote') {
+  //    let foodImage = this.getDOMElement().querySelector('.game__playerstats-food'),
+  //        startX, endX, endRot;
+  //
+  //    endX = _domUtils.position(foodImage).left;
+  //
+  //    startX = -700;
+  //    endRot = 125;
+  //
+  //    this.tweenSet(foodImage, {
+  //      x       : startX,
+  //      rotation: -360,
+  //      scale   : 2
+  //    });
+  //
+  //    this.tweenTo(foodImage, 1, {
+  //      scale   : 1,
+  //      x       : 0,
+  //      rotation: endRot,
+  //      ease    : Quad.easeOut
+  //    });
+  //  }
+  //},
+
+  // TODO will not animate to local player
   animateFoodToss: function animateFoodToss() {
+    //
     if (this.getState().questionDifficultyImage !== 'null.png' && this.getConfigProps().target === 'remote') {
       var foodImage = this.getDOMElement().querySelector('.game__playerstats-food'),
           startX = undefined,
-          endX = undefined,
           endRot = undefined;
 
       endX = _domUtils.position(foodImage).left;
 
-      startX = -700;
-      endRot = 125;
+      if (this.getConfigProps().target === 'local') {
+        startX = 700;
+        endRot = -125;
+      } else {
+        startX = -700;
+        endRot = 125;
+      }
 
-      this.tweenSet(foodImage, {
+      this.tweenFromTo(foodImage, 1, {
         x: startX,
         rotation: -360,
         scale: 2
-      });
-
-      this.tweenTo(foodImage, 1, {
+      }, {
         scale: 1,
         x: 0,
         rotation: endRot,
         ease: Quad.easeOut
       });
+    } else {
+      //
     }
   },
 
@@ -1132,7 +1144,7 @@ var Component = Nori.view().createComponentView({
    * @param configProps
    */
   initialize: function initialize(configProps) {
-    _questionChangeObs = _appStore.subscribe('currentQuestionChange', this.update.bind(this));
+    this.bindMap(_appStore);
   },
 
   /**
@@ -1580,7 +1592,6 @@ var Component = Nori.view().createComponentView({
   },
 
   getGameState: function getGameState() {
-    console.log('updating main game state');
     var appState = _appStore.getState();
     return {
       sentQuestion: appState.sentQuestion
@@ -1625,10 +1636,7 @@ var Component = Nori.view().createComponentView({
         alpha: 1,
         y: 0,
         delay: i * 0.15,
-        ease: Back.easeOut,
-        onComplete: function onComplete() {
-          console.log('done rendering card');
-        }
+        ease: Back.easeOut
       });
     });
   },
@@ -1638,18 +1646,21 @@ var Component = Nori.view().createComponentView({
    */
   componentWillUnmount: function componentWillUnmount() {},
 
+  template: function template(state) {
+    if (state.sentQuestion.q_difficulty_level === -1) {
+      var cardsHTML = _template.getSource('game__choose');
+      return _.template(cardsHTML);
+    } else {
+      var remoteHTML = _template.getSource('game__remote');
+      return _.template(remoteHTML);
+    }
+  },
+
   /**
    * Only renders if there is a current question
    */
   render: function render(state) {
-    console.log('rendering main game');
-    if (state.sentQuestion.q_difficulty_level === -1) {
-      var cardsHTML = _template.getSource('game__choose');
-      return _.template(cardsHTML)(state);
-    } else {
-      var remoteHTML = _template.getSource('game__remote');
-      return _.template(remoteHTML)(state);
-    }
+    return this.template(state)(state);
   },
 
   componentWillDispose: function componentWillDispose() {
@@ -4234,8 +4245,8 @@ var MixinStoreStateViews = function MixinStoreStateViews() {
     this.showViewComponent(_currentViewID);
 
     // Transition new view in
-    //TweenLite.set(_stateViewMountPoint, {alpha: 0});
-    //TweenLite.to(_stateViewMountPoint, 0.25, {alpha: 1, ease: Quad.easeIn});
+    TweenLite.set(_stateViewMountPoint, { alpha: 0 });
+    TweenLite.to(_stateViewMountPoint, 0.25, { alpha: 1, ease: Quad.easeIn });
 
     this.notifySubscribersOf('viewChange', componentID);
   }
@@ -4387,7 +4398,7 @@ var ViewComponent = function ViewComponent() {
    */
   function componentRender() {
     if (!_templateObjCache) {
-      _templateObjCache = this.template();
+      _templateObjCache = this.template(this.getState());
     }
 
     _html = this.render(this.getState());
@@ -4404,7 +4415,7 @@ var ViewComponent = function ViewComponent() {
    *
    * @returns {Function}
    */
-  function template() {
+  function template(state) {
     // assumes the template ID matches the component's ID as passed on initialize
     var html = _template.getSource(this.getID());
     return _.template(html);

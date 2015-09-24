@@ -75,7 +75,6 @@ var Component = Nori.view().createComponentView({
   },
 
   getGameState() {
-    console.log('updating main game state');
     let appState = _appStore.getState();
     return {
       sentQuestion: appState.sentQuestion
@@ -115,13 +114,10 @@ var Component = Nori.view().createComponentView({
         alpha: 0,
         y    : 300
       }, {
-        alpha     : 1,
-        y         : 0,
-        delay     : i * 0.15,
-        ease      : Back.easeOut,
-        onComplete: function () {
-          console.log('done rendering card');
-        }
+        alpha: 1,
+        y    : 0,
+        delay: i * 0.15,
+        ease : Back.easeOut
       });
 
     });
@@ -133,18 +129,21 @@ var Component = Nori.view().createComponentView({
     componentWillUnmount(){
   },
 
+  template(state) {
+    if (state.sentQuestion.q_difficulty_level === -1) {
+      var cardsHTML = _template.getSource('game__choose');
+      return _.template(cardsHTML);
+    } else {
+      var remoteHTML = _template.getSource('game__remote');
+      return _.template(remoteHTML);
+    }
+  },
+
   /**
    * Only renders if there is a current question
    */
     render(state) {
-    console.log('rendering main game')
-    if (state.sentQuestion.q_difficulty_level === -1) {
-      var cardsHTML = _template.getSource('game__choose');
-      return _.template(cardsHTML)(state);
-    } else {
-      var remoteHTML = _template.getSource('game__remote');
-      return _.template(remoteHTML)(state);
-    }
+    return this.template(state)(state);
   },
 
   componentWillDispose(){
