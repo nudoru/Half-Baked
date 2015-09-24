@@ -4199,7 +4199,7 @@ body {
   position: relative;
   display: block;
   width: 975px;
-  height: 650px;
+  height: 625px;
   margin: 1.236rem auto 0;
   overflow: hidden;
   border-radius: 0.309rem;
@@ -4293,7 +4293,7 @@ body {
   top: 0;
   left: 0;
   width: 975px;
-  height: 650px;
+  height: 625px;
   background-image: -webkit-gradient(linear, left 0%, left 100%, from(#512d6d), to(rgba(81, 45, 109, 0.85)));
   background-image: -webkit-linear-gradient(top, #512d6d, 0%, rgba(81, 45, 109, 0.85), 100%);
   background-image: -moz-linear-gradient(top, #512d6d 0%, rgba(81, 45, 109, 0.85) 100%);
