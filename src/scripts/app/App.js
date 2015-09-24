@@ -1,5 +1,6 @@
 import * as _rx from '../nori/utils/Rx.js';
 import * as _appActions from './action/ActionCreator.js';
+import * as _appActionConstants from './action/ActionConstants.js';
 import * as _noriActions from '../nori/action/ActionCreator.js';
 import * as _socketIOEvents from '../nori/service/SocketIOEvents.js';
 
@@ -48,11 +49,7 @@ let App = Nori.createApplication({
    */
     onStoreInitialized() {
     console.log('app, onstore initialized');
-    this.store.subscribe('localPlayerDataUpdated', this.handleLocalPlayerPropsUpdate.bind(this));
-    this.store.subscribe('answeredCorrect', this.handleAnswerCorrect.bind(this));
-    this.store.subscribe('answeredIncorrect', this.handleAnswerIncorrect.bind(this));
-    this.store.subscribe('reset', this.handleGameReset.bind(this));
-
+    this.store.subscribe(this.handleStoreMutation.bind(this));
     this.runApplication();
   },
 
@@ -71,12 +68,52 @@ let App = Nori.createApplication({
   // Handle FROM store
   //----------------------------------------------------------------------------
 
+  handleStoreMutation() {
+    var appState = this.store.getState(),
+        type = appState.lastActionType;
+
+    if (type === _appActionConstants.SET_LOCAL_PLAYER_PROPS) {
+      this.handleLocalPlayerPropsUpdate();
+    } else if (type === _appActionConstants.ANSWERED_CORRECT) {
+      this.handleAnswerCorrect();
+      this.handleLocalPlayerPropsUpdate();
+    } else if (type === _appActionConstants.ANSWERED_INCORRECT) {
+      this.handleAnswerIncorrect();
+      this.handleLocalPlayerPropsUpdate();
+    } else if (type === _appActionConstants.RESET_GAME) {
+      this.handleGameReset()
+    }
+  },
+
   handleLocalPlayerPropsUpdate() {
     let appState = this.store.getState();
 
     this.socket.notifyServer(_socketIOEvents.SEND_PLAYER_DETAILS, {
       roomID       : appState.session.roomID,
       playerDetails: appState.localPlayer
+    });
+  },
+
+  handleGameReset() {
+    console.log('Game reset');
+    let appState = this.store.getState();
+
+    this.leaveRoom(appState.session.roomID);
+  },
+
+  handleAnswerCorrect() {
+    this.sendMyAnswer(true);
+  },
+
+  handleAnswerIncorrect() {
+    this.sendMyAnswer(false);
+  },
+
+  sendMyAnswer(isCorrect) {
+    let appState = this.store.getState();
+    this.socket.notifyServer(_socketIOEvents.OPPONENT_ANSWERED, {
+      roomID: appState.session.roomID,
+      result: isCorrect
     });
   },
 
@@ -230,29 +267,6 @@ let App = Nori.createApplication({
     });
 
     this.store.apply(setSentQuestion);
-  },
-
-  handleGameReset() {
-    console.log('Game reset');
-    let appState = this.store.getState();
-
-    this.leaveRoom(appState.session.roomID);
-  },
-
-  handleAnswerCorrect() {
-    this.sendMyAnswer(true);
-  },
-
-  handleAnswerIncorrect() {
-    this.sendMyAnswer(false);
-  },
-
-  sendMyAnswer(isCorrect) {
-    let appState = this.store.getState();
-    this.socket.notifyServer(_socketIOEvents.OPPONENT_ANSWERED, {
-      roomID: appState.session.roomID,
-      result: isCorrect
-    });
   }
 
 });

@@ -35,28 +35,17 @@ var AppStore = Nori.createStore({
 
   mixins: [],
 
-  //gameStates    : ['TITLE', 'PLAYER_SELECT', 'WAITING_ON_PLAYER', 'MAIN_GAME', 'GAME_OVER'],
-
   initialize() {
     this.addReducer(this.mainStateReducer.bind(this));
     this.initializeReducerStore();
     this.setState(Nori.config());
 
     this.createSubject('storeInitialized');
-
-    this.createSubject('localPlayerDataUpdated');
-    this.createSubject('answeredCorrect');
-    this.createSubject('answeredIncorrect');
-    this.createSubject('reset');
-
-    //this.createSubject('remotePlayerDataUpdated');
-    //this.createSubject('currentQuestionChange');
-    //this.createSubject('opponentAnswered');
   },
 
   initialState() {
     return  {
-      lastEventHandled: '',
+      lastActionType: '',
       gameStates      : ['TITLE', 'PLAYER_SELECT', 'WAITING_ON_PLAYER', 'MAIN_GAME', 'GAME_OVER'],
       currentState    : '',
       currentPlayState: '',
@@ -76,6 +65,8 @@ var AppStore = Nori.createStore({
    * Set or load any necessary data and then broadcast a initialized event.
    */
     loadStore() {
+    console.log('appstore, loading');
+
     this.setState(this.initialState());
 
     //https://market.mashape.com/pareshchouhan/trivia
@@ -89,7 +80,7 @@ var AppStore = Nori.createStore({
   },
 
   onQuestionsSuccess(data) {
-    //console.log('Questions fetched', data[0]);
+    console.log('Questions fetched', data[0]);
     let updated = data.map(q => {
       // Strip tags from text
       q.q_text = _stringUtils.stripTags(_stringUtils.unescapeHTML(q.q_text));
@@ -160,7 +151,7 @@ var AppStore = Nori.createStore({
     mainStateReducer(state, event) {
     state = state || {};
 
-    state.lastEventHandled = event.type;
+    state.lastActionType = event.type;
 
     console.log(event.type, event.payload);
 
@@ -197,27 +188,13 @@ var AppStore = Nori.createStore({
     handleStateMutation() {
     let state = this.getState();
 
-    // These are listened to by the controller to send data to server
-    if (state.lastEventHandled === _appActionConstants.SET_LOCAL_PLAYER_PROPS) {
-      this.notifySubscribersOf('localPlayerDataUpdated');
-    } else if (state.lastEventHandled === _appActionConstants.ANSWERED_CORRECT) {
-      this.notifySubscribersOf('answeredCorrect');
-      this.notifySubscribersOf('localPlayerDataUpdated');
-    } else if (state.lastEventHandled === _appActionConstants.ANSWERED_INCORRECT) {
-      this.notifySubscribersOf('answeredIncorrect');
-      this.notifySubscribersOf('localPlayerDataUpdated');
-    } else if (state.lastEventHandled === _appActionConstants.RESET_GAME) {
-      this.notifySubscribersOf('reset');
-    }
-
     // Check if player health is 0
     if (this.shouldGameEnd(state)) {
       console.log('ENDING GAME!');
       this.setState({currentState: this.getState().gameStates[4]});
     }
 
-    // update everyone
-    this.notifySubscribers(state);
+    this.notifySubscribers();
   },
 
   /**

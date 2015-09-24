@@ -105,6 +105,10 @@ var _actionActionCreatorJs = require('./action/ActionCreator.js');
 
 var _appActions = _interopRequireWildcard(_actionActionCreatorJs);
 
+var _actionActionConstantsJs = require('./action/ActionConstants.js');
+
+var _appActionConstants = _interopRequireWildcard(_actionActionConstantsJs);
+
 var _noriActionActionCreatorJs = require('../nori/action/ActionCreator.js');
 
 var _noriActions = _interopRequireWildcard(_noriActionActionCreatorJs);
@@ -166,11 +170,7 @@ var App = Nori.createApplication({
    */
   onStoreInitialized: function onStoreInitialized() {
     console.log('app, onstore initialized');
-    this.store.subscribe('localPlayerDataUpdated', this.handleLocalPlayerPropsUpdate.bind(this));
-    this.store.subscribe('answeredCorrect', this.handleAnswerCorrect.bind(this));
-    this.store.subscribe('answeredIncorrect', this.handleAnswerIncorrect.bind(this));
-    this.store.subscribe('reset', this.handleGameReset.bind(this));
-
+    this.store.subscribe(this.handleStoreMutation.bind(this));
     this.runApplication();
   },
 
@@ -189,12 +189,52 @@ var App = Nori.createApplication({
   // Handle FROM store
   //----------------------------------------------------------------------------
 
+  handleStoreMutation: function handleStoreMutation() {
+    var appState = this.store.getState(),
+        type = appState.lastActionType;
+
+    if (type === _appActionConstants.SET_LOCAL_PLAYER_PROPS) {
+      this.handleLocalPlayerPropsUpdate();
+    } else if (type === _appActionConstants.ANSWERED_CORRECT) {
+      this.handleAnswerCorrect();
+      this.handleLocalPlayerPropsUpdate();
+    } else if (type === _appActionConstants.ANSWERED_INCORRECT) {
+      this.handleAnswerIncorrect();
+      this.handleLocalPlayerPropsUpdate();
+    } else if (type === _appActionConstants.RESET_GAME) {
+      this.handleGameReset();
+    }
+  },
+
   handleLocalPlayerPropsUpdate: function handleLocalPlayerPropsUpdate() {
     var appState = this.store.getState();
 
     this.socket.notifyServer(_socketIOEvents.SEND_PLAYER_DETAILS, {
       roomID: appState.session.roomID,
       playerDetails: appState.localPlayer
+    });
+  },
+
+  handleGameReset: function handleGameReset() {
+    console.log('Game reset');
+    var appState = this.store.getState();
+
+    this.leaveRoom(appState.session.roomID);
+  },
+
+  handleAnswerCorrect: function handleAnswerCorrect() {
+    this.sendMyAnswer(true);
+  },
+
+  handleAnswerIncorrect: function handleAnswerIncorrect() {
+    this.sendMyAnswer(false);
+  },
+
+  sendMyAnswer: function sendMyAnswer(isCorrect) {
+    var appState = this.store.getState();
+    this.socket.notifyServer(_socketIOEvents.OPPONENT_ANSWERED, {
+      roomID: appState.session.roomID,
+      result: isCorrect
     });
   },
 
@@ -348,29 +388,6 @@ var App = Nori.createApplication({
     });
 
     this.store.apply(setSentQuestion);
-  },
-
-  handleGameReset: function handleGameReset() {
-    console.log('Game reset');
-    var appState = this.store.getState();
-
-    this.leaveRoom(appState.session.roomID);
-  },
-
-  handleAnswerCorrect: function handleAnswerCorrect() {
-    this.sendMyAnswer(true);
-  },
-
-  handleAnswerIncorrect: function handleAnswerIncorrect() {
-    this.sendMyAnswer(false);
-  },
-
-  sendMyAnswer: function sendMyAnswer(isCorrect) {
-    var appState = this.store.getState();
-    this.socket.notifyServer(_socketIOEvents.OPPONENT_ANSWERED, {
-      roomID: appState.session.roomID,
-      result: isCorrect
-    });
   }
 
 });
@@ -378,7 +395,7 @@ var App = Nori.createApplication({
 exports['default'] = App;
 module.exports = exports['default'];
 
-},{"../nori/action/ActionCreator.js":17,"../nori/service/SocketIO.js":19,"../nori/service/SocketIOEvents.js":20,"../nori/utils/Rx.js":27,"./action/ActionCreator.js":4,"./store/AppStore.js":5,"./view/AppView.js":6}],3:[function(require,module,exports){
+},{"../nori/action/ActionCreator.js":17,"../nori/service/SocketIO.js":19,"../nori/service/SocketIOEvents.js":20,"../nori/utils/Rx.js":27,"./action/ActionConstants.js":3,"./action/ActionCreator.js":4,"./store/AppStore.js":5,"./view/AppView.js":6}],3:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -618,28 +635,17 @@ var AppStore = Nori.createStore({
 
   mixins: [],
 
-  //gameStates    : ['TITLE', 'PLAYER_SELECT', 'WAITING_ON_PLAYER', 'MAIN_GAME', 'GAME_OVER'],
-
   initialize: function initialize() {
     this.addReducer(this.mainStateReducer.bind(this));
     this.initializeReducerStore();
     this.setState(Nori.config());
 
     this.createSubject('storeInitialized');
-
-    this.createSubject('localPlayerDataUpdated');
-    this.createSubject('answeredCorrect');
-    this.createSubject('answeredIncorrect');
-    this.createSubject('reset');
-
-    //this.createSubject('remotePlayerDataUpdated');
-    //this.createSubject('currentQuestionChange');
-    //this.createSubject('opponentAnswered');
   },
 
   initialState: function initialState() {
     return {
-      lastEventHandled: '',
+      lastActionType: '',
       gameStates: ['TITLE', 'PLAYER_SELECT', 'WAITING_ON_PLAYER', 'MAIN_GAME', 'GAME_OVER'],
       currentState: '',
       currentPlayState: '',
@@ -659,6 +665,8 @@ var AppStore = Nori.createStore({
    * Set or load any necessary data and then broadcast a initialized event.
    */
   loadStore: function loadStore() {
+    console.log('appstore, loading');
+
     this.setState(this.initialState());
 
     //https://market.mashape.com/pareshchouhan/trivia
@@ -672,7 +680,7 @@ var AppStore = Nori.createStore({
   },
 
   onQuestionsSuccess: function onQuestionsSuccess(data) {
-    //console.log('Questions fetched', data[0]);
+    console.log('Questions fetched', data[0]);
     var updated = data.map(function (q) {
       // Strip tags from text
       q.q_text = _stringUtils.stripTags(_stringUtils.unescapeHTML(q.q_text));
@@ -741,7 +749,7 @@ var AppStore = Nori.createStore({
   mainStateReducer: function mainStateReducer(state, event) {
     state = state || {};
 
-    state.lastEventHandled = event.type;
+    state.lastActionType = event.type;
 
     console.log(event.type, event.payload);
 
@@ -778,27 +786,13 @@ var AppStore = Nori.createStore({
   handleStateMutation: function handleStateMutation() {
     var state = this.getState();
 
-    // These are listened to by the controller to send data to server
-    if (state.lastEventHandled === _appActionConstants.SET_LOCAL_PLAYER_PROPS) {
-      this.notifySubscribersOf('localPlayerDataUpdated');
-    } else if (state.lastEventHandled === _appActionConstants.ANSWERED_CORRECT) {
-      this.notifySubscribersOf('answeredCorrect');
-      this.notifySubscribersOf('localPlayerDataUpdated');
-    } else if (state.lastEventHandled === _appActionConstants.ANSWERED_INCORRECT) {
-      this.notifySubscribersOf('answeredIncorrect');
-      this.notifySubscribersOf('localPlayerDataUpdated');
-    } else if (state.lastEventHandled === _appActionConstants.RESET_GAME) {
-      this.notifySubscribersOf('reset');
-    }
-
     // Check if player health is 0
     if (this.shouldGameEnd(state)) {
       console.log('ENDING GAME!');
       this.setState({ currentState: this.getState().gameStates[4] });
     }
 
-    // update everyone
-    this.notifySubscribers(state);
+    this.notifySubscribers();
   },
 
   /**

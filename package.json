@@ -36,7 +36,7 @@
     "vinyl-source-stream": "^1.1.0"
   },
   "scripts": {
-    "start": "node server/server.js",
+    "start": "nodemon server/server.js",
     "lint": "jshint src/scripts/nori/",
     "build": "gulp default"
   },
