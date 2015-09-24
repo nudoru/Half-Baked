@@ -761,12 +761,15 @@ var AppStore = Nori.createStore({
       this.notifySubscribersOf('localPlayerDataUpdated');
     } else if (state.lastEventHandled === _appActionConstants.ANSWERED_CORRECT) {
       this.notifySubscribersOf('answeredCorrect');
+      this.notifySubscribersOf('localPlayerDataUpdated');
     } else if (state.lastEventHandled === _appActionConstants.ANSWERED_INCORRECT) {
       this.notifySubscribersOf('answeredIncorrect');
+      this.notifySubscribersOf('localPlayerDataUpdated');
     }
 
     // Check if player health is 0
     if (this.shouldGameEnd(state)) {
+      console.log('ENDING GAME!');
       this.setState({ currentState: this.getState().gameStates[4] });
     }
 
@@ -1533,6 +1536,12 @@ var _noriViewMixinDOMManipulationJs = require('../../nori/view/MixinDOMManipulat
 
 var _mixinDOMManipulation = _interopRequireWildcard(_noriViewMixinDOMManipulationJs);
 
+var _noriUtilsRxJs = require('../../nori/utils/Rx.js');
+
+var _rx = _interopRequireWildcard(_noriUtilsRxJs);
+
+var _cardAnimationSub = null;
+
 /**
  * Module for a dynamic application view for a route or a persistent view
  */
@@ -1618,7 +1627,13 @@ var Component = Nori.view().createComponentView({
    */
   componentDidMount: function componentDidMount() {
     if (this.isShowingCards()) {
-      this.animateDifficultyCards();
+      if (_cardAnimationSub) {
+        _cardAnimationSub.dispose();
+      }
+
+      // Needs a 1ms delay
+      _cardAnimationSub = _rx.doEvery(1, 1, this.animateDifficultyCards.bind(this));
+      //this.animateDifficultyCards();
     }
   },
 
@@ -1643,6 +1658,8 @@ var Component = Nori.view().createComponentView({
         ease: Back.easeOut
       });
     });
+
+    _cardAnimationSub.dispose();
   },
 
   /**
@@ -1667,18 +1684,14 @@ var Component = Nori.view().createComponentView({
     return this.template(state)(state);
   },
 
-  componentWillDispose: function componentWillDispose() {
-    if (_currentQuestionChanged) {
-      _currentQuestionChanged.dispose();
-    }
-  }
+  componentWillDispose: function componentWillDispose() {}
 
 });
 
 exports['default'] = Component;
 module.exports = exports['default'];
 
-},{"../../nori/action/ActionCreator":17,"../../nori/utils/Templating.js":28,"../../nori/view/MixinDOMManipulation.js":31,"../../nudoru/browser/DOMUtils.js":37,"../../nudoru/core/NumberUtils.js":45,"../App":2,"../action/ActionCreator.js":4,"../store/AppStore":5,"./AppView":6,"./Region.PlayerStats.js":7,"./Region.Question.js":8}],11:[function(require,module,exports){
+},{"../../nori/action/ActionCreator":17,"../../nori/utils/Rx.js":27,"../../nori/utils/Templating.js":28,"../../nori/view/MixinDOMManipulation.js":31,"../../nudoru/browser/DOMUtils.js":37,"../../nudoru/core/NumberUtils.js":45,"../App":2,"../action/ActionCreator.js":4,"../store/AppStore":5,"./AppView":6,"./Region.PlayerStats.js":7,"./Region.Question.js":8}],11:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });

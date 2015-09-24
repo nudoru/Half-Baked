@@ -198,12 +198,15 @@ var AppStore = Nori.createStore({
       this.notifySubscribersOf('localPlayerDataUpdated');
     } else if (state.lastEventHandled === _appActionConstants.ANSWERED_CORRECT) {
       this.notifySubscribersOf('answeredCorrect');
+      this.notifySubscribersOf('localPlayerDataUpdated');
     } else if (state.lastEventHandled === _appActionConstants.ANSWERED_INCORRECT) {
       this.notifySubscribersOf('answeredIncorrect');
+      this.notifySubscribersOf('localPlayerDataUpdated');
     }
 
     // Check if player health is 0
     if (this.shouldGameEnd(state)) {
+      console.log('ENDING GAME!');
       this.setState({currentState: this.getState().gameStates[4]});
     }
 

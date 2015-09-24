@@ -9,6 +9,9 @@ import * as _regionQuestion from './Region.Question.js';
 import * as _numUtils from '../../nudoru/core/NumberUtils.js';
 import * as _domUtils from '../../nudoru/browser/DOMUtils.js';
 import * as _mixinDOMManipulation from '../../nori/view/MixinDOMManipulation.js';
+import * as _rx from '../../nori/utils/Rx.js';
+
+let _cardAnimationSub = null;
 
 /**
  * Module for a dynamic application view for a route or a persistent view
@@ -97,7 +100,13 @@ var Component = Nori.view().createComponentView({
    */
     componentDidMount(){
     if (this.isShowingCards()) {
-      this.animateDifficultyCards();
+      if (_cardAnimationSub) {
+        _cardAnimationSub.dispose();
+      }
+
+      // Needs a 1ms delay
+      _cardAnimationSub = _rx.doEvery(1, 1, this.animateDifficultyCards.bind(this));
+      //this.animateDifficultyCards();
     }
   },
 
@@ -121,6 +130,9 @@ var Component = Nori.view().createComponentView({
       });
 
     });
+
+    _cardAnimationSub.dispose();
+
   },
 
   /**
@@ -147,9 +159,6 @@ var Component = Nori.view().createComponentView({
   },
 
   componentWillDispose(){
-    if (_currentQuestionChanged) {
-      _currentQuestionChanged.dispose();
-    }
   }
 
 });
