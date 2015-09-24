@@ -161,14 +161,13 @@ var ViewComponent = function () {
         // Pass true to automatically pass form element handlers the elements value or other status
         this.delegateEvents(true);
       }
-
     }
-
-    this.mountRegions();
 
     if (this.componentDidMount) {
       this.componentDidMount();
     }
+
+    this.mountRegions();
 
     this.notifySubscribersOf('mount', this.getID());
   }

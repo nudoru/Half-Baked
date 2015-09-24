@@ -44,17 +44,8 @@ let ApplicationView = function () {
     let cover   = document.querySelector('#initialization__cover'),
         message = document.querySelector('.initialization__message');
 
-    TweenLite.to(cover, 1, {
-      alpha: 0, ease: Quad.easeOut, onComplete: function () {
-        cover.parentNode.removeChild(cover);
-      }
-    });
-
-    TweenLite.to(message, 2, {
-      top: "+=50px", ease: Quad.easeIn, onComplete: function () {
-        cover.removeChild(message);
-      }
-    });
+    cover.parentNode.removeChild(cover);
+    cover.removeChild(message);
   }
 
   //----------------------------------------------------------------------------

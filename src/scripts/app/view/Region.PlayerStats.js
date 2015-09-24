@@ -57,6 +57,7 @@ var Component = Nori.view().createComponentView({
         stats,
         localQ   = false,
         remoteQ  = false,
+        playState,
         dlevel,
         dimage   = 'null.png';
 
@@ -76,18 +77,39 @@ var Component = Nori.view().createComponentView({
       }
     }
 
+    stats.localQ  = localQ;
+    stats.remoteQ = remoteQ;
+
+    playState = this.getPlayState(stats);
+
     // TODO determine state from questions, present or not
     // TODO remote needs to be opposite local
-    stats.playerImage             = this.getPlayerHUDImage('CHOOSE', stats.appearance);
+    stats.playerImage             = this.getPlayerHUDImage(playState, stats.appearance);
     stats.questionDifficultyImage = dimage;
-    stats.localQ                  = localQ;
-    stats.remoteQ                 = remoteQ;
+
 
     return stats;
   },
 
+  getPlayState(playState) {
+    let isLocal = this.getConfigProps().target === 'local',
+        local = playState.localQ,
+        remote = playState.remoteQ;
+
+    if(!local && !remote) {
+      return 'CHOOSE'
+    }
+
+    if((isLocal && local) || (!isLocal && remote)){
+      return 'ANSWERING'
+    }
+
+    return 'WAITING';
+
+  },
+
   //'CHOOSE', 'ANSWERING', 'WAITING'
-  getOppositePlayState: function (playState) {
+  getOppositePlayState(playState) {
     if (playState === 'WAITING') {
       return 'ANSWERING';
     }
@@ -126,7 +148,6 @@ var Component = Nori.view().createComponentView({
 
   // TODO will not animate to local player
   animateFoodToss() {
-    // && this.getConfigProps().target === 'remote'
     if (this.getState().questionDifficultyImage !== 'null.png') {
 
       let foodImage = this.getDOMElement().querySelector('.game__playerstats-food'),
@@ -154,11 +175,7 @@ var Component = Nori.view().createComponentView({
         rotation: endRot,
         ease    : Circ.easeOut
       });
-    } else {
-      //
     }
-
-    _foodAnimationSub.dispose();
   },
 
   /**

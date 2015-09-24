@@ -985,6 +985,7 @@ var Component = Nori.view().createComponentView({
         stats = undefined,
         localQ = false,
         remoteQ = false,
+        playState = undefined,
         dlevel = undefined,
         dimage = 'null.png';
 
@@ -1004,14 +1005,33 @@ var Component = Nori.view().createComponentView({
       }
     }
 
-    // TODO determine state from questions, present or not
-    // TODO remote needs to be opposite local
-    stats.playerImage = this.getPlayerHUDImage('CHOOSE', stats.appearance);
-    stats.questionDifficultyImage = dimage;
     stats.localQ = localQ;
     stats.remoteQ = remoteQ;
 
+    playState = this.getPlayState(stats);
+
+    // TODO determine state from questions, present or not
+    // TODO remote needs to be opposite local
+    stats.playerImage = this.getPlayerHUDImage(playState, stats.appearance);
+    stats.questionDifficultyImage = dimage;
+
     return stats;
+  },
+
+  getPlayState: function getPlayState(playState) {
+    var isLocal = this.getConfigProps().target === 'local',
+        local = playState.localQ,
+        remote = playState.remoteQ;
+
+    if (!local && !remote) {
+      return 'CHOOSE';
+    }
+
+    if (isLocal && local || !isLocal && remote) {
+      return 'ANSWERING';
+    }
+
+    return 'WAITING';
   },
 
   //'CHOOSE', 'ANSWERING', 'WAITING'
@@ -1054,7 +1074,6 @@ var Component = Nori.view().createComponentView({
 
   // TODO will not animate to local player
   animateFoodToss: function animateFoodToss() {
-    // && this.getConfigProps().target === 'remote'
     if (this.getState().questionDifficultyImage !== 'null.png') {
 
       var foodImage = this.getDOMElement().querySelector('.game__playerstats-food'),
@@ -1084,11 +1103,7 @@ var Component = Nori.view().createComponentView({
         rotation: endRot,
         ease: Circ.easeOut
       });
-    } else {
-      //
     }
-
-    _foodAnimationSub.dispose();
   },
 
   /**
@@ -1950,6 +1965,10 @@ var _noriUtilsTemplatingJs = require('../../nori/utils/Templating.js');
 
 var _template = _interopRequireWildcard(_noriUtilsTemplatingJs);
 
+var _actionActionCreatorJs = require('../action/ActionCreator.js');
+
+var _appActions = _interopRequireWildcard(_actionActionCreatorJs);
+
 /**
  * Module for a dynamic application view for a route or a persistent view
  */
@@ -1972,6 +1991,9 @@ var Component = Nori.view().createComponentView({
     return {
       'click #waiting__button-skip': function clickWaiting__buttonSkip() {
         _appStore.apply(_noriActions.changeStoreState({ currentState: _appStore.getState().gameStates[3] }));
+      },
+      'click #waiting__button-goback': function clickWaiting__buttonGoback() {
+        _appStore.apply(_appActions.resetGame());
       }
     };
   },
@@ -2019,7 +2041,7 @@ var Component = Nori.view().createComponentView({
 exports['default'] = Component;
 module.exports = exports['default'];
 
-},{"../../nori/action/ActionCreator":17,"../../nori/utils/Templating.js":28,"../store/AppStore":5,"./AppView":6}],14:[function(require,module,exports){
+},{"../../nori/action/ActionCreator":17,"../../nori/utils/Templating.js":28,"../action/ActionCreator.js":4,"../store/AppStore":5,"./AppView":6}],14:[function(require,module,exports){
 /**
  * Initial file for the Application
  */
@@ -3578,17 +3600,8 @@ var ApplicationView = function ApplicationView() {
     var cover = document.querySelector('#initialization__cover'),
         message = document.querySelector('.initialization__message');
 
-    TweenLite.to(cover, 1, {
-      alpha: 0, ease: Quad.easeOut, onComplete: function onComplete() {
-        cover.parentNode.removeChild(cover);
-      }
-    });
-
-    TweenLite.to(message, 2, {
-      top: "+=50px", ease: Quad.easeIn, onComplete: function onComplete() {
-        cover.removeChild(message);
-      }
-    });
+    cover.parentNode.removeChild(cover);
+    cover.removeChild(message);
   }
 
   //----------------------------------------------------------------------------
@@ -4475,11 +4488,11 @@ var ViewComponent = function ViewComponent() {
       }
     }
 
-    this.mountRegions();
-
     if (this.componentDidMount) {
       this.componentDidMount();
     }
+
+    this.mountRegions();
 
     this.notifySubscribersOf('mount', this.getID());
   }
