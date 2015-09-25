@@ -61,15 +61,15 @@ module.exports = function () {
   }
 
   return {
-    get                : get,
-    set                : set,
-    getID              : getID,
-    add                : add,
-    remove             : remove,
-    removeBySocket     : removeBySocket,
-    setPlayerDetails   : setPlayerDetails,
-    getPlayerDetails   : getPlayerDetails,
-    getAllPlayerDetails: getAllPlayerDetails
-  }
+    get                     : get,
+    set                     : set,
+    getID                   : getID,
+    add                     : add,
+    remove                  : remove,
+    removeBySocket          : removeBySocket,
+    setPlayerDetails        : setPlayerDetails,
+    getPlayerDetails        : getPlayerDetails,
+    getAllPlayerDetails     : getAllPlayerDetails
+  };
 
 };

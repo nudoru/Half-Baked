@@ -1,13 +1,15 @@
 var SocketIO               = require('socket.io'),
     _                      = require('lodash-node'),
-    Moment                = require('moment'),
+    Moment                 = require('moment'),
     _events                = require('./socketioevents'),
-    Connections           = require('./socketConnections.js')(),
+    Connections            = require('./socketConnections.js')(),
+    Rooms                  = require('./socketRooms.js')(),
     _io,
     _lastConnectedSocket,
     _lastConnectedSocketID,
     _roomMap               = {},
-    _maxConnectionsPerRoom = 2;
+    _maxConnectionsPerRoom = 2,
+    _testRoomID            = '0000';
 
 //----------------------------------------------------------------------------
 //  Server
@@ -34,49 +36,6 @@ function onConnect(socket) {
   //broadcastClientNotification(_events.USER_CONNECTED, Connections.getID(_lastConnectedSocketID).name);
 }
 
-//----------------------------------------------------------------------------
-//  Connections map
-//----------------------------------------------------------------------------
-
-function pruneConnectionsMap() {
-  var socketList = _io.sockets.server.eio.clients,
-      connections = Connections.get(),
-      notifyRoom,
-      status = true;
-  //Object.keys(connections).forEach(socketID => {
-  for (var socketID in connections) {
-    if (connections.hasOwnProperty(socketID)) {
-      if (socketList[socketID] === undefined) {
-        status = false;
-
-        console.log('Disconnect ', socketID);
-
-        for (var roomid in _roomMap) {
-          if (_roomMap.hasOwnProperty(roomid)) {
-            var idx = _roomMap[roomid].indexOf(socketID);
-            if (idx >= 0) {
-              console.log('the disconnect was in room', roomid);
-              //_roomMap[roomid].splice(idx, 1);
-              removeConnectionFromRoom(roomid, socketID);
-              notifyRoom = roomid;
-            }
-          }
-        }
-
-        broadcastClientNotification(_events.USER_DISCONNECTED, socketID);
-        Connections.remove(socketID);
-
-        if (notifyRoom) {
-          emitClientNotificationToRoom(notifyRoom, _events.GAME_ABORT, 'A player disconnected! The game was aborted.');
-          deleteRoom(notifyRoom);
-        }
-
-      }
-    }
-  }
-
-  return status;
-}
 
 //----------------------------------------------------------------------------
 //  Events
@@ -104,15 +63,13 @@ function handleSocketMessage(payload) {
       console.log("Connected!");
       return;
     case (_events.CREATE_ROOM):
-      Connections.setPlayerDetails(payload.connectionID, payload.payload.playerDetails);
-      createAndAddConnectionToRoom(payload.connectionID);
+      createRoom(payload.connectionID, payload.payload.playerDetails);
       return;
     case (_events.JOIN_ROOM):
-      Connections.setPlayerDetails(payload.connectionID, payload.payload.playerDetails);
-      addConnectionToRoom(payload.payload.roomID, payload.connectionID);
+      joinRoom(payload.connectionID, payload.payload.playerDetails, payload.payload.roomID);
       return;
     case (_events.LEAVE_ROOM):
-      removeConnectionFromRoom(payload.payload.roomID, payload.connectionID);
+      leaveRoom(payload.connectionID, payload.payload.roomID);
       return;
     case (_events.SEND_PLAYER_DETAILS):
       Connections.setPlayerDetails(payload.connectionID, payload.payload.playerDetails);
@@ -130,112 +87,146 @@ function handleSocketMessage(payload) {
   }
 }
 
+function createRoom(connectionID, playerDetails) {
+  console.log('create room');
+  Connections.setPlayerDetails(connectionID, playerDetails);
+  var roomID = Rooms.createAndAddConnectionToRoom(connectionID);
+console.log(roomID);
+  if (roomID !== -1) {
+    emitClientNotificationToConnection(connectionID, _events.JOIN_ROOM, {roomID: roomID});
+    checkForGameStart(roomID);
+  }
+}
+
+function joinRoom(connectionID, playerDetails, roomID) {
+  Connections.setPlayerDetails(connectionID, playerDetails);
+  var result = Rooms.addConnectionToRoom(roomID, connectionID);
+
+  if (!result) {
+    emitClientNotificationToConnection(connectionID, _events.JOIN_ROOM, {roomID: roomID});
+    checkForGameStart(roomID);
+  } else {
+    emitClientNotificationToConnection(connectionID, _events.MESSAGE, result);
+  }
+}
+
+function leaveRoom(connectionID, roomID) {
+  var success = Rooms.removeConnectionFromRoom(roomID, connectionID);
+  if(success) {
+    emitClientNotificationToConnection(connectionID, _events.MESSAGE, 'You\'ve left room ' + roomID + '.');
+  } else {
+    // because room doesn't exist
+    //emitClientNotificationToConnection(connectionID, _events.MESSAGE, 'Something went wrong leaving ' + roomID + '.');
+  }
+}
+
 // Remove from room, end game
 function onDisconnect() {
   pruneConnectionsMap();
 }
 
 //----------------------------------------------------------------------------
-//  Room
+//  Connections map
 //----------------------------------------------------------------------------
 
-function createRoomID() {
-  return Math.floor(Math.random() * (9999 - 1000 + 1)) + 1000;
-}
+function pruneConnectionsMap() {
+  var socketList  = _io.sockets.server.eio.clients,
+      connections = Connections.get(),
+      rooms       = Rooms.getMap(),
+      roomToNotify,
+      status      = true;
+  //Object.keys(connections).forEach(socketID => {
+  for (var socketID in connections) {
+    if (connections.hasOwnProperty(socketID)) {
+      if (socketList[socketID] === undefined) {
+        status = false;
 
-function createTestRoom() {
-  _roomMap['0000'] = [];
-}
+        console.log('Disconnect ', socketID);
 
-function createRoom() {
-  var roomId       = createRoomID();
-  _roomMap[roomId] = [];
-  return roomId;
-}
+        for (var roomid in rooms) {
+          if (rooms.hasOwnProperty(roomid)) {
+            var idx = rooms[roomid].indexOf(socketID);
+            if (idx >= 0) {
+              console.log('the disconnect was in room', roomid);
+              Rooms.removeConnectionFromRoom(roomid, socketID);
+              roomToNotify = roomid;
+            }
+          }
+        }
 
-function isValidRoomID(roomID) {
-  return _roomMap.hasOwnProperty(roomID);
-}
+        broadcastClientNotification(_events.USER_DISCONNECTED, socketID);
+        Connections.remove(socketID);
 
-function getNumConnectionsInRoom(roomID) {
-  return _roomMap[roomID].length;
-}
+        if (roomToNotify) {
+          emitClientNotificationToRoom(roomToNotify, _events.GAME_ABORT, 'A player disconnected! The game was aborted.');
+          Rooms.deleteRoom(roomToNotify);
+        }
 
-//----------------------------------------------------------------------------
-//  Adding
-//----------------------------------------------------------------------------
-
-function createAndAddConnectionToRoom(socketID) {
-  var roomID  = createRoom(),
-      success = addConnectionToRoom(roomID, socketID);
-  if (success) {
-    emitClientNotificationToConnection(socketID, _events.JOIN_ROOM, {roomID: roomID});
-  } else {
-    emitClientNotificationToConnection(socketID, _events.MESSAGE, 'Error creating and adding to room.');
-  }
-}
-
-function addConnectionToRoom(roomID, socketID) {
-  if (isValidRoomID(roomID)) {
-    console.log('Add socketID to room ' + roomID + ': ' + Connections.getPlayerDetails(socketID).name);
-    if (getNumConnectionsInRoom(roomID) < _maxConnectionsPerRoom) {
-      _roomMap[roomID].push(socketID);
-      emitClientNotificationToConnection(socketID, _events.JOIN_ROOM, {roomID: roomID});
-      checkForGameStart(roomID);
-      return true;
-    } else {
-      console.log('Max connections in room ' + roomID);
-      emitClientNotificationToConnection(socketID, _events.MESSAGE, 'Too many people are in that room.');
+      }
     }
-  } else {
-    console.log('Add to room, no room id ' + roomID);
-    emitClientNotificationToConnection(socketID, _events.MESSAGE, 'That room doesn\'t exist on the server');
   }
-  return false;
+
+  return status;
+}
+
+//----------------------------------------------------------------------------
+//  Game communication
+//----------------------------------------------------------------------------
+
+function getPlayerDetailsForRoom(roomID) {
+  var roomConnections = Rooms.connections(roomID);
+  return roomConnections.map(socketID => Connections.getPlayerDetails(socketID));
 }
 
 function checkForGameStart(roomID) {
-  if (_roomMap[roomID].length === 2) {
-    var playersInRoom = Connections.getAllPlayerDetails().map(player => player.name);
+  if (Rooms.getNumConnectionsInRoom(roomID) === 2) {
+    var roomConnections = Rooms.connections(roomID),
+        playersInRoom   = getPlayerDetailsForRoom(roomID),
+        playerNames = playersInRoom.map(details => details.name);
 
-    broadcastNotification('Starting game in room ' + roomID + ' with ' + playersInRoom.join(' and '));
+    broadcastNotification('Starting game in room ' + roomID + ' between ' + playerNames.join(' and '));
 
-    console.log('STARTING ...', playersInRoom);
-    _roomMap[roomID].forEach(function (socketID) {
+    console.log('STARTING ...', playerNames);
+
+    roomConnections.forEach(function (socketID) {
       emitClientNotificationToConnection(socketID, _events.GAME_START, {
         roomID : roomID,
-        players: Connections.getAllPlayerDetails()
+        players: playersInRoom
       });
     });
     return;
   }
+
   console.log('Not ready to start');
 }
 
 function sendUpdatedPlayerDetails(roomID) {
-  if (roomID === '0000' || !roomID) {
+  var roomConnections = Rooms.connections(roomID);
+
+  if (roomID === _testRoomID || !roomID) {
     console.log('sendUpdatedPlayerDetails on test socket');
     return;
   }
 
-  if (!_roomMap[roomID]) {
+  if (!roomConnections) {
     console.log('sendUpdatedPlayerDetails: No connections in room: ', roomID);
     return;
   }
 
-  _roomMap[roomID].forEach(function (socketID) {
+  roomConnections.forEach(function (socketID) {
     emitClientNotificationToConnection(socketID, _events.SEND_PLAYER_DETAILS, {
       roomID : roomID,
-      players: Connections.getAllPlayerDetails()
+      players: getPlayerDetailsForRoom(roomID)
     });
   });
 }
 
 function sendQuestion(srcConnection, payload) {
-  var roomID   = payload.roomID,
-      question = payload.question;
+  var roomID          = payload.roomID,
+      roomConnections = Rooms.connections(roomID),
+      question        = payload.question;
 
-  if (roomID === '0000' || !roomID) {
+  if (roomID === _testRoomID || !roomID) {
     console.log('sendQuestion on test socket');
     emitClientNotificationToConnection(srcConnection, _events.SEND_QUESTION, {
       question: question
@@ -243,12 +234,12 @@ function sendQuestion(srcConnection, payload) {
     return;
   }
 
-  if (!_roomMap[roomID]) {
+  if (!roomConnections) {
     console.log('sendQuestion: No connections in room: ', roomID);
     return;
   }
 
-  _roomMap[roomID].forEach(function (socketID) {
+  roomConnections.forEach(function (socketID) {
     if (socketID !== srcConnection) {
       emitClientNotificationToConnection(socketID, _events.SEND_QUESTION, {
         question: question
@@ -258,10 +249,11 @@ function sendQuestion(srcConnection, payload) {
 }
 
 function sendOpponentResult(srcConnection, payload) {
-  var roomID = payload.roomID,
-      result = payload.result;
+  var roomID          = payload.roomID,
+      roomConnections = Rooms.connections(roomID),
+      result          = payload.result;
 
-  if (roomID === '0000' || !roomID) {
+  if (roomID === _testRoomID || !roomID) {
     console.log('sendQuestion on test socket');
     emitClientNotificationToConnection(srcConnection, _events.OPPONENT_ANSWERED, {
       result: result
@@ -269,49 +261,18 @@ function sendOpponentResult(srcConnection, payload) {
     return;
   }
 
-  if (!_roomMap[roomID]) {
+  if (!roomConnections) {
     console.log('sendOpponentResult: No connections in room: ', roomID);
     return;
   }
 
-  _roomMap[roomID].forEach(function (socketID) {
+  roomConnections.forEach(function (socketID) {
     if (socketID !== srcConnection) {
       emitClientNotificationToConnection(socketID, _events.OPPONENT_ANSWERED, {
         result: result
       });
     }
   });
-}
-
-//----------------------------------------------------------------------------
-//  Removal / delete
-//----------------------------------------------------------------------------
-
-function removeConnectionFromRoom(roomID, connection) {
-  if (isValidRoomID(roomID)) {
-    console.log('Remove connection on room ' + roomID);
-    var idx = _roomMap[roomID].indexOf(connection);
-    _roomMap[roomID].splice(idx, 1);
-
-    emitClientNotificationToConnection(connection, _events.MESSAGE, 'You\'ve left room ' + roomID + '.');
-
-    return true;
-  } else {
-    console.log('Remove from room, no room id ' + roomID);
-    return false;
-  }
-}
-
-function deleteRoom(roomID) {
-  if (isValidRoomID(roomID)) {
-    console.log('Deleting room ' + roomID + ' with ' + _roomMap[roomID].length + 'connections');
-    //emitClientNotificationToRoom(roomID, _events.GAME_ABORT, 'For some reason the room was deleted!');
-    delete _roomMap[roomID];
-    return true;
-  } else {
-    console.log('No room to delete ' + roomID);
-  }
-  return false;
 }
 
 //----------------------------------------------------------------------------
@@ -333,7 +294,7 @@ function emitClientNotificationToConnection(connectionID, type, payload) {
 }
 
 function emitClientNotificationToRoom(roomID, type, payload) {
-  _roomMap[roomID].forEach(function (socket) {
+  Rooms.connections(roomID).forEach(function (socket) {
     emitClientNotificationToConnection(socket, type, payload);
   });
 }
