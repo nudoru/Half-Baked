@@ -11,7 +11,8 @@ import * as _stateObjFactory from '../store/SimpleStore.js';
 
 let MixinComponentViews = function () {
 
-  let _componentViewMap = Object.create(null);
+  let _componentViewMap      = Object.create(null),
+      _componentViewKeyIndex = 0;
 
   /**
    * Map a component to a mounting point. If a string is passed,
@@ -52,6 +53,7 @@ let MixinComponentViews = function () {
       }
 
       finalComponent = Nori.assignArray({}, componentAssembly);
+      finalComponent.key = _componentViewKeyIndex++;
 
       // Compose a new initialize function by inserting call to component super module
       previousInitialize        = finalComponent.initialize;

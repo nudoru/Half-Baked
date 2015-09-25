@@ -41,6 +41,8 @@ var ViewComponent = function () {
 
     this.initializeRegions();
 
+    console.log(this.getID(),'init',this.key);
+
     _isInitialized = true;
   }
 

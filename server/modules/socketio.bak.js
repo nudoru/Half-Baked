@@ -1,12 +1,13 @@
-var SocketIO               = require('socket.io'),
+var socketIO               = require('socket.io'),
     _                      = require('lodash-node'),
-    Moment                = require('moment'),
+    _moment                = require('moment'),
     _events                = require('./socketioevents'),
-    Connections           = require('./socketConnections.js')(),
     _io,
     _lastConnectedSocket,
     _lastConnectedSocketID,
+    _connectionsMap        = {},
     _roomMap               = {},
+    _connectionsCount      = 0,
     _maxConnectionsPerRoom = 2;
 
 //----------------------------------------------------------------------------
@@ -15,7 +16,7 @@ var SocketIO               = require('socket.io'),
 
 module.exports = {
   connect: server => {
-    _io = SocketIO(server);
+    _io = socketIO(server);
     _io.on('connection', onConnect);
   }
 };
@@ -25,27 +26,53 @@ function onConnect(socket) {
   _lastConnectedSocketID = socket.id;
 
   console.log('Client connected', _lastConnectedSocketID);
-  Connections.add(socket.id, socket);
+  addConnectionToMap(socket.id, socket);
 
   _lastConnectedSocket.on(_events.NOTIFY_SERVER, onNotifyServer);
   _lastConnectedSocket.on('disconnect', onDisconnect);
 
-  emitClientNotification(_events.CONNECT, Connections.getID(_lastConnectedSocketID).name);
-  //broadcastClientNotification(_events.USER_CONNECTED, Connections.getID(_lastConnectedSocketID).name);
+  emitClientNotification(_events.CONNECT, getConnectionsForID(_lastConnectedSocketID).name);
+  //broadcastClientNotification(_events.USER_CONNECTED, getConnectionsForID(_lastConnectedSocketID).name);
 }
 
 //----------------------------------------------------------------------------
 //  Connections map
 //----------------------------------------------------------------------------
 
+function addConnectionToMap(id, socket) {
+  _connectionsMap[id] = {
+    name         : 'Connection' + _connectionsCount++,
+    id           : id,
+    socket       : socket,
+    connected    : true,
+    status       : null,
+    playerDetails: {}
+  };
+}
+
+function updatePlayerDetails(id, details) {
+  _connectionsMap[id].playerDetails = details;
+}
+
+function getPlayerDetails() {
+  var details = [];
+  Object.keys(_connectionsMap).forEach(id => {
+    if (_connectionsMap.hasOwnProperty(id)) {
+      details.push(_connectionsMap[id].playerDetails);
+    }
+  });
+  return details;
+}
+
+function getConnectionsForID(id) {
+  return _.assign({}, _connectionsMap[id]);
+}
+
+// TODO iterate over Object.keys()
 function pruneConnectionsMap() {
-  var socketList = _io.sockets.server.eio.clients,
-      connections = Connections.get(),
-      notifyRoom,
-      status = true;
-  //Object.keys(connections).forEach(socketID => {
-  for (var socketID in connections) {
-    if (connections.hasOwnProperty(socketID)) {
+  var socketList = _io.sockets.server.eio.clients, notifyRoom, status = true;
+  for (var socketID in _connectionsMap) {
+    if (_connectionsMap.hasOwnProperty(socketID)) {
       if (socketList[socketID] === undefined) {
         status = false;
 
@@ -64,7 +91,7 @@ function pruneConnectionsMap() {
         }
 
         broadcastClientNotification(_events.USER_DISCONNECTED, socketID);
-        Connections.remove(socketID);
+        delete _connectionsMap[socketID];
 
         if (notifyRoom) {
           emitClientNotificationToRoom(notifyRoom, _events.GAME_ABORT, 'A player disconnected! The game was aborted.');
@@ -104,18 +131,18 @@ function handleSocketMessage(payload) {
       console.log("Connected!");
       return;
     case (_events.CREATE_ROOM):
-      Connections.setPlayerDetails(payload.connectionID, payload.payload.playerDetails);
+      updatePlayerDetails(payload.connectionID, payload.payload.playerDetails);
       createAndAddConnectionToRoom(payload.connectionID);
       return;
     case (_events.JOIN_ROOM):
-      Connections.setPlayerDetails(payload.connectionID, payload.payload.playerDetails);
+      updatePlayerDetails(payload.connectionID, payload.payload.playerDetails);
       addConnectionToRoom(payload.payload.roomID, payload.connectionID);
       return;
     case (_events.LEAVE_ROOM):
       removeConnectionFromRoom(payload.payload.roomID, payload.connectionID);
       return;
     case (_events.SEND_PLAYER_DETAILS):
-      Connections.setPlayerDetails(payload.connectionID, payload.payload.playerDetails);
+      updatePlayerDetails(payload.connectionID, payload.payload.playerDetails);
       sendUpdatedPlayerDetails(payload.payload.roomID);
       return;
     case(_events.SEND_QUESTION):
@@ -132,6 +159,7 @@ function handleSocketMessage(payload) {
 
 // Remove from room, end game
 function onDisconnect() {
+  _connectionsCount--;
   pruneConnectionsMap();
 }
 
@@ -177,7 +205,7 @@ function createAndAddConnectionToRoom(socketID) {
 
 function addConnectionToRoom(roomID, socketID) {
   if (isValidRoomID(roomID)) {
-    console.log('Add socketID to room ' + roomID + ': ' + Connections.getPlayerDetails(socketID).name);
+    console.log('Add socketID to room ' + roomID + ': ' + _connectionsMap[socketID].playerDetails.name);
     if (getNumConnectionsInRoom(roomID) < _maxConnectionsPerRoom) {
       _roomMap[roomID].push(socketID);
       emitClientNotificationToConnection(socketID, _events.JOIN_ROOM, {roomID: roomID});
@@ -196,7 +224,7 @@ function addConnectionToRoom(roomID, socketID) {
 
 function checkForGameStart(roomID) {
   if (_roomMap[roomID].length === 2) {
-    var playersInRoom = Connections.getAllPlayerDetails().map(player => player.name);
+    var playersInRoom = getPlayerDetails().map(player => player.name);
 
     broadcastNotification('Starting game in room ' + roomID + ' with ' + playersInRoom.join(' and '));
 
@@ -204,7 +232,7 @@ function checkForGameStart(roomID) {
     _roomMap[roomID].forEach(function (socketID) {
       emitClientNotificationToConnection(socketID, _events.GAME_START, {
         roomID : roomID,
-        players: Connections.getAllPlayerDetails()
+        players: getPlayerDetails()
       });
     });
     return;
@@ -226,7 +254,7 @@ function sendUpdatedPlayerDetails(roomID) {
   _roomMap[roomID].forEach(function (socketID) {
     emitClientNotificationToConnection(socketID, _events.SEND_PLAYER_DETAILS, {
       roomID : roomID,
-      players: Connections.getAllPlayerDetails()
+      players: getPlayerDetails()
     });
   });
 }
@@ -319,11 +347,11 @@ function deleteRoom(roomID) {
 //----------------------------------------------------------------------------
 
 function formattedDate() {
-  return Moment().format('h:mm:ss a');
+  return _moment().format('h:mm:ss a');
 }
 
 function emitClientNotificationToConnection(connectionID, type, payload) {
-  var socket = Connections.getID(connectionID).socket;
+  var socket = getConnectionsForID(connectionID).socket;
   socket.emit(_events.NOTIFY_CLIENT, {
     type   : type,
     id     : _lastConnectedSocketID,

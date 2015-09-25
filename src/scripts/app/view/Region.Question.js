@@ -77,7 +77,11 @@ var Component = Nori.view().createComponentView({
 
     this.clearTimer();
 
+    console.log('applying incorrect');
+
     _appStore.apply([answeredIncorrect, clearQuestion]);
+
+    console.log('showing incorrect feedback', _appStore.isGameOver());
 
     _appView.default.negativeAlert('The correct answer was <span class="correct-answer">' + caText + '</span>', 'You missed that one!');
   },

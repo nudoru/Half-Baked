@@ -95,9 +95,7 @@ let App = Nori.createApplication({
   },
 
   handleGameReset() {
-    console.log('Game reset');
     let appState = this.store.getState();
-
     this.leaveRoom(appState.session.roomID);
   },
 
@@ -221,9 +219,9 @@ let App = Nori.createApplication({
 
   handleOpponentAnswered(payload) {
     if (payload.result) {
-      this.view.positiveAlert('Your opponent got it right!', 'Opponent\'s Answer');
+      this.view.positiveAlert('They got it right!', 'Darn ...');
     } else {
-      this.view.negativeAlert('Your opponent got it wrong!', 'Opponent\'s Answer');
+      this.view.negativeAlert('They missed it!', 'Sweet!');
     }
 
     let opponentAnswered = _appActions.opponentAnswered(payload.result);

@@ -216,9 +216,7 @@ var App = Nori.createApplication({
   },
 
   handleGameReset: function handleGameReset() {
-    console.log('Game reset');
     var appState = this.store.getState();
-
     this.leaveRoom(appState.session.roomID);
   },
 
@@ -342,9 +340,9 @@ var App = Nori.createApplication({
 
   handleOpponentAnswered: function handleOpponentAnswered(payload) {
     if (payload.result) {
-      this.view.positiveAlert('Your opponent got it right!', 'Opponent\'s Answer');
+      this.view.positiveAlert('They got it right!', 'Darn ...');
     } else {
-      this.view.negativeAlert('Your opponent got it wrong!', 'Opponent\'s Answer');
+      this.view.negativeAlert('They missed it!', 'Sweet!');
     }
 
     var opponentAnswered = _appActions.opponentAnswered(payload.result);
@@ -1237,7 +1235,11 @@ var Component = Nori.view().createComponentView({
 
     this.clearTimer();
 
+    console.log('applying incorrect');
+
     _appStore.apply([answeredIncorrect, clearQuestion]);
+
+    console.log('showing incorrect feedback', _appStore.isGameOver());
 
     _appView['default'].negativeAlert('The correct answer was <span class="correct-answer">' + caText + '</span>', 'You missed that one!');
   },
@@ -3155,13 +3157,18 @@ var Renderer = function Renderer() {
     var callback = _ref.callback;
 
     var domEl = undefined,
-        mountPoint = document.querySelector(target);
-
-    mountPoint.innerHTML = '';
+        mountPoint = document.querySelector(target),
+        currentHTML = mountPoint.innerHTML;
 
     if (html) {
       domEl = _domUtils.HTMLStrToNode(html);
-      mountPoint.appendChild(domEl);
+      if (html !== currentHTML) {
+        // TODO experiment with the jsdiff function
+        mountPoint.innerHTML = '';
+        mountPoint.appendChild(domEl);
+      } else {
+        console.log('> is SAME');
+      }
     }
 
     if (callback) {
@@ -3665,7 +3672,8 @@ var _stateObjFactory = _interopRequireWildcard(_storeSimpleStoreJs);
 
 var MixinComponentViews = function MixinComponentViews() {
 
-  var _componentViewMap = Object.create(null);
+  var _componentViewMap = Object.create(null),
+      _componentViewKeyIndex = 0;
 
   /**
    * Map a component to a mounting point. If a string is passed,
@@ -3702,6 +3710,7 @@ var MixinComponentViews = function MixinComponentViews() {
       }
 
       finalComponent = Nori.assignArray({}, componentAssembly);
+      finalComponent.key = _componentViewKeyIndex++;
 
       // Compose a new initialize function by inserting call to component super module
       previousInitialize = finalComponent.initialize;
@@ -4382,6 +4391,8 @@ var ViewComponent = function ViewComponent() {
     this.createSubject('unmount');
 
     this.initializeRegions();
+
+    console.log(this.getID(), 'init', this.key);
 
     _isInitialized = true;
   }
