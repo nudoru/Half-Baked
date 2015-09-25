@@ -88,10 +88,10 @@ function handleSocketMessage(payload) {
 }
 
 function createRoom(connectionID, playerDetails) {
-  var roomID = Rooms.createAndAddConnectionToRoom(connectionID);
-
+  console.log('create room');
   Connections.setPlayerDetails(connectionID, playerDetails);
-
+  var roomID = Rooms.createAndAddConnectionToRoom(connectionID);
+console.log(roomID);
   if (roomID !== -1) {
     emitClientNotificationToConnection(connectionID, _events.JOIN_ROOM, {roomID: roomID});
     checkForGameStart(roomID);
@@ -99,9 +99,8 @@ function createRoom(connectionID, playerDetails) {
 }
 
 function joinRoom(connectionID, playerDetails, roomID) {
-  var result = Rooms.addConnection(roomID, connectionID);
-
   Connections.setPlayerDetails(connectionID, playerDetails);
+  var result = Rooms.addConnectionToRoom(roomID, connectionID);
 
   if (!result) {
     emitClientNotificationToConnection(connectionID, _events.JOIN_ROOM, {roomID: roomID});
@@ -112,8 +111,8 @@ function joinRoom(connectionID, playerDetails, roomID) {
 }
 
 function leaveRoom(connectionID, roomID) {
-  var success = Rooms.removeConnection(roomID, connectionID);
-  if (success) {
+  var success = Rooms.removeConnectionFromRoom(roomID, connectionID);
+  if(success) {
     emitClientNotificationToConnection(connectionID, _events.MESSAGE, 'You\'ve left room ' + roomID + '.');
   } else {
     // because room doesn't exist
@@ -136,36 +135,36 @@ function pruneConnectionsMap() {
       rooms       = Rooms.getMap(),
       roomToNotify,
       status      = true;
-
-  Object.keys(connections).forEach(socketID => {
+  //Object.keys(connections).forEach(socketID => {
+  for (var socketID in connections) {
     if (connections.hasOwnProperty(socketID)) {
       if (socketList[socketID] === undefined) {
         status = false;
 
         console.log('Disconnect ', socketID);
 
-        Object.keys(rooms).forEach(roomid => {
+        for (var roomid in rooms) {
           if (rooms.hasOwnProperty(roomid)) {
             var idx = rooms[roomid].indexOf(socketID);
             if (idx >= 0) {
               console.log('the disconnect was in room', roomid);
-              Rooms.removeConnection(roomid, socketID);
+              Rooms.removeConnectionFromRoom(roomid, socketID);
               roomToNotify = roomid;
             }
           }
-        });
+        }
 
         broadcastClientNotification(_events.USER_DISCONNECTED, socketID);
         Connections.remove(socketID);
 
         if (roomToNotify) {
           emitClientNotificationToRoom(roomToNotify, _events.GAME_ABORT, 'A player disconnected! The game was aborted.');
-          Rooms.remove(roomToNotify);
+          Rooms.deleteRoom(roomToNotify);
         }
 
       }
     }
-  });
+  }
 
   return status;
 }
@@ -180,16 +179,16 @@ function getPlayerDetailsForRoom(roomID) {
 }
 
 function checkForGameStart(roomID) {
-  if (Rooms.getNumConnections(roomID) === 2) {
+  if (Rooms.getNumConnectionsInRoom(roomID) === 2) {
     var roomConnections = Rooms.connections(roomID),
         playersInRoom   = getPlayerDetailsForRoom(roomID),
-        playerNames     = playersInRoom.map(details => details.name);
+        playerNames = playersInRoom.map(details => details.name);
 
     broadcastNotification('Starting game in room ' + roomID + ' between ' + playerNames.join(' and '));
 
     console.log('STARTING ...', playerNames);
 
-    roomConnections.forEach(socketID => {
+    roomConnections.forEach(function (socketID) {
       emitClientNotificationToConnection(socketID, _events.GAME_START, {
         roomID : roomID,
         players: playersInRoom
@@ -214,7 +213,7 @@ function sendUpdatedPlayerDetails(roomID) {
     return;
   }
 
-  roomConnections.forEach(socketID => {
+  roomConnections.forEach(function (socketID) {
     emitClientNotificationToConnection(socketID, _events.SEND_PLAYER_DETAILS, {
       roomID : roomID,
       players: getPlayerDetailsForRoom(roomID)
@@ -240,7 +239,7 @@ function sendQuestion(srcConnection, payload) {
     return;
   }
 
-  roomConnections.forEach(socketID => {
+  roomConnections.forEach(function (socketID) {
     if (socketID !== srcConnection) {
       emitClientNotificationToConnection(socketID, _events.SEND_QUESTION, {
         question: question
@@ -267,7 +266,7 @@ function sendOpponentResult(srcConnection, payload) {
     return;
   }
 
-  roomConnections.forEach(socketID => {
+  roomConnections.forEach(function (socketID) {
     if (socketID !== srcConnection) {
       emitClientNotificationToConnection(socketID, _events.OPPONENT_ANSWERED, {
         result: result

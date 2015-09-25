@@ -13,18 +13,18 @@ module.exports = function () {
     return Math.floor(Math.random() * (9999 - 1000 + 1)) + 1000;
   }
 
-  function createRoom() {
+  function create() {
     var roomId       = createID();
     _roomMap[roomId] = [];
     return roomId;
   }
 
-  function isValidRoomID(roomID) {
-    return _roomMap.hasOwnProperty(roomID);
+  function isValidID(id) {
+    return _roomMap.hasOwnProperty(id);
   }
 
-  function getNumConnectionsInRoom(roomID) {
-    return _roomMap[roomID].length;
+  function getNumConnections(id) {
+    return _roomMap[id].length;
   }
 
   function connections(id) {
@@ -36,33 +36,29 @@ module.exports = function () {
   //----------------------------------------------------------------------------
 
   // On CREATE
-  // TODO split this up
   function createAndAddConnectionToRoom(socketID) {
-    console.log('create and add connections');
-    var roomID  = createRoom(),
-        result = addConnectionToRoom(roomID, socketID);
+    var roomID = create(),
+        result = addConnection(roomID, socketID);
     if (!result) {
       return roomID;
-      // FIX emitClientNotificationToConnection(socketID, _events.JOIN_ROOM, {roomID: roomID});
     } else {
       return -1;
-      //emitClientNotificationToConnection(socketID, _events.MESSAGE, 'Error creating and adding to room.');
     }
   }
 
   // On JOIN
-  function addConnectionToRoom(roomID, socketID) {
-    if (isValidRoomID(roomID)) {
-      if (getNumConnectionsInRoom(roomID) < _maxConnections) {
-        _roomMap[roomID].push(socketID);
+  function addConnection(id, socketID) {
+    if (isValidID(id)) {
+      if (getNumConnections(id) < _maxConnections) {
+        _roomMap[id].push(socketID);
         return;
       } else {
-        console.log('Max connections in room ' + roomID);
+        console.log('Max connections in room ' + id);
         return 'Too many people are in that room.';
       }
     } else {
-      console.log('Add to room, no room id ' + roomID);
-      return 'Room ' + roomID + ' doesn\'t exist.';
+      console.log('Add to room, no room id ' + id);
+      return 'Room ' + id + ' doesn\'t exist.';
     }
   }
 
@@ -70,25 +66,25 @@ module.exports = function () {
   //  Removal / delete
   //----------------------------------------------------------------------------
 
-  function removeConnectionFromRoom(roomID, connection) {
-    if (isValidRoomID(roomID)) {
-      console.log('Remove connection on room ' + roomID);
-      var idx = _roomMap[roomID].indexOf(connection);
-      _roomMap[roomID].splice(idx, 1);
+  function removeConnection(id, connection) {
+    if (isValidID(id)) {
+      console.log('Remove connection on room ' + id);
+      var idx = _roomMap[id].indexOf(connection);
+      _roomMap[id].splice(idx, 1);
       return true;
     } else {
-      console.log('Remove from room, no room id ' + roomID);
+      console.log('Remove from room, no room id ' + id);
       return false;
     }
   }
 
-  function deleteRoom(roomID) {
-    if (isValidRoomID(roomID)) {
-      console.log('Deleting room ' + roomID + ' with ' + _roomMap[roomID].length + 'connections');
-      delete _roomMap[roomID];
+  function remove(id) {
+    if (isValidID(id)) {
+      console.log('Deleting room ' + id + ' with ' + _roomMap[id].length + 'connections');
+      delete _roomMap[id];
       return true;
     } else {
-      console.log('No room to delete ' + roomID);
+      console.log('No room to delete ' + id);
     }
     return false;
   }
@@ -96,13 +92,13 @@ module.exports = function () {
   return {
     getMap                      : getMap,
     createID                    : createID,
-    createRoom                  : createRoom,
-    isValidRoomID               : isValidRoomID,
+    create                      : create,
+    isValidID                   : isValidID,
     connections                 : connections,
-    getNumConnectionsInRoom     : getNumConnectionsInRoom,
+    getNumConnections           : getNumConnections,
     createAndAddConnectionToRoom: createAndAddConnectionToRoom,
-    addConnectionToRoom         : addConnectionToRoom,
-    removeConnectionFromRoom    : removeConnectionFromRoom,
-    deleteRoom                  : deleteRoom
+    addConnection               : addConnection,
+    removeConnection            : removeConnection,
+    remove                      : remove
   };
 };
