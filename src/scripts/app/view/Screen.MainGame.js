@@ -110,8 +110,8 @@ var Component = Nori.view().createComponentView({
   },
 
   isShowingCards() {
-    return (this.getDOMElement().querySelector('#game_question-difficulty1'));
-    //return (this.getState().sentQuestion.q_difficulty_level === -1);
+    //return (this.getDOMElement().querySelector('#game_question-difficulty1'));
+    return (this.getState().sentQuestion.q_difficulty_level === -1);
   },
 
   animateDifficultyCards() {

@@ -61,9 +61,9 @@ var Component = Nori.view().createComponentView({
 
     this.clearTimer();
 
-    _appStore.apply(answeredCorrect);
-
     _appView.default.positiveAlert('You got it!', 'Correct!');
+
+    _appStore.apply(answeredCorrect);
   },
 
   scoreIncorrect() {
@@ -75,13 +75,9 @@ var Component = Nori.view().createComponentView({
 
     this.clearTimer();
 
-    console.log('applying incorrect');
+    _appView.default.negativeAlert('The correct answer was <span class="correct-answer">' + caText + '</span>', 'You missed that one!');
 
     _appStore.apply(answeredIncorrect);
-
-    console.log('showing incorrect feedback', _appStore.isGameOver());
-
-    _appView.default.negativeAlert('The correct answer was <span class="correct-answer">' + caText + '</span>', 'You missed that one!');
   },
 
   getQuestionState() {

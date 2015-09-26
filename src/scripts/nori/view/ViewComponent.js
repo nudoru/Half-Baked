@@ -18,6 +18,7 @@ var ViewComponent = function () {
       _html,
       _DOMElement,
       _mountPoint,
+      _mountDelay,
       _regions       = {},
       _isMounted     = false;
 
@@ -164,15 +165,22 @@ var ViewComponent = function () {
     }
 
     if (this.componentDidMount) {
-      //this.componentDidMount();
       // This delay helps animation on components run on mount
-      // 10 is arbitrary, might be able to reduce?
-      _.delay(this.componentDidMount.bind(this), 10);
+      //_mountDelay = _.delay(this.componentDidMount.bind(this), 10);
+      _mountDelay = _.delay(this.mountAfterDelay.bind(this), 10);
     }
 
     this.mountRegions();
 
     this.notifySubscribersOf('mount', this.getID());
+  }
+
+  function mountAfterDelay() {
+    if (_mountDelay) {
+      window.clearTimeout(_mountDelay);
+    }
+
+    this.componentDidMount();
   }
 
   /**
@@ -198,8 +206,13 @@ var ViewComponent = function () {
   }
 
   function unmount() {
+
+    if (_mountDelay) {
+      window.clearTimeout(_mountDelay);
+    }
+
     // Tweens are present in the MixinDOMManipulation. This is convenience
-    if(this.killTweens) {
+    if (this.killTweens) {
       this.killTweens();
     }
 
@@ -337,6 +350,7 @@ var ViewComponent = function () {
     render               : render,
     mount                : mount,
     shouldDelegateEvents : shouldDelegateEvents,
+    mountAfterDelay      : mountAfterDelay,
     componentDidMount    : componentDidMount,
     componentWillUnmount : componentWillUnmount,
     unmount              : unmount,

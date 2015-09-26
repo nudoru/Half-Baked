@@ -49,7 +49,7 @@ let App = Nori.createApplication({
    */
     onStoreInitialized() {
     console.log('app, onstore initialized');
-    this.store.subscribe(this.handleStoreChanges.bind(this));
+    this.store.subscribe(this.reactToStoreMutation.bind(this));
     this.runApplication();
   },
 
@@ -68,11 +68,11 @@ let App = Nori.createApplication({
   // Handle FROM store
   //----------------------------------------------------------------------------
 
-  handleStoreChanges() {
+  reactToStoreMutation() {
     var appState = this.store.getState(),
-        type = appState.lastActionType;
+        type     = appState.lastActionType;
 
-    //console.log('App, handling: ',type);
+    console.log('APP, handle after action: ',type);
 
     if (type === _appActionConstants.SET_LOCAL_PLAYER_PROPS) {
       this.handleLocalPlayerPropsUpdate();
@@ -85,6 +85,34 @@ let App = Nori.createApplication({
     } else if (type === _appActionConstants.RESET_GAME) {
       this.handleGameReset();
     }
+
+    if (this.shouldGameEnd(appState)) {
+      console.log('app, game should end');
+      this.doGameOver();
+    }
+  },
+
+  //When a player's health reaches 0, the game is over
+  shouldGameEnd(state) {
+    if (!state.localPlayer || !state.remotePlayer || state.currentState !== 'MAIN_GAME') {
+      return false;
+    }
+
+    let local  = state.localPlayer.health,
+        remote = state.remotePlayer.health;
+
+    if (local <= 0 || remote <= 0) {
+      return true;
+    }
+
+    return false;
+  },
+
+  doGameOver() {
+    let appState          = this.store.getState(),
+        setGameOverScreen = _noriActions.changeStoreState({currentState: appState.gameStates[4]});
+
+    this.store.apply(setGameOverScreen);
   },
 
   handleLocalPlayerPropsUpdate() {

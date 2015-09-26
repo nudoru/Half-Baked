@@ -170,7 +170,7 @@ var App = Nori.createApplication({
    */
   onStoreInitialized: function onStoreInitialized() {
     console.log('app, onstore initialized');
-    this.store.subscribe(this.handleStoreChanges.bind(this));
+    this.store.subscribe(this.reactToStoreMutation.bind(this));
     this.runApplication();
   },
 
@@ -189,11 +189,11 @@ var App = Nori.createApplication({
   // Handle FROM store
   //----------------------------------------------------------------------------
 
-  handleStoreChanges: function handleStoreChanges() {
+  reactToStoreMutation: function reactToStoreMutation() {
     var appState = this.store.getState(),
         type = appState.lastActionType;
 
-    //console.log('App, handling: ',type);
+    console.log('APP, handle after action: ', type);
 
     if (type === _appActionConstants.SET_LOCAL_PLAYER_PROPS) {
       this.handleLocalPlayerPropsUpdate();
@@ -206,6 +206,34 @@ var App = Nori.createApplication({
     } else if (type === _appActionConstants.RESET_GAME) {
       this.handleGameReset();
     }
+
+    if (this.shouldGameEnd(appState)) {
+      console.log('app, game should end');
+      this.doGameOver();
+    }
+  },
+
+  //When a player's health reaches 0, the game is over
+  shouldGameEnd: function shouldGameEnd(state) {
+    if (!state.localPlayer || !state.remotePlayer || state.currentState !== 'MAIN_GAME') {
+      return false;
+    }
+
+    var local = state.localPlayer.health,
+        remote = state.remotePlayer.health;
+
+    if (local <= 0 || remote <= 0) {
+      return true;
+    }
+
+    return false;
+  },
+
+  doGameOver: function doGameOver() {
+    var appState = this.store.getState(),
+        setGameOverScreen = _noriActions.changeStoreState({ currentState: appState.gameStates[4] });
+
+    this.store.apply(setGameOverScreen);
   },
 
   handleLocalPlayerPropsUpdate: function handleLocalPlayerPropsUpdate() {
@@ -784,45 +812,6 @@ var AppStore = Nori.createStore({
         console.warn('Reducer store, unhandled event type: ' + event.type);
         return state;
     }
-  },
-
-  /**
-   * Called after all reducers have run and broadcast possible updates.
-   */
-  handleStateMutation: function handleStateMutation() {
-    var state = this.getState();
-
-    // Check if player health is 0
-    if (this.shouldGameEnd(state)) {
-      console.log('ENDING GAME!');
-      this.setState({ currentState: this.getState().gameStates[4] });
-    }
-
-    //this.notifySubscribers();
-  },
-
-  /**
-   * When a player's health reaches 0, the game is over
-   * @param state
-   * @returns {boolean}
-   */
-  shouldGameEnd: function shouldGameEnd(state) {
-    if (!state.localPlayer || !state.remotePlayer || state.currentState !== 'MAIN_GAME') {
-      return false;
-    }
-
-    var local = state.localPlayer.health,
-        remote = state.remotePlayer.health;
-
-    if (local <= 0 || remote <= 0) {
-      return true;
-    }
-
-    return false;
-  },
-
-  isGameOver: function isGameOver() {
-    return this.shouldGameEnd(this.getState());
   }
 
 });
@@ -1227,9 +1216,9 @@ var Component = Nori.view().createComponentView({
 
     this.clearTimer();
 
-    _appStore.apply(answeredCorrect);
-
     _appView['default'].positiveAlert('You got it!', 'Correct!');
+
+    _appStore.apply(answeredCorrect);
   },
 
   scoreIncorrect: function scoreIncorrect() {
@@ -1241,13 +1230,9 @@ var Component = Nori.view().createComponentView({
 
     this.clearTimer();
 
-    console.log('applying incorrect');
+    _appView['default'].negativeAlert('The correct answer was <span class="correct-answer">' + caText + '</span>', 'You missed that one!');
 
     _appStore.apply(answeredIncorrect);
-
-    console.log('showing incorrect feedback', _appStore.isGameOver());
-
-    _appView['default'].negativeAlert('The correct answer was <span class="correct-answer">' + caText + '</span>', 'You missed that one!');
   },
 
   getQuestionState: function getQuestionState() {
@@ -1678,8 +1663,8 @@ var Component = Nori.view().createComponentView({
   },
 
   isShowingCards: function isShowingCards() {
-    return this.getDOMElement().querySelector('#game_question-difficulty1');
-    //return (this.getState().sentQuestion.q_difficulty_level === -1);
+    //return (this.getDOMElement().querySelector('#game_question-difficulty1'));
+    return this.getState().sentQuestion.q_difficulty_level === -1;
   },
 
   animateDifficultyCards: function animateDifficultyCards() {
@@ -4373,6 +4358,7 @@ var ViewComponent = function ViewComponent() {
       _html = undefined,
       _DOMElement = undefined,
       _mountPoint = undefined,
+      _mountDelay = undefined,
       _regions = {},
       _isMounted = false;
 
@@ -4519,15 +4505,22 @@ var ViewComponent = function ViewComponent() {
     }
 
     if (this.componentDidMount) {
-      //this.componentDidMount();
       // This delay helps animation on components run on mount
-      // 10 is arbitrary, might be able to reduce?
-      _.delay(this.componentDidMount.bind(this), 10);
+      //_mountDelay = _.delay(this.componentDidMount.bind(this), 10);
+      _mountDelay = _.delay(this.mountAfterDelay.bind(this), 10);
     }
 
     this.mountRegions();
 
     this.notifySubscribersOf('mount', this.getID());
+  }
+
+  function mountAfterDelay() {
+    if (_mountDelay) {
+      window.clearTimeout(_mountDelay);
+    }
+
+    this.componentDidMount();
   }
 
   /**
@@ -4552,6 +4545,11 @@ var ViewComponent = function ViewComponent() {
   }
 
   function unmount() {
+
+    if (_mountDelay) {
+      window.clearTimeout(_mountDelay);
+    }
+
     // Tweens are present in the MixinDOMManipulation. This is convenience
     if (this.killTweens) {
       this.killTweens();
@@ -4690,6 +4688,7 @@ var ViewComponent = function ViewComponent() {
     render: render,
     mount: mount,
     shouldDelegateEvents: shouldDelegateEvents,
+    mountAfterDelay: mountAfterDelay,
     componentDidMount: componentDidMount,
     componentWillUnmount: componentWillUnmount,
     unmount: unmount,

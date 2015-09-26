@@ -186,44 +186,6 @@ var AppStore = Nori.createStore({
     }
   },
 
-  /**
-   * Called after all reducers have run and broadcast possible updates.
-   */
-    handleStateMutation() {
-    let state = this.getState();
-
-    // Check if player health is 0
-    if (this.shouldGameEnd(state)) {
-      console.log('ENDING GAME!');
-      this.setState({currentState: this.getState().gameStates[4]});
-    }
-
-    //this.notifySubscribers();
-  },
-
-  /**
-   * When a player's health reaches 0, the game is over
-   * @param state
-   * @returns {boolean}
-   */
-    shouldGameEnd(state) {
-    if (!state.localPlayer || !state.remotePlayer || state.currentState !== 'MAIN_GAME') {
-      return false;
-    }
-
-    let local  = state.localPlayer.health,
-        remote = state.remotePlayer.health;
-
-    if (local <= 0 || remote <= 0) {
-      return true;
-    }
-
-    return false;
-  },
-
-  isGameOver() {
-    return this.shouldGameEnd(this.getState());
-  },
 
 });
 
