@@ -57,12 +57,11 @@ var Component = Nori.view().createComponentView({
 
   scoreCorrect() {
     let qPoints         = this.getState().question.q_difficulty_level,
-        answeredCorrect = _appActions.answeredCorrect(qPoints),
-        clearQuestion   = _appActions.clearQuestion();
+        answeredCorrect = _appActions.answeredCorrect(qPoints);
 
     this.clearTimer();
 
-    _appStore.apply([answeredCorrect, clearQuestion]);
+    _appStore.apply(answeredCorrect);
 
     _appView.default.positiveAlert('You got it!', 'Correct!');
   },
@@ -72,14 +71,13 @@ var Component = Nori.view().createComponentView({
         question          = state.currentQuestion.question,
         qPoints           = question.q_difficulty_level,
         caText            = question['q_options_' + question.q_correct_option],
-        answeredIncorrect = _appActions.answeredIncorrect(qPoints),
-        clearQuestion     = _appActions.clearQuestion();
+        answeredIncorrect = _appActions.answeredIncorrect(qPoints);
 
     this.clearTimer();
 
     console.log('applying incorrect');
 
-    _appStore.apply([answeredIncorrect, clearQuestion]);
+    _appStore.apply(answeredIncorrect);
 
     console.log('showing incorrect feedback', _appStore.isGameOver());
 

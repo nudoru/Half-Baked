@@ -98,39 +98,37 @@ var Component = Nori.view().createComponentView({
    * Component HTML was attached to the DOM
    */
     componentDidMount(){
-    //if (this.isShowingCards()) {
-    //  if (_cardAnimationSub) {
-    //    _cardAnimationSub.dispose();
-    //  }
-    //
-    //  // Needs a 1ms delay
-    //  _cardAnimationSub = _rx.doEvery(10, 1, this.animateDifficultyCards.bind(this));
-    //  //this.animateDifficultyCards();
-    //}
+    if (this.isShowingCards()) {
+      if (_cardAnimationSub) {
+        _cardAnimationSub.dispose();
+      }
+
+      // Needs a 1ms delay
+      //_cardAnimationSub = _rx.doEvery(10, 1, this.animateDifficultyCards.bind(this));
+      this.animateDifficultyCards();
+    }
   },
 
   isShowingCards() {
-    return (this.getState().sentQuestion.q_difficulty_level === -1);
+    return (this.getDOMElement().querySelector('#game_question-difficulty1'));
+    //return (this.getState().sentQuestion.q_difficulty_level === -1);
   },
 
   animateDifficultyCards() {
     let difficultyCardElIDs = ['#game_question-difficulty1', '#game_question-difficulty2', '#game_question-difficulty3', '#game_question-difficulty4', '#game_question-difficulty5'];
 
     difficultyCardElIDs.forEach((cardID, i) => {
-
-      this.tweenFromTo(cardID, 1, {
+      this.tweenFromTo(cardID, .5, {
         alpha: 0,
         y    : 300
       }, {
         alpha: 1,
         y    : 0,
-        delay: i * 0.15,
+        delay: i * 0.1,
         ease : Back.easeOut
       });
 
     });
-
-    _cardAnimationSub.dispose();
 
   },
 

@@ -4282,12 +4282,6 @@ body {
   border-radius: 0.618rem;
   cursor: pointer;
 }
-.game__question-difficulty ul li:hover {
-  background-image: none;
-  box-shadow: 2px 10px 10px #005eb8;
-  border: 1px solid #fff;
-  background-color: #efd0ee;
-}
 .game__question-difficulty ul li img {
   pointer-events: none;
   padding-top: 50px;

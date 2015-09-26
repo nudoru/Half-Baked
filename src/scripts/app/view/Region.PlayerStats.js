@@ -82,25 +82,23 @@ var Component = Nori.view().createComponentView({
 
     playState = this.getPlayState(stats);
 
-    // TODO determine state from questions, present or not
     // TODO remote needs to be opposite local
     stats.playerImage             = this.getPlayerHUDImage(playState, stats.appearance);
     stats.questionDifficultyImage = dimage;
-
 
     return stats;
   },
 
   getPlayState(playState) {
     let isLocal = this.getConfigProps().target === 'local',
-        local = playState.localQ,
-        remote = playState.remoteQ;
+        local   = playState.localQ,
+        remote  = playState.remoteQ;
 
-    if(!local && !remote) {
+    if (!local && !remote) {
       return 'CHOOSE';
     }
 
-    if((isLocal && local) || (!isLocal && remote)){
+    if ((isLocal && local) || (!isLocal && remote)) {
       return 'ANSWERING';
     }
 
@@ -143,7 +141,8 @@ var Component = Nori.view().createComponentView({
     }
 
     // Needs a 1ms delay
-    _foodAnimationSub = _rx.doEvery(1, 1, this.animateFoodToss.bind(this));
+    //_foodAnimationSub = _rx.doEvery(1, 1, this.animateFoodToss.bind(this));
+    this.animateFoodToss();
   },
 
   // TODO will not animate to local player

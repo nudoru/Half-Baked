@@ -170,7 +170,7 @@ var App = Nori.createApplication({
    */
   onStoreInitialized: function onStoreInitialized() {
     console.log('app, onstore initialized');
-    this.store.subscribe(this.handleStoreMutation.bind(this));
+    this.store.subscribe(this.handleStoreChanges.bind(this));
     this.runApplication();
   },
 
@@ -189,9 +189,11 @@ var App = Nori.createApplication({
   // Handle FROM store
   //----------------------------------------------------------------------------
 
-  handleStoreMutation: function handleStoreMutation() {
+  handleStoreChanges: function handleStoreChanges() {
     var appState = this.store.getState(),
         type = appState.lastActionType;
+
+    //console.log('App, handling: ',type);
 
     if (type === _appActionConstants.SET_LOCAL_PLAYER_PROPS) {
       this.handleLocalPlayerPropsUpdate();
@@ -229,6 +231,7 @@ var App = Nori.createApplication({
   },
 
   sendMyAnswer: function sendMyAnswer(isCorrect) {
+    console.log('sending answer ...');
     var appState = this.store.getState();
     this.socket.notifyServer(_socketIOEvents.OPPONENT_ANSWERED, {
       roomID: appState.session.roomID,
@@ -249,18 +252,16 @@ var App = Nori.createApplication({
       return;
     }
 
-    console.log("from Socket.IO server", payload);
+    //console.log("from Socket.IO server", payload);
 
     switch (payload.type) {
       case _socketIOEvents.CONNECT:
         this.handleConnect(payload.id);
         return;
       case _socketIOEvents.JOIN_ROOM:
-        console.log("join room", payload.payload);
         this.handleJoinNewlyCreatedRoom(payload.payload.roomID);
         return;
       case _socketIOEvents.GAME_START:
-        console.log("GAME STARTED");
         this.handleGameStart(payload.payload);
         return;
       case _socketIOEvents.GAME_ABORT:
@@ -330,6 +331,9 @@ var App = Nori.createApplication({
   handleUpdatedPlayerDetails: function handleUpdatedPlayerDetails(payload) {
     var remotePlayer = this.pluckRemotePlayer(payload.players),
         setRemotePlayer = _appActions.setRemotePlayerProps(remotePlayer);
+
+    console.log('setting player details');
+
     this.store.apply(setRemotePlayer);
   },
 
@@ -759,8 +763,12 @@ var AppStore = Nori.createStore({
       case _appActionConstants.RESET_GAME:
       case _appActionConstants.SET_CURRENT_QUESTION:
       case _appActionConstants.SET_SENT_QUESTION:
+        return _.merge({}, state, event.payload.data);
+
       case _appActionConstants.ANSWERED_CORRECT:
       case _appActionConstants.ANSWERED_INCORRECT:
+        state.currentQuestion = null;
+        state.sentQuestion = this.createNullQuestion();
         return _.merge({}, state, event.payload.data);
 
       case _appActionConstants.OPPONENT_ANSWERED:
@@ -779,7 +787,7 @@ var AppStore = Nori.createStore({
   },
 
   /**
-   * Called after all reducers have run to broadcast possible updates.
+   * Called after all reducers have run and broadcast possible updates.
    */
   handleStateMutation: function handleStateMutation() {
     var state = this.getState();
@@ -790,7 +798,7 @@ var AppStore = Nori.createStore({
       this.setState({ currentState: this.getState().gameStates[4] });
     }
 
-    this.notifySubscribers();
+    //this.notifySubscribers();
   },
 
   /**
@@ -1026,7 +1034,6 @@ var Component = Nori.view().createComponentView({
 
     playState = this.getPlayState(stats);
 
-    // TODO determine state from questions, present or not
     // TODO remote needs to be opposite local
     stats.playerImage = this.getPlayerHUDImage(playState, stats.appearance);
     stats.questionDifficultyImage = dimage;
@@ -1085,7 +1092,8 @@ var Component = Nori.view().createComponentView({
     }
 
     // Needs a 1ms delay
-    _foodAnimationSub = _rx.doEvery(1, 1, this.animateFoodToss.bind(this));
+    //_foodAnimationSub = _rx.doEvery(1, 1, this.animateFoodToss.bind(this));
+    this.animateFoodToss();
   },
 
   // TODO will not animate to local player
@@ -1215,12 +1223,11 @@ var Component = Nori.view().createComponentView({
 
   scoreCorrect: function scoreCorrect() {
     var qPoints = this.getState().question.q_difficulty_level,
-        answeredCorrect = _appActions.answeredCorrect(qPoints),
-        clearQuestion = _appActions.clearQuestion();
+        answeredCorrect = _appActions.answeredCorrect(qPoints);
 
     this.clearTimer();
 
-    _appStore.apply([answeredCorrect, clearQuestion]);
+    _appStore.apply(answeredCorrect);
 
     _appView['default'].positiveAlert('You got it!', 'Correct!');
   },
@@ -1230,14 +1237,13 @@ var Component = Nori.view().createComponentView({
         question = state.currentQuestion.question,
         qPoints = question.q_difficulty_level,
         caText = question['q_options_' + question.q_correct_option],
-        answeredIncorrect = _appActions.answeredIncorrect(qPoints),
-        clearQuestion = _appActions.clearQuestion();
+        answeredIncorrect = _appActions.answeredIncorrect(qPoints);
 
     this.clearTimer();
 
     console.log('applying incorrect');
 
-    _appStore.apply([answeredIncorrect, clearQuestion]);
+    _appStore.apply(answeredIncorrect);
 
     console.log('showing incorrect feedback', _appStore.isGameOver());
 
@@ -1660,19 +1666,20 @@ var Component = Nori.view().createComponentView({
    * Component HTML was attached to the DOM
    */
   componentDidMount: function componentDidMount() {
-    //if (this.isShowingCards()) {
-    //  if (_cardAnimationSub) {
-    //    _cardAnimationSub.dispose();
-    //  }
-    //
-    //  // Needs a 1ms delay
-    //  _cardAnimationSub = _rx.doEvery(10, 1, this.animateDifficultyCards.bind(this));
-    //  //this.animateDifficultyCards();
-    //}
+    if (this.isShowingCards()) {
+      if (_cardAnimationSub) {
+        _cardAnimationSub.dispose();
+      }
+
+      // Needs a 1ms delay
+      //_cardAnimationSub = _rx.doEvery(10, 1, this.animateDifficultyCards.bind(this));
+      this.animateDifficultyCards();
+    }
   },
 
   isShowingCards: function isShowingCards() {
-    return this.getState().sentQuestion.q_difficulty_level === -1;
+    return this.getDOMElement().querySelector('#game_question-difficulty1');
+    //return (this.getState().sentQuestion.q_difficulty_level === -1);
   },
 
   animateDifficultyCards: function animateDifficultyCards() {
@@ -1681,19 +1688,16 @@ var Component = Nori.view().createComponentView({
     var difficultyCardElIDs = ['#game_question-difficulty1', '#game_question-difficulty2', '#game_question-difficulty3', '#game_question-difficulty4', '#game_question-difficulty5'];
 
     difficultyCardElIDs.forEach(function (cardID, i) {
-
-      _this.tweenFromTo(cardID, 1, {
+      _this.tweenFromTo(cardID, .5, {
         alpha: 0,
         y: 300
       }, {
         alpha: 1,
         y: 0,
-        delay: i * 0.15,
+        delay: i * 0.1,
         ease: Back.easeOut
       });
     });
-
-    _cardAnimationSub.dispose();
   },
 
   /**
@@ -4515,7 +4519,10 @@ var ViewComponent = function ViewComponent() {
     }
 
     if (this.componentDidMount) {
-      this.componentDidMount();
+      //this.componentDidMount();
+      // This delay helps animation on components run on mount
+      // 10 is arbitrary, might be able to reduce?
+      _.delay(this.componentDidMount.bind(this), 10);
     }
 
     this.mountRegions();

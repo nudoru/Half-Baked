@@ -163,8 +163,12 @@ var AppStore = Nori.createStore({
       case _appActionConstants.RESET_GAME:
       case _appActionConstants.SET_CURRENT_QUESTION:
       case _appActionConstants.SET_SENT_QUESTION:
+        return _.merge({}, state, event.payload.data);
+
       case _appActionConstants.ANSWERED_CORRECT:
       case _appActionConstants.ANSWERED_INCORRECT:
+        state.currentQuestion = null;
+        state.sentQuestion    = this.createNullQuestion();
         return _.merge({}, state, event.payload.data);
 
       case _appActionConstants.OPPONENT_ANSWERED:
@@ -183,7 +187,7 @@ var AppStore = Nori.createStore({
   },
 
   /**
-   * Called after all reducers have run to broadcast possible updates.
+   * Called after all reducers have run and broadcast possible updates.
    */
     handleStateMutation() {
     let state = this.getState();
@@ -194,7 +198,7 @@ var AppStore = Nori.createStore({
       this.setState({currentState: this.getState().gameStates[4]});
     }
 
-    this.notifySubscribers();
+    //this.notifySubscribers();
   },
 
   /**

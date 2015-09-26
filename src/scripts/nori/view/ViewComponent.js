@@ -164,7 +164,10 @@ var ViewComponent = function () {
     }
 
     if (this.componentDidMount) {
-      this.componentDidMount();
+      //this.componentDidMount();
+      // This delay helps animation on components run on mount
+      // 10 is arbitrary, might be able to reduce?
+      _.delay(this.componentDidMount.bind(this), 10);
     }
 
     this.mountRegions();

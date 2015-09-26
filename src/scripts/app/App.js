@@ -49,7 +49,7 @@ let App = Nori.createApplication({
    */
     onStoreInitialized() {
     console.log('app, onstore initialized');
-    this.store.subscribe(this.handleStoreMutation.bind(this));
+    this.store.subscribe(this.handleStoreChanges.bind(this));
     this.runApplication();
   },
 
@@ -68,9 +68,11 @@ let App = Nori.createApplication({
   // Handle FROM store
   //----------------------------------------------------------------------------
 
-  handleStoreMutation() {
+  handleStoreChanges() {
     var appState = this.store.getState(),
         type = appState.lastActionType;
+
+    //console.log('App, handling: ',type);
 
     if (type === _appActionConstants.SET_LOCAL_PLAYER_PROPS) {
       this.handleLocalPlayerPropsUpdate();
@@ -108,6 +110,7 @@ let App = Nori.createApplication({
   },
 
   sendMyAnswer(isCorrect) {
+    console.log('sending answer ...');
     let appState = this.store.getState();
     this.socket.notifyServer(_socketIOEvents.OPPONENT_ANSWERED, {
       roomID: appState.session.roomID,
@@ -128,18 +131,16 @@ let App = Nori.createApplication({
       return;
     }
 
-    console.log("from Socket.IO server", payload);
+    //console.log("from Socket.IO server", payload);
 
     switch (payload.type) {
       case (_socketIOEvents.CONNECT):
         this.handleConnect(payload.id);
         return;
       case (_socketIOEvents.JOIN_ROOM):
-        console.log("join room", payload.payload);
         this.handleJoinNewlyCreatedRoom(payload.payload.roomID);
         return;
       case (_socketIOEvents.GAME_START):
-        console.log("GAME STARTED");
         this.handleGameStart(payload.payload);
         return;
       case (_socketIOEvents.GAME_ABORT):
@@ -209,6 +210,9 @@ let App = Nori.createApplication({
   handleUpdatedPlayerDetails(payload) {
     let remotePlayer    = this.pluckRemotePlayer(payload.players),
         setRemotePlayer = _appActions.setRemotePlayerProps(remotePlayer);
+
+    console.log('setting player details');
+
     this.store.apply(setRemotePlayer);
   },
 

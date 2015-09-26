@@ -50,7 +50,7 @@ function handleSocketMessage(payload) {
     return;
   }
 
-  //console.log("from client", payload);
+  console.log("Client: ", payload.type);
 
   switch (payload.type) {
     case (_events.PING):
