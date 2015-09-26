@@ -4238,6 +4238,21 @@ body {
   width: 95px !important;
 }
 
+.button-game {
+  width: 190px;
+  height: 45px;
+  color: #fff;
+  border: none;
+  box-shadow: none;
+  background: url("../img/green_button01.png");
+}
+.button-game:hover {
+  background: url("../img/green_button05.png");
+}
+.button-game:active {
+  background: url("../img/green_button03.png");
+}
+
 .game__question-difficulty {
   position: relative;
   width: 100%;
@@ -4360,12 +4375,19 @@ body {
   top: 1.545rem;
 }
 
+.game__question-waiting {
+  background-color: rgba(0, 94, 184, 0.75);
+  padding: 1.236rem;
+  border-radius: 0.618rem;
+  margin-bottom: 1.236rem;
+}
+
 .game__sent-question {
   padding-top: 1.854rem;
 }
 .game__sent-question h1, .game__sent-question li {
-  text-shadow: 2px 1px 0px rgba(255, 255, 255, 0.5);
-  color: #512d6d;
+  text-shadow: 2px 1px 0px rgba(0, 0, 0, 0.5);
+  color: #fff;
 }
 
 #game__localplayerstats, #game__remoteplayerstats {

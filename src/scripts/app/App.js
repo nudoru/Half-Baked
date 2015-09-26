@@ -81,7 +81,7 @@ let App = Nori.createApplication({
       this.handleAnswerIncorrect();
       this.handleLocalPlayerPropsUpdate();
     } else if (type === _appActionConstants.RESET_GAME) {
-      this.handleGameReset()
+      this.handleGameReset();
     }
   },
 

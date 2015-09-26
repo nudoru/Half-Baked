@@ -26,7 +26,7 @@ BEGIN Templates for Sub Views
             </label>
             <label for="select__playertype">Appearance
                 <select id="select__playertype">
-                    <option value="Biege">Biege</option>
+                    <option value="Biege">Beige</option>
                     <option value="Blue">Blue</option>
                     <option value="Green">Green</option>
                     <option value="Pink">Pink</option>
@@ -42,7 +42,7 @@ BEGIN Templates for Sub Views
 
                         <p>You'll have to give the room ID to your opponent.</p>
                         <button id="select__button-createroom"
-                                class="button-success">Create
+                                class="button-game">Create
                             Room
                         </button>
                     </div>
@@ -52,11 +52,11 @@ BEGIN Templates for Sub Views
                         <p>Enter the room id provided to you by your
                             opponent.</p>
                         <label for="select__roomid">Room ID
-                            <input id="select__roomid" type="text"
-                                   placeholder="Type here">
+                            <input id="select__roomid" type="text" style="width: 80px;"
+                                   placeholder="">
                         </label>
                         <button id="select__button-joinroom"
-                                class="button-success">Join Room
+                                class="button-game">Join Room
                         </button>
                     </div>
                 </div>
@@ -75,67 +75,12 @@ BEGIN Templates for Sub Views
             <h4>Let your opponent know that the room number to join is</h4>
             <h2>{{roomID }}</h2>
             <button id="waiting__button-goback"
-                    class="button-success">Go back
+                    class="button-game">Go back
             </button>
         </div>
         <button class="button-cheat" id="waiting__button-skip">==>></button>
     </div>
 </script>
-
-<!---->
-
-
-<!--<script id="game" type="text/template">-->
-    <!--<div>-->
-        <!--<div class="game__question-difficulty">-->
-            <!--<h4>Quick! Pick a question!</h4>-->
-            <!--<ul>-->
-                <!--<li id="game_question-difficulty1">-->
-                    <!--<img src="img/pastries/pastry_cookie01.png">-->
-
-                    <!--<p>Difficulty 1</p>-->
-                <!--</li>-->
-                <!--<li id="game_question-difficulty2">-->
-                    <!--<img src="img/pastries/pastry_poptart01.png">-->
-
-                    <!--<p>Difficulty 2</p>-->
-                <!--</li>-->
-                <!--<li id="game_question-difficulty3">-->
-                    <!--<img src="img/pastries/pastry_donut.png">-->
-
-                    <!--<p>Difficulty 3</p>-->
-                <!--</li>-->
-                <!--<li id="game_question-difficulty4">-->
-                    <!--<img src="img/pastries/pastry_pie.png">-->
-
-                    <!--<p>Difficulty 4</p>-->
-                <!--</li>-->
-                <!--<li id="game_question-difficulty5">-->
-                    <!--<img src="img/pastries/pastry_cupcake.png">-->
-
-                    <!--<p>Difficulty 5</p>-->
-                <!--</li>-->
-            <!--</ul>-->
-        <!--</div>-->
-        <!--<div class="game__question-waiting text-center">-->
-            <!--<h2>You sent your opponent a question!</h2>-->
-            <!--<div class="game__sent-question">-->
-                <!--<h1>{{sentQuestion.q_text}}</h1>-->
-                <!--<ul class="list-plain">-->
-                    <!--<li>{{sentQuestion.q_options_1}}</li>-->
-                    <!--<li>{{sentQuestion.q_options_2}}</li>-->
-                    <!--<li>{{sentQuestion.q_options_3}}</li>-->
-                    <!--<li>{{sentQuestion.q_options_4}}</li>-->
-                <!--</ul>-->
-            <!--</div>-->
-        <!--</div>-->
-        <!--<button class="button-cheat" id="game__button-skip">==>></button>-->
-        <!--&lt;!&ndash;<button id="game__test" class="button-danger">Test</button>&ndash;&gt;-->
-        <!--<div id="game__remoteplayerstats"></div>-->
-        <!--<div id="game__questionarea"></div>-->
-        <!--<div id="game__localplayerstats"></div>-->
-    <!--</div>-->
-<!--</script>-->
 
 <script id="game__choose" type="text/template">
     <div>
@@ -180,7 +125,7 @@ BEGIN Templates for Sub Views
 <script id="game__remote" type="text/template">
     <div>
         <div class="game__question-waiting text-center">
-            <h2>You sent your opponent a question!</h2>
+            <h2>Waiting on your opponent to answer ...</h2>
             <div class="game__sent-question">
                 <h1>{{sentQuestion.q_text}}</h1>
                 <ul class="list-plain">
@@ -219,15 +164,6 @@ BEGIN Templates for Sub Views
         </ul>
     </div>
 </script>
-
-<!--q_correct_option: 1-->
-<!--q_date_added: "2013-06-19T04:00:00.000Z"-->
-<!--q_difficulty_level: 1-->
-<!--q_options_1: "Artificial Intelligence"-->
-<!--q_options_2: "System Knowledge"-->
-<!--q_options_3: "Programming Intelligence"-->
-<!--q_options_4: "All of these"-->
-<!--q_text: "Vth Generation Computers are based on."-->
 
 <script id="game__question" type="text/template">
     <div id="question__layer">
@@ -307,7 +243,7 @@ BEGIN Templates for Sub Views
                             </ul>
                         </div>
                         <button id="gameover__button-replay"
-                                class="button-success">Play
+                                class="button-game">Play
                             again?
                         </button>
                     </div>

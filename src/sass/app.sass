@@ -160,6 +160,18 @@ $button-height: 45px
   font-family: $font-content
   width: $button-width/2 !important
 
+.button-game
+  width: 190px
+  height: 45px
+  color: #fff
+  border: none
+  box-shadow: none
+  background: url('../img/green_button01.png')
+  &:hover
+    background: url('../img/green_button05.png')
+  &:active
+    background: url('../img/green_button03.png')
+
 .game__question-difficulty
   position: relative
   width: 100%
@@ -261,11 +273,17 @@ $button-height: 45px
   right: $base-line-height * 5
   top: $base-line-height * 2.5
 
+.game__question-waiting
+  background-color: rgba(0, 94, 184, .75)
+  padding: $double-base-line-height
+  border-radius: $base-line-height
+  margin-bottom: $double-base-line-height
+
 .game__sent-question
   padding-top: $triple-base-line-height
   h1, li
-    +text__shadow(1px, 0px, rgba(255,255,255,.5))
-    color: $dark-purple
+    +text__shadow(1px, 0px, rgba(0,0,0,.5))
+    color: #fff
   h1
     @extend .h2-alternate
   li

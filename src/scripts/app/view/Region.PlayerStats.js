@@ -97,11 +97,11 @@ var Component = Nori.view().createComponentView({
         remote = playState.remoteQ;
 
     if(!local && !remote) {
-      return 'CHOOSE'
+      return 'CHOOSE';
     }
 
     if((isLocal && local) || (!isLocal && remote)){
-      return 'ANSWERING'
+      return 'ANSWERING';
     }
 
     return 'WAITING';
