@@ -118,7 +118,7 @@ var Component = Nori.view().createComponentView({
     let difficultyCardElIDs = ['#game_question-difficulty1', '#game_question-difficulty2', '#game_question-difficulty3', '#game_question-difficulty4', '#game_question-difficulty5'];
 
     difficultyCardElIDs.forEach((cardID, i) => {
-      this.tweenFromTo(cardID, .5, {
+      this.tweenFromTo(cardID, 0.5, {
         alpha: 0,
         y    : 300
       }, {

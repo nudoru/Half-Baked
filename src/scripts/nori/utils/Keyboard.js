@@ -148,7 +148,7 @@ let Keyboard = function () {
    * @returns {void|*}
    */
   function getKeyCodes() {
-    return _.assign({}, _keyCodes);
+    return Object.assign({}, _keyCodes);
   }
 
   /**

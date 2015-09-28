@@ -8,7 +8,7 @@ let SimpleStore = function () {
    * @returns {void|*}
    */
   function getState() {
-    return _.assign({}, _internalState);
+    return Object.assign({}, _internalState);
   }
 
   /**
@@ -16,7 +16,7 @@ let SimpleStore = function () {
    * @param nextState
    */
   function setState(nextState) {
-    _internalState = _.assign({}, _internalState, nextState);
+    _internalState = Object.assign({}, _internalState, nextState);
   }
 
   return {

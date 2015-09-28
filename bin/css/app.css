@@ -4250,7 +4250,22 @@ body {
   background: url("../img/green_button05.png");
 }
 .button-game:active {
-  background: url("../img/green_button03.png");
+  background: url("../img/green_button04.png");
+}
+
+.button-game-secondary {
+  width: 190px;
+  height: 45px;
+  color: #005eb8;
+  border: none;
+  box-shadow: none;
+  background: url("../img/grey_button00.png");
+}
+.button-game-secondary:hover {
+  background: url("../img/grey_button05.png");
+}
+.button-game-secondary:active {
+  background: url("../img/grey_button03.png");
 }
 
 .game__question-difficulty {
@@ -4443,4 +4458,19 @@ body {
 .gameover__score-avatar {
   position: absolute;
   top: -45px;
+}
+
+.leader__board {
+  margin: 0 auto;
+  width: 200px;
+}
+.leader__board li {
+  overflow: hidden;
+}
+.leader__board .leader__name {
+  float: left;
+  font-weight: 700;
+}
+.leader__board .leader__score {
+  float: right;
 }

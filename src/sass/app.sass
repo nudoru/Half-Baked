@@ -170,7 +170,19 @@ $button-height: 45px
   &:hover
     background: url('../img/green_button05.png')
   &:active
-    background: url('../img/green_button03.png')
+    background: url('../img/green_button04.png')
+
+.button-game-secondary
+  width: 190px
+  height: 45px
+  color: $dark-blue
+  border: none
+  box-shadow: none
+  background: url('../img/grey_button00.png')
+  &:hover
+    background: url('../img/grey_button05.png')
+  &:active
+    background: url('../img/grey_button03.png')
 
 .game__question-difficulty
   position: relative
@@ -344,3 +356,24 @@ $button-height: 45px
 .gameover__score-avatar
   position: absolute
   top: -45px
+  
+.leader__board
+  margin: 0 auto
+  width: 200px
+  li
+    overflow: hidden
+  .leader__name
+    float: left
+    font-weight: 700
+    //&::before
+    //  background-image: url('../img/hudPlayer_Blue.png')
+    //  background-size: 32px 32px
+    //  width: 32px
+    //  height: 32px
+    //  content: ''
+  .leader__score
+    float: right
+    //&::before
+    //  content: url('../img/hudCoin.png')
+    //  width: 32px
+    //  height: 32px

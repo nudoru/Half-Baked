@@ -87,7 +87,7 @@ let SocketIOConnector = function () {
   }
 
   function getEventConstants() {
-    return _.assign({}, _events);
+    return Object.assign({}, _events);
   }
 
   return {

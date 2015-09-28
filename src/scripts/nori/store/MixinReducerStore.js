@@ -87,14 +87,6 @@ let MixinReducerStore = function () {
   function applyReducers(actionObject) {
     let nextState = applyReducersToState(getState(), actionObject);
     setState(nextState);
-    _this.handleStateMutation();
-  }
-
-  /**
-   * API hook to handle state updates
-   */
-  function handleStateMutation() {
-    // override this
   }
 
   /**
@@ -141,8 +133,7 @@ let MixinReducerStore = function () {
     setReducers           : setReducers,
     addReducer            : addReducer,
     applyReducers         : applyReducers,
-    applyReducersToState  : applyReducersToState,
-    handleStateMutation   : handleStateMutation
+    applyReducersToState  : applyReducersToState
   };
 
 };

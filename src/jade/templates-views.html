@@ -56,7 +56,7 @@ BEGIN Templates for Sub Views
                                    placeholder="">
                         </label>
                         <button id="select__button-joinroom"
-                                class="button-game">Join Room
+                                class="button-game-secondary">Join Room
                         </button>
                     </div>
                 </div>
@@ -77,6 +77,16 @@ BEGIN Templates for Sub Views
             <button id="waiting__button-goback"
                     class="button-game">Go back
             </button>
+            <hr>
+            <h5>(Coming soon) Invite a friend!</h5>
+            <p>Enter their email address and press invite. They will be sent a link to join the game.</p>
+            <label for="waiting__email">
+                <input id="waiting__email" type="text" style="width: 250px;"
+                       placeholder="Email address">
+            </label>
+            <button id="waiting__button-invite"
+                    class="button-game-secondary">Send Invite
+            </button>
         </div>
         <button class="button-cheat" id="waiting__button-skip">==>></button>
     </div>
@@ -89,27 +99,22 @@ BEGIN Templates for Sub Views
             <ul>
                 <li id="game_question-difficulty1">
                     <img src="img/pastries/pastry_cookie01.png">
-
                     <p>Difficulty 1</p>
                 </li>
                 <li id="game_question-difficulty2">
                     <img src="img/pastries/pastry_poptart01.png">
-
                     <p>Difficulty 2</p>
                 </li>
                 <li id="game_question-difficulty3">
                     <img src="img/pastries/pastry_donut.png">
-
                     <p>Difficulty 3</p>
                 </li>
                 <li id="game_question-difficulty4">
                     <img src="img/pastries/pastry_pie.png">
-
                     <p>Difficulty 4</p>
                 </li>
                 <li id="game_question-difficulty5">
                     <img src="img/pastries/pastry_cupcake.png">
-
                     <p>Difficulty 5</p>
                 </li>
             </ul>
@@ -125,7 +130,7 @@ BEGIN Templates for Sub Views
 <script id="game__remote" type="text/template">
     <div>
         <div class="game__question-waiting text-center">
-            <h2>Waiting on your opponent to answer ...</h2>
+            <h2>Waiting on your opponent to answer this question ...</h2>
             <div class="game__sent-question">
                 <h1>{{sentQuestion.q_text}}</h1>
                 <ul class="list-plain">
@@ -250,7 +255,27 @@ BEGIN Templates for Sub Views
                 </div>
             </div>
         </div>
-
+        <div class="game__area-shaded text-center gameover__leaderboard">
+            <h4>(Coming soon) Leader board</h4>
+            <ul class="list-plain leader__board">
+                <li>
+                    <span class="leader__name">Blinky</span>
+                    <span class="leader__score">999</span>
+                </li>
+                <li>
+                    <span class="leader__name">Inky</span>
+                    <span class="leader__score">900</span>
+                </li>
+                <li>
+                    <span class="leader__name">Pinky</span>
+                    <span class="leader__score">899</span>
+                </li>
+                <li>
+                    <span class="leader__name">Clyde</span>
+                    <span class="leader__score">709</span>
+                </li>
+            </ul>
+        </div>
     </div>
 </script>
 

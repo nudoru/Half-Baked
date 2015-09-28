@@ -183,6 +183,7 @@ var App = Nori.createApplication({
     // View will show based on the current store state
     //this.store.setState({currentState: 'MAIN_GAME'});
     this.store.setState({ currentState: 'PLAYER_SELECT' });
+    //this.store.setState({currentState: 'GAME_OVER'});
   },
 
   //----------------------------------------------------------------------------
@@ -771,7 +772,7 @@ var AppStore = Nori.createStore({
    * Modify state based on incoming events. Returns a copy of the modified
    * state and does not modify the state directly.
    * Can compose state transformations
-   * return _.assign({}, state, otherStateTransformer(state));
+   * return Object.assign({}, state, otherStateTransformer(state));
    * @param state
    * @param event
    * @returns {*}
@@ -1673,7 +1674,7 @@ var Component = Nori.view().createComponentView({
     var difficultyCardElIDs = ['#game_question-difficulty1', '#game_question-difficulty2', '#game_question-difficulty3', '#game_question-difficulty4', '#game_question-difficulty5'];
 
     difficultyCardElIDs.forEach(function (cardID, i) {
-      _this.tweenFromTo(cardID, .5, {
+      _this.tweenFromTo(cardID, 0.5, {
         alpha: 0,
         y: 300
       }, {
@@ -2130,7 +2131,7 @@ var Nori = function Nori() {
   }
 
   function getConfig() {
-    return _.assign({}, window.APP_CONFIG_DATA || {});
+    return Object.assign({}, window.APP_CONFIG_DATA || {});
   }
 
   function getCurrentRoute() {
@@ -2169,7 +2170,7 @@ var Nori = function Nori() {
    */
   function assignArray(target, sourceArray) {
     sourceArray.forEach(function (source) {
-      target = _.assign(target, source);
+      target = Object.assign(target, source);
     });
     return target;
   }
@@ -2191,7 +2192,7 @@ var Nori = function Nori() {
    */
   function createStore(custom) {
     return function cs() {
-      return _.assign({}, _storeTemplate, buildFromMixins(custom));
+      return Object.assign({}, _storeTemplate, buildFromMixins(custom));
     };
   }
 
@@ -2202,7 +2203,7 @@ var Nori = function Nori() {
    */
   function createView(custom) {
     return function cv() {
-      return _.assign({}, _viewTemplate, buildFromMixins(custom));
+      return Object.assign({}, _viewTemplate, buildFromMixins(custom));
     };
   }
 
@@ -2543,7 +2544,7 @@ var SocketIOConnector = function SocketIOConnector() {
   }
 
   function getEventConstants() {
-    return _.assign({}, _events);
+    return Object.assign({}, _events);
   }
 
   return {
@@ -2694,14 +2695,7 @@ var MixinReducerStore = function MixinReducerStore() {
   function applyReducers(actionObject) {
     var nextState = applyReducersToState(getState(), actionObject);
     setState(nextState);
-    _this.handleStateMutation();
   }
-
-  /**
-   * API hook to handle state updates
-   */
-  function handleStateMutation() {}
-  // override this
 
   /**
    * Creates a new state from the combined reduces and action object
@@ -2748,8 +2742,7 @@ var MixinReducerStore = function MixinReducerStore() {
     setReducers: setReducers,
     addReducer: addReducer,
     applyReducers: applyReducers,
-    applyReducersToState: applyReducersToState,
-    handleStateMutation: handleStateMutation
+    applyReducersToState: applyReducersToState
   };
 };
 
@@ -2770,7 +2763,7 @@ var SimpleStore = function SimpleStore() {
    * @returns {void|*}
    */
   function getState() {
-    return _.assign({}, _internalState);
+    return Object.assign({}, _internalState);
   }
 
   /**
@@ -2778,7 +2771,7 @@ var SimpleStore = function SimpleStore() {
    * @param nextState
    */
   function setState(nextState) {
-    _internalState = _.assign({}, _internalState, nextState);
+    _internalState = Object.assign({}, _internalState, nextState);
   }
 
   return {
@@ -3714,7 +3707,7 @@ var MixinComponentViews = function MixinComponentViews() {
         };
       }
 
-      return _.assign({}, finalComponent);
+      return Object.assign({}, finalComponent);
     };
   }
 
@@ -3750,7 +3743,7 @@ var MixinComponentViews = function MixinComponentViews() {
    * @returns {null}
    */
   function getComponentViewMap() {
-    return _.assign({}, _componentViewMap);
+    return Object.assign({}, _componentViewMap);
   }
 
   //----------------------------------------------------------------------------

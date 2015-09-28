@@ -68,7 +68,7 @@ let MixinComponentViews = function () {
         };
       }
 
-      return _.assign({}, finalComponent);
+      return Object.assign({}, finalComponent);
     };
   }
 
@@ -104,7 +104,7 @@ let MixinComponentViews = function () {
    * @returns {null}
    */
   function getComponentViewMap() {
-    return _.assign({}, _componentViewMap);
+    return Object.assign({}, _componentViewMap);
   }
 
   //----------------------------------------------------------------------------
