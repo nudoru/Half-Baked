@@ -51,12 +51,13 @@ var ActionCreator = {
     };
   },
 
-  setSentQuestion: function (data) {
+  setSentQuestion: function (question, risk) {
     return {
       type   : _actionConstants.SET_SENT_QUESTION,
       payload: {
         data: {
-          sentQuestion: data
+          sentQuestion: question,
+          questionRisk: risk
         }
       }
     };
@@ -112,6 +113,24 @@ var ActionCreator = {
       type   : _actionConstants.OPPONENT_ANSWERED,
       payload: {
         data: result
+      }
+    };
+  },
+
+  applyRisk: function (risk) {
+    var state  = _appStore.getState(),
+        health = state.localPlayer.health - risk,
+        score  = state.localPlayer.score;
+
+    return {
+      type   : _actionConstants.APPLY_RISK,
+      payload: {
+        data: {
+          localPlayer: {
+            health: health,
+            score : score
+          }
+        }
       }
     };
   },

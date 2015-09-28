@@ -73,7 +73,7 @@ let App = Nori.createApplication({
     var appState = this.store.getState(),
         type     = appState.lastActionType;
 
-    console.log('APP, handle after action: ',type);
+    console.log('APP, handle after action: ', type);
 
     if (type === _appActionConstants.SET_LOCAL_PLAYER_PROPS) {
       this.handleLocalPlayerPropsUpdate();
@@ -82,6 +82,8 @@ let App = Nori.createApplication({
       this.handleLocalPlayerPropsUpdate();
     } else if (type === _appActionConstants.ANSWERED_INCORRECT) {
       this.handleAnswerIncorrect();
+      this.handleLocalPlayerPropsUpdate();
+    } else if (type === _appActionConstants.APPLY_RISK) {
       this.handleLocalPlayerPropsUpdate();
     } else if (type === _appActionConstants.RESET_GAME) {
       this.handleGameReset();
@@ -251,15 +253,19 @@ let App = Nori.createApplication({
   },
 
   handleOpponentAnswered(payload) {
+    let state            = this.store.getState(),
+        risk             = state.questionRisk,
+        opponentAnswered = _appActions.opponentAnswered(payload.result),
+        applyRisk        = _appActions.applyRisk(risk);
+
     if (payload.result) {
-      this.view.positiveAlert('They got it right!', 'Darn ...');
+      this.view.positiveAlert('They got it right! You lost ' + risk + ' health points.', 'Ouch!');
     } else {
       this.view.negativeAlert('They missed it!', 'Sweet!');
+      applyRisk = _appActions.applyRisk(0);
     }
 
-    let opponentAnswered = _appActions.opponentAnswered(payload.result);
-
-    this.store.apply(opponentAnswered);
+    this.store.apply([opponentAnswered, applyRisk]);
   },
 
   //----------------------------------------------------------------------------
@@ -290,7 +296,8 @@ let App = Nori.createApplication({
   sendQuestion(difficulty) {
     let appState        = this.store.getState(),
         question        = this.store.getQuestionOfDifficulty(difficulty),
-        setSentQuestion = _appActions.setSentQuestion(question);
+        risk            = Math.ceil(question.q_difficulty_level / 2),
+        setSentQuestion = _appActions.setSentQuestion(question, risk);
 
     this.socket.notifyServer(_socketIOEvents.SEND_QUESTION, {
       roomID  : appState.session.roomID,

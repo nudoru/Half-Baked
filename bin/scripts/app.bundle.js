@@ -204,6 +204,8 @@ var App = Nori.createApplication({
     } else if (type === _appActionConstants.ANSWERED_INCORRECT) {
       this.handleAnswerIncorrect();
       this.handleLocalPlayerPropsUpdate();
+    } else if (type === _appActionConstants.APPLY_RISK) {
+      this.handleLocalPlayerPropsUpdate();
     } else if (type === _appActionConstants.RESET_GAME) {
       this.handleGameReset();
     }
@@ -372,15 +374,19 @@ var App = Nori.createApplication({
   },
 
   handleOpponentAnswered: function handleOpponentAnswered(payload) {
+    var state = this.store.getState(),
+        risk = state.questionRisk,
+        opponentAnswered = _appActions.opponentAnswered(payload.result),
+        applyRisk = _appActions.applyRisk(risk);
+
     if (payload.result) {
-      this.view.positiveAlert('They got it right!', 'Darn ...');
+      this.view.positiveAlert('They got it right! You lost ' + risk + ' health points.', 'Ouch!');
     } else {
       this.view.negativeAlert('They missed it!', 'Sweet!');
+      applyRisk = _appActions.applyRisk(0);
     }
 
-    var opponentAnswered = _appActions.opponentAnswered(payload.result);
-
-    this.store.apply(opponentAnswered);
+    this.store.apply([opponentAnswered, applyRisk]);
   },
 
   //----------------------------------------------------------------------------
@@ -411,7 +417,8 @@ var App = Nori.createApplication({
   sendQuestion: function sendQuestion(difficulty) {
     var appState = this.store.getState(),
         question = this.store.getQuestionOfDifficulty(difficulty),
-        setSentQuestion = _appActions.setSentQuestion(question);
+        risk = Math.ceil(question.q_difficulty_level / 2),
+        setSentQuestion = _appActions.setSentQuestion(question, risk);
 
     this.socket.notifyServer(_socketIOEvents.SEND_QUESTION, {
       roomID: appState.session.roomID,
@@ -443,15 +450,8 @@ exports['default'] = {
   CLEAR_QUESTION: 'CLEAR_QUESTION',
   ANSWERED_CORRECT: 'ANSWERED_CORRECT',
   ANSWERED_INCORRECT: 'ANSWERED_INCORRECT',
-  OPPONENT_ANSWERED: 'OPPONENT_ANSWERED'
-  //SELECT_PLAYER              : 'SELECT_PLAYER',
-  //REMOTE_PLAYER_CONNECT      : 'REMOTE_PLAYER_CONNECT',
-  //GAME_START                 : 'GAME_START',
-  //LOCAL_QUESTION             : 'LOCAL_QUESTION',
-  //REMOTE_QUESTION            : 'REMOTE_QUESTION',
-  //LOCAL_PLAYER_HEALTH_CHANGE : 'LOCAL_PLAYER_HEALTH_CHANGE',
-  //REMOTE_PLAYER_HEALTH_CHANGE: 'REMOTE_PLAYER_HEALTH_CHANGE',
-  //GAME_OVER                  : 'GAME_OVER'
+  OPPONENT_ANSWERED: 'OPPONENT_ANSWERED',
+  APPLY_RISK: 'APPLY_RISK'
 };
 module.exports = exports['default'];
 
@@ -520,12 +520,13 @@ var ActionCreator = {
     };
   },
 
-  setSentQuestion: function setSentQuestion(data) {
+  setSentQuestion: function setSentQuestion(question, risk) {
     return {
       type: _actionConstants.SET_SENT_QUESTION,
       payload: {
         data: {
-          sentQuestion: data
+          sentQuestion: question,
+          questionRisk: risk
         }
       }
     };
@@ -581,6 +582,24 @@ var ActionCreator = {
       type: _actionConstants.OPPONENT_ANSWERED,
       payload: {
         data: result
+      }
+    };
+  },
+
+  applyRisk: function applyRisk(risk) {
+    var state = _appStore.getState(),
+        health = state.localPlayer.health - risk,
+        score = state.localPlayer.score;
+
+    return {
+      type: _actionConstants.APPLY_RISK,
+      payload: {
+        data: {
+          localPlayer: {
+            health: health,
+            score: score
+          }
+        }
       }
     };
   },
@@ -682,6 +701,7 @@ var AppStore = Nori.createStore({
       currentPlayState: '',
       currentQuestion: null,
       sentQuestion: this.createNullQuestion(),
+      questionRisk: 0,
       session: {
         socketIOID: '',
         roomID: '0000'
@@ -792,6 +812,7 @@ var AppStore = Nori.createStore({
       case _appActionConstants.RESET_GAME:
       case _appActionConstants.SET_CURRENT_QUESTION:
       case _appActionConstants.SET_SENT_QUESTION:
+      case _appActionConstants.APPLY_RISK:
         return _.merge({}, state, event.payload.data);
 
       case _appActionConstants.ANSWERED_CORRECT:
@@ -802,7 +823,6 @@ var AppStore = Nori.createStore({
 
       case _appActionConstants.OPPONENT_ANSWERED:
       case _appActionConstants.CLEAR_QUESTION:
-        console.log('clearing question');
         state.currentQuestion = null;
         state.sentQuestion = this.createNullQuestion();
         return state;
@@ -1231,7 +1251,7 @@ var Component = Nori.view().createComponentView({
 
     this.clearTimer();
 
-    _appView['default'].negativeAlert('The correct answer was <span class="correct-answer">' + caText + '</span>', 'You missed that one!');
+    _appView['default'].negativeAlert('The correct answer was <span class="correct-answer">' + caText + '</span>. You lost ' + qPoints + ' health points.', 'You missed that one!');
 
     _appStore.apply(answeredIncorrect);
   },
@@ -1657,7 +1677,6 @@ var Component = Nori.view().createComponentView({
         _cardAnimationSub.dispose();
       }
 
-      // Needs a 1ms delay
       //_cardAnimationSub = _rx.doEvery(10, 1, this.animateDifficultyCards.bind(this));
       this.animateDifficultyCards();
     }

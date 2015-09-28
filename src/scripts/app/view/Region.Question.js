@@ -75,7 +75,7 @@ var Component = Nori.view().createComponentView({
 
     this.clearTimer();
 
-    _appView.default.negativeAlert('The correct answer was <span class="correct-answer">' + caText + '</span>', 'You missed that one!');
+    _appView.default.negativeAlert('The correct answer was <span class="correct-answer">' + caText + '</span>. You lost ' + qPoints + ' health points.', 'You missed that one!');
 
     _appStore.apply(answeredIncorrect);
   },

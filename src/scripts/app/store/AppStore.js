@@ -44,13 +44,14 @@ var AppStore = Nori.createStore({
   },
 
   initialState() {
-    return  {
-      lastActionType: '',
+    return {
+      lastActionType  : '',
       gameStates      : ['TITLE', 'PLAYER_SELECT', 'WAITING_ON_PLAYER', 'MAIN_GAME', 'GAME_OVER'],
       currentState    : '',
       currentPlayState: '',
       currentQuestion : null,
       sentQuestion    : this.createNullQuestion(),
+      questionRisk    : 0,
       session         : {
         socketIOID: '',
         roomID    : '0000'
@@ -163,6 +164,7 @@ var AppStore = Nori.createStore({
       case _appActionConstants.RESET_GAME:
       case _appActionConstants.SET_CURRENT_QUESTION:
       case _appActionConstants.SET_SENT_QUESTION:
+      case _appActionConstants.APPLY_RISK:
         return _.merge({}, state, event.payload.data);
 
       case _appActionConstants.ANSWERED_CORRECT:
@@ -173,7 +175,6 @@ var AppStore = Nori.createStore({
 
       case _appActionConstants.OPPONENT_ANSWERED:
       case _appActionConstants.CLEAR_QUESTION:
-        console.log('clearing question');
         state.currentQuestion = null;
         state.sentQuestion    = this.createNullQuestion();
         return state;
