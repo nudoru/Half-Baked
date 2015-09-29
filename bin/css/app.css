@@ -4217,7 +4217,7 @@ body {
 .app__content h2, .app__content h3, .app__content h4, .app__content h5, .app__content h6 {
   text-shadow: 2px 2px 0px #005eb8;
 }
-.app__content p, .app__content label, .app__content li {
+.app__content p, .app__content label, .app__content li, .app__content a {
   font-size: 1.277rem;
   color: #fff;
 }

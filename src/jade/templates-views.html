@@ -4,10 +4,19 @@ BEGIN Templates for Sub Views
 
 <script id="title" type="text/template">
     <div>
-        <h1>Half-Baked!</h1>
+        <h1>Half-Baked! (ALPHA)</h1>
 
-        <p>Two player quiz battle!</p>
-        <button id="title__button-start" class="button-success">Start!</button>
+        <div class="game__area-shaded">
+            <h5>How do you play?</h5>
+            <p>Connect with another player and send questions back and forth. If your opponent gets the question correct, they earn points (difficulty level), and you loose 1/2 of those points in health. If they miss it, or don't answer in the time limit, they'll loose the full points in health. The game is over when a player's health reaches 0 - the player with the most points wins!</p>
+            <p>Contact me for questions or feedback!<br>
+                Matt Perkins, <a href="https://twitter.com/nudoru" target="_blank">@nudoru</a>, <a href="mailto:kheavy@nudoru.com?subject=Half-baked">kheavy@nudoru.com</a></p>
+            <button id="title__button-start" class="button-game text-center">Start!</button>
+        </div>
+        <div class="game__area-shaded">
+            <p><strong>Notes </strong>1. This is very much in development! 2. The questions are pulled from a public server and may be crazy hard or just crazy. 3. Check back often for more juice and game play features!</p>
+
+        </div>
     </div>
 </script>
 
@@ -63,7 +72,7 @@ BEGIN Templates for Sub Views
             </div>
         </div>
 
-        <button class="button-cheat" id="select__button-go">==>></button>
+        <button class="button-cheat" id="select__button-go">Test</button>
     </div>
 </script>
 
@@ -88,7 +97,7 @@ BEGIN Templates for Sub Views
                     class="button-game-secondary">Send Invite
             </button>
         </div>
-        <button class="button-cheat" id="waiting__button-skip">==>></button>
+        <button class="button-cheat" id="waiting__button-skip">Test</button>
     </div>
 </script>
 
@@ -119,7 +128,7 @@ BEGIN Templates for Sub Views
                 </li>
             </ul>
         </div>
-        <button class="button-cheat" id="game__button-skip">==>></button>
+        <button class="button-cheat" id="game__button-skip">Test</button>
         <!--<button id="game__test" class="button-danger">Test</button>-->
         <div id="game__remoteplayerstats"></div>
         <div id="game__questionarea"></div>
@@ -141,7 +150,7 @@ BEGIN Templates for Sub Views
                 </ul>
             </div>
         </div>
-        <button class="button-cheat" id="game__button-skip">==>></button>
+        <button class="button-cheat" id="game__button-skip">Test</button>
         <!--<button id="game__test" class="button-danger">Test</button>-->
         <div id="game__remoteplayerstats"></div>
         <div id="game__questionarea"></div>

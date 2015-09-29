@@ -182,8 +182,8 @@ var App = Nori.createApplication({
 
     // View will show based on the current store state
     //this.store.setState({currentState: 'MAIN_GAME'});
-    this.store.setState({ currentState: 'PLAYER_SELECT' });
-    //this.store.setState({currentState: 'GAME_OVER'});
+    //this.store.setState({currentState: 'PLAYER_SELECT'});
+    this.store.setState({ currentState: 'TITLE' });
   },
 
   //----------------------------------------------------------------------------
@@ -1673,12 +1673,12 @@ var Component = Nori.view().createComponentView({
    */
   componentDidMount: function componentDidMount() {
     if (this.isShowingCards()) {
-      if (_cardAnimationSub) {
-        _cardAnimationSub.dispose();
-      }
-
-      //_cardAnimationSub = _rx.doEvery(10, 1, this.animateDifficultyCards.bind(this));
-      this.animateDifficultyCards();
+      //if (_cardAnimationSub) {
+      //  _cardAnimationSub.dispose();
+      //}
+      //
+      ////_cardAnimationSub = _rx.doEvery(10, 1, this.animateDifficultyCards.bind(this));
+      //this.animateDifficultyCards();
     }
   },
 
