@@ -8,6 +8,7 @@ import _componentViewFactory from './ViewComponent.js';
 import _eventDelegatorFactory from './MixinEventDelegator.js';
 import _observableFactory from '../utils/MixinObservableSubject.js';
 import _stateObjFactory from '../store/SimpleStore.js';
+import _immutableMapFactory from '../store/ImmutableMap.js';
 
 let MixinComponentViews = function () {
 
@@ -44,7 +45,8 @@ let MixinComponentViews = function () {
         _componentViewFactory(),
         _eventDelegatorFactory(),
         _observableFactory(),
-        _stateObjFactory(),
+        //_stateObjFactory(),
+        _immutableMapFactory(),
         componentSource
       ];
 
@@ -68,7 +70,7 @@ let MixinComponentViews = function () {
         };
       }
 
-      return Object.assign({}, finalComponent);
+      return _.assign({}, finalComponent);
     };
   }
 
@@ -104,7 +106,7 @@ let MixinComponentViews = function () {
    * @returns {null}
    */
   function getComponentViewMap() {
-    return Object.assign({}, _componentViewMap);
+    return _.assign({}, _componentViewMap);
   }
 
   //----------------------------------------------------------------------------

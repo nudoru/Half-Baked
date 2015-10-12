@@ -144,7 +144,7 @@ let AppStoreModule = Nori.createStore({
    * Modify state based on incoming events. Returns a copy of the modified
    * state and does not modify the state directly.
    * Can compose state transformations
-   * return Object.assign({}, state, otherStateTransformer(state));
+   * return _.assign({}, state, otherStateTransformer(state));
    * @param state
    * @param event
    * @returns {*}

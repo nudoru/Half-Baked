@@ -13,6 +13,7 @@
 
 import is from '../../nudoru/util/is.js';
 import _stateObjFactory from './SimpleStore.js';
+import _immutableMapFactory from './ImmutableMap.js';
 
 let MixinReducerStore = function () {
   let _this,
@@ -61,7 +62,8 @@ let MixinReducerStore = function () {
     }
 
     _this  = this;
-    _state = _stateObjFactory(); //require('./ImmutableMap.js')();
+    //_state = _stateObjFactory(); //require('./ImmutableMap.js')();
+    _state = _immutableMapFactory();
 
     if (!_stateReducers) {
       throw new Error('ReducerStore, must set a reducer before initialization');

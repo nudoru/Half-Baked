@@ -8,7 +8,7 @@ let SimpleStore = function () {
    * @returns {void|*}
    */
   function getState() {
-    return Object.assign({}, _internalState);
+    return _.assign({}, _internalState);
   }
 
   /**
@@ -16,12 +16,27 @@ let SimpleStore = function () {
    * @param nextState
    */
   function setState(nextState) {
-    _internalState = Object.assign({}, _internalState, nextState);
+    _internalState = _.assign({}, _internalState, nextState);
+  }
+
+  function toJSON() {
+    return JSON.stringify(getState());
+  }
+
+  function fromJSON(data) {
+    try {
+      setState(JSON.parse(data));
+    } catch (e) {
+      console.warn('Nori, SimpleStore, could not parse JSON');
+      setState({});
+    }
   }
 
   return {
     getState: getState,
-    setState: setState
+    setState: setState,
+    toJSON  : toJSON,
+    fromJSON: fromJSON
   };
 
 };

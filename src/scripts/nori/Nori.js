@@ -28,7 +28,7 @@ let Nori = function () {
   }
 
   function getConfig() {
-    return Object.assign({}, (window.APP_CONFIG_DATA || {}));
+    return _.assign({}, (window.APP_CONFIG_DATA || {}));
   }
 
   function getCurrentRoute() {
@@ -74,7 +74,7 @@ let Nori = function () {
    */
   function assignArray(target, sourceArray) {
     sourceArray.forEach(function (source) {
-      target = Object.assign(target, source);
+      target = _.assign(target, source);
     });
     return target;
   }
@@ -96,7 +96,7 @@ let Nori = function () {
    */
   function createStore(custom) {
     return function cs() {
-      return Object.assign({}, _storeTemplate, buildFromMixins(custom));
+      return _.assign({}, _storeTemplate, buildFromMixins(custom));
     };
   }
 
@@ -107,7 +107,7 @@ let Nori = function () {
    */
   function createView(custom) {
     return function cv() {
-      return Object.assign({}, _viewTemplate, buildFromMixins(custom));
+      return _.assign({}, _viewTemplate, buildFromMixins(custom));
     };
   }
 
