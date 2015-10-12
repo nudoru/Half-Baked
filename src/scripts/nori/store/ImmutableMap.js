@@ -6,7 +6,7 @@
  * View Docs http://facebook.github.io/immutable-js/docs/#/Map
  */
 
-import * as immutable from '../../vendor/immutable.min.js';
+import immutable from '../../vendor/immutable.min.js';
 
 let ImmutableMap = function () {
   let _map = immutable.Map();

@@ -1,8 +1,8 @@
-import * as _noriActions from '../../nori/action/ActionCreator';
-import * as _appView from './AppView';
-import * as _appStore from '../store/AppStore';
-import * as _template from '../../nori/utils/Templating.js';
-import * as _appActions from '../action/ActionCreator.js';
+import _noriActions from '../../nori/action/ActionCreator';
+import _appView from './AppView';
+import _appStore from '../store/AppStore';
+import _template from '../../nori/utils/Templating.js';
+import _appActions from '../action/ActionCreator.js';
 
 /**
  * Module for a dynamic application view for a route or a persistent view

@@ -4,10 +4,10 @@
  * Mixin view that allows for component views
  */
 
-import * as _componentViewFactory from './ViewComponent.js';
-import * as _eventDelegatorFactory from './MixinEventDelegator.js';
-import * as _observableFactory from '../utils/MixinObservableSubject.js';
-import * as _stateObjFactory from '../store/SimpleStore.js';
+import _componentViewFactory from './ViewComponent.js';
+import _eventDelegatorFactory from './MixinEventDelegator.js';
+import _observableFactory from '../utils/MixinObservableSubject.js';
+import _stateObjFactory from '../store/SimpleStore.js';
 
 let MixinComponentViews = function () {
 
@@ -41,10 +41,10 @@ let MixinComponentViews = function () {
       let componentAssembly, finalComponent, previousInitialize;
 
       componentAssembly = [
-        _componentViewFactory.default(),
-        _eventDelegatorFactory.default(),
-        _observableFactory.default(),
-        _stateObjFactory.default(),
+        _componentViewFactory(),
+        _eventDelegatorFactory(),
+        _observableFactory(),
+        _stateObjFactory(),
         componentSource
       ];
 

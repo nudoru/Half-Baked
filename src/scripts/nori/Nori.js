@@ -1,11 +1,11 @@
 /* @flow weak */
 
-import * as _mixinObservableSubject from './utils/MixinObservableSubject.js';
-import * as _mixinReducerStore from './store/MixinReducerStore.js';
-import * as _mixinComponentViews from './view/MixinComponentViews.js';
-import * as _mixinEventDelegator from './view/MixinEventDelegator.js';
-import * as _dispatcher from './utils/Dispatcher.js';
-import * as _router from './utils/Router.js';
+import _mixinObservableSubject from './utils/MixinObservableSubject.js';
+import _mixinReducerStore from './store/MixinReducerStore.js';
+import _mixinComponentViews from './view/MixinComponentViews.js';
+import _mixinEventDelegator from './view/MixinEventDelegator.js';
+import _dispatcher from './utils/Dispatcher.js';
+import _router from './utils/Router.js';
 
 let Nori = function () {
 
@@ -50,15 +50,15 @@ let Nori = function () {
   _storeTemplate = createStore({
     mixins: [
       _mixinReducerStore,
-      _mixinObservableSubject.default()
+      _mixinObservableSubject()
     ]
   })();
 
   _viewTemplate = createView({
     mixins: [
       _mixinComponentViews,
-      _mixinEventDelegator.default(),
-      _mixinObservableSubject.default()
+      _mixinEventDelegator(),
+      _mixinObservableSubject()
     ]
   })();
 

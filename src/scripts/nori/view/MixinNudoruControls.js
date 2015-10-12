@@ -1,10 +1,10 @@
 /* @flow weak */
 
-import * as _notificationView from '../../nudoru/components/ToastView.js';
-import * as _toolTipView from '../../nudoru/components/ToolTipView.js';
-import * as _messageBoxView from '../../nudoru/components/MessageBoxView.js';
-import * as _messageBoxCreator from '../../nudoru/components/MessageBoxCreator.js';
-import * as _modalCoverView from '../../nudoru/components/ModalCoverView.js';
+import _notificationView from '../../nudoru/components/ToastView.js';
+import _toolTipView from '../../nudoru/components/ToolTipView.js';
+import _messageBoxView from '../../nudoru/components/MessageBoxView.js';
+import _messageBoxCreator from '../../nudoru/components/MessageBoxCreator.js';
+import _modalCoverView from '../../nudoru/components/ModalCoverView.js';
 
 let MixinNudoruControls = function () {
 

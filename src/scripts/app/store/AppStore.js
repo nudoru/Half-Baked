@@ -1,9 +1,9 @@
-import * as _rest from '../../nori/service/Rest.js';
-import * as _noriActionConstants from '../../nori/action/ActionConstants.js';
-import * as _appActionConstants from '../action/ActionConstants.js';
-import * as _stringUtils from '../../nudoru/core/StringUtils.js';
-import * as _numUtils from '../../nudoru/core/NumberUtils.js';
-import * as _arrayUtils from '../../nudoru/core/ArrayUtils.js';
+import _rest from '../../nori/service/Rest.js';
+import _noriActionConstants from '../../nori/action/ActionConstants.js';
+import _appActionConstants from '../action/ActionConstants.js';
+import _stringUtils from '../../nudoru/core/StringUtils.js';
+import _numUtils from '../../nudoru/core/NumberUtils.js';
+import _arrayUtils from '../../nudoru/core/ArrayUtils.js';
 
 const _restNumQuestions     = 300,
       _restQuestionCategory = 117,
@@ -31,7 +31,7 @@ const _restNumQuestions     = 300,
  *
  * Events => handleApplicationEvents => applyReducers => handleStateMutation => Notify
  */
-var AppStore = Nori.createStore({
+let AppStoreModule = Nori.createStore({
 
   mixins: [],
 
@@ -190,4 +190,6 @@ var AppStore = Nori.createStore({
 
 });
 
-export default AppStore();
+let AppStore = AppStoreModule();
+
+export default AppStore;

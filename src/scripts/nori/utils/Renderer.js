@@ -4,7 +4,7 @@
  * Utility to handle all view DOM attachment tasks
  */
 
-import * as _domUtils from '../../nudoru/browser/DOMUtils.js';
+import _domUtils from '../../nudoru/browser/DOMUtils.js';
 
 let Renderer = function () {
   function render({target, html, callback}) {

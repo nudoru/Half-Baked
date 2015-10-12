@@ -6,7 +6,7 @@
  4/7/15
  */
 
-import * as _DOMUtils from '../../nudoru/browser/DOMUtils.js';
+import _DOMUtils from '../../nudoru/browser/DOMUtils.js';
 
 let Templating = function () {
 

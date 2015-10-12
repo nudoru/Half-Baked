@@ -61,7 +61,7 @@
  *
  */
 
-import * as Rxjs from '../../vendor/rxjs/rx.lite.min.js';
+import Rxjs from '../../vendor/rxjs/rx.lite.min.js';
 
 let Rest = function () {
 

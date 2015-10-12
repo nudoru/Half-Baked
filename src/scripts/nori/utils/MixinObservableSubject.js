@@ -7,8 +7,8 @@
  * more complex eventing needs.
  */
 
-import * as is from '../../nudoru/util/is.js';
-import * as Rxjs from '../../vendor/rxjs/rx.lite.min.js';
+import is from '../../nudoru/util/is.js';
+import Rxjs from '../../vendor/rxjs/rx.lite.min.js';
 
 let MixinObservableSubject = function () {
 

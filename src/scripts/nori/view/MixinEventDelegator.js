@@ -15,9 +15,9 @@
  *
  */
 
-import * as _rx from '../utils/Rx.js';
-import * as _browserInfo from '../../nudoru/browser/BrowserInfo.js';
-import * as is from '../../nudoru/util/is.js';
+import _rx from '../utils/Rx.js';
+import _browserInfo from '../../nudoru/browser/BrowserInfo.js';
+import is from '../../nudoru/util/is.js';
 
 let MixinEventDelegator = function () {
 

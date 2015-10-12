@@ -5,9 +5,9 @@
  * Must be extended with custom modules
  */
 
-import * as _template from '../utils/Templating.js';
-import * as _renderer from '../utils/Renderer.js';
-import * as is from '../../nudoru/util/is.js';
+import _template from '../utils/Templating.js';
+import _renderer from '../utils/Renderer.js';
+import is from '../../nudoru/util/is.js';
 
 var ViewComponent = function () {
 

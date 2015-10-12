@@ -1,10 +1,10 @@
-import * as _noriActions from '../../nori/action/ActionCreator';
-import * as _appView from './AppView';
-import * as _appStore from '../store/AppStore';
-import * as _appActions from '../action/ActionCreator.js';
-import * as _template from '../../nori/utils/Templating.js';
-import * as Rxjs from '../../vendor/rxjs/rx.lite.min.js';
-import * as _mixinDOMManipulation from '../../nori/view/MixinDOMManipulation.js';
+import _noriActions from '../../nori/action/ActionCreator';
+import _appView from './AppView';
+import _appStore from '../store/AppStore';
+import _appActions from '../action/ActionCreator.js';
+import _template from '../../nori/utils/Templating.js';
+import Rxjs from '../../vendor/rxjs/rx.lite.min.js';
+import _mixinDOMManipulation from '../../nori/view/MixinDOMManipulation.js';
 
 let _questionChangeObs = null,
     _timerObservable   = null,
@@ -61,7 +61,7 @@ var Component = Nori.view().createComponentView({
 
     this.clearTimer();
 
-    _appView.default.positiveAlert('You got it!', 'Correct!');
+    _appView.positiveAlert('You got it!', 'Correct!');
 
     _appStore.apply(answeredCorrect);
   },
@@ -75,7 +75,7 @@ var Component = Nori.view().createComponentView({
 
     this.clearTimer();
 
-    _appView.default.negativeAlert('The correct answer was <span class="correct-answer">' + caText + '</span>. You lost ' + qPoints + ' health points.', 'You missed that one!');
+    _appView.negativeAlert('The correct answer was <span class="correct-answer">' + caText + '</span>. You lost ' + qPoints + ' health points.', 'You missed that one!');
 
     _appStore.apply(answeredIncorrect);
   },
@@ -121,7 +121,7 @@ var Component = Nori.view().createComponentView({
    */
     render(state) {
     if (this.hasQuestion()) {
-      _appView.default.closeAllAlerts();
+      _appView.closeAllAlerts();
       return this.template()(state);
     }
 

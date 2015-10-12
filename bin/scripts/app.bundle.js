@@ -95,39 +95,39 @@ Object.defineProperty(exports, '__esModule', {
   value: true
 });
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj['default'] = obj; return newObj; } }
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
 var _noriUtilsRxJs = require('../nori/utils/Rx.js');
 
-var _rx = _interopRequireWildcard(_noriUtilsRxJs);
+var _noriUtilsRxJs2 = _interopRequireDefault(_noriUtilsRxJs);
 
 var _actionActionCreatorJs = require('./action/ActionCreator.js');
 
-var _appActions = _interopRequireWildcard(_actionActionCreatorJs);
+var _actionActionCreatorJs2 = _interopRequireDefault(_actionActionCreatorJs);
 
 var _actionActionConstantsJs = require('./action/ActionConstants.js');
 
-var _appActionConstants = _interopRequireWildcard(_actionActionConstantsJs);
+var _actionActionConstantsJs2 = _interopRequireDefault(_actionActionConstantsJs);
 
 var _noriActionActionCreatorJs = require('../nori/action/ActionCreator.js');
 
-var _noriActions = _interopRequireWildcard(_noriActionActionCreatorJs);
+var _noriActionActionCreatorJs2 = _interopRequireDefault(_noriActionActionCreatorJs);
 
 var _noriServiceSocketIOEventsJs = require('../nori/service/SocketIOEvents.js');
 
-var _socketIOEvents = _interopRequireWildcard(_noriServiceSocketIOEventsJs);
+var _noriServiceSocketIOEventsJs2 = _interopRequireDefault(_noriServiceSocketIOEventsJs);
 
 var _storeAppStoreJs = require('./store/AppStore.js');
 
-var _appStore = _interopRequireWildcard(_storeAppStoreJs);
+var _storeAppStoreJs2 = _interopRequireDefault(_storeAppStoreJs);
 
 var _viewAppViewJs = require('./view/AppView.js');
 
-var _appView = _interopRequireWildcard(_viewAppViewJs);
+var _viewAppViewJs2 = _interopRequireDefault(_viewAppViewJs);
 
 var _noriServiceSocketIOJs = require('../nori/service/SocketIO.js');
 
-var _Socket = _interopRequireWildcard(_noriServiceSocketIOJs);
+var _noriServiceSocketIOJs2 = _interopRequireDefault(_noriServiceSocketIOJs);
 
 /**
  * "Controller" for a Nori application. The controller is responsible for
@@ -141,9 +141,9 @@ var App = Nori.createApplication({
   /**
    * Create the main Nori App store and view.
    */
-  store: _appStore,
-  view: _appView,
-  socket: _Socket,
+  store: _storeAppStoreJs2['default'],
+  view: _viewAppViewJs2['default'],
+  socket: _noriServiceSocketIOJs2['default'],
 
   /**
    * Intialize the appilcation, view and store
@@ -196,17 +196,17 @@ var App = Nori.createApplication({
 
     console.log('APP, handle after action: ', type);
 
-    if (type === _appActionConstants.SET_LOCAL_PLAYER_PROPS) {
+    if (type === _actionActionConstantsJs2['default'].SET_LOCAL_PLAYER_PROPS) {
       this.handleLocalPlayerPropsUpdate();
-    } else if (type === _appActionConstants.ANSWERED_CORRECT) {
+    } else if (type === _actionActionConstantsJs2['default'].ANSWERED_CORRECT) {
       this.handleAnswerCorrect();
       this.handleLocalPlayerPropsUpdate();
-    } else if (type === _appActionConstants.ANSWERED_INCORRECT) {
+    } else if (type === _actionActionConstantsJs2['default'].ANSWERED_INCORRECT) {
       this.handleAnswerIncorrect();
       this.handleLocalPlayerPropsUpdate();
-    } else if (type === _appActionConstants.APPLY_RISK) {
+    } else if (type === _actionActionConstantsJs2['default'].APPLY_RISK) {
       this.handleLocalPlayerPropsUpdate();
-    } else if (type === _appActionConstants.RESET_GAME) {
+    } else if (type === _actionActionConstantsJs2['default'].RESET_GAME) {
       this.handleGameReset();
     }
 
@@ -234,7 +234,7 @@ var App = Nori.createApplication({
 
   doGameOver: function doGameOver() {
     var appState = this.store.getState(),
-        setGameOverScreen = _noriActions.changeStoreState({ currentState: appState.gameStates[4] });
+        setGameOverScreen = _noriActionActionCreatorJs2['default'].changeStoreState({ currentState: appState.gameStates[4] });
 
     this.store.apply(setGameOverScreen);
   },
@@ -242,7 +242,7 @@ var App = Nori.createApplication({
   handleLocalPlayerPropsUpdate: function handleLocalPlayerPropsUpdate() {
     var appState = this.store.getState();
 
-    this.socket.notifyServer(_socketIOEvents.SEND_PLAYER_DETAILS, {
+    this.socket.notifyServer(_noriServiceSocketIOEventsJs2['default'].SEND_PLAYER_DETAILS, {
       roomID: appState.session.roomID,
       playerDetails: appState.localPlayer
     });
@@ -264,7 +264,7 @@ var App = Nori.createApplication({
   sendMyAnswer: function sendMyAnswer(isCorrect) {
     console.log('sending answer ...');
     var appState = this.store.getState();
-    this.socket.notifyServer(_socketIOEvents.OPPONENT_ANSWERED, {
+    this.socket.notifyServer(_noriServiceSocketIOEventsJs2['default'].OPPONENT_ANSWERED, {
       roomID: appState.session.roomID,
       result: isCorrect
     });
@@ -286,35 +286,35 @@ var App = Nori.createApplication({
     //console.log("from Socket.IO server", payload);
 
     switch (payload.type) {
-      case _socketIOEvents.CONNECT:
+      case _noriServiceSocketIOEventsJs2['default'].CONNECT:
         this.handleConnect(payload.id);
         return;
-      case _socketIOEvents.JOIN_ROOM:
+      case _noriServiceSocketIOEventsJs2['default'].JOIN_ROOM:
         this.handleJoinNewlyCreatedRoom(payload.payload.roomID);
         return;
-      case _socketIOEvents.GAME_START:
+      case _noriServiceSocketIOEventsJs2['default'].GAME_START:
         this.handleGameStart(payload.payload);
         return;
-      case _socketIOEvents.GAME_ABORT:
+      case _noriServiceSocketIOEventsJs2['default'].GAME_ABORT:
         this.handleGameAbort(payload);
         return;
-      case _socketIOEvents.SEND_PLAYER_DETAILS:
+      case _noriServiceSocketIOEventsJs2['default'].SEND_PLAYER_DETAILS:
         this.handleUpdatedPlayerDetails(payload.payload);
         return;
-      case _socketIOEvents.SEND_QUESTION:
+      case _noriServiceSocketIOEventsJs2['default'].SEND_QUESTION:
         this.handleReceivedQuestion(payload.payload);
         return;
-      case _socketIOEvents.OPPONENT_ANSWERED:
+      case _noriServiceSocketIOEventsJs2['default'].OPPONENT_ANSWERED:
         this.handleOpponentAnswered(payload.payload);
         return;
-      case _socketIOEvents.SYSTEM_MESSAGE:
+      case _noriServiceSocketIOEventsJs2['default'].SYSTEM_MESSAGE:
         this.view.notify(payload.payload, payload.type, 'success');
         return;
-      case _socketIOEvents.BROADCAST:
-      case _socketIOEvents.MESSAGE:
+      case _noriServiceSocketIOEventsJs2['default'].BROADCAST:
+      case _noriServiceSocketIOEventsJs2['default'].MESSAGE:
         this.view.notify(payload.payload, payload.type, 'warning');
         return;
-      case _socketIOEvents.USER_DISCONNECTED:
+      case _noriServiceSocketIOEventsJs2['default'].USER_DISCONNECTED:
         return;
       default:
         console.warn("Unhandled SocketIO message type", payload);
@@ -323,16 +323,16 @@ var App = Nori.createApplication({
   },
 
   handleConnect: function handleConnect(socketID) {
-    var setSessionID = _appActions.setSessionProps({ socketIOID: socketID }),
-        setLocalID = _appActions.setLocalPlayerProps({ id: socketID });
+    var setSessionID = _actionActionCreatorJs2['default'].setSessionProps({ socketIOID: socketID }),
+        setLocalID = _actionActionCreatorJs2['default'].setLocalPlayerProps({ id: socketID });
 
     this.store.apply([setSessionID, setLocalID]);
   },
 
   handleJoinNewlyCreatedRoom: function handleJoinNewlyCreatedRoom(roomID) {
     var appState = this.store.getState(),
-        setRoom = _appActions.setSessionProps({ roomID: roomID }),
-        setWaitingScreenState = _noriActions.changeStoreState({ currentState: appState.gameStates[2] });
+        setRoom = _actionActionCreatorJs2['default'].setSessionProps({ roomID: roomID }),
+        setWaitingScreenState = _noriActionActionCreatorJs2['default'].changeStoreState({ currentState: appState.gameStates[2] });
 
     this.store.apply([setRoom, setWaitingScreenState]);
   },
@@ -340,9 +340,9 @@ var App = Nori.createApplication({
   handleGameStart: function handleGameStart(payload) {
     var appState = this.store.getState(),
         remotePlayer = this.pluckRemotePlayer(payload.players),
-        setRemotePlayer = _appActions.setRemotePlayerProps(remotePlayer),
-        setGameState = _noriActions.changeStoreState({ currentState: appState.gameStates[3] }),
-        setCurrentQuestion = _appActions.setCurrentQuestion(null);
+        setRemotePlayer = _actionActionCreatorJs2['default'].setRemotePlayerProps(remotePlayer),
+        setGameState = _noriActionActionCreatorJs2['default'].changeStoreState({ currentState: appState.gameStates[3] }),
+        setCurrentQuestion = _actionActionCreatorJs2['default'].setCurrentQuestion(null);
 
     this.store.apply([setRemotePlayer, setGameState, setCurrentQuestion]);
   },
@@ -355,13 +355,13 @@ var App = Nori.createApplication({
   },
 
   handleGameAbort: function handleGameAbort(payload) {
-    this.store.apply(_appActions.resetGame());
+    this.store.apply(_actionActionCreatorJs2['default'].resetGame());
     this.view.alert(payload.payload, payload.type);
   },
 
   handleUpdatedPlayerDetails: function handleUpdatedPlayerDetails(payload) {
     var remotePlayer = this.pluckRemotePlayer(payload.players),
-        setRemotePlayer = _appActions.setRemotePlayerProps(remotePlayer);
+        setRemotePlayer = _actionActionCreatorJs2['default'].setRemotePlayerProps(remotePlayer);
 
     console.log('setting player details');
 
@@ -369,21 +369,21 @@ var App = Nori.createApplication({
   },
 
   handleReceivedQuestion: function handleReceivedQuestion(question) {
-    var setCurrentQuestion = _appActions.setCurrentQuestion(question);
+    var setCurrentQuestion = _actionActionCreatorJs2['default'].setCurrentQuestion(question);
     this.store.apply(setCurrentQuestion);
   },
 
   handleOpponentAnswered: function handleOpponentAnswered(payload) {
     var state = this.store.getState(),
         risk = state.questionRisk,
-        opponentAnswered = _appActions.opponentAnswered(payload.result),
-        applyRisk = _appActions.applyRisk(risk);
+        opponentAnswered = _actionActionCreatorJs2['default'].opponentAnswered(payload.result),
+        applyRisk = _actionActionCreatorJs2['default'].applyRisk(risk);
 
     if (payload.result) {
       this.view.positiveAlert('They got it right! You lost ' + risk + ' health points.', 'Ouch!');
     } else {
       this.view.negativeAlert('They missed it!', 'Sweet!');
-      applyRisk = _appActions.applyRisk(0);
+      applyRisk = _actionActionCreatorJs2['default'].applyRisk(0);
     }
 
     this.store.apply([opponentAnswered, applyRisk]);
@@ -394,33 +394,33 @@ var App = Nori.createApplication({
   //----------------------------------------------------------------------------
 
   createRoom: function createRoom() {
-    this.socket.notifyServer(_socketIOEvents.CREATE_ROOM, {
+    this.socket.notifyServer(_noriServiceSocketIOEventsJs2['default'].CREATE_ROOM, {
       playerDetails: this.store.getState().localPlayer
     });
   },
 
   joinRoom: function joinRoom(roomID) {
-    this.socket.notifyServer(_socketIOEvents.JOIN_ROOM, {
+    this.socket.notifyServer(_noriServiceSocketIOEventsJs2['default'].JOIN_ROOM, {
       roomID: roomID,
       playerDetails: this.store.getState().localPlayer
     });
   },
 
   leaveRoom: function leaveRoom(roomID) {
-    this.socket.notifyServer(_socketIOEvents.LEAVE_ROOM, {
+    this.socket.notifyServer(_noriServiceSocketIOEventsJs2['default'].LEAVE_ROOM, {
       roomID: roomID
     });
 
-    this.store.apply(_appActions.setSessionProps({ roomID: '0000' }));
+    this.store.apply(_actionActionCreatorJs2['default'].setSessionProps({ roomID: '0000' }));
   },
 
   sendQuestion: function sendQuestion(difficulty) {
     var appState = this.store.getState(),
         question = this.store.getQuestionOfDifficulty(difficulty),
         risk = Math.ceil(question.q_difficulty_level / 2),
-        setSentQuestion = _appActions.setSentQuestion(question, risk);
+        setSentQuestion = _actionActionCreatorJs2['default'].setSentQuestion(question, risk);
 
-    this.socket.notifyServer(_socketIOEvents.SEND_QUESTION, {
+    this.socket.notifyServer(_noriServiceSocketIOEventsJs2['default'].SEND_QUESTION, {
       roomID: appState.session.roomID,
       question: question
     });
@@ -460,15 +460,15 @@ Object.defineProperty(exports, '__esModule', {
   value: true
 });
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj['default'] = obj; return newObj; } }
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
 var _ActionConstantsJs = require('./ActionConstants.js');
 
-var _actionConstants = _interopRequireWildcard(_ActionConstantsJs);
+var _ActionConstantsJs2 = _interopRequireDefault(_ActionConstantsJs);
 
 var _storeAppStoreJs = require('../store/AppStore.js');
 
-var _appStore = _interopRequireWildcard(_storeAppStoreJs);
+var _storeAppStoreJs2 = _interopRequireDefault(_storeAppStoreJs);
 
 /**
  * Purely for convenience, an Event ("action") Creator ala Flux spec. Follow
@@ -478,7 +478,7 @@ var ActionCreator = {
 
   setLocalPlayerProps: function setLocalPlayerProps(data) {
     return {
-      type: _actionConstants.SET_LOCAL_PLAYER_PROPS,
+      type: _ActionConstantsJs2['default'].SET_LOCAL_PLAYER_PROPS,
       payload: {
         data: {
           localPlayer: data
@@ -489,7 +489,7 @@ var ActionCreator = {
 
   setRemotePlayerProps: function setRemotePlayerProps(data) {
     return {
-      type: _actionConstants.SET_REMOTE_PLAYER_PROPS,
+      type: _ActionConstantsJs2['default'].SET_REMOTE_PLAYER_PROPS,
       payload: {
         data: {
           remotePlayer: data
@@ -500,7 +500,7 @@ var ActionCreator = {
 
   setSessionProps: function setSessionProps(data) {
     return {
-      type: _actionConstants.SET_SESSION_PROPS,
+      type: _ActionConstantsJs2['default'].SET_SESSION_PROPS,
       payload: {
         data: {
           session: data
@@ -511,7 +511,7 @@ var ActionCreator = {
 
   setCurrentQuestion: function setCurrentQuestion(data) {
     return {
-      type: _actionConstants.SET_CURRENT_QUESTION,
+      type: _ActionConstantsJs2['default'].SET_CURRENT_QUESTION,
       payload: {
         data: {
           currentQuestion: data
@@ -522,7 +522,7 @@ var ActionCreator = {
 
   setSentQuestion: function setSentQuestion(question, risk) {
     return {
-      type: _actionConstants.SET_SENT_QUESTION,
+      type: _ActionConstantsJs2['default'].SET_SENT_QUESTION,
       payload: {
         data: {
           sentQuestion: question,
@@ -534,7 +534,7 @@ var ActionCreator = {
 
   clearQuestion: function clearQuestion() {
     return {
-      type: _actionConstants.CLEAR_QUESTION,
+      type: _ActionConstantsJs2['default'].CLEAR_QUESTION,
       payload: {
         data: {}
       }
@@ -542,12 +542,12 @@ var ActionCreator = {
   },
 
   answeredCorrect: function answeredCorrect(points) {
-    var state = _appStore.getState(),
+    var state = _storeAppStoreJs2['default'].getState(),
         health = state.localPlayer.health,
         score = state.localPlayer.score + points;
 
     return {
-      type: _actionConstants.ANSWERED_CORRECT,
+      type: _ActionConstantsJs2['default'].ANSWERED_CORRECT,
       payload: {
         data: {
           localPlayer: {
@@ -560,12 +560,12 @@ var ActionCreator = {
   },
 
   answeredIncorrect: function answeredIncorrect(points) {
-    var state = _appStore.getState(),
+    var state = _storeAppStoreJs2['default'].getState(),
         health = state.localPlayer.health - points,
         score = state.localPlayer.score;
 
     return {
-      type: _actionConstants.ANSWERED_INCORRECT,
+      type: _ActionConstantsJs2['default'].ANSWERED_INCORRECT,
       payload: {
         data: {
           localPlayer: {
@@ -579,7 +579,7 @@ var ActionCreator = {
 
   opponentAnswered: function opponentAnswered(result) {
     return {
-      type: _actionConstants.OPPONENT_ANSWERED,
+      type: _ActionConstantsJs2['default'].OPPONENT_ANSWERED,
       payload: {
         data: result
       }
@@ -587,12 +587,12 @@ var ActionCreator = {
   },
 
   applyRisk: function applyRisk(risk) {
-    var state = _appStore.getState(),
+    var state = _storeAppStoreJs2['default'].getState(),
         health = state.localPlayer.health - risk,
         score = state.localPlayer.score;
 
     return {
-      type: _actionConstants.APPLY_RISK,
+      type: _ActionConstantsJs2['default'].APPLY_RISK,
       payload: {
         data: {
           localPlayer: {
@@ -606,15 +606,15 @@ var ActionCreator = {
 
   resetGame: function resetGame() {
     return {
-      type: _actionConstants.RESET_GAME,
+      type: _ActionConstantsJs2['default'].RESET_GAME,
       payload: {
         data: {
-          currentState: _appStore.getState().gameStates[1],
+          currentState: _storeAppStoreJs2['default'].getState().gameStates[1],
           //session     : {
           //  roomID: ''
           //},
-          localPlayer: _appStore.createPlayerResetObject(),
-          remotePlayer: _appStore.createPlayerResetObject()
+          localPlayer: _storeAppStoreJs2['default'].createPlayerResetObject(),
+          remotePlayer: _storeAppStoreJs2['default'].createPlayerResetObject()
         }
       }
     };
@@ -630,31 +630,31 @@ Object.defineProperty(exports, '__esModule', {
   value: true
 });
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj['default'] = obj; return newObj; } }
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
 var _noriServiceRestJs = require('../../nori/service/Rest.js');
 
-var _rest = _interopRequireWildcard(_noriServiceRestJs);
+var _noriServiceRestJs2 = _interopRequireDefault(_noriServiceRestJs);
 
 var _noriActionActionConstantsJs = require('../../nori/action/ActionConstants.js');
 
-var _noriActionConstants = _interopRequireWildcard(_noriActionActionConstantsJs);
+var _noriActionActionConstantsJs2 = _interopRequireDefault(_noriActionActionConstantsJs);
 
 var _actionActionConstantsJs = require('../action/ActionConstants.js');
 
-var _appActionConstants = _interopRequireWildcard(_actionActionConstantsJs);
+var _actionActionConstantsJs2 = _interopRequireDefault(_actionActionConstantsJs);
 
 var _nudoruCoreStringUtilsJs = require('../../nudoru/core/StringUtils.js');
 
-var _stringUtils = _interopRequireWildcard(_nudoruCoreStringUtilsJs);
+var _nudoruCoreStringUtilsJs2 = _interopRequireDefault(_nudoruCoreStringUtilsJs);
 
 var _nudoruCoreNumberUtilsJs = require('../../nudoru/core/NumberUtils.js');
 
-var _numUtils = _interopRequireWildcard(_nudoruCoreNumberUtilsJs);
+var _nudoruCoreNumberUtilsJs2 = _interopRequireDefault(_nudoruCoreNumberUtilsJs);
 
 var _nudoruCoreArrayUtilsJs = require('../../nudoru/core/ArrayUtils.js');
 
-var _arrayUtils = _interopRequireWildcard(_nudoruCoreArrayUtilsJs);
+var _nudoruCoreArrayUtilsJs2 = _interopRequireDefault(_nudoruCoreArrayUtilsJs);
 
 var _restNumQuestions = 300,
     _restQuestionCategory = 117,
@@ -681,7 +681,7 @@ var _restNumQuestions = 300,
  *
  * Events => handleApplicationEvents => applyReducers => handleStateMutation => Notify
  */
-var AppStore = Nori.createStore({
+var AppStoreModule = Nori.createStore({
 
   mixins: [],
 
@@ -721,7 +721,7 @@ var AppStore = Nori.createStore({
     this.setState(this.initialState());
 
     //https://market.mashape.com/pareshchouhan/trivia
-    var getQuestions = _rest.request({
+    var getQuestions = _noriServiceRestJs2['default'].request({
       method: 'GET',
       //url    : 'https://pareshchouhan-trivia-v1.p.mashape.com/v1/getAllQuizQuestions?limit=' + _restNumQuestions + '&page=1',
       url: 'https://pareshchouhan-trivia-v1.p.mashape.com/v1/getQuizQuestionsByCategory?categoryId=' + _restQuestionCategory + '&limit=' + _restNumQuestions + '&page=1',
@@ -734,9 +734,9 @@ var AppStore = Nori.createStore({
     console.log('Questions fetched', data[0]);
     var updated = data.map(function (q) {
       // Strip tags from text
-      q.q_text = _stringUtils.stripTags(_stringUtils.unescapeHTML(q.q_text));
+      q.q_text = _nudoruCoreStringUtilsJs2['default'].stripTags(_nudoruCoreStringUtilsJs2['default'].unescapeHTML(q.q_text));
       // Service only returns 2 levels of difficulty. For now, fake it
-      q.q_difficulty_level = _numUtils.rndNumber(1, 5);
+      q.q_difficulty_level = _nudoruCoreNumberUtilsJs2['default'].rndNumber(1, 5);
       q.used = false;
       return q;
     });
@@ -757,7 +757,7 @@ var AppStore = Nori.createStore({
     });
 
     // TODO set .used to true here
-    return _arrayUtils.rndElement(possibleQuestions);
+    return _nudoruCoreArrayUtilsJs2['default'].rndElement(possibleQuestions);
   },
 
   createNullQuestion: function createNullQuestion() {
@@ -776,8 +776,8 @@ var AppStore = Nori.createStore({
     return {
       id: '',
       type: '',
-      name: _arrayUtils.rndElement(_mockNames) + _numUtils.rndNumber(100, 999),
-      appearance: _arrayUtils.rndElement(_mockAppearence)
+      name: _nudoruCoreArrayUtilsJs2['default'].rndElement(_mockNames) + _nudoruCoreNumberUtilsJs2['default'].rndNumber(100, 999),
+      appearance: _nudoruCoreArrayUtilsJs2['default'].rndElement(_mockAppearence)
     };
   },
 
@@ -805,24 +805,24 @@ var AppStore = Nori.createStore({
     console.log(event.type, event.payload);
 
     switch (event.type) {
-      case _noriActionConstants.CHANGE_STORE_STATE:
-      case _appActionConstants.SET_LOCAL_PLAYER_PROPS:
-      case _appActionConstants.SET_REMOTE_PLAYER_PROPS:
-      case _appActionConstants.SET_SESSION_PROPS:
-      case _appActionConstants.RESET_GAME:
-      case _appActionConstants.SET_CURRENT_QUESTION:
-      case _appActionConstants.SET_SENT_QUESTION:
-      case _appActionConstants.APPLY_RISK:
+      case _noriActionActionConstantsJs2['default'].CHANGE_STORE_STATE:
+      case _actionActionConstantsJs2['default'].SET_LOCAL_PLAYER_PROPS:
+      case _actionActionConstantsJs2['default'].SET_REMOTE_PLAYER_PROPS:
+      case _actionActionConstantsJs2['default'].SET_SESSION_PROPS:
+      case _actionActionConstantsJs2['default'].RESET_GAME:
+      case _actionActionConstantsJs2['default'].SET_CURRENT_QUESTION:
+      case _actionActionConstantsJs2['default'].SET_SENT_QUESTION:
+      case _actionActionConstantsJs2['default'].APPLY_RISK:
         return _.merge({}, state, event.payload.data);
 
-      case _appActionConstants.ANSWERED_CORRECT:
-      case _appActionConstants.ANSWERED_INCORRECT:
+      case _actionActionConstantsJs2['default'].ANSWERED_CORRECT:
+      case _actionActionConstantsJs2['default'].ANSWERED_INCORRECT:
         state.currentQuestion = null;
         state.sentQuestion = this.createNullQuestion();
         return _.merge({}, state, event.payload.data);
 
-      case _appActionConstants.OPPONENT_ANSWERED:
-      case _appActionConstants.CLEAR_QUESTION:
+      case _actionActionConstantsJs2['default'].OPPONENT_ANSWERED:
+      case _actionActionConstantsJs2['default'].CLEAR_QUESTION:
         state.currentQuestion = null;
         state.sentQuestion = this.createNullQuestion();
         return state;
@@ -837,7 +837,9 @@ var AppStore = Nori.createStore({
 
 });
 
-exports['default'] = AppStore();
+var AppStore = AppStoreModule();
+
+exports['default'] = AppStore;
 module.exports = exports['default'];
 
 },{"../../nori/action/ActionConstants.js":16,"../../nori/service/Rest.js":18,"../../nudoru/core/ArrayUtils.js":44,"../../nudoru/core/NumberUtils.js":45,"../../nudoru/core/StringUtils.js":47,"../action/ActionConstants.js":3}],6:[function(require,module,exports){
@@ -845,50 +847,50 @@ Object.defineProperty(exports, '__esModule', {
   value: true
 });
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj['default'] = obj; return newObj; } }
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
 var _storeAppStoreJs = require('../store/AppStore.js');
 
-var _appStore = _interopRequireWildcard(_storeAppStoreJs);
+var _storeAppStoreJs2 = _interopRequireDefault(_storeAppStoreJs);
 
 var _noriViewApplicationViewJs = require('../../nori/view/ApplicationView.js');
 
-var _mixinApplicationView = _interopRequireWildcard(_noriViewApplicationViewJs);
+var _noriViewApplicationViewJs2 = _interopRequireDefault(_noriViewApplicationViewJs);
 
 var _noriViewMixinNudoruControlsJs = require('../../nori/view/MixinNudoruControls.js');
 
-var _mixinNudoruControls = _interopRequireWildcard(_noriViewMixinNudoruControlsJs);
+var _noriViewMixinNudoruControlsJs2 = _interopRequireDefault(_noriViewMixinNudoruControlsJs);
 
 var _noriViewMixinStoreStateViewsJs = require('../../nori/view/MixinStoreStateViews.js');
 
-var _mixinStoreStateViews = _interopRequireWildcard(_noriViewMixinStoreStateViewsJs);
+var _noriViewMixinStoreStateViewsJs2 = _interopRequireDefault(_noriViewMixinStoreStateViewsJs);
 
 var _ScreenTitleJs = require('./Screen.Title.js');
 
-var _screenTitleFactory = _interopRequireWildcard(_ScreenTitleJs);
+var _ScreenTitleJs2 = _interopRequireDefault(_ScreenTitleJs);
 
 var _ScreenPlayerSelectJs = require('./Screen.PlayerSelect.js');
 
-var _screenPlayerSelectFactory = _interopRequireWildcard(_ScreenPlayerSelectJs);
+var _ScreenPlayerSelectJs2 = _interopRequireDefault(_ScreenPlayerSelectJs);
 
 var _ScreenWaitingOnPlayerJs = require('./Screen.WaitingOnPlayer.js');
 
-var _screenWaitingOnPlayerFactory = _interopRequireWildcard(_ScreenWaitingOnPlayerJs);
+var _ScreenWaitingOnPlayerJs2 = _interopRequireDefault(_ScreenWaitingOnPlayerJs);
 
 var _ScreenMainGameJs = require('./Screen.MainGame.js');
 
-var _screenMainGameFactory = _interopRequireWildcard(_ScreenMainGameJs);
+var _ScreenMainGameJs2 = _interopRequireDefault(_ScreenMainGameJs);
 
 var _ScreenGameOverJs = require('./Screen.GameOver.js');
 
-var _screenGameOverFactory = _interopRequireWildcard(_ScreenGameOverJs);
+var _ScreenGameOverJs2 = _interopRequireDefault(_ScreenGameOverJs);
 
 var _imagesLoadedInst = undefined,
     _preloadImages = ['img/pastries/null.png', 'img/pastries/pastry_cookie01.png', 'img/pastries/pastry_cookie02.png', 'img/pastries/pastry_croissant.png', 'img/pastries/pastry_cupcake.png', 'img/pastries/pastry_donut.png', 'img/pastries/pastry_eclair.png', 'img/pastries/pastry_macaroon.png', 'img/pastries/pastry_pie.png', 'img/pastries/pastry_poptart01.png', 'img/pastries/pastry_poptart02.png', 'img/pastries/pastry_starcookie01.png', 'img/pastries/pastry_starcookie02.png', 'img/players/alienBiege_climb1.png', 'img/players/alienBiege_climb2.png', 'img/players/alienBiege_duck.png', 'img/players/alienBiege_front.png', 'img/players/alienBiege_hit.png', 'img/players/alienBiege_jump.png', 'img/players/alienBiege_stand.png', 'img/players/alienBiege_swim1.png', 'img/players/alienBiege_swim2.png', 'img/players/alienBiege_walk1.png', 'img/players/alienBiege_walk2.png', 'img/players/alienBlue_climb1.png', 'img/players/alienBlue_climb2.png', 'img/players/alienBlue_duck.png', 'img/players/alienBlue_front.png', 'img/players/alienBlue_hit.png', 'img/players/alienBlue_jump.png', 'img/players/alienBlue_stand.png', 'img/players/alienBlue_swim1.png', 'img/players/alienBlue_swim2.png', 'img/players/alienBlue_walk1.png', 'img/players/alienBlue_walk2.png', 'img/players/alienGreen_climb1.png', 'img/players/alienGreen_climb2.png', 'img/players/alienGreen_duck.png', 'img/players/alienGreen_front.png', 'img/players/alienGreen_hit.png', 'img/players/alienGreen_jump.png', 'img/players/alienGreen_stand.png', 'img/players/alienGreen_swim1.png', 'img/players/alienGreen_swim2.png', 'img/players/alienGreen_walk1.png', 'img/players/alienGreen_walk2.png', 'img/players/alienPink_climb1.png', 'img/players/alienPink_climb2.png', 'img/players/alienPink_duck.png', 'img/players/alienPink_front.png', 'img/players/alienPink_hit.png', 'img/players/alienPink_jump.png', 'img/players/alienPink_stand.png', 'img/players/alienPink_swim1.png', 'img/players/alienPink_swim2.png', 'img/players/alienPink_walk1.png', 'img/players/alienPink_walk2.png', 'img/players/alienYellow_climb1.png', 'img/players/alienYellow_climb2.png', 'img/players/alienYellow_duck.png', 'img/players/alienYellow_front.png', 'img/players/alienYellow_hit.png', 'img/players/alienYellow_jump.png', 'img/players/alienYellow_stand.png', 'img/players/alienYellow_swim1.png', 'img/players/alienYellow_swim2.png', 'img/players/alienYellow_walk1.png', 'img/players/alienYellow_walk2.png'];
 
-var AppView = Nori.createView({
+var AppViewModule = Nori.createView({
 
-  mixins: [_mixinApplicationView, _mixinNudoruControls, _mixinStoreStateViews],
+  mixins: [_noriViewApplicationViewJs2['default'], _noriViewMixinNudoruControlsJs2['default'], _noriViewMixinStoreStateViewsJs2['default']],
 
   initialize: function initialize() {
     this.createSubject('viewInitialized');
@@ -905,7 +907,7 @@ var AppView = Nori.createView({
     console.log('appview, images preloaded OK');
 
     this.initializeApplicationView(['applicationscaffold', 'applicationcomponentsscaffold']);
-    this.initializeStateViews(_appStore);
+    this.initializeStateViews(_storeAppStoreJs2['default']);
     this.initializeNudoruControls();
 
     this.configureViews();
@@ -916,15 +918,15 @@ var AppView = Nori.createView({
 
   configureViews: function configureViews() {
     // TODO need to init this aspect of the store before here
-    var gameStates = ['TITLE', 'PLAYER_SELECT', 'WAITING_ON_PLAYER', 'MAIN_GAME', 'GAME_OVER']; //_appStore.getState().gameStates;
+    var gameStates = ['TITLE', 'PLAYER_SELECT', 'WAITING_ON_PLAYER', 'MAIN_GAME', 'GAME_OVER']; //AppStore.getState().gameStates;
 
     this.setViewMountPoint('#contents');
 
-    this.mapStateToViewComponent(gameStates[0], 'title', _screenTitleFactory['default']());
-    this.mapStateToViewComponent(gameStates[1], 'playerselect', _screenPlayerSelectFactory['default']());
-    this.mapStateToViewComponent(gameStates[2], 'waitingonplayer', _screenWaitingOnPlayerFactory['default']());
-    this.mapStateToViewComponent(gameStates[3], 'game', _screenMainGameFactory['default']());
-    this.mapStateToViewComponent(gameStates[4], 'gameover', _screenGameOverFactory['default']());
+    this.mapStateToViewComponent(gameStates[0], 'title', (0, _ScreenTitleJs2['default'])());
+    this.mapStateToViewComponent(gameStates[1], 'playerselect', (0, _ScreenPlayerSelectJs2['default'])());
+    this.mapStateToViewComponent(gameStates[2], 'waitingonplayer', (0, _ScreenWaitingOnPlayerJs2['default'])());
+    this.mapStateToViewComponent(gameStates[3], 'game', (0, _ScreenMainGameJs2['default'])());
+    this.mapStateToViewComponent(gameStates[4], 'gameover', (0, _ScreenGameOverJs2['default'])());
   },
 
   handleViewChange: function handleViewChange() {
@@ -933,7 +935,9 @@ var AppView = Nori.createView({
 
 });
 
-exports['default'] = AppView();
+var AppView = AppViewModule();
+
+exports['default'] = AppView;
 module.exports = exports['default'];
 
 },{"../../nori/view/ApplicationView.js":29,"../../nori/view/MixinNudoruControls.js":33,"../../nori/view/MixinStoreStateViews.js":34,"../store/AppStore.js":5,"./Screen.GameOver.js":9,"./Screen.MainGame.js":10,"./Screen.PlayerSelect.js":11,"./Screen.Title.js":12,"./Screen.WaitingOnPlayer.js":13}],7:[function(require,module,exports){
@@ -941,35 +945,35 @@ Object.defineProperty(exports, '__esModule', {
   value: true
 });
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj['default'] = obj; return newObj; } }
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
 var _noriActionActionCreator = require('../../nori/action/ActionCreator');
 
-var _noriActions = _interopRequireWildcard(_noriActionActionCreator);
+var _noriActionActionCreator2 = _interopRequireDefault(_noriActionActionCreator);
 
 var _AppView = require('./AppView');
 
-var _appView = _interopRequireWildcard(_AppView);
+var _AppView2 = _interopRequireDefault(_AppView);
 
 var _storeAppStore = require('../store/AppStore');
 
-var _appStore = _interopRequireWildcard(_storeAppStore);
+var _storeAppStore2 = _interopRequireDefault(_storeAppStore);
 
 var _noriUtilsTemplatingJs = require('../../nori/utils/Templating.js');
 
-var _template = _interopRequireWildcard(_noriUtilsTemplatingJs);
+var _noriUtilsTemplatingJs2 = _interopRequireDefault(_noriUtilsTemplatingJs);
 
 var _noriViewMixinDOMManipulationJs = require('../../nori/view/MixinDOMManipulation.js');
 
-var _mixinDOMManipulation = _interopRequireWildcard(_noriViewMixinDOMManipulationJs);
+var _noriViewMixinDOMManipulationJs2 = _interopRequireDefault(_noriViewMixinDOMManipulationJs);
 
 var _nudoruBrowserDOMUtilsJs = require('../../nudoru/browser/DOMUtils.js');
 
-var _domUtils = _interopRequireWildcard(_nudoruBrowserDOMUtilsJs);
+var _nudoruBrowserDOMUtilsJs2 = _interopRequireDefault(_nudoruBrowserDOMUtilsJs);
 
 var _noriUtilsRxJs = require('../../nori/utils/Rx.js');
 
-var _rx = _interopRequireWildcard(_noriUtilsRxJs);
+var _noriUtilsRxJs2 = _interopRequireDefault(_noriUtilsRxJs);
 
 var _difficultyImages = ['pastry_cookie01.png', 'pastry_poptart01.png', 'pastry_donut.png', 'pastry_pie.png', 'pastry_cupcake.png'],
     _gamePlayStates = ['CHOOSE', 'ANSWERING', 'WAITING'],
@@ -980,7 +984,7 @@ var _difficultyImages = ['pastry_cookie01.png', 'pastry_poptart01.png', 'pastry_
  */
 var Component = Nori.view().createComponentView({
 
-  mixins: [_mixinDOMManipulation],
+  mixins: [_noriViewMixinDOMManipulationJs2['default']],
 
   /**
    * configProps passed in from region definition on parent View
@@ -989,7 +993,7 @@ var Component = Nori.view().createComponentView({
    * @param configProps
    */
   initialize: function initialize(configProps) {
-    this.bindMap(_appStore); // Reducer store, map id string or map object
+    this.bindMap(_storeAppStore2['default']); // Reducer store, map id string or map object
   },
 
   /**
@@ -1015,7 +1019,7 @@ var Component = Nori.view().createComponentView({
   },
 
   getHUDState: function getHUDState() {
-    var appState = _appStore.getState(),
+    var appState = _storeAppStore2['default'].getState(),
         stats = undefined,
         localQ = false,
         remoteQ = false,
@@ -1115,7 +1119,7 @@ var Component = Nori.view().createComponentView({
           startX = undefined,
           endRot = undefined;
 
-      endX = _domUtils.position(foodImage).left;
+      endX = _nudoruBrowserDOMUtilsJs2['default'].position(foodImage).left;
 
       if (this.getConfigProps().target === 'local') {
         startX = 700;
@@ -1155,35 +1159,35 @@ Object.defineProperty(exports, '__esModule', {
   value: true
 });
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj['default'] = obj; return newObj; } }
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
 var _noriActionActionCreator = require('../../nori/action/ActionCreator');
 
-var _noriActions = _interopRequireWildcard(_noriActionActionCreator);
+var _noriActionActionCreator2 = _interopRequireDefault(_noriActionActionCreator);
 
 var _AppView = require('./AppView');
 
-var _appView = _interopRequireWildcard(_AppView);
+var _AppView2 = _interopRequireDefault(_AppView);
 
 var _storeAppStore = require('../store/AppStore');
 
-var _appStore = _interopRequireWildcard(_storeAppStore);
+var _storeAppStore2 = _interopRequireDefault(_storeAppStore);
 
 var _actionActionCreatorJs = require('../action/ActionCreator.js');
 
-var _appActions = _interopRequireWildcard(_actionActionCreatorJs);
+var _actionActionCreatorJs2 = _interopRequireDefault(_actionActionCreatorJs);
 
 var _noriUtilsTemplatingJs = require('../../nori/utils/Templating.js');
 
-var _template = _interopRequireWildcard(_noriUtilsTemplatingJs);
+var _noriUtilsTemplatingJs2 = _interopRequireDefault(_noriUtilsTemplatingJs);
 
 var _vendorRxjsRxLiteMinJs = require('../../vendor/rxjs/rx.lite.min.js');
 
-var Rxjs = _interopRequireWildcard(_vendorRxjsRxLiteMinJs);
+var _vendorRxjsRxLiteMinJs2 = _interopRequireDefault(_vendorRxjsRxLiteMinJs);
 
 var _noriViewMixinDOMManipulationJs = require('../../nori/view/MixinDOMManipulation.js');
 
-var _mixinDOMManipulation = _interopRequireWildcard(_noriViewMixinDOMManipulationJs);
+var _noriViewMixinDOMManipulationJs2 = _interopRequireDefault(_noriViewMixinDOMManipulationJs);
 
 var _questionChangeObs = null,
     _timerObservable = null,
@@ -1195,7 +1199,7 @@ var _questionChangeObs = null,
  */
 var Component = Nori.view().createComponentView({
 
-  mixins: [_mixinDOMManipulation],
+  mixins: [_noriViewMixinDOMManipulationJs2['default']],
 
   /**
    * configProps passed in from region definition on parent View
@@ -1204,7 +1208,7 @@ var Component = Nori.view().createComponentView({
    * @param configProps
    */
   initialize: function initialize(configProps) {
-    this.bindMap(_appStore);
+    this.bindMap(_storeAppStore2['default']);
   },
 
   /**
@@ -1233,31 +1237,31 @@ var Component = Nori.view().createComponentView({
 
   scoreCorrect: function scoreCorrect() {
     var qPoints = this.getState().question.q_difficulty_level,
-        answeredCorrect = _appActions.answeredCorrect(qPoints);
+        answeredCorrect = _actionActionCreatorJs2['default'].answeredCorrect(qPoints);
 
     this.clearTimer();
 
-    _appView['default'].positiveAlert('You got it!', 'Correct!');
+    _AppView2['default'].positiveAlert('You got it!', 'Correct!');
 
-    _appStore.apply(answeredCorrect);
+    _storeAppStore2['default'].apply(answeredCorrect);
   },
 
   scoreIncorrect: function scoreIncorrect() {
-    var state = _appStore.getState(),
+    var state = _storeAppStore2['default'].getState(),
         question = state.currentQuestion.question,
         qPoints = question.q_difficulty_level,
         caText = question['q_options_' + question.q_correct_option],
-        answeredIncorrect = _appActions.answeredIncorrect(qPoints);
+        answeredIncorrect = _actionActionCreatorJs2['default'].answeredIncorrect(qPoints);
 
     this.clearTimer();
 
-    _appView['default'].negativeAlert('The correct answer was <span class="correct-answer">' + caText + '</span>. You lost ' + qPoints + ' health points.', 'You missed that one!');
+    _AppView2['default'].negativeAlert('The correct answer was <span class="correct-answer">' + caText + '</span>. You lost ' + qPoints + ' health points.', 'You missed that one!');
 
-    _appStore.apply(answeredIncorrect);
+    _storeAppStore2['default'].apply(answeredIncorrect);
   },
 
   getQuestionState: function getQuestionState() {
-    var state = _appStore.getState(),
+    var state = _storeAppStore2['default'].getState(),
         viewState = { question: null };
 
     if (state.currentQuestion) {
@@ -1288,7 +1292,7 @@ var Component = Nori.view().createComponentView({
   },
 
   template: function template() {
-    var html = _template.getSource('game__question');
+    var html = _noriUtilsTemplatingJs2['default'].getSource('game__question');
     return _.template(html);
   },
 
@@ -1297,7 +1301,7 @@ var Component = Nori.view().createComponentView({
    */
   render: function render(state) {
     if (this.hasQuestion()) {
-      _appView['default'].closeAllAlerts();
+      _AppView2['default'].closeAllAlerts();
       return this.template()(state);
     }
 
@@ -1356,7 +1360,7 @@ var Component = Nori.view().createComponentView({
 
     this.updateTimerText(_timerValue);
 
-    _timerObservable = Rxjs.Observable.interval(1000).take(_timerValue).subscribe(this.onTimerTick.bind(this), function onErr() {}, this.onTimerComplete.bind(this));
+    _timerObservable = _vendorRxjsRxLiteMinJs2['default'].Observable.interval(1000).take(_timerValue).subscribe(this.onTimerTick.bind(this), function onErr() {}, this.onTimerComplete.bind(this));
   },
 
   onTimerTick: function onTimerTick(second) {
@@ -1402,38 +1406,38 @@ Object.defineProperty(exports, '__esModule', {
   value: true
 });
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj['default'] = obj; return newObj; } }
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
 var _noriActionActionCreator = require('../../nori/action/ActionCreator');
 
-var _noriActions = _interopRequireWildcard(_noriActionActionCreator);
+var _noriActionActionCreator2 = _interopRequireDefault(_noriActionActionCreator);
 
 var _AppView = require('./AppView');
 
-var _appView = _interopRequireWildcard(_AppView);
+var _AppView2 = _interopRequireDefault(_AppView);
 
 var _storeAppStore = require('../store/AppStore');
 
-var _appStore = _interopRequireWildcard(_storeAppStore);
+var _storeAppStore2 = _interopRequireDefault(_storeAppStore);
 
 var _noriUtilsTemplatingJs = require('../../nori/utils/Templating.js');
 
-var _template = _interopRequireWildcard(_noriUtilsTemplatingJs);
+var _noriUtilsTemplatingJs2 = _interopRequireDefault(_noriUtilsTemplatingJs);
 
 var _actionActionCreatorJs = require('../action/ActionCreator.js');
 
-var _appActions = _interopRequireWildcard(_actionActionCreatorJs);
+var _actionActionCreatorJs2 = _interopRequireDefault(_actionActionCreatorJs);
 
 var _noriViewMixinDOMManipulationJs = require('../../nori/view/MixinDOMManipulation.js');
 
-var _mixinDOMManipulation = _interopRequireWildcard(_noriViewMixinDOMManipulationJs);
+var _noriViewMixinDOMManipulationJs2 = _interopRequireDefault(_noriViewMixinDOMManipulationJs);
 
 /**
  * Module for a dynamic application view for a route or a persistent view
  */
 var Component = Nori.view().createComponentView({
 
-  mixins: [_mixinDOMManipulation],
+  mixins: [_noriViewMixinDOMManipulationJs2['default']],
 
   /**
    * Initialize and bind, called once on first render. Parent component is
@@ -1451,7 +1455,7 @@ var Component = Nori.view().createComponentView({
   defineEvents: function defineEvents() {
     return {
       'click #gameover__button-replay': function clickGameover__buttonReplay() {
-        _appStore.apply(_appActions.resetGame());
+        _storeAppStore2['default'].apply(_actionActionCreatorJs2['default'].resetGame());
       }
     };
   },
@@ -1460,7 +1464,7 @@ var Component = Nori.view().createComponentView({
    * Set initial state properties. Call once on first render
    */
   getInitialState: function getInitialState() {
-    var appState = _appStore.getState(),
+    var appState = _storeAppStore2['default'].getState(),
         state = {
       name: appState.localPlayer.name,
       appearance: appState.localPlayer.appearance,
@@ -1537,55 +1541,55 @@ Object.defineProperty(exports, '__esModule', {
   value: true
 });
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj['default'] = obj; return newObj; } }
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
 var _noriActionActionCreator = require('../../nori/action/ActionCreator');
 
-var _noriActions = _interopRequireWildcard(_noriActionActionCreator);
+var _noriActionActionCreator2 = _interopRequireDefault(_noriActionActionCreator);
 
 var _App = require('../App');
 
-var _app = _interopRequireWildcard(_App);
+var _App2 = _interopRequireDefault(_App);
 
 var _AppView = require('./AppView');
 
-var _appView = _interopRequireWildcard(_AppView);
+var _AppView2 = _interopRequireDefault(_AppView);
 
 var _storeAppStore = require('../store/AppStore');
 
-var _appStore = _interopRequireWildcard(_storeAppStore);
+var _storeAppStore2 = _interopRequireDefault(_storeAppStore);
 
 var _noriUtilsTemplatingJs = require('../../nori/utils/Templating.js');
 
-var _template = _interopRequireWildcard(_noriUtilsTemplatingJs);
+var _noriUtilsTemplatingJs2 = _interopRequireDefault(_noriUtilsTemplatingJs);
 
 var _actionActionCreatorJs = require('../action/ActionCreator.js');
 
-var _appActions = _interopRequireWildcard(_actionActionCreatorJs);
+var _actionActionCreatorJs2 = _interopRequireDefault(_actionActionCreatorJs);
 
 var _RegionPlayerStatsJs = require('./Region.PlayerStats.js');
 
-var _regionPlayerStats = _interopRequireWildcard(_RegionPlayerStatsJs);
+var _RegionPlayerStatsJs2 = _interopRequireDefault(_RegionPlayerStatsJs);
 
 var _RegionQuestionJs = require('./Region.Question.js');
 
-var _regionQuestion = _interopRequireWildcard(_RegionQuestionJs);
+var _RegionQuestionJs2 = _interopRequireDefault(_RegionQuestionJs);
 
 var _nudoruCoreNumberUtilsJs = require('../../nudoru/core/NumberUtils.js');
 
-var _numUtils = _interopRequireWildcard(_nudoruCoreNumberUtilsJs);
+var _nudoruCoreNumberUtilsJs2 = _interopRequireDefault(_nudoruCoreNumberUtilsJs);
 
 var _nudoruBrowserDOMUtilsJs = require('../../nudoru/browser/DOMUtils.js');
 
-var _domUtils = _interopRequireWildcard(_nudoruBrowserDOMUtilsJs);
+var _nudoruBrowserDOMUtilsJs2 = _interopRequireDefault(_nudoruBrowserDOMUtilsJs);
 
 var _noriViewMixinDOMManipulationJs = require('../../nori/view/MixinDOMManipulation.js');
 
-var _mixinDOMManipulation = _interopRequireWildcard(_noriViewMixinDOMManipulationJs);
+var _noriViewMixinDOMManipulationJs2 = _interopRequireDefault(_noriViewMixinDOMManipulationJs);
 
 var _noriUtilsRxJs = require('../../nori/utils/Rx.js');
 
-var _rx = _interopRequireWildcard(_noriUtilsRxJs);
+var _noriUtilsRxJs2 = _interopRequireDefault(_noriUtilsRxJs);
 
 var _cardAnimationSub = null;
 
@@ -1594,7 +1598,7 @@ var _cardAnimationSub = null;
  */
 var Component = Nori.view().createComponentView({
 
-  mixins: [_mixinDOMManipulation],
+  mixins: [_noriViewMixinDOMManipulationJs2['default']],
 
   /**
    * Initialize and bind, called once on first render. Parent component is
@@ -1602,22 +1606,22 @@ var Component = Nori.view().createComponentView({
    * @param configProps
    */
   initialize: function initialize(configProps) {
-    this.bindMap(_appStore);
+    this.bindMap(_storeAppStore2['default']);
   },
 
   defineRegions: function defineRegions() {
     return {
-      localPlayerStats: _regionPlayerStats['default']({
+      localPlayerStats: (0, _RegionPlayerStatsJs2['default'])({
         id: 'game__playerstats',
         mountPoint: '#game__localplayerstats',
         target: 'local'
       }),
-      remotePlayerStats: _regionPlayerStats['default']({
+      remotePlayerStats: (0, _RegionPlayerStatsJs2['default'])({
         id: 'game__playerstats',
         mountPoint: '#game__remoteplayerstats',
         target: 'remote'
       }),
-      questionView: _regionQuestion['default']({
+      questionView: (0, _RegionQuestionJs2['default'])({
         id: 'game__question',
         mountPoint: '#game__questionarea'
       })
@@ -1631,7 +1635,7 @@ var Component = Nori.view().createComponentView({
   defineEvents: function defineEvents() {
     return {
       'click #game__button-skip': function clickGame__buttonSkip() {
-        _appStore.apply(_noriActions.changeStoreState({ currentState: _appStore.getState().gameStates[4] }));
+        _storeAppStore2['default'].apply(_noriActionActionCreator2['default'].changeStoreState({ currentState: _storeAppStore2['default'].getState().gameStates[4] }));
       },
       'click #game_question-difficulty1, click #game_question-difficulty2, click #game_question-difficulty3, click #game_question-difficulty4, click #game_question-difficulty5': this.sendQuestion.bind(this)
     };
@@ -1652,16 +1656,16 @@ var Component = Nori.view().createComponentView({
   },
 
   getGameState: function getGameState() {
-    var appState = _appStore.getState();
+    var appState = _storeAppStore2['default'].getState();
     return {
       sentQuestion: appState.sentQuestion
     };
   },
 
   sendQuestion: function sendQuestion(evt) {
-    _appView['default'].closeAllAlerts();
+    _AppView2['default'].closeAllAlerts();
     var difficulty = parseInt(evt.target.getAttribute('id').substr(-1, 1));
-    _app['default'].sendQuestion(difficulty);
+    _App2['default'].sendQuestion(difficulty);
   },
 
   shouldDelegateEvents: function shouldDelegateEvents() {
@@ -1712,10 +1716,10 @@ var Component = Nori.view().createComponentView({
 
   template: function template(state) {
     if (state.sentQuestion.q_difficulty_level === -1) {
-      var cardsHTML = _template.getSource('game__choose');
+      var cardsHTML = _noriUtilsTemplatingJs2['default'].getSource('game__choose');
       return _.template(cardsHTML);
     } else {
-      var remoteHTML = _template.getSource('game__remote');
+      var remoteHTML = _noriUtilsTemplatingJs2['default'].getSource('game__remote');
       return _.template(remoteHTML);
     }
   },
@@ -1739,31 +1743,31 @@ Object.defineProperty(exports, '__esModule', {
   value: true
 });
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj['default'] = obj; return newObj; } }
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
 var _noriActionActionCreator = require('../../nori/action/ActionCreator');
 
-var _noriActions = _interopRequireWildcard(_noriActionActionCreator);
+var _noriActionActionCreator2 = _interopRequireDefault(_noriActionActionCreator);
 
 var _App = require('../App');
 
-var _app = _interopRequireWildcard(_App);
+var _App2 = _interopRequireDefault(_App);
 
 var _AppView = require('./AppView');
 
-var _appView = _interopRequireWildcard(_AppView);
+var _AppView2 = _interopRequireDefault(_AppView);
 
 var _storeAppStore = require('../store/AppStore');
 
-var _appStore = _interopRequireWildcard(_storeAppStore);
+var _storeAppStore2 = _interopRequireDefault(_storeAppStore);
 
 var _noriUtilsTemplatingJs = require('../../nori/utils/Templating.js');
 
-var _template = _interopRequireWildcard(_noriUtilsTemplatingJs);
+var _noriUtilsTemplatingJs2 = _interopRequireDefault(_noriUtilsTemplatingJs);
 
 var _actionActionCreatorJs = require('../action/ActionCreator.js');
 
-var _appActions = _interopRequireWildcard(_actionActionCreatorJs);
+var _actionActionCreatorJs2 = _interopRequireDefault(_actionActionCreatorJs);
 
 var _roomNumberLength = 4;
 
@@ -1792,30 +1796,30 @@ var Component = Nori.view().createComponentView({
       'click #select__button-joinroom': this.onJoinRoom.bind(this),
       'click #select__button-createroom': this.onCreateRoom.bind(this),
       'click #select__button-go': function clickSelect__buttonGo() {
-        _appStore.apply(_noriActions.changeStoreState({ currentState: _appStore.getState().gameStates[2] }));
+        _storeAppStore2['default'].apply(_noriActionActionCreator2['default'].changeStoreState({ currentState: _storeAppStore2['default'].getState().gameStates[2] }));
       }
     };
   },
 
   setPlayerName: function setPlayerName(value) {
-    var action = _appActions.setLocalPlayerProps({
+    var action = _actionActionCreatorJs2['default'].setLocalPlayerProps({
       name: value
     });
-    _appStore.apply(action);
+    _storeAppStore2['default'].apply(action);
   },
 
   setPlayerAppearance: function setPlayerAppearance(value) {
-    var action = _appActions.setLocalPlayerProps({
+    var action = _actionActionCreatorJs2['default'].setLocalPlayerProps({
       appearance: value
     });
-    _appStore.apply(action);
+    _storeAppStore2['default'].apply(action);
   },
 
   /**
    * Set initial state properties. Call once on first render
    */
   getInitialState: function getInitialState() {
-    var appState = _appStore.getState();
+    var appState = _storeAppStore2['default'].getState();
     return {
       name: appState.localPlayer.name,
       appearance: appState.localPlayer.appearance
@@ -1838,16 +1842,16 @@ var Component = Nori.view().createComponentView({
 
   onCreateRoom: function onCreateRoom() {
     if (this.validateUserDetailsInput()) {
-      _app['default'].createRoom();
+      _App2['default'].createRoom();
     }
   },
 
   onJoinRoom: function onJoinRoom() {
     var roomID = document.querySelector('#select__roomid').value;
     if (this.validateRoomID(roomID)) {
-      _app['default'].joinRoom(roomID);
+      _App2['default'].joinRoom(roomID);
     } else {
-      _appView['default'].alert('The room ID is not correct. Does it contain letters or is less than ' + _roomNumberLength + ' digits?', 'Bad Room ID');
+      _AppView2['default'].alert('The room ID is not correct. Does it contain letters or is less than ' + _roomNumberLength + ' digits?', 'Bad Room ID');
     }
   },
 
@@ -1856,7 +1860,7 @@ var Component = Nori.view().createComponentView({
         appearance = document.querySelector('#select__playertype').value;
 
     if (!name.length || !appearance) {
-      _appView['default'].alert('Make sure you\'ve typed a name for yourself and selected an appearance');
+      _AppView2['default'].alert('Make sure you\'ve typed a name for yourself and selected an appearance');
       return false;
     }
     return true;
@@ -1893,23 +1897,23 @@ Object.defineProperty(exports, '__esModule', {
   value: true
 });
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj['default'] = obj; return newObj; } }
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
 var _noriActionActionCreator = require('../../nori/action/ActionCreator');
 
-var _noriActions = _interopRequireWildcard(_noriActionActionCreator);
+var _noriActionActionCreator2 = _interopRequireDefault(_noriActionActionCreator);
 
 var _AppView = require('./AppView');
 
-var _appView = _interopRequireWildcard(_AppView);
+var _AppView2 = _interopRequireDefault(_AppView);
 
 var _storeAppStore = require('../store/AppStore');
 
-var _appStore = _interopRequireWildcard(_storeAppStore);
+var _storeAppStore2 = _interopRequireDefault(_storeAppStore);
 
 var _noriUtilsTemplatingJs = require('../../nori/utils/Templating.js');
 
-var _template = _interopRequireWildcard(_noriUtilsTemplatingJs);
+var _noriUtilsTemplatingJs2 = _interopRequireDefault(_noriUtilsTemplatingJs);
 
 /**
  * Module for a dynamic application view for a route or a persistent view
@@ -1932,7 +1936,7 @@ var Component = Nori.view().createComponentView({
   defineEvents: function defineEvents() {
     return {
       'click #title__button-start': function clickTitle__buttonStart() {
-        _appStore.apply(_noriActions.changeStoreState({ currentState: _appStore.getState().gameStates[1] }));
+        _storeAppStore2['default'].apply(_noriActionActionCreator2['default'].changeStoreState({ currentState: _storeAppStore2['default'].getState().gameStates[1] }));
       }
     };
   },
@@ -1975,27 +1979,27 @@ Object.defineProperty(exports, '__esModule', {
   value: true
 });
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj['default'] = obj; return newObj; } }
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
 var _noriActionActionCreator = require('../../nori/action/ActionCreator');
 
-var _noriActions = _interopRequireWildcard(_noriActionActionCreator);
+var _noriActionActionCreator2 = _interopRequireDefault(_noriActionActionCreator);
 
 var _AppView = require('./AppView');
 
-var _appView = _interopRequireWildcard(_AppView);
+var _AppView2 = _interopRequireDefault(_AppView);
 
 var _storeAppStore = require('../store/AppStore');
 
-var _appStore = _interopRequireWildcard(_storeAppStore);
+var _storeAppStore2 = _interopRequireDefault(_storeAppStore);
 
 var _noriUtilsTemplatingJs = require('../../nori/utils/Templating.js');
 
-var _template = _interopRequireWildcard(_noriUtilsTemplatingJs);
+var _noriUtilsTemplatingJs2 = _interopRequireDefault(_noriUtilsTemplatingJs);
 
 var _actionActionCreatorJs = require('../action/ActionCreator.js');
 
-var _appActions = _interopRequireWildcard(_actionActionCreatorJs);
+var _actionActionCreatorJs2 = _interopRequireDefault(_actionActionCreatorJs);
 
 /**
  * Module for a dynamic application view for a route or a persistent view
@@ -2018,10 +2022,10 @@ var Component = Nori.view().createComponentView({
   defineEvents: function defineEvents() {
     return {
       'click #waiting__button-skip': function clickWaiting__buttonSkip() {
-        _appStore.apply(_noriActions.changeStoreState({ currentState: _appStore.getState().gameStates[3] }));
+        _storeAppStore2['default'].apply(_noriActionActionCreator2['default'].changeStoreState({ currentState: _storeAppStore2['default'].getState().gameStates[3] }));
       },
       'click #waiting__button-goback': function clickWaiting__buttonGoback() {
-        _appStore.apply(_appActions.resetGame());
+        _storeAppStore2['default'].apply(_actionActionCreatorJs2['default'].resetGame());
       }
     };
   },
@@ -2030,7 +2034,7 @@ var Component = Nori.view().createComponentView({
    * Set initial state properties. Call once on first render
    */
   getInitialState: function getInitialState() {
-    var appState = _appStore.getState();
+    var appState = _storeAppStore2['default'].getState();
     return {
       name: appState.localPlayer.name,
       appearance: appState.localPlayer.appearance,
@@ -2042,7 +2046,7 @@ var Component = Nori.view().createComponentView({
    * State change on bound stores (map, etc.) Return nextState object
    */
   componentWillUpdate: function componentWillUpdate() {
-    var appState = _appStore.getState();
+    var appState = _storeAppStore2['default'].getState();
     return {
       name: appState.localPlayer.name,
       appearance: appState.localPlayer.appearance,
@@ -2101,33 +2105,33 @@ Object.defineProperty(exports, '__esModule', {
   value: true
 });
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj['default'] = obj; return newObj; } }
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
 /*  weak */
 
 var _utilsMixinObservableSubjectJs = require('./utils/MixinObservableSubject.js');
 
-var _mixinObservableSubject = _interopRequireWildcard(_utilsMixinObservableSubjectJs);
+var _utilsMixinObservableSubjectJs2 = _interopRequireDefault(_utilsMixinObservableSubjectJs);
 
 var _storeMixinReducerStoreJs = require('./store/MixinReducerStore.js');
 
-var _mixinReducerStore = _interopRequireWildcard(_storeMixinReducerStoreJs);
+var _storeMixinReducerStoreJs2 = _interopRequireDefault(_storeMixinReducerStoreJs);
 
 var _viewMixinComponentViewsJs = require('./view/MixinComponentViews.js');
 
-var _mixinComponentViews = _interopRequireWildcard(_viewMixinComponentViewsJs);
+var _viewMixinComponentViewsJs2 = _interopRequireDefault(_viewMixinComponentViewsJs);
 
 var _viewMixinEventDelegatorJs = require('./view/MixinEventDelegator.js');
 
-var _mixinEventDelegator = _interopRequireWildcard(_viewMixinEventDelegatorJs);
+var _viewMixinEventDelegatorJs2 = _interopRequireDefault(_viewMixinEventDelegatorJs);
 
 var _utilsDispatcherJs = require('./utils/Dispatcher.js');
 
-var _dispatcher = _interopRequireWildcard(_utilsDispatcherJs);
+var _utilsDispatcherJs2 = _interopRequireDefault(_utilsDispatcherJs);
 
 var _utilsRouterJs = require('./utils/Router.js');
 
-var _router = _interopRequireWildcard(_utilsRouterJs);
+var _utilsRouterJs2 = _interopRequireDefault(_utilsRouterJs);
 
 var Nori = function Nori() {
 
@@ -2142,11 +2146,11 @@ var Nori = function Nori() {
   //----------------------------------------------------------------------------
 
   function getDispatcher() {
-    return _dispatcher;
+    return _utilsDispatcherJs2['default'];
   }
 
   function getRouter() {
-    return _router;
+    return _utilsRouterJs2['default'];
   }
 
   function getConfig() {
@@ -2154,7 +2158,7 @@ var Nori = function Nori() {
   }
 
   function getCurrentRoute() {
-    return _router.getCurrentRoute();
+    return _utilsRouterJs2['default'].getCurrentRoute();
   }
 
   function view() {
@@ -2170,11 +2174,11 @@ var Nori = function Nori() {
   //----------------------------------------------------------------------------
 
   _storeTemplate = createStore({
-    mixins: [_mixinReducerStore, _mixinObservableSubject['default']()]
+    mixins: [_storeMixinReducerStoreJs2['default'], (0, _utilsMixinObservableSubjectJs2['default'])()]
   })();
 
   _viewTemplate = createView({
-    mixins: [_mixinComponentViews, _mixinEventDelegator['default'](), _mixinObservableSubject['default']()]
+    mixins: [_viewMixinComponentViewsJs2['default'], (0, _viewMixinEventDelegatorJs2['default'])(), (0, _utilsMixinObservableSubjectJs2['default'])()]
   })();
 
   //----------------------------------------------------------------------------
@@ -2280,7 +2284,7 @@ Object.defineProperty(exports, '__esModule', {
   value: true
 });
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj['default'] = obj; return newObj; } }
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
 /*  weak */
 
@@ -2292,13 +2296,13 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 
 var _ActionConstantsJs = require('./ActionConstants.js');
 
-var _noriActionConstants = _interopRequireWildcard(_ActionConstantsJs);
+var _ActionConstantsJs2 = _interopRequireDefault(_ActionConstantsJs);
 
 var NoriActionCreator = {
 
   changeStoreState: function changeStoreState(data, id) {
     return {
-      type: _noriActionConstants.CHANGE_STORE_STATE,
+      type: _ActionConstantsJs2['default'].CHANGE_STORE_STATE,
       payload: {
         id: id,
         data: data
@@ -2316,7 +2320,7 @@ Object.defineProperty(exports, '__esModule', {
   value: true
 });
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj['default'] = obj; return newObj; } }
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
 /*  weak */
 
@@ -2383,7 +2387,7 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 
 var _vendorRxjsRxLiteMinJs = require('../../vendor/rxjs/rx.lite.min.js');
 
-var Rxjs = _interopRequireWildcard(_vendorRxjsRxLiteMinJs);
+var _vendorRxjsRxLiteMinJs2 = _interopRequireDefault(_vendorRxjsRxLiteMinJs);
 
 var Rest = function Rest() {
 
@@ -2396,7 +2400,7 @@ var Rest = function Rest() {
         headers = reqObj.headers || [],
         data = reqObj.data || null;
 
-    return new Rxjs.Observable.create(function makeReq(observer) {
+    return new _vendorRxjsRxLiteMinJs2['default'].Observable.create(function makeReq(observer) {
       xhr.open(method, url, true);
 
       xhr.onreadystatechange = function () {
@@ -2467,27 +2471,27 @@ Object.defineProperty(exports, '__esModule', {
   value: true
 });
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj['default'] = obj; return newObj; } }
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
 /*  weak */
 
 var _SocketIOEventsJs = require('./SocketIOEvents.js');
 
-var _events = _interopRequireWildcard(_SocketIOEventsJs);
+var _SocketIOEventsJs2 = _interopRequireDefault(_SocketIOEventsJs);
 
 var _vendorRxjsRxLiteMinJs = require('../../vendor/rxjs/rx.lite.min.js');
 
-var Rxjs = _interopRequireWildcard(_vendorRxjsRxLiteMinJs);
+var _vendorRxjsRxLiteMinJs2 = _interopRequireDefault(_vendorRxjsRxLiteMinJs);
 
 var SocketIOConnector = function SocketIOConnector() {
 
-  var _subject = new Rxjs.Subject(),
+  var _subject = new _vendorRxjsRxLiteMinJs2['default'].Subject(),
       _socketIO = io(),
       _log = [],
       _connectionID = undefined;
 
   function initialize() {
-    _socketIO.on(_events.NOTIFY_CLIENT, onNotifyClient);
+    _socketIO.on(_SocketIOEventsJs2['default'].NOTIFY_CLIENT, onNotifyClient);
   }
 
   /**
@@ -2499,18 +2503,18 @@ var SocketIOConnector = function SocketIOConnector() {
 
     var type = payload.type;
 
-    if (type === _events.PING) {
-      notifyServer(_events.PONG, {});
-    } else if (type === _events.PONG) {
+    if (type === _SocketIOEventsJs2['default'].PING) {
+      notifyServer(_SocketIOEventsJs2['default'].PONG, {});
+    } else if (type === _SocketIOEventsJs2['default'].PONG) {
       console.log('SOCKET.IO PONG!');
-    } else if (type === _events.CONNECT) {
+    } else if (type === _SocketIOEventsJs2['default'].CONNECT) {
       _connectionID = payload.id;
     }
     notifySubscribers(payload);
   }
 
   function ping() {
-    notifyServer(_events.PING, {});
+    notifyServer(_SocketIOEventsJs2['default'].PING, {});
   }
 
   /**
@@ -2520,7 +2524,7 @@ var SocketIOConnector = function SocketIOConnector() {
    */
   function notifyServer(type, payload) {
     //console.log('notify server',type,payload);
-    _socketIO.emit(_events.NOTIFY_SERVER, {
+    _socketIO.emit(_SocketIOEventsJs2['default'].NOTIFY_SERVER, {
       type: type,
       connectionID: _connectionID,
       payload: payload
@@ -2563,7 +2567,7 @@ var SocketIOConnector = function SocketIOConnector() {
   }
 
   function getEventConstants() {
-    return Object.assign({}, _events);
+    return Object.assign({}, _SocketIOEventsJs2['default']);
   }
 
   return {
@@ -2616,7 +2620,7 @@ Object.defineProperty(exports, '__esModule', {
   value: true
 });
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj['default'] = obj; return newObj; } }
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
 /*  weak */
 
@@ -2633,11 +2637,11 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 
 var _nudoruUtilIsJs = require('../../nudoru/util/is.js');
 
-var is = _interopRequireWildcard(_nudoruUtilIsJs);
+var _nudoruUtilIsJs2 = _interopRequireDefault(_nudoruUtilIsJs);
 
 var _SimpleStoreJs = require('./SimpleStore.js');
 
-var _stateObjFactory = _interopRequireWildcard(_SimpleStoreJs);
+var _SimpleStoreJs2 = _interopRequireDefault(_SimpleStoreJs);
 
 var MixinReducerStore = function MixinReducerStore() {
   var _this = undefined,
@@ -2686,7 +2690,7 @@ var MixinReducerStore = function MixinReducerStore() {
     }
 
     _this = this;
-    _state = _stateObjFactory['default'](); //require('./ImmutableMap.js')();
+    _state = (0, _SimpleStoreJs2['default'])(); //require('./ImmutableMap.js')();
 
     if (!_stateReducers) {
       throw new Error('ReducerStore, must set a reducer before initialization');
@@ -2702,7 +2706,7 @@ var MixinReducerStore = function MixinReducerStore() {
    * @param actionObjOrArry Array of actions or a single action to reduce from
    */
   function apply(actionObjOrArry) {
-    if (is.array(actionObjOrArry)) {
+    if (_nudoruUtilIsJs2['default'].array(actionObjOrArry)) {
       actionObjOrArry.forEach(function (actionObj) {
         return applyReducers(actionObj);
       });
@@ -2807,7 +2811,7 @@ Object.defineProperty(exports, '__esModule', {
   value: true
 });
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj['default'] = obj; return newObj; } }
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
 /*  weak */
 
@@ -2827,7 +2831,7 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 
 var _vendorRxjsRxLiteMinJs = require('../../vendor/rxjs/rx.lite.min.js');
 
-var Rxjs = _interopRequireWildcard(_vendorRxjsRxLiteMinJs);
+var _vendorRxjsRxLiteMinJs2 = _interopRequireDefault(_vendorRxjsRxLiteMinJs);
 
 var Dispatcher = function Dispatcher() {
 
@@ -2873,7 +2877,7 @@ var Dispatcher = function Dispatcher() {
       _subjectMap[evtStr] = [];
     }
 
-    var subject = new Rxjs.Subject();
+    var subject = new _vendorRxjsRxLiteMinJs2['default'].Subject();
 
     _subjectMap[evtStr].push({
       once: once,
@@ -2896,8 +2900,8 @@ var Dispatcher = function Dispatcher() {
       return;
     }
 
-    _timerPausable = new Rxjs.Subject();
-    _timerObservable = Rxjs.Observable.interval(1).pausable(_timerPausable);
+    _timerPausable = new _vendorRxjsRxLiteMinJs2['default'].Subject();
+    _timerObservable = _vendorRxjsRxLiteMinJs2['default'].Observable.interval(1).pausable(_timerPausable);
     _timerSubscription = _timerObservable.subscribe(processNextEvent);
   }
 
@@ -3052,7 +3056,7 @@ Object.defineProperty(exports, '__esModule', {
   value: true
 });
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj['default'] = obj; return newObj; } }
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
 /*  weak */
 
@@ -3065,15 +3069,15 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 
 var _nudoruUtilIsJs = require('../../nudoru/util/is.js');
 
-var is = _interopRequireWildcard(_nudoruUtilIsJs);
+var _nudoruUtilIsJs2 = _interopRequireDefault(_nudoruUtilIsJs);
 
 var _vendorRxjsRxLiteMinJs = require('../../vendor/rxjs/rx.lite.min.js');
 
-var Rxjs = _interopRequireWildcard(_vendorRxjsRxLiteMinJs);
+var _vendorRxjsRxLiteMinJs2 = _interopRequireDefault(_vendorRxjsRxLiteMinJs);
 
 var MixinObservableSubject = function MixinObservableSubject() {
 
-  var _subject = new Rxjs.Subject(),
+  var _subject = new _vendorRxjsRxLiteMinJs2['default'].Subject(),
       _subjectMap = {};
 
   /**
@@ -3083,7 +3087,7 @@ var MixinObservableSubject = function MixinObservableSubject() {
    */
   function createSubject(name) {
     if (!_subjectMap.hasOwnProperty(name)) {
-      _subjectMap[name] = new Rxjs.Subject();
+      _subjectMap[name] = new _vendorRxjsRxLiteMinJs2['default'].Subject();
     }
     return _subjectMap[name];
   }
@@ -3095,7 +3099,7 @@ var MixinObservableSubject = function MixinObservableSubject() {
    * @returns {*}
    */
   function subscribe(handlerOrName, optHandler) {
-    if (is.string(handlerOrName)) {
+    if (_nudoruUtilIsJs2['default'].string(handlerOrName)) {
       return createSubject(handlerOrName).subscribe(optHandler);
     } else {
       return _subject.subscribe(handlerOrName);
@@ -3139,7 +3143,7 @@ Object.defineProperty(exports, '__esModule', {
   value: true
 });
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj['default'] = obj; return newObj; } }
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
 /*  weak */
 
@@ -3149,7 +3153,7 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 
 var _nudoruBrowserDOMUtilsJs = require('../../nudoru/browser/DOMUtils.js');
 
-var _domUtils = _interopRequireWildcard(_nudoruBrowserDOMUtilsJs);
+var _nudoruBrowserDOMUtilsJs2 = _interopRequireDefault(_nudoruBrowserDOMUtilsJs);
 
 var Renderer = function Renderer() {
   function render(_ref) {
@@ -3162,7 +3166,7 @@ var Renderer = function Renderer() {
         currentHTML = mountPoint.innerHTML;
 
     if (html) {
-      domEl = _domUtils.HTMLStrToNode(html);
+      domEl = _nudoruBrowserDOMUtilsJs2['default'].HTMLStrToNode(html);
       if (html !== currentHTML) {
         // TODO experiment with the jsdiff function
         mountPoint.innerHTML = '';
@@ -3192,7 +3196,7 @@ Object.defineProperty(exports, '__esModule', {
   value: true
 });
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj['default'] = obj; return newObj; } }
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
 /*  weak */
 
@@ -3203,22 +3207,22 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 
 var _nudoruCoreObjectUtilsJs = require('../../nudoru/core/ObjectUtils.js');
 
-var _objUtils = _interopRequireWildcard(_nudoruCoreObjectUtilsJs);
+var _nudoruCoreObjectUtilsJs2 = _interopRequireDefault(_nudoruCoreObjectUtilsJs);
 
 var _vendorRxjsRxLiteMinJs = require('../../vendor/rxjs/rx.lite.min.js');
 
-var Rxjs = _interopRequireWildcard(_vendorRxjsRxLiteMinJs);
+var _vendorRxjsRxLiteMinJs2 = _interopRequireDefault(_vendorRxjsRxLiteMinJs);
 
 var Router = function Router() {
 
-  var _subject = new Rxjs.Subject(),
+  var _subject = new _vendorRxjsRxLiteMinJs2['default'].Subject(),
       _hashChangeObservable = undefined;
 
   /**
    * Set event handlers
    */
   function initialize() {
-    _hashChangeObservable = Rxjs.Observable.fromEvent(window, 'hashchange').subscribe(notifySubscribers);
+    _hashChangeObservable = _vendorRxjsRxLiteMinJs2['default'].Observable.fromEvent(window, 'hashchange').subscribe(notifySubscribers);
   }
 
   /**
@@ -3286,7 +3290,7 @@ var Router = function Router() {
   function set(route, dataObj) {
     var path = route,
         data = [];
-    if (!_objUtils.isNull(dataObj)) {
+    if (!_nudoruCoreObjectUtilsJs2['default'].isNull(dataObj)) {
       path += "?";
       for (var prop in dataObj) {
         if (prop !== 'undefined' && dataObj.hasOwnProperty(prop)) {
@@ -3337,7 +3341,7 @@ Object.defineProperty(exports, '__esModule', {
   value: true
 });
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj['default'] = obj; return newObj; } }
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
 /*  weak */
 
@@ -3348,11 +3352,11 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 
 var _vendorRxjsRxLiteMinJs = require('../../vendor/rxjs/rx.lite.min.js');
 
-var Rxjs = _interopRequireWildcard(_vendorRxjsRxLiteMinJs);
+var _vendorRxjsRxLiteMinJs2 = _interopRequireDefault(_vendorRxjsRxLiteMinJs);
 
 var _nudoruUtilIsJs = require('../../nudoru/util/is.js');
 
-var is = _interopRequireWildcard(_nudoruUtilIsJs);
+var _nudoruUtilIsJs2 = _interopRequireDefault(_nudoruUtilIsJs);
 
 exports['default'] = {
   dom: function dom(selector, event) {
@@ -3361,30 +3365,30 @@ exports['default'] = {
       console.warn('nori/utils/Rx, dom, invalid DOM selector: ' + selector);
       return;
     }
-    return Rxjs.Observable.fromEvent(el, event.trim());
+    return _vendorRxjsRxLiteMinJs2['default'].Observable.fromEvent(el, event.trim());
   },
 
   from: function from(ittr) {
-    return Rxjs.Observable.from(ittr);
+    return _vendorRxjsRxLiteMinJs2['default'].Observable.from(ittr);
   },
 
   interval: function interval(ms) {
-    return Rxjs.Observable.interval(ms);
+    return _vendorRxjsRxLiteMinJs2['default'].Observable.interval(ms);
   },
 
   doEvery: function doEvery(ms) {
-    if (is.func(arguments[1])) {
+    if (_nudoruUtilIsJs2['default'].func(arguments[1])) {
       return this.interval(ms).subscribe(arguments[1]);
     }
     return this.interval(ms).take(arguments[1]).subscribe(arguments[2]);
   },
 
   just: function just(value) {
-    return Rxjs.Observable.just(value);
+    return _vendorRxjsRxLiteMinJs2['default'].Observable.just(value);
   },
 
   empty: function empty() {
-    return Rxjs.Observable.empty();
+    return _vendorRxjsRxLiteMinJs2['default'].Observable.empty();
   }
 
 };
@@ -3395,7 +3399,7 @@ Object.defineProperty(exports, '__esModule', {
   value: true
 });
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj['default'] = obj; return newObj; } }
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
 /*  weak */
 
@@ -3407,7 +3411,7 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 
 var _nudoruBrowserDOMUtilsJs = require('../../nudoru/browser/DOMUtils.js');
 
-var _DOMUtils = _interopRequireWildcard(_nudoruBrowserDOMUtilsJs);
+var _nudoruBrowserDOMUtilsJs2 = _interopRequireDefault(_nudoruBrowserDOMUtilsJs);
 
 var Templating = function Templating() {
 
@@ -3507,7 +3511,7 @@ var Templating = function Templating() {
    * @returns {*}
    */
   function asElement(id, obj) {
-    return _DOMUtils.HTMLStrToNode(asHTML(id, obj));
+    return _nudoruBrowserDOMUtilsJs2['default'].HTMLStrToNode(asHTML(id, obj));
   }
 
   /**
@@ -3572,17 +3576,17 @@ Object.defineProperty(exports, '__esModule', {
   value: true
 });
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj['default'] = obj; return newObj; } }
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
 /*  weak */
 
 var _utilsTemplatingJs = require('../utils/Templating.js');
 
-var _template = _interopRequireWildcard(_utilsTemplatingJs);
+var _utilsTemplatingJs2 = _interopRequireDefault(_utilsTemplatingJs);
 
 var _nudoruBrowserDOMUtilsJs = require('../../nudoru/browser/DOMUtils.js');
 
-var _domUtils = _interopRequireWildcard(_nudoruBrowserDOMUtilsJs);
+var _nudoruBrowserDOMUtilsJs2 = _interopRequireDefault(_nudoruBrowserDOMUtilsJs);
 
 var ApplicationView = function ApplicationView() {
 
@@ -3614,7 +3618,7 @@ var ApplicationView = function ApplicationView() {
     var bodyEl = document.querySelector('body');
 
     templates.forEach(function (templ) {
-      bodyEl.appendChild(_domUtils.HTMLStrToNode(_template.getSource(templ, {})));
+      bodyEl.appendChild(_nudoruBrowserDOMUtilsJs2['default'].HTMLStrToNode(_utilsTemplatingJs2['default'].getSource(templ, {})));
     });
   }
 
@@ -3647,7 +3651,7 @@ Object.defineProperty(exports, '__esModule', {
   value: true
 });
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj['default'] = obj; return newObj; } }
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
 /*  weak */
 
@@ -3657,19 +3661,19 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 
 var _ViewComponentJs = require('./ViewComponent.js');
 
-var _componentViewFactory = _interopRequireWildcard(_ViewComponentJs);
+var _ViewComponentJs2 = _interopRequireDefault(_ViewComponentJs);
 
 var _MixinEventDelegatorJs = require('./MixinEventDelegator.js');
 
-var _eventDelegatorFactory = _interopRequireWildcard(_MixinEventDelegatorJs);
+var _MixinEventDelegatorJs2 = _interopRequireDefault(_MixinEventDelegatorJs);
 
 var _utilsMixinObservableSubjectJs = require('../utils/MixinObservableSubject.js');
 
-var _observableFactory = _interopRequireWildcard(_utilsMixinObservableSubjectJs);
+var _utilsMixinObservableSubjectJs2 = _interopRequireDefault(_utilsMixinObservableSubjectJs);
 
 var _storeSimpleStoreJs = require('../store/SimpleStore.js');
 
-var _stateObjFactory = _interopRequireWildcard(_storeSimpleStoreJs);
+var _storeSimpleStoreJs2 = _interopRequireDefault(_storeSimpleStoreJs);
 
 var MixinComponentViews = function MixinComponentViews() {
 
@@ -3704,7 +3708,7 @@ var MixinComponentViews = function MixinComponentViews() {
           finalComponent = undefined,
           previousInitialize = undefined;
 
-      componentAssembly = [_componentViewFactory['default'](), _eventDelegatorFactory['default'](), _observableFactory['default'](), _stateObjFactory['default'](), componentSource];
+      componentAssembly = [(0, _ViewComponentJs2['default'])(), (0, _MixinEventDelegatorJs2['default'])(), (0, _utilsMixinObservableSubjectJs2['default'])(), (0, _storeSimpleStoreJs2['default'])(), componentSource];
 
       if (componentSource.mixins) {
         componentAssembly = componentAssembly.concat(componentSource.mixins);
@@ -3785,11 +3789,11 @@ Object.defineProperty(exports, '__esModule', {
   value: true
 });
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj['default'] = obj; return newObj; } }
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
 var _nudoruUtilIsJs = require('../../nudoru/util/is.js');
 
-var is = _interopRequireWildcard(_nudoruUtilIsJs);
+var _nudoruUtilIsJs2 = _interopRequireDefault(_nudoruUtilIsJs);
 
 var MixinDOMManipulation = function MixinDOMManipulation() {
 
@@ -3807,7 +3811,7 @@ var MixinDOMManipulation = function MixinDOMManipulation() {
   function getElement(selector) {
     var el = undefined;
 
-    if (is.string(selector)) {
+    if (_nudoruUtilIsJs2['default'].string(selector)) {
       el = document.querySelector(selector);
     } else {
       el = selector;
@@ -3910,7 +3914,7 @@ Object.defineProperty(exports, '__esModule', {
   value: true
 });
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj['default'] = obj; return newObj; } }
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
 /*  weak */
 
@@ -3931,15 +3935,15 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 
 var _utilsRxJs = require('../utils/Rx.js');
 
-var _rx = _interopRequireWildcard(_utilsRxJs);
+var _utilsRxJs2 = _interopRequireDefault(_utilsRxJs);
 
 var _nudoruBrowserBrowserInfoJs = require('../../nudoru/browser/BrowserInfo.js');
 
-var _browserInfo = _interopRequireWildcard(_nudoruBrowserBrowserInfoJs);
+var _nudoruBrowserBrowserInfoJs2 = _interopRequireDefault(_nudoruBrowserBrowserInfoJs);
 
 var _nudoruUtilIsJs = require('../../nudoru/util/is.js');
 
-var is = _interopRequireWildcard(_nudoruUtilIsJs);
+var _nudoruUtilIsJs2 = _interopRequireDefault(_nudoruUtilIsJs);
 
 var MixinEventDelegator = function MixinEventDelegator() {
 
@@ -3973,7 +3977,7 @@ var MixinEventDelegator = function MixinEventDelegator() {
           var mappings = evtStrings.split(','),
               eventHandler = _eventsMap[evtStrings];
 
-          if (!is.func(eventHandler)) {
+          if (!_nudoruUtilIsJs2['default'].func(eventHandler)) {
             console.warn('EventDelegator, handler for ' + evtStrings + ' is not a function');
             return {
               v: undefined
@@ -3988,7 +3992,7 @@ var MixinEventDelegator = function MixinEventDelegator() {
             var eventStr = evtMap.split(' ')[0].trim(),
                 selector = evtMap.split(' ')[1].trim();
 
-            if (_browserInfo.mobile.any()) {
+            if (_nudoruBrowserBrowserInfoJs2['default'].mobile.any()) {
               eventStr = convertMouseToTouchEventStr(eventStr);
             }
 
@@ -4023,7 +4027,7 @@ var MixinEventDelegator = function MixinEventDelegator() {
   }
 
   function createHandler(selector, eventStr, eventHandler, autoForm) {
-    var observable = _rx.dom(selector, eventStr),
+    var observable = _utilsRxJs2['default'].dom(selector, eventStr),
         el = document.querySelector(selector),
         tag = undefined,
         type = undefined;
@@ -4103,51 +4107,51 @@ Object.defineProperty(exports, '__esModule', {
   value: true
 });
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj['default'] = obj; return newObj; } }
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
 /*  weak */
 
 var _nudoruComponentsToastViewJs = require('../../nudoru/components/ToastView.js');
 
-var _notificationView = _interopRequireWildcard(_nudoruComponentsToastViewJs);
+var _nudoruComponentsToastViewJs2 = _interopRequireDefault(_nudoruComponentsToastViewJs);
 
 var _nudoruComponentsToolTipViewJs = require('../../nudoru/components/ToolTipView.js');
 
-var _toolTipView = _interopRequireWildcard(_nudoruComponentsToolTipViewJs);
+var _nudoruComponentsToolTipViewJs2 = _interopRequireDefault(_nudoruComponentsToolTipViewJs);
 
 var _nudoruComponentsMessageBoxViewJs = require('../../nudoru/components/MessageBoxView.js');
 
-var _messageBoxView = _interopRequireWildcard(_nudoruComponentsMessageBoxViewJs);
+var _nudoruComponentsMessageBoxViewJs2 = _interopRequireDefault(_nudoruComponentsMessageBoxViewJs);
 
 var _nudoruComponentsMessageBoxCreatorJs = require('../../nudoru/components/MessageBoxCreator.js');
 
-var _messageBoxCreator = _interopRequireWildcard(_nudoruComponentsMessageBoxCreatorJs);
+var _nudoruComponentsMessageBoxCreatorJs2 = _interopRequireDefault(_nudoruComponentsMessageBoxCreatorJs);
 
 var _nudoruComponentsModalCoverViewJs = require('../../nudoru/components/ModalCoverView.js');
 
-var _modalCoverView = _interopRequireWildcard(_nudoruComponentsModalCoverViewJs);
+var _nudoruComponentsModalCoverViewJs2 = _interopRequireDefault(_nudoruComponentsModalCoverViewJs);
 
 var MixinNudoruControls = function MixinNudoruControls() {
 
   var _alerts = [];
 
   function initializeNudoruControls() {
-    _toolTipView.initialize('tooltip__container');
-    _notificationView.initialize('toast__container');
-    _messageBoxView.initialize('messagebox__container');
-    _modalCoverView.initialize();
+    _nudoruComponentsToolTipViewJs2['default'].initialize('tooltip__container');
+    _nudoruComponentsToastViewJs2['default'].initialize('toast__container');
+    _nudoruComponentsMessageBoxViewJs2['default'].initialize('messagebox__container');
+    _nudoruComponentsModalCoverViewJs2['default'].initialize();
   }
 
   function mbCreator() {
-    return _messageBoxCreator;
+    return _nudoruComponentsMessageBoxCreatorJs2['default'];
   }
 
   function addMessageBox(obj) {
-    return _messageBoxView.add(obj);
+    return _nudoruComponentsMessageBoxViewJs2['default'].add(obj);
   }
 
   function removeMessageBox(id) {
-    _messageBoxView.remove(id);
+    _nudoruComponentsMessageBoxViewJs2['default'].remove(id);
   }
 
   function alert(message) {
@@ -4163,7 +4167,7 @@ var MixinNudoruControls = function MixinNudoruControls() {
   }
 
   function customAlert(message, title, type) {
-    return _messageBoxView.add({
+    return _nudoruComponentsMessageBoxViewJs2['default'].add({
       title: title,
       content: '<p>' + message + '</p>',
       type: type,
@@ -4187,13 +4191,13 @@ var MixinNudoruControls = function MixinNudoruControls() {
   }
 
   function addNotification(obj) {
-    return _notificationView.add(obj);
+    return _nudoruComponentsToastViewJs2['default'].add(obj);
   }
 
   function notify(message, title, type) {
     return addNotification({
       title: title || '',
-      type: type || _notificationView.type().DEFAULT,
+      type: type || _nudoruComponentsToastViewJs2['default'].type().DEFAULT,
       message: message
     });
   }
@@ -4340,7 +4344,7 @@ Object.defineProperty(exports, '__esModule', {
   value: true
 });
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj['default'] = obj; return newObj; } }
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
 /*  weak */
 
@@ -4351,15 +4355,15 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 
 var _utilsTemplatingJs = require('../utils/Templating.js');
 
-var _template = _interopRequireWildcard(_utilsTemplatingJs);
+var _utilsTemplatingJs2 = _interopRequireDefault(_utilsTemplatingJs);
 
 var _utilsRendererJs = require('../utils/Renderer.js');
 
-var _renderer = _interopRequireWildcard(_utilsRendererJs);
+var _utilsRendererJs2 = _interopRequireDefault(_utilsRendererJs);
 
 var _nudoruUtilIsJs = require('../../nudoru/util/is.js');
 
-var is = _interopRequireWildcard(_nudoruUtilIsJs);
+var _nudoruUtilIsJs2 = _interopRequireDefault(_nudoruUtilIsJs);
 
 var ViewComponent = function ViewComponent() {
 
@@ -4410,7 +4414,7 @@ var ViewComponent = function ViewComponent() {
    * @param mapObj Object to subscribe to or ID. Should implement nori/store/MixinObservableStore
    */
   function bindMap(mapObj) {
-    if (!is.func(mapObj.subscribe)) {
+    if (!_nudoruUtilIsJs2['default'].func(mapObj.subscribe)) {
       console.warn('ViewComponent bindMap, must be observable: ' + mapObj);
       return;
     }
@@ -4479,7 +4483,7 @@ var ViewComponent = function ViewComponent() {
    */
   function template(state) {
     // assumes the template ID matches the component's ID as passed on initialize
-    var html = _template.getSource(this.getID());
+    var html = _utilsTemplatingJs2['default'].getSource(this.getID());
     return _.template(html);
   }
 
@@ -4504,7 +4508,7 @@ var ViewComponent = function ViewComponent() {
 
     _isMounted = true;
 
-    _DOMElement = _renderer.render({
+    _DOMElement = _utilsRendererJs2['default'].render({
       target: _mountPoint,
       html: _html
     });
@@ -4577,7 +4581,7 @@ var ViewComponent = function ViewComponent() {
       this.undelegateEvents();
     }
 
-    _renderer.render({
+    _utilsRendererJs2['default'].render({
       target: _mountPoint,
       html: ''
     });

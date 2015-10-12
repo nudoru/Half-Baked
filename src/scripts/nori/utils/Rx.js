@@ -5,8 +5,8 @@
  * @type {{dom: Function, from: Function, interval: Function, doEvery: Function, just: Function, empty: Function}}
  */
 
-import * as Rxjs from '../../vendor/rxjs/rx.lite.min.js';
-import * as is from '../../nudoru/util/is.js';
+import Rxjs from '../../vendor/rxjs/rx.lite.min.js';
+import is from '../../nudoru/util/is.js';
 
 export default {
   dom: function (selector, event) {

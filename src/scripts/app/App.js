@@ -1,12 +1,12 @@
-import * as _rx from '../nori/utils/Rx.js';
-import * as _appActions from './action/ActionCreator.js';
-import * as _appActionConstants from './action/ActionConstants.js';
-import * as _noriActions from '../nori/action/ActionCreator.js';
-import * as _socketIOEvents from '../nori/service/SocketIOEvents.js';
+import _rx from '../nori/utils/Rx.js';
+import _appActions from './action/ActionCreator.js';
+import _appActionConstants from './action/ActionConstants.js';
+import _noriActions from '../nori/action/ActionCreator.js';
+import _socketIOEvents from '../nori/service/SocketIOEvents.js';
 
-import * as _appStore from './store/AppStore.js';
-import * as _appView from './view/AppView.js';
-import * as _Socket from '../nori/service/SocketIO.js';
+import _appStore from './store/AppStore.js';
+import _appView from './view/AppView.js';
+import _Socket from '../nori/service/SocketIO.js';
 
 /**
  * "Controller" for a Nori application. The controller is responsible for

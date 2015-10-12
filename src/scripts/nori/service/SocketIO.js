@@ -1,7 +1,7 @@
 /* @flow weak */
 
-import * as _events from './SocketIOEvents.js';
-import * as Rxjs from '../../vendor/rxjs/rx.lite.min.js';
+import _events from './SocketIOEvents.js';
+import Rxjs from '../../vendor/rxjs/rx.lite.min.js';
 
 let SocketIOConnector = function () {
 

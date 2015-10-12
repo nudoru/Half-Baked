@@ -1,10 +1,10 @@
-import * as _noriActions from '../../nori/action/ActionCreator';
-import * as _appView from './AppView';
-import * as _appStore from '../store/AppStore';
-import * as _template from '../../nori/utils/Templating.js';
-import * as _mixinDOMManipulation from '../../nori/view/MixinDOMManipulation.js';
-import * as _domUtils from '../../nudoru/browser/DOMUtils.js';
-import * as _rx from '../../nori/utils/Rx.js';
+import _noriActions from '../../nori/action/ActionCreator';
+import _appView from './AppView';
+import _appStore from '../store/AppStore';
+import _template from '../../nori/utils/Templating.js';
+import _mixinDOMManipulation from '../../nori/view/MixinDOMManipulation.js';
+import _domUtils from '../../nudoru/browser/DOMUtils.js';
+import _rx from '../../nori/utils/Rx.js';
 
 let _difficultyImages = ['pastry_cookie01.png', 'pastry_poptart01.png', 'pastry_donut.png', 'pastry_pie.png', 'pastry_cupcake.png'],
     _gamePlayStates   = ['CHOOSE', 'ANSWERING', 'WAITING'],

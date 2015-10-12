@@ -5,8 +5,8 @@
  * Supporting IE9 so using hashes instead of the history API for now
  */
 
-import * as _objUtils from '../../nudoru/core/ObjectUtils.js';
-import * as Rxjs from '../../vendor/rxjs/rx.lite.min.js';
+import _objUtils from '../../nudoru/core/ObjectUtils.js';
+import Rxjs from '../../vendor/rxjs/rx.lite.min.js';
 
 let Router = function () {
 

@@ -1,5 +1,5 @@
-import * as _actionConstants from './ActionConstants.js';
-import * as _appStore from '../store/AppStore.js';
+import _actionConstants from './ActionConstants.js';
+import AppStore from '../store/AppStore.js';
 
 /**
  * Purely for convenience, an Event ("action") Creator ala Flux spec. Follow
@@ -73,7 +73,7 @@ var ActionCreator = {
   },
 
   answeredCorrect: function (points) {
-    var state  = _appStore.getState(),
+    var state  = AppStore.getState(),
         health = state.localPlayer.health,
         score  = state.localPlayer.score + points;
 
@@ -91,7 +91,7 @@ var ActionCreator = {
   },
 
   answeredIncorrect: function (points) {
-    var state  = _appStore.getState(),
+    var state  = AppStore.getState(),
         health = state.localPlayer.health - points,
         score  = state.localPlayer.score;
 
@@ -118,7 +118,7 @@ var ActionCreator = {
   },
 
   applyRisk: function (risk) {
-    var state  = _appStore.getState(),
+    var state  = AppStore.getState(),
         health = state.localPlayer.health - risk,
         score  = state.localPlayer.score;
 
@@ -140,12 +140,12 @@ var ActionCreator = {
       type   : _actionConstants.RESET_GAME,
       payload: {
         data: {
-          currentState: _appStore.getState().gameStates[1],
+          currentState: AppStore.getState().gameStates[1],
           //session     : {
           //  roomID: ''
           //},
-          localPlayer : _appStore.createPlayerResetObject(),
-          remotePlayer: _appStore.createPlayerResetObject()
+          localPlayer : AppStore.createPlayerResetObject(),
+          remotePlayer: AppStore.createPlayerResetObject()
         }
       }
     };

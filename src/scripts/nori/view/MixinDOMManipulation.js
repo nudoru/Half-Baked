@@ -1,4 +1,4 @@
-import * as is from '../../nudoru/util/is.js';
+import is from '../../nudoru/util/is.js';
 
 let MixinDOMManipulation = function () {
 

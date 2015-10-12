@@ -1,9 +1,9 @@
-import * as _noriActions from '../../nori/action/ActionCreator';
-import * as _app from '../App';
-import * as _appView from './AppView';
-import * as _appStore from '../store/AppStore';
-import * as _template from '../../nori/utils/Templating.js';
-import * as _appActions from '../action/ActionCreator.js';
+import _noriActions from '../../nori/action/ActionCreator';
+import _app from '../App';
+import _appView from './AppView';
+import _appStore from '../store/AppStore';
+import _template from '../../nori/utils/Templating.js';
+import _appActions from '../action/ActionCreator.js';
 
 let _roomNumberLength = 4;
 
@@ -78,16 +78,16 @@ var Component = Nori.view().createComponentView({
 
   onCreateRoom() {
     if (this.validateUserDetailsInput()) {
-      _app.default.createRoom();
+      _app.createRoom();
     }
   },
 
   onJoinRoom() {
     var roomID = document.querySelector('#select__roomid').value;
     if (this.validateRoomID(roomID)) {
-      _app.default.joinRoom(roomID);
+      _app.joinRoom(roomID);
     } else {
-      _appView.default.alert('The room ID is not correct. Does it contain letters or is less than '+_roomNumberLength+' digits?', 'Bad Room ID');
+      _appView.alert('The room ID is not correct. Does it contain letters or is less than '+_roomNumberLength+' digits?', 'Bad Room ID');
     }
   },
 
@@ -96,7 +96,7 @@ var Component = Nori.view().createComponentView({
         appearance = document.querySelector('#select__playertype').value;
 
     if (!name.length || !appearance) {
-      _appView.default.alert('Make sure you\'ve typed a name for yourself and selected an appearance');
+      _appView.alert('Make sure you\'ve typed a name for yourself and selected an appearance');
       return false;
     }
     return true;
