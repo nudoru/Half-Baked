@@ -1,11 +1,22 @@
 import _actionConstants from './ActionConstants.js';
-import AppStore from '../store/AppStore.js';
+import _appStore from '../store/AppStore.js';
 
 /**
  * Purely for convenience, an Event ("action") Creator ala Flux spec. Follow
  * guidelines for creating actions: https://github.com/acdlite/flux-standard-action
  */
 var ActionCreator = {
+
+  setQuestionBank(data) {
+    return {
+      type   : _actionConstants.SET_QUESTION_BANK,
+      payload: {
+        data: {
+          questionBank: data
+        }
+      }
+    };
+  },
 
   setLocalPlayerProps(data) {
     return {
@@ -73,7 +84,7 @@ var ActionCreator = {
   },
 
   answeredCorrect: function (points) {
-    var state  = AppStore.getState(),
+    var state  = _appStore.getState(),
         health = state.localPlayer.health,
         score  = state.localPlayer.score + points;
 
@@ -91,7 +102,7 @@ var ActionCreator = {
   },
 
   answeredIncorrect: function (points) {
-    var state  = AppStore.getState(),
+    var state  = _appStore.getState(),
         health = state.localPlayer.health - points,
         score  = state.localPlayer.score;
 
@@ -118,7 +129,7 @@ var ActionCreator = {
   },
 
   applyRisk: function (risk) {
-    var state  = AppStore.getState(),
+    var state  = _appStore.getState(),
         health = state.localPlayer.health - risk,
         score  = state.localPlayer.score;
 
@@ -140,12 +151,12 @@ var ActionCreator = {
       type   : _actionConstants.RESET_GAME,
       payload: {
         data: {
-          currentState: AppStore.getState().gameStates[1],
+          currentState: _appStore.getState().gameStates[1],
           //session     : {
           //  roomID: ''
           //},
-          localPlayer : AppStore.createPlayerResetObject(),
-          remotePlayer: AppStore.createPlayerResetObject()
+          localPlayer : _appStore.createPlayerResetObject(),
+          remotePlayer: _appStore.createPlayerResetObject()
         }
       }
     };

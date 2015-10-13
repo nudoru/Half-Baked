@@ -1,4 +1,4 @@
-import AppStore from '../store/AppStore.js';
+import _appStore from '../store/AppStore.js';
 import _mixinApplicationView from '../../nori/view/ApplicationView.js';
 import _mixinNudoruControls from '../../nori/view/MixinNudoruControls.js';
 import _mixinStoreStateViews from '../../nori/view/MixinStoreStateViews.js';
@@ -35,7 +35,7 @@ let AppViewModule = Nori.createView({
     console.log('appview, images preloaded OK');
 
     this.initializeApplicationView(['applicationscaffold', 'applicationcomponentsscaffold']);
-    this.initializeStateViews(AppStore);
+    this.initializeStateViews(_appStore);
     this.initializeNudoruControls();
 
     this.configureViews();
@@ -47,7 +47,7 @@ let AppViewModule = Nori.createView({
 
   configureViews() {
     // TODO need to init this aspect of the store before here
-    var gameStates = ['TITLE', 'PLAYER_SELECT', 'WAITING_ON_PLAYER', 'MAIN_GAME', 'GAME_OVER']; //AppStore.getState().gameStates;
+    var gameStates = ['TITLE', 'PLAYER_SELECT', 'WAITING_ON_PLAYER', 'MAIN_GAME', 'GAME_OVER']; //_appStore.getState().gameStates;
 
     this.setViewMountPoint('#contents');
 
@@ -61,7 +61,7 @@ let AppViewModule = Nori.createView({
 
   handleViewChange() {
     this.closeAllAlerts();
-  },
+  }
 
 });
 

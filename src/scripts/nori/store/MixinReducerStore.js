@@ -62,7 +62,7 @@ let MixinReducerStore = function () {
     }
 
     _this  = this;
-    //_state = _stateObjFactory(); //require('./ImmutableMap.js')();
+    //_state = _stateObjFactory();
     _state = _immutableMapFactory();
 
     if (!_stateReducers) {
@@ -106,7 +106,6 @@ let MixinReducerStore = function () {
   /**
    * Template reducer function
    * Store state isn't modified, current state is passed in and mutated state returned
-
    function templateReducerFunction(state, event) {
         state = state || {};
         switch (event.type) {
@@ -115,6 +114,7 @@ let MixinReducerStore = function () {
             // return _.merge({}, state, otherStateTransformer(state));
             return _.merge({}, state, {prop: event.payload.value});
           case undefined:
+            return state;
           default:
             console.warn('Reducer store, unhandled event type: '+event.type);
             return state;

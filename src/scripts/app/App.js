@@ -1,12 +1,17 @@
 import _rx from '../nori/utils/Rx.js';
+import _rest from '../nori/service/Rest.js';
+import _Socket from '../nori/service/SocketIO.js';
 import _appActions from './action/ActionCreator.js';
 import _appActionConstants from './action/ActionConstants.js';
 import _noriActions from '../nori/action/ActionCreator.js';
 import _socketIOEvents from '../nori/service/SocketIOEvents.js';
-
+import _stringUtils from '../nudoru/core/StringUtils.js';
+import _numUtils from '../nudoru/core/NumberUtils.js';
 import _appStore from './store/AppStore.js';
 import _appView from './view/AppView.js';
-import _Socket from '../nori/service/SocketIO.js';
+
+const _restNumQuestions     = 300,
+      _restQuestionCategory = 117;
 
 /**
  * "Controller" for a Nori application. The controller is responsible for
@@ -28,21 +33,16 @@ let App = Nori.createApplication({
    * Intialize the appilcation, view and store
    */
     initialize() {
-    console.log('ap, initialize');
     this.socket.initialize();
     this.socket.subscribe(this.handleSocketMessage.bind(this));
 
     this.view.initialize();
-    this.view.subscribe('viewInitialized', this.onViewInitialized.bind(this));
-
-    this.store.initialize(); // store will acquire data dispatch event when complete
-    this.store.subscribe('storeInitialized', this.onStoreInitialized.bind(this));
-    this.store.loadStore();
+    this.store.initialize();
+    this.store.subscribe(this.reactToStoreMutation.bind(this));
+    this.fetchQuestions(); // will call runapp on load
   },
 
-  onViewInitialized() {
-    console.log('app, onview initialized');
-  },
+  onViewInitialized() {},
 
   /**
    * After the store data is ready
@@ -59,10 +59,53 @@ let App = Nori.createApplication({
     runApplication() {
     this.view.removeLoadingMessage();
 
-    // View will show based on the current store state
-    //this.store.setState({currentState: 'MAIN_GAME'});
-    this.store.setState({currentState: 'PLAYER_SELECT'});
-    //this.store.setState({currentState: 'TITLE'});
+    //'TITLE' 'PLAYER_SELECT' 'MAIN_GAME'
+    this.store.apply(_noriActions.changeStoreState({currentState: 'PLAYER_SELECT'}));
+  },
+
+  //----------------------------------------------------------------------------
+  // Load questions from REST
+  //----------------------------------------------------------------------------
+
+  /**
+   * Set or load any necessary data and then broadcast a initialized event.
+   */
+  /*
+   SCI/TECh 24,
+   63 General knowledge,
+   59 general sci,
+   98 banking and bus,
+   117 world history,
+   158 puzzle, contains HTML encoded
+   166 comp intro
+   */
+    fetchQuestions() {
+    //https://market.mashape.com/pareshchouhan/trivia
+    var getQuestions = _rest.request({
+      method : 'GET',
+      //url    : 'https://pareshchouhan-trivia-v1.p.mashape.com/v1/getAllQuizQuestions?limit=' + _restNumQuestions + '&page=1',
+      url    : 'https://pareshchouhan-trivia-v1.p.mashape.com/v1/getQuizQuestionsByCategory?categoryId=' + _restQuestionCategory + '&limit=' + _restNumQuestions + '&page=1',
+      headers: [{'X-Mashape-Key': 'tPxKgDvrkqmshg8zW4olS87hzF7Ap1vi63rjsnUuVw1sBHV9KJ'}],
+      json   : true
+    }).subscribe(this.onQuestionsSuccess.bind(this), this.onQuestionError);
+  },
+
+  onQuestionsSuccess(data) {
+    console.log('Questions fetched');
+
+    let questions      = data.map(q => {
+      q.q_text             = _stringUtils.stripTags(_stringUtils.unescapeHTML(q.q_text));
+      q.q_difficulty_level = _numUtils.rndNumber(1, 5);
+      q.used               = false;
+      return q;
+    }), questionBank = _appActions.setQuestionBank(questions);
+
+    this.store.apply(questionBank);
+    this.runApplication();
+  },
+
+  onQuestionError(data) {
+    throw new Error('Error fetching questions', data);
   },
 
   //----------------------------------------------------------------------------

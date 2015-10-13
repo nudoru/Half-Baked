@@ -101,6 +101,14 @@ var _noriUtilsRxJs = require('../nori/utils/Rx.js');
 
 var _noriUtilsRxJs2 = _interopRequireDefault(_noriUtilsRxJs);
 
+var _noriServiceRestJs = require('../nori/service/Rest.js');
+
+var _noriServiceRestJs2 = _interopRequireDefault(_noriServiceRestJs);
+
+var _noriServiceSocketIOJs = require('../nori/service/SocketIO.js');
+
+var _noriServiceSocketIOJs2 = _interopRequireDefault(_noriServiceSocketIOJs);
+
 var _actionActionCreatorJs = require('./action/ActionCreator.js');
 
 var _actionActionCreatorJs2 = _interopRequireDefault(_actionActionCreatorJs);
@@ -117,6 +125,14 @@ var _noriServiceSocketIOEventsJs = require('../nori/service/SocketIOEvents.js');
 
 var _noriServiceSocketIOEventsJs2 = _interopRequireDefault(_noriServiceSocketIOEventsJs);
 
+var _nudoruCoreStringUtilsJs = require('../nudoru/core/StringUtils.js');
+
+var _nudoruCoreStringUtilsJs2 = _interopRequireDefault(_nudoruCoreStringUtilsJs);
+
+var _nudoruCoreNumberUtilsJs = require('../nudoru/core/NumberUtils.js');
+
+var _nudoruCoreNumberUtilsJs2 = _interopRequireDefault(_nudoruCoreNumberUtilsJs);
+
 var _storeAppStoreJs = require('./store/AppStore.js');
 
 var _storeAppStoreJs2 = _interopRequireDefault(_storeAppStoreJs);
@@ -125,9 +141,8 @@ var _viewAppViewJs = require('./view/AppView.js');
 
 var _viewAppViewJs2 = _interopRequireDefault(_viewAppViewJs);
 
-var _noriServiceSocketIOJs = require('../nori/service/SocketIO.js');
-
-var _noriServiceSocketIOJs2 = _interopRequireDefault(_noriServiceSocketIOJs);
+var _restNumQuestions = 300,
+    _restQuestionCategory = 117;
 
 /**
  * "Controller" for a Nori application. The controller is responsible for
@@ -149,21 +164,16 @@ var App = Nori.createApplication({
    * Intialize the appilcation, view and store
    */
   initialize: function initialize() {
-    console.log('ap, initialize');
     this.socket.initialize();
     this.socket.subscribe(this.handleSocketMessage.bind(this));
 
     this.view.initialize();
-    this.view.subscribe('viewInitialized', this.onViewInitialized.bind(this));
-
-    this.store.initialize(); // store will acquire data dispatch event when complete
-    this.store.subscribe('storeInitialized', this.onStoreInitialized.bind(this));
-    this.store.loadStore();
+    this.store.initialize();
+    this.store.subscribe(this.reactToStoreMutation.bind(this));
+    this.fetchQuestions(); // will call runapp on load
   },
 
-  onViewInitialized: function onViewInitialized() {
-    console.log('app, onview initialized');
-  },
+  onViewInitialized: function onViewInitialized() {},
 
   /**
    * After the store data is ready
@@ -180,10 +190,54 @@ var App = Nori.createApplication({
   runApplication: function runApplication() {
     this.view.removeLoadingMessage();
 
-    // View will show based on the current store state
-    //this.store.setState({currentState: 'MAIN_GAME'});
-    this.store.setState({ currentState: 'PLAYER_SELECT' });
-    //this.store.setState({currentState: 'TITLE'});
+    //'TITLE' 'PLAYER_SELECT' 'MAIN_GAME'
+    this.store.apply(_noriActionActionCreatorJs2['default'].changeStoreState({ currentState: 'PLAYER_SELECT' }));
+  },
+
+  //----------------------------------------------------------------------------
+  // Load questions from REST
+  //----------------------------------------------------------------------------
+
+  /**
+   * Set or load any necessary data and then broadcast a initialized event.
+   */
+  /*
+   SCI/TECh 24,
+   63 General knowledge,
+   59 general sci,
+   98 banking and bus,
+   117 world history,
+   158 puzzle, contains HTML encoded
+   166 comp intro
+   */
+  fetchQuestions: function fetchQuestions() {
+    //https://market.mashape.com/pareshchouhan/trivia
+    var getQuestions = _noriServiceRestJs2['default'].request({
+      method: 'GET',
+      //url    : 'https://pareshchouhan-trivia-v1.p.mashape.com/v1/getAllQuizQuestions?limit=' + _restNumQuestions + '&page=1',
+      url: 'https://pareshchouhan-trivia-v1.p.mashape.com/v1/getQuizQuestionsByCategory?categoryId=' + _restQuestionCategory + '&limit=' + _restNumQuestions + '&page=1',
+      headers: [{ 'X-Mashape-Key': 'tPxKgDvrkqmshg8zW4olS87hzF7Ap1vi63rjsnUuVw1sBHV9KJ' }],
+      json: true
+    }).subscribe(this.onQuestionsSuccess.bind(this), this.onQuestionError);
+  },
+
+  onQuestionsSuccess: function onQuestionsSuccess(data) {
+    console.log('Questions fetched');
+
+    var questions = data.map(function (q) {
+      q.q_text = _nudoruCoreStringUtilsJs2['default'].stripTags(_nudoruCoreStringUtilsJs2['default'].unescapeHTML(q.q_text));
+      q.q_difficulty_level = _nudoruCoreNumberUtilsJs2['default'].rndNumber(1, 5);
+      q.used = false;
+      return q;
+    }),
+        questionBank = _actionActionCreatorJs2['default'].setQuestionBank(questions);
+
+    this.store.apply(questionBank);
+    this.runApplication();
+  },
+
+  onQuestionError: function onQuestionError(data) {
+    throw new Error('Error fetching questions', data);
   },
 
   //----------------------------------------------------------------------------
@@ -433,12 +487,13 @@ var App = Nori.createApplication({
 exports['default'] = App;
 module.exports = exports['default'];
 
-},{"../nori/action/ActionCreator.js":17,"../nori/service/SocketIO.js":19,"../nori/service/SocketIOEvents.js":20,"../nori/utils/Rx.js":28,"./action/ActionConstants.js":3,"./action/ActionCreator.js":4,"./store/AppStore.js":5,"./view/AppView.js":6}],3:[function(require,module,exports){
+},{"../nori/action/ActionCreator.js":17,"../nori/service/Rest.js":18,"../nori/service/SocketIO.js":19,"../nori/service/SocketIOEvents.js":20,"../nori/utils/Rx.js":28,"../nudoru/core/NumberUtils.js":46,"../nudoru/core/StringUtils.js":48,"./action/ActionConstants.js":3,"./action/ActionCreator.js":4,"./store/AppStore.js":5,"./view/AppView.js":6}],3:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
 exports['default'] = {
   LOCAL_PLAYER_CONNECT: 'LOCAL_PLAYER_CONNECT',
+  SET_QUESTION_BANK: 'SET_QUESTION_BANK',
   SET_SESSION_PROPS: 'SET_SESSION_PROPS',
   SET_LOCAL_PLAYER_PROPS: 'SET_LOCAL_PLAYER_PROPS',
   SET_LOCAL_PLAYER_NAME: 'SET_LOCAL_PLAYER_NAME',
@@ -475,6 +530,17 @@ var _storeAppStoreJs2 = _interopRequireDefault(_storeAppStoreJs);
  * guidelines for creating actions: https://github.com/acdlite/flux-standard-action
  */
 var ActionCreator = {
+
+  setQuestionBank: function setQuestionBank(data) {
+    return {
+      type: _ActionConstantsJs2['default'].SET_QUESTION_BANK,
+      payload: {
+        data: {
+          questionBank: data
+        }
+      }
+    };
+  },
 
   setLocalPlayerProps: function setLocalPlayerProps(data) {
     return {
@@ -632,9 +698,7 @@ Object.defineProperty(exports, '__esModule', {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-var _noriServiceRestJs = require('../../nori/service/Rest.js');
-
-var _noriServiceRestJs2 = _interopRequireDefault(_noriServiceRestJs);
+//import _rest from '../../nori/service/Rest.js';
 
 var _noriActionActionConstantsJs = require('../../nori/action/ActionConstants.js');
 
@@ -656,20 +720,8 @@ var _nudoruCoreArrayUtilsJs = require('../../nudoru/core/ArrayUtils.js');
 
 var _nudoruCoreArrayUtilsJs2 = _interopRequireDefault(_nudoruCoreArrayUtilsJs);
 
-var _restNumQuestions = 300,
-    _restQuestionCategory = 117,
-    _mockAppearence = ['Biege', 'Blue', 'Green', 'Pink', 'Yellow'],
+var _mockAppearence = ['Biege', 'Blue', 'Green', 'Pink', 'Yellow'],
     _mockNames = ['Bagel', 'Loaf', 'Bready', 'Twist', 'Cupcake', 'Cake', 'Batter', 'Cookie', 'Donut', 'Bun', 'Biscuit', 'Flakey', 'Gluten', 'Croissant', 'Dough', 'Knead', 'Sugar', 'Flour', 'Butter', 'Yeast', 'Icing', 'Frost', 'Eggy', 'Fondant', 'Mix', 'Fluffy', 'Whip', 'Chip', 'Honey', 'Eclaire'];
-
-/*
- SCI/TECh 24,
- 63 General knowledge,
- 59 general sci,
- 98 banking and bus,
- 117 world history,
- 158 puzzle, contains HTML encoded
- 166 comp intro
- */
 
 /**
  * This application store contains "reducer store" functionality based on Redux.
@@ -686,11 +738,10 @@ var AppStoreModule = Nori.createStore({
   mixins: [],
 
   initialize: function initialize() {
-    this.addReducer(this.mainStateReducer.bind(this));
-    this.initializeReducerStore();
-    this.setState(Nori.config());
+    this.setReducers([this.gameStateReducer.bind(this), this.playerResponseStateReducer.bind(this), this.opponentResponseStateReducer.bind(this)]);
 
-    this.createSubject('storeInitialized');
+    this.initializeReducerStore();
+    this.setState(this.initialState());
   },
 
   initialState: function initialState() {
@@ -706,58 +757,10 @@ var AppStoreModule = Nori.createStore({
         socketIOID: '',
         roomID: '0000'
       },
-      localPlayer: _.merge(this.createBlankPlayerObject(), this.createPlayerResetObject()),
-      remotePlayer: _.merge(this.createBlankPlayerObject(), this.createPlayerResetObject()),
+      localPlayer: _.assign(this.createBlankPlayerObject(), this.createPlayerResetObject()),
+      remotePlayer: _.assign(this.createBlankPlayerObject(), this.createPlayerResetObject()),
       questionBank: []
     };
-  },
-
-  /**
-   * Set or load any necessary data and then broadcast a initialized event.
-   */
-  loadStore: function loadStore() {
-    console.log('appstore, loading');
-
-    this.setState(this.initialState());
-
-    //https://market.mashape.com/pareshchouhan/trivia
-    var getQuestions = _noriServiceRestJs2['default'].request({
-      method: 'GET',
-      //url    : 'https://pareshchouhan-trivia-v1.p.mashape.com/v1/getAllQuizQuestions?limit=' + _restNumQuestions + '&page=1',
-      url: 'https://pareshchouhan-trivia-v1.p.mashape.com/v1/getQuizQuestionsByCategory?categoryId=' + _restQuestionCategory + '&limit=' + _restNumQuestions + '&page=1',
-      headers: [{ 'X-Mashape-Key': 'tPxKgDvrkqmshg8zW4olS87hzF7Ap1vi63rjsnUuVw1sBHV9KJ' }],
-      json: true
-    }).subscribe(this.onQuestionsSuccess.bind(this), this.onQuestionError);
-  },
-
-  onQuestionsSuccess: function onQuestionsSuccess(data) {
-    console.log('Questions fetched', data[0]);
-    var updated = data.map(function (q) {
-      // Strip tags from text
-      q.q_text = _nudoruCoreStringUtilsJs2['default'].stripTags(_nudoruCoreStringUtilsJs2['default'].unescapeHTML(q.q_text));
-      // Service only returns 2 levels of difficulty. For now, fake it
-      q.q_difficulty_level = _nudoruCoreNumberUtilsJs2['default'].rndNumber(1, 5);
-      q.used = false;
-      return q;
-    });
-
-    this.setState({ questionBank: updated });
-    this.notifySubscribersOf('storeInitialized');
-  },
-
-  onQuestionError: function onQuestionError(data) {
-    throw new Error('Error fetching questions', data);
-  },
-
-  getQuestionOfDifficulty: function getQuestionOfDifficulty(difficulty) {
-    var possibleQuestions = this.getState().questionBank.filter(function (q) {
-      return q.q_difficulty_level === difficulty;
-    }).filter(function (q) {
-      return !q.used;
-    });
-
-    // TODO set .used to true here
-    return _nudoruCoreArrayUtilsJs2['default'].rndElement(possibleQuestions);
   },
 
   createNullQuestion: function createNullQuestion() {
@@ -797,15 +800,14 @@ var AppStoreModule = Nori.createStore({
    * @param event
    * @returns {*}
    */
-  mainStateReducer: function mainStateReducer(state, event) {
+  gameStateReducer: function gameStateReducer(state, action) {
     state = state || {};
 
-    state.lastActionType = event.type;
+    state.lastActionType = action.type;
 
-    console.log(event.type, event.payload);
-
-    switch (event.type) {
+    switch (action.type) {
       case _noriActionActionConstantsJs2['default'].CHANGE_STORE_STATE:
+      case _actionActionConstantsJs2['default'].SET_QUESTION_BANK:
       case _actionActionConstantsJs2['default'].SET_LOCAL_PLAYER_PROPS:
       case _actionActionConstantsJs2['default'].SET_REMOTE_PLAYER_PROPS:
       case _actionActionConstantsJs2['default'].SET_SESSION_PROPS:
@@ -813,26 +815,49 @@ var AppStoreModule = Nori.createStore({
       case _actionActionConstantsJs2['default'].SET_CURRENT_QUESTION:
       case _actionActionConstantsJs2['default'].SET_SENT_QUESTION:
       case _actionActionConstantsJs2['default'].APPLY_RISK:
-        return _.merge({}, state, event.payload.data);
+        return _.merge({}, state, action.payload.data);
+    }
 
-      case _actionActionConstantsJs2['default'].ANSWERED_CORRECT:
-      case _actionActionConstantsJs2['default'].ANSWERED_INCORRECT:
-        state.currentQuestion = null;
-        state.sentQuestion = this.createNullQuestion();
-        return _.merge({}, state, event.payload.data);
+    return state;
+  },
 
+  opponentResponseStateReducer: function opponentResponseStateReducer(state, action) {
+    state = state || {};
+    state.lastActionType = action.type;
+
+    switch (action.type) {
       case _actionActionConstantsJs2['default'].OPPONENT_ANSWERED:
       case _actionActionConstantsJs2['default'].CLEAR_QUESTION:
         state.currentQuestion = null;
         state.sentQuestion = this.createNullQuestion();
         return state;
-
-      case undefined:
-        return state;
-      default:
-        console.warn('Reducer store, unhandled event type: ' + event.type);
-        return state;
     }
+    return state;
+  },
+
+  playerResponseStateReducer: function playerResponseStateReducer(state, action) {
+    state = state || {};
+    state.lastActionType = action.type;
+
+    switch (action.type) {
+      case _actionActionConstantsJs2['default'].ANSWERED_CORRECT:
+      case _actionActionConstantsJs2['default'].ANSWERED_INCORRECT:
+        state.currentQuestion = null;
+        state.sentQuestion = this.createNullQuestion();
+        return _.merge({}, state, action.payload.data);
+    }
+    return state;
+  },
+
+  getQuestionOfDifficulty: function getQuestionOfDifficulty(difficulty) {
+    var possibleQuestions = this.getState().questionBank.filter(function (q) {
+      return q.q_difficulty_level === difficulty;
+    }).filter(function (q) {
+      return !q.used;
+    });
+
+    // TODO set .used to true here
+    return _nudoruCoreArrayUtilsJs2['default'].rndElement(possibleQuestions);
   }
 
 });
@@ -842,7 +867,7 @@ var AppStore = AppStoreModule();
 exports['default'] = AppStore;
 module.exports = exports['default'];
 
-},{"../../nori/action/ActionConstants.js":16,"../../nori/service/Rest.js":18,"../../nudoru/core/ArrayUtils.js":45,"../../nudoru/core/NumberUtils.js":46,"../../nudoru/core/StringUtils.js":48,"../action/ActionConstants.js":3}],6:[function(require,module,exports){
+},{"../../nori/action/ActionConstants.js":16,"../../nudoru/core/ArrayUtils.js":45,"../../nudoru/core/NumberUtils.js":46,"../../nudoru/core/StringUtils.js":48,"../action/ActionConstants.js":3}],6:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -918,7 +943,7 @@ var AppViewModule = Nori.createView({
 
   configureViews: function configureViews() {
     // TODO need to init this aspect of the store before here
-    var gameStates = ['TITLE', 'PLAYER_SELECT', 'WAITING_ON_PLAYER', 'MAIN_GAME', 'GAME_OVER']; //AppStore.getState().gameStates;
+    var gameStates = ['TITLE', 'PLAYER_SELECT', 'WAITING_ON_PLAYER', 'MAIN_GAME', 'GAME_OVER']; //_appStore.getState().gameStates;
 
     this.setViewMountPoint('#contents');
 
@@ -2430,7 +2455,6 @@ var Rest = function Rest() {
         handleError('About');
       };
 
-      // TODO refactor with array.reduce
       headers.forEach(function (headerPair) {
         var prop = Object.keys(headerPair)[0],
             value = headerPair[prop];
@@ -2770,7 +2794,7 @@ var MixinReducerStore = function MixinReducerStore() {
     }
 
     _this = this;
-    //_state = _stateObjFactory(); //require('./ImmutableMap.js')();
+    //_state = _stateObjFactory();
     _state = (0, _ImmutableMapJs2['default'])();
 
     if (!_stateReducers) {
@@ -2818,7 +2842,7 @@ var MixinReducerStore = function MixinReducerStore() {
   /**
    * Template reducer function
    * Store state isn't modified, current state is passed in and mutated state returned
-    function templateReducerFunction(state, event) {
+   function templateReducerFunction(state, event) {
         state = state || {};
         switch (event.type) {
           case _noriActionConstants.MODEL_DATA_CHANGED:
@@ -2826,6 +2850,7 @@ var MixinReducerStore = function MixinReducerStore() {
             // return _.merge({}, state, otherStateTransformer(state));
             return _.merge({}, state, {prop: event.payload.value});
           case undefined:
+            return state;
           default:
             console.warn('Reducer store, unhandled event type: '+event.type);
             return state;
