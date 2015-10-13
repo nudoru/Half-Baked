@@ -26,7 +26,7 @@ var Component = Nori.view().createComponentView({
    * @param configProps
    */
     initialize(configProps) {
-    this.bindMap(_appStore); // Reducer store, map id string or map object
+    this.bind(_appStore); // Reducer store, map id string or map object
   },
 
 

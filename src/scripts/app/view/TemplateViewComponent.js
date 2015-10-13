@@ -24,7 +24,7 @@ var Component = view.createComponentView({
    */
   initialize(configProps) {
     //Bind to a map, update will be called on changes to the map
-    //this.bindMap(APP.store()); // Reducer store, map id string or map object
+    //this.bind(APP.store()); // Reducer store, map id string or map object
 
     //custom init below here
     //this.setTemplate('<h1>{{ greeting }}</h1>'); // set custom HTML template

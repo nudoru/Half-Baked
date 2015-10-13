@@ -86,7 +86,7 @@ let MixinStoreStateViews = function () {
 
     // Transition new view in
     TweenLite.set(_stateViewMountPoint, {alpha: 0});
-    TweenLite.to(_stateViewMountPoint, 0.25, {alpha: 1, ease: Quad.easeIn});
+    TweenLite.to(_stateViewMountPoint, 0.25, {alpha: 1, ease: Quad.easeOut});
 
     this.notifySubscribersOf('viewChange', componentID);
   }

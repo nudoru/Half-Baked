@@ -58,6 +58,10 @@ var ViewComponent = function () {
     return undefined;
   }
 
+  /**
+   * Define DOM events to be attached after the element is mounted
+   * @returns {undefined}
+   */
   function defineEvents() {
     return undefined;
   }
@@ -66,9 +70,9 @@ var ViewComponent = function () {
    * Bind updates to the map ID to this view's update
    * @param mapObj Object to subscribe to or ID. Should implement nori/store/MixinObservableStore
    */
-  function bindMap(mapObj) {
+  function bind(mapObj) {
     if (!is.func(mapObj.subscribe)) {
-      console.warn('ViewComponent bindMap, must be observable: ' + mapObj);
+      console.warn('ViewComponent bind, must be observable: ' + mapObj);
       return;
     }
 
@@ -351,7 +355,7 @@ var ViewComponent = function () {
     template             : template,
     getDOMElement        : getDOMElement,
     isMounted            : isMounted,
-    bindMap              : bindMap,
+    bind                 : bind,
     componentWillUpdate  : componentWillUpdate,
     shouldComponentUpdate: shouldComponentUpdate,
     update               : update,

@@ -1018,7 +1018,7 @@ var Component = Nori.view().createComponentView({
    * @param configProps
    */
   initialize: function initialize(configProps) {
-    this.bindMap(_storeAppStore2['default']); // Reducer store, map id string or map object
+    this.bind(_storeAppStore2['default']); // Reducer store, map id string or map object
   },
 
   /**
@@ -1233,7 +1233,7 @@ var Component = Nori.view().createComponentView({
    * @param configProps
    */
   initialize: function initialize(configProps) {
-    this.bindMap(_storeAppStore2['default']);
+    this.bind(_storeAppStore2['default']);
   },
 
   /**
@@ -1631,7 +1631,7 @@ var Component = Nori.view().createComponentView({
    * @param configProps
    */
   initialize: function initialize(configProps) {
-    this.bindMap(_storeAppStore2['default']);
+    this.bind(_storeAppStore2['default']);
   },
 
   defineRegions: function defineRegions() {
@@ -4437,7 +4437,7 @@ var MixinStoreStateViews = function MixinStoreStateViews() {
 
     // Transition new view in
     TweenLite.set(_stateViewMountPoint, { alpha: 0 });
-    TweenLite.to(_stateViewMountPoint, 0.25, { alpha: 1, ease: Quad.easeIn });
+    TweenLite.to(_stateViewMountPoint, 0.25, { alpha: 1, ease: Quad.easeOut });
 
     this.notifySubscribersOf('viewChange', componentID);
   }
@@ -4540,6 +4540,10 @@ var ViewComponent = function ViewComponent() {
     return undefined;
   }
 
+  /**
+   * Define DOM events to be attached after the element is mounted
+   * @returns {undefined}
+   */
   function defineEvents() {
     return undefined;
   }
@@ -4548,9 +4552,9 @@ var ViewComponent = function ViewComponent() {
    * Bind updates to the map ID to this view's update
    * @param mapObj Object to subscribe to or ID. Should implement nori/store/MixinObservableStore
    */
-  function bindMap(mapObj) {
+  function bind(mapObj) {
     if (!_nudoruUtilIsJs2['default'].func(mapObj.subscribe)) {
-      console.warn('ViewComponent bindMap, must be observable: ' + mapObj);
+      console.warn('ViewComponent bind, must be observable: ' + mapObj);
       return;
     }
 
@@ -4831,7 +4835,7 @@ var ViewComponent = function ViewComponent() {
     template: template,
     getDOMElement: getDOMElement,
     isMounted: isMounted,
-    bindMap: bindMap,
+    bind: bind,
     componentWillUpdate: componentWillUpdate,
     shouldComponentUpdate: shouldComponentUpdate,
     update: update,

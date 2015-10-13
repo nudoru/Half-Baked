@@ -28,7 +28,7 @@ var Component = Nori.view().createComponentView({
    * @param configProps
    */
     initialize (configProps) {
-    this.bindMap(_appStore);
+    this.bind(_appStore);
   },
 
   defineRegions () {
