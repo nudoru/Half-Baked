@@ -134,7 +134,6 @@ let Templating = function () {
     let ids = getAllTemplateIDs();
     ids.forEach(id => {
       var src = removeWhiteSpace(getSource(id));
-      console.log(id, src);
     });
   }
 

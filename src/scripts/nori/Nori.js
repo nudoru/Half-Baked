@@ -73,10 +73,9 @@ let Nori = function () {
    * @returns {*}
    */
   function assignArray(target, sourceArray) {
-    sourceArray.forEach(function (source) {
-      target = _.assign(target, source);
-    });
-    return target;
+    return sourceArray.reduce((tgt, mixin) => {
+      return _.assign(tgt, mixin);
+    }, target);
   }
 
   /**

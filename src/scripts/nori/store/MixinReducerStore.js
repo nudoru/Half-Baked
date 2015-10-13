@@ -100,8 +100,7 @@ let MixinReducerStore = function () {
    */
   function applyReducersToState(state, action) {
     state = state || {};
-    _stateReducers.forEach(reducerFunc => state = reducerFunc(state, action));
-    return state;
+    return _stateReducers.reduce((nextState, reducerFunc) => reducerFunc(nextState, action), state);
   }
 
   /**

@@ -69,6 +69,7 @@ let Router = function () {
     let obj   = {},
         parts = queryStr.split('&');
 
+    // TODO refactor with Array.reduce
     parts.forEach(pairStr => {
       let pairArr     = pairStr.split('=');
       obj[pairArr[0]] = pairArr[1];

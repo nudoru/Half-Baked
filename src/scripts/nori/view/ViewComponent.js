@@ -316,7 +316,7 @@ var ViewComponent = function () {
   }
 
   function getProps() {
-    return _props;
+    return _.assign({}, _props);
   }
 
   function isMounted() {

@@ -2192,10 +2192,9 @@ var Nori = function Nori() {
    * @returns {*}
    */
   function assignArray(target, sourceArray) {
-    sourceArray.forEach(function (source) {
-      target = _.assign(target, source);
-    });
-    return target;
+    return sourceArray.reduce(function (tgt, mixin) {
+      return _.assign(tgt, mixin);
+    }, target);
   }
 
   /**
@@ -2431,6 +2430,7 @@ var Rest = function Rest() {
         handleError('About');
       };
 
+      // TODO refactor with array.reduce
       headers.forEach(function (headerPair) {
         var prop = Object.keys(headerPair)[0],
             value = headerPair[prop];
@@ -2810,10 +2810,9 @@ var MixinReducerStore = function MixinReducerStore() {
    */
   function applyReducersToState(state, action) {
     state = state || {};
-    _stateReducers.forEach(function (reducerFunc) {
-      return state = reducerFunc(state, action);
-    });
-    return state;
+    return _stateReducers.reduce(function (nextState, reducerFunc) {
+      return reducerFunc(nextState, action);
+    }, state);
   }
 
   /**
@@ -3370,6 +3369,7 @@ var Router = function Router() {
     var obj = {},
         parts = queryStr.split('&');
 
+    // TODO refactor with Array.reduce
     parts.forEach(function (pairStr) {
       var pairArr = pairStr.split('=');
       obj[pairArr[0]] = pairArr[1];
@@ -3635,7 +3635,6 @@ var Templating = function Templating() {
     var ids = getAllTemplateIDs();
     ids.forEach(function (id) {
       var src = removeWhiteSpace(getSource(id));
-      console.log(id, src);
     });
   }
 
@@ -4772,7 +4771,7 @@ var ViewComponent = function ViewComponent() {
   }
 
   function getProps() {
-    return _props;
+    return _.assign({}, _props);
   }
 
   function isMounted() {

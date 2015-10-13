@@ -106,6 +106,7 @@ let Rest = function () {
         handleError('About');
       };
 
+      // TODO refactor with array.reduce
       headers.forEach(function (headerPair) {
         let prop = Object.keys(headerPair)[0],
             value = headerPair[prop];
