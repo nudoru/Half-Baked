@@ -114,7 +114,7 @@ var ViewComponent = function () {
    * @returns {*}
    */
   function shouldComponentUpdate(nextState) {
-    return _.isEqual(this.getState(), nextState) !== true;
+    return !(_.isEqual(this.getState(), nextState));
   }
 
   /**

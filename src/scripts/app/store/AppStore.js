@@ -28,7 +28,9 @@ let AppStoreModule = Nori.createStore({
       this.opponentResponseStateReducer.bind(this)]);
 
     this.initializeReducerStore();
-    this.setState(this.initialState());
+
+    // Will default state to initial state defaults
+    this.setState();
   },
 
   initialState() {

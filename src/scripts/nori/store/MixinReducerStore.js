@@ -34,9 +34,15 @@ let MixinReducerStore = function () {
     return {};
   }
 
-  function setState(state) {
-    if (!_.isEqual(state, _state)) {
-      _state.setState(state);
+  /**
+   * Set the state of the store. Will default to initial state shape returned from
+   * initialState() function. Will only update the state if it's not equal to
+   * current
+   * @param nextstate
+   */
+  function setState(nextstate = this.initialState()) {
+    if (!_.isEqual(nextstate, getState())) {
+      _state.setState(nextstate);
       _this.notifySubscribers({});
     }
   }
@@ -61,16 +67,19 @@ let MixinReducerStore = function () {
       console.warn('nori/store/MixinReducerStore needs nori/utils/MixinObservableSubject to notify');
     }
 
-    _this  = this;
+    _this = this;
     //_state = _stateObjFactory();
     _state = _immutableMapFactory();
 
-    if (!_stateReducers) {
-      throw new Error('ReducerStore, must set a reducer before initialization');
-    }
-
+    //if (!_stateReducers) {
+    //  throw new Error('ReducerStore, must set a reducer before initialization');
+    //}
     // Set initial state from empty event
-    applyReducers({});
+    //applyReducers({});
+  }
+
+  function initialState() {
+    return {};
   }
 
   /**
@@ -128,6 +137,7 @@ let MixinReducerStore = function () {
 
   return {
     initializeReducerStore: initializeReducerStore,
+    initialState          : initialState,
     getState              : getState,
     setState              : setState,
     apply                 : apply,

@@ -94,7 +94,15 @@ let MixinEventDelegator = function () {
     }
   }
 
-  function createHandler(selector, eventStr, eventHandler, autoForm) {
+  /**
+   * Returns an observable subscription
+   * @param selector DOM element
+   * @param eventStr Event to watch
+   * @param handler Subscriber to handle the event
+   * @param autoForm True to automatically pass common form element data to the handler
+   * @returns {*}
+   */
+  function createHandler(selector, eventStr, handler, autoForm) {
     let observable = _rx.dom(selector, eventStr),
         el         = document.querySelector(selector),
         tag, type;
@@ -111,23 +119,23 @@ let MixinEventDelegator = function () {
       if (tag === 'input' || tag === 'textarea') {
         if (!type || type === 'text') {
           if (eventStr === 'blur' || eventStr === 'focus') {
-            return observable.map(evt => evt.target.value).subscribe(eventHandler);
+            return observable.map(evt => evt.target.value).subscribe(handler);
           } else if (eventStr === 'keyup' || eventStr === 'keydown') {
-            return observable.throttle(100).map(evt => evt.target.value).subscribe(eventHandler);
+            return observable.throttle(100).map(evt => evt.target.value).subscribe(handler);
           }
         } else if (type === 'radio' || type === 'checkbox') {
           if (eventStr === 'click') {
-            return observable.map(evt => evt.target.checked).subscribe(eventHandler);
+            return observable.map(evt => evt.target.checked).subscribe(handler);
           }
         }
       } else if (tag === 'select') {
         if (eventStr === 'change') {
-          return observable.map(evt => evt.target.value).subscribe(eventHandler);
+          return observable.map(evt => evt.target.value).subscribe(handler);
         }
       }
     }
 
-    return observable.subscribe(eventHandler);
+    return observable.subscribe(handler);
   }
 
   /**

@@ -154,44 +154,27 @@ var App = Nori.createApplication({
   mixins: [],
 
   /**
-   * Create the main Nori App store and view.
-   */
-  store: _storeAppStoreJs2['default'],
-  view: _viewAppViewJs2['default'],
-  socket: _noriServiceSocketIOJs2['default'],
-
-  /**
    * Intialize the appilcation, view and store
    */
   initialize: function initialize() {
-    this.socket.initialize();
-    this.socket.subscribe(this.handleSocketMessage.bind(this));
+    _noriServiceSocketIOJs2['default'].initialize();
+    _noriServiceSocketIOJs2['default'].subscribe(this.handleSocketMessage.bind(this));
 
-    this.view.initialize();
-    this.store.initialize();
-    this.store.subscribe(this.reactToStoreMutation.bind(this));
+    _viewAppViewJs2['default'].initialize();
+    _storeAppStoreJs2['default'].initialize();
+    _storeAppStoreJs2['default'].subscribe(this.reactToStoreMutation.bind(this));
     this.fetchQuestions(); // will call runapp on load
-  },
-
-  onViewInitialized: function onViewInitialized() {},
-
-  /**
-   * After the store data is ready
-   */
-  onStoreInitialized: function onStoreInitialized() {
-    console.log('app, onstore initialized');
-    this.store.subscribe(this.reactToStoreMutation.bind(this));
-    this.runApplication();
   },
 
   /**
    * Remove the "Please wait" cover and start the app
+   * Called after questions fetched and parsed in to store
    */
   runApplication: function runApplication() {
-    this.view.removeLoadingMessage();
+    _viewAppViewJs2['default'].removeLoadingMessage();
 
     //'TITLE' 'PLAYER_SELECT' 'MAIN_GAME'
-    this.store.apply(_noriActionActionCreatorJs2['default'].changeStoreState({ currentState: 'PLAYER_SELECT' }));
+    _storeAppStoreJs2['default'].apply(_noriActionActionCreatorJs2['default'].changeStoreState({ currentState: 'PLAYER_SELECT' }));
   },
 
   //----------------------------------------------------------------------------
@@ -232,7 +215,7 @@ var App = Nori.createApplication({
     }),
         questionBank = _actionActionCreatorJs2['default'].setQuestionBank(questions);
 
-    this.store.apply(questionBank);
+    _storeAppStoreJs2['default'].apply(questionBank);
     this.runApplication();
   },
 
@@ -245,7 +228,7 @@ var App = Nori.createApplication({
   //----------------------------------------------------------------------------
 
   reactToStoreMutation: function reactToStoreMutation() {
-    var appState = this.store.getState(),
+    var appState = _storeAppStoreJs2['default'].getState(),
         type = appState.lastActionType;
 
     console.log('APP, handle after action: ', type);
@@ -279,31 +262,27 @@ var App = Nori.createApplication({
     var local = state.localPlayer.health,
         remote = state.remotePlayer.health;
 
-    if (local <= 0 || remote <= 0) {
-      return true;
-    }
-
-    return false;
+    return local <= 0 || remote <= 0;
   },
 
   doGameOver: function doGameOver() {
-    var appState = this.store.getState(),
+    var appState = _storeAppStoreJs2['default'].getState(),
         setGameOverScreen = _noriActionActionCreatorJs2['default'].changeStoreState({ currentState: appState.gameStates[4] });
 
-    this.store.apply(setGameOverScreen);
+    _storeAppStoreJs2['default'].apply(setGameOverScreen);
   },
 
   handleLocalPlayerPropsUpdate: function handleLocalPlayerPropsUpdate() {
-    var appState = this.store.getState();
+    var appState = _storeAppStoreJs2['default'].getState();
 
-    this.socket.notifyServer(_noriServiceSocketIOEventsJs2['default'].SEND_PLAYER_DETAILS, {
+    _noriServiceSocketIOJs2['default'].notifyServer(_noriServiceSocketIOEventsJs2['default'].SEND_PLAYER_DETAILS, {
       roomID: appState.session.roomID,
       playerDetails: appState.localPlayer
     });
   },
 
   handleGameReset: function handleGameReset() {
-    var appState = this.store.getState();
+    var appState = _storeAppStoreJs2['default'].getState();
     this.leaveRoom(appState.session.roomID);
   },
 
@@ -317,8 +296,8 @@ var App = Nori.createApplication({
 
   sendMyAnswer: function sendMyAnswer(isCorrect) {
     console.log('sending answer ...');
-    var appState = this.store.getState();
-    this.socket.notifyServer(_noriServiceSocketIOEventsJs2['default'].OPPONENT_ANSWERED, {
+    var appState = _storeAppStoreJs2['default'].getState();
+    _noriServiceSocketIOJs2['default'].notifyServer(_noriServiceSocketIOEventsJs2['default'].OPPONENT_ANSWERED, {
       roomID: appState.session.roomID,
       result: isCorrect
     });
@@ -362,11 +341,11 @@ var App = Nori.createApplication({
         this.handleOpponentAnswered(payload.payload);
         return;
       case _noriServiceSocketIOEventsJs2['default'].SYSTEM_MESSAGE:
-        this.view.notify(payload.payload, payload.type, 'success');
+        _viewAppViewJs2['default'].notify(payload.payload, payload.type, 'success');
         return;
       case _noriServiceSocketIOEventsJs2['default'].BROADCAST:
       case _noriServiceSocketIOEventsJs2['default'].MESSAGE:
-        this.view.notify(payload.payload, payload.type, 'warning');
+        _viewAppViewJs2['default'].notify(payload.payload, payload.type, 'warning');
         return;
       case _noriServiceSocketIOEventsJs2['default'].USER_DISCONNECTED:
         return;
@@ -380,37 +359,37 @@ var App = Nori.createApplication({
     var setSessionID = _actionActionCreatorJs2['default'].setSessionProps({ socketIOID: socketID }),
         setLocalID = _actionActionCreatorJs2['default'].setLocalPlayerProps({ id: socketID });
 
-    this.store.apply([setSessionID, setLocalID]);
+    _storeAppStoreJs2['default'].apply([setSessionID, setLocalID]);
   },
 
   handleJoinNewlyCreatedRoom: function handleJoinNewlyCreatedRoom(roomID) {
-    var appState = this.store.getState(),
+    var appState = _storeAppStoreJs2['default'].getState(),
         setRoom = _actionActionCreatorJs2['default'].setSessionProps({ roomID: roomID }),
         setWaitingScreenState = _noriActionActionCreatorJs2['default'].changeStoreState({ currentState: appState.gameStates[2] });
 
-    this.store.apply([setRoom, setWaitingScreenState]);
+    _storeAppStoreJs2['default'].apply([setRoom, setWaitingScreenState]);
   },
 
   handleGameStart: function handleGameStart(payload) {
-    var appState = this.store.getState(),
+    var appState = _storeAppStoreJs2['default'].getState(),
         remotePlayer = this.pluckRemotePlayer(payload.players),
         setRemotePlayer = _actionActionCreatorJs2['default'].setRemotePlayerProps(remotePlayer),
         setGameState = _noriActionActionCreatorJs2['default'].changeStoreState({ currentState: appState.gameStates[3] }),
         setCurrentQuestion = _actionActionCreatorJs2['default'].setCurrentQuestion(null);
 
-    this.store.apply([setRemotePlayer, setGameState, setCurrentQuestion]);
+    _storeAppStoreJs2['default'].apply([setRemotePlayer, setGameState, setCurrentQuestion]);
   },
 
   pluckRemotePlayer: function pluckRemotePlayer(playersArry) {
-    var localPlayerID = this.store.getState().localPlayer.id;
+    var localPlayerID = _storeAppStoreJs2['default'].getState().localPlayer.id;
     return playersArry.filter(function (player) {
       return player.id !== localPlayerID;
     })[0];
   },
 
   handleGameAbort: function handleGameAbort(payload) {
-    this.store.apply(_actionActionCreatorJs2['default'].resetGame());
-    this.view.alert(payload.payload, payload.type);
+    _storeAppStoreJs2['default'].apply(_actionActionCreatorJs2['default'].resetGame());
+    _viewAppViewJs2['default'].alert(payload.payload, payload.type);
   },
 
   handleUpdatedPlayerDetails: function handleUpdatedPlayerDetails(payload) {
@@ -419,28 +398,28 @@ var App = Nori.createApplication({
 
     console.log('setting player details');
 
-    this.store.apply(setRemotePlayer);
+    _storeAppStoreJs2['default'].apply(setRemotePlayer);
   },
 
   handleReceivedQuestion: function handleReceivedQuestion(question) {
     var setCurrentQuestion = _actionActionCreatorJs2['default'].setCurrentQuestion(question);
-    this.store.apply(setCurrentQuestion);
+    _storeAppStoreJs2['default'].apply(setCurrentQuestion);
   },
 
   handleOpponentAnswered: function handleOpponentAnswered(payload) {
-    var state = this.store.getState(),
+    var state = _storeAppStoreJs2['default'].getState(),
         risk = state.questionRisk,
         opponentAnswered = _actionActionCreatorJs2['default'].opponentAnswered(payload.result),
         applyRisk = _actionActionCreatorJs2['default'].applyRisk(risk);
 
     if (payload.result) {
-      this.view.positiveAlert('They got it right! You lost ' + risk + ' health points.', 'Ouch!');
+      _viewAppViewJs2['default'].positiveAlert('They got it right! You lost ' + risk + ' health points.', 'Ouch!');
     } else {
-      this.view.negativeAlert('They missed it!', 'Sweet!');
+      _viewAppViewJs2['default'].negativeAlert('They missed it!', 'Sweet!');
       applyRisk = _actionActionCreatorJs2['default'].applyRisk(0);
     }
 
-    this.store.apply([opponentAnswered, applyRisk]);
+    _storeAppStoreJs2['default'].apply([opponentAnswered, applyRisk]);
   },
 
   //----------------------------------------------------------------------------
@@ -448,38 +427,38 @@ var App = Nori.createApplication({
   //----------------------------------------------------------------------------
 
   createRoom: function createRoom() {
-    this.socket.notifyServer(_noriServiceSocketIOEventsJs2['default'].CREATE_ROOM, {
-      playerDetails: this.store.getState().localPlayer
+    _noriServiceSocketIOJs2['default'].notifyServer(_noriServiceSocketIOEventsJs2['default'].CREATE_ROOM, {
+      playerDetails: _storeAppStoreJs2['default'].getState().localPlayer
     });
   },
 
   joinRoom: function joinRoom(roomID) {
-    this.socket.notifyServer(_noriServiceSocketIOEventsJs2['default'].JOIN_ROOM, {
+    _noriServiceSocketIOJs2['default'].notifyServer(_noriServiceSocketIOEventsJs2['default'].JOIN_ROOM, {
       roomID: roomID,
-      playerDetails: this.store.getState().localPlayer
+      playerDetails: _storeAppStoreJs2['default'].getState().localPlayer
     });
   },
 
   leaveRoom: function leaveRoom(roomID) {
-    this.socket.notifyServer(_noriServiceSocketIOEventsJs2['default'].LEAVE_ROOM, {
+    _noriServiceSocketIOJs2['default'].notifyServer(_noriServiceSocketIOEventsJs2['default'].LEAVE_ROOM, {
       roomID: roomID
     });
 
-    this.store.apply(_actionActionCreatorJs2['default'].setSessionProps({ roomID: '0000' }));
+    _storeAppStoreJs2['default'].apply(_actionActionCreatorJs2['default'].setSessionProps({ roomID: '0000' }));
   },
 
   sendQuestion: function sendQuestion(difficulty) {
-    var appState = this.store.getState(),
-        question = this.store.getQuestionOfDifficulty(difficulty),
+    var appState = _storeAppStoreJs2['default'].getState(),
+        question = _storeAppStoreJs2['default'].getQuestionOfDifficulty(difficulty),
         risk = Math.ceil(question.q_difficulty_level / 2),
         setSentQuestion = _actionActionCreatorJs2['default'].setSentQuestion(question, risk);
 
-    this.socket.notifyServer(_noriServiceSocketIOEventsJs2['default'].SEND_QUESTION, {
+    _noriServiceSocketIOJs2['default'].notifyServer(_noriServiceSocketIOEventsJs2['default'].SEND_QUESTION, {
       roomID: appState.session.roomID,
       question: question
     });
 
-    this.store.apply(setSentQuestion);
+    _storeAppStoreJs2['default'].apply(setSentQuestion);
   }
 
 });
@@ -741,7 +720,9 @@ var AppStoreModule = Nori.createStore({
     this.setReducers([this.gameStateReducer.bind(this), this.playerResponseStateReducer.bind(this), this.opponentResponseStateReducer.bind(this)]);
 
     this.initializeReducerStore();
-    this.setState(this.initialState());
+
+    // Will default state to initial state defaults
+    this.setState();
   },
 
   initialState: function initialState() {
@@ -918,19 +899,6 @@ var AppViewModule = Nori.createView({
   mixins: [_noriViewApplicationViewJs2['default'], _noriViewMixinNudoruControlsJs2['default'], _noriViewMixinStoreStateViewsJs2['default']],
 
   initialize: function initialize() {
-    this.createSubject('viewInitialized');
-    this.preloadImages();
-  },
-
-  preloadImages: function preloadImages() {
-    console.log('appview, preload images');
-    // refer to docs http://desandro.github.io/imagesloaded/
-    imagesLoadedInst = new imagesLoaded(_preloadImages, this.imagesPreloaded.bind(this));
-  },
-
-  imagesPreloaded: function imagesPreloaded() {
-    console.log('appview, images preloaded OK');
-
     this.initializeApplicationView(['applicationscaffold', 'applicationcomponentsscaffold']);
     this.initializeStateViews(_storeAppStoreJs2['default']);
     this.initializeNudoruControls();
@@ -938,11 +906,17 @@ var AppViewModule = Nori.createView({
     this.configureViews();
     this.subscribe('viewChange', this.handleViewChange.bind(this));
 
-    this.notifySubscribersOf('viewInitialized');
+    this.preloadImages();
   },
 
+  preloadImages: function preloadImages() {
+    // refer to docs http://desandro.github.io/imagesloaded/
+    imagesLoadedInst = new imagesLoaded(_preloadImages, this.imagesPreloaded.bind(this));
+  },
+
+  imagesPreloaded: function imagesPreloaded() {},
+
   configureViews: function configureViews() {
-    // TODO need to init this aspect of the store before here
     var gameStates = ['TITLE', 'PLAYER_SELECT', 'WAITING_ON_PLAYER', 'MAIN_GAME', 'GAME_OVER']; //_appStore.getState().gameStates;
 
     this.setViewMountPoint('#contents');
@@ -954,6 +928,9 @@ var AppViewModule = Nori.createView({
     this.mapStateToViewComponent(gameStates[4], 'gameover', (0, _ScreenGameOverJs2['default'])());
   },
 
+  /**
+   * Close all alert boxes on view changes so there are no left over messages displayed
+   */
   handleViewChange: function handleViewChange() {
     this.closeAllAlerts();
   }
@@ -1702,17 +1679,15 @@ var Component = Nori.view().createComponentView({
    */
   componentDidMount: function componentDidMount() {
     if (this.isShowingCards()) {
-      //if (_cardAnimationSub) {
-      //  _cardAnimationSub.dispose();
-      //}
-      //
-      ////_cardAnimationSub = _rx.doEvery(10, 1, this.animateDifficultyCards.bind(this));
-      //this.animateDifficultyCards();
+      if (_cardAnimationSub) {
+        _cardAnimationSub.dispose();
+      }
+
+      this.animateDifficultyCards();
     }
   },
 
   isShowingCards: function isShowingCards() {
-    //return (this.getDOMElement().querySelector('#game_question-difficulty1'));
     return this.getState().sentQuestion.q_difficulty_level === -1;
   },
 
@@ -2178,6 +2153,11 @@ var Nori = function Nori() {
     return _utilsRouterJs2['default'];
   }
 
+  /**
+   * Allow for optional external configuration data from outside of the compiled
+   * app bundle. For easy of settings tweaks after the build by non technical devs
+   * @returns {void|*}
+   */
   function getConfig() {
     return _.assign({}, window.APP_CONFIG_DATA || {});
   }
@@ -2766,9 +2746,17 @@ var MixinReducerStore = function MixinReducerStore() {
     return {};
   }
 
-  function setState(state) {
-    if (!_.isEqual(state, _state)) {
-      _state.setState(state);
+  /**
+   * Set the state of the store. Will default to initial state shape returned from
+   * initialState() function. Will only update the state if it's not equal to
+   * current
+   * @param nextstate
+   */
+  function setState() {
+    var nextstate = arguments.length <= 0 || arguments[0] === undefined ? this.initialState() : arguments[0];
+
+    if (!_.isEqual(nextstate, getState())) {
+      _state.setState(nextstate);
       _this.notifySubscribers({});
     }
   }
@@ -2797,12 +2785,15 @@ var MixinReducerStore = function MixinReducerStore() {
     //_state = _stateObjFactory();
     _state = (0, _ImmutableMapJs2['default'])();
 
-    if (!_stateReducers) {
-      throw new Error('ReducerStore, must set a reducer before initialization');
-    }
-
+    //if (!_stateReducers) {
+    //  throw new Error('ReducerStore, must set a reducer before initialization');
+    //}
     // Set initial state from empty event
-    applyReducers({});
+    //applyReducers({});
+  }
+
+  function initialState() {
+    return {};
   }
 
   /**
@@ -2864,6 +2855,7 @@ var MixinReducerStore = function MixinReducerStore() {
 
   return {
     initializeReducerStore: initializeReducerStore,
+    initialState: initialState,
     getState: getState,
     setState: setState,
     apply: apply,
@@ -3710,8 +3702,6 @@ var _nudoruBrowserDOMUtilsJs2 = _interopRequireDefault(_nudoruBrowserDOMUtilsJs)
 
 var ApplicationView = function ApplicationView() {
 
-  var _this = undefined;
-
   //----------------------------------------------------------------------------
   //  Initialization
   //----------------------------------------------------------------------------
@@ -3721,8 +3711,6 @@ var ApplicationView = function ApplicationView() {
    * @param scaffoldTemplates template IDs to attached to the body for the app
    */
   function initializeApplicationView(scaffoldTemplates) {
-    _this = this;
-
     attachApplicationScaffolding(scaffoldTemplates);
   }
 
@@ -3921,19 +3909,19 @@ var _nudoruUtilIsJs = require('../../nudoru/util/is.js');
 
 var _nudoruUtilIsJs2 = _interopRequireDefault(_nudoruUtilIsJs);
 
+/**
+ * DOM manipulation and animation helpers for ViewComponents
+ */
 var MixinDOMManipulation = function MixinDOMManipulation() {
 
   var _tweenedEls = [],
       _zIndex = 1000;
 
-  function toTop(selector) {
-    var el = document.querySelector(selector);
-    if (el) {
-      el.style.zIndex = _zIndex++;
-    }
-    console.warn('MixinDOMManipulation, to top, selector not found ' + selector);
-  }
-
+  /**
+   * Returns the element. If passed a string will query DOM and return.
+   * @param selector
+   * @returns {*}
+   */
   function getElement(selector) {
     var el = undefined;
 
@@ -3948,6 +3936,14 @@ var MixinDOMManipulation = function MixinDOMManipulation() {
     }
 
     return el;
+  }
+
+  function toTop(selector) {
+    var el = document.querySelector(selector);
+    if (el) {
+      el.style.zIndex = _zIndex++;
+    }
+    console.warn('MixinDOMManipulation, to top, selector not found ' + selector);
   }
 
   function addTweenedElement(selector) {
@@ -3967,7 +3963,6 @@ var MixinDOMManipulation = function MixinDOMManipulation() {
     if (!el) {
       return;
     }
-    //TweenLite.killTweensOf(el);
     return TweenLite.to(el, dur, props);
   }
 
@@ -3977,7 +3972,6 @@ var MixinDOMManipulation = function MixinDOMManipulation() {
     if (!el) {
       return;
     }
-    //TweenLite.killTweensOf(el);
     return TweenLite.from(el, dur, props);
   }
 
@@ -3987,7 +3981,6 @@ var MixinDOMManipulation = function MixinDOMManipulation() {
     if (!el) {
       return;
     }
-    //TweenLite.killTweensOf(el);
     return TweenLite.fromTo(el, dur, startprops, endprops);
   }
 
@@ -4152,7 +4145,15 @@ var MixinEventDelegator = function MixinEventDelegator() {
     }
   }
 
-  function createHandler(selector, eventStr, eventHandler, autoForm) {
+  /**
+   * Returns an observable subscription
+   * @param selector DOM element
+   * @param eventStr Event to watch
+   * @param handler Subscriber to handle the event
+   * @param autoForm True to automatically pass common form element data to the handler
+   * @returns {*}
+   */
+  function createHandler(selector, eventStr, handler, autoForm) {
     var observable = _utilsRxJs2['default'].dom(selector, eventStr),
         el = document.querySelector(selector),
         tag = undefined,
@@ -4172,29 +4173,29 @@ var MixinEventDelegator = function MixinEventDelegator() {
           if (eventStr === 'blur' || eventStr === 'focus') {
             return observable.map(function (evt) {
               return evt.target.value;
-            }).subscribe(eventHandler);
+            }).subscribe(handler);
           } else if (eventStr === 'keyup' || eventStr === 'keydown') {
             return observable.throttle(100).map(function (evt) {
               return evt.target.value;
-            }).subscribe(eventHandler);
+            }).subscribe(handler);
           }
         } else if (type === 'radio' || type === 'checkbox') {
           if (eventStr === 'click') {
             return observable.map(function (evt) {
               return evt.target.checked;
-            }).subscribe(eventHandler);
+            }).subscribe(handler);
           }
         }
       } else if (tag === 'select') {
         if (eventStr === 'change') {
           return observable.map(function (evt) {
             return evt.target.value;
-          }).subscribe(eventHandler);
+          }).subscribe(handler);
         }
       }
     }
 
-    return observable.subscribe(eventHandler);
+    return observable.subscribe(handler);
   }
 
   /**
@@ -4596,7 +4597,7 @@ var ViewComponent = function ViewComponent() {
    * @returns {*}
    */
   function shouldComponentUpdate(nextState) {
-    return _.isEqual(this.getState(), nextState) !== true;
+    return !_.isEqual(this.getState(), nextState);
   }
 
   /**

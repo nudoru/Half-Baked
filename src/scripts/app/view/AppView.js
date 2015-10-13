@@ -21,19 +21,6 @@ let AppViewModule = Nori.createView({
   ],
 
   initialize() {
-    this.createSubject('viewInitialized');
-    this.preloadImages();
-  },
-
-  preloadImages() {
-    console.log('appview, preload images');
-    // refer to docs http://desandro.github.io/imagesloaded/
-    imagesLoadedInst = new imagesLoaded(_preloadImages, this.imagesPreloaded.bind(this));
-  },
-
-  imagesPreloaded() {
-    console.log('appview, images preloaded OK');
-
     this.initializeApplicationView(['applicationscaffold', 'applicationcomponentsscaffold']);
     this.initializeStateViews(_appStore);
     this.initializeNudoruControls();
@@ -41,12 +28,19 @@ let AppViewModule = Nori.createView({
     this.configureViews();
     this.subscribe('viewChange', this.handleViewChange.bind(this));
 
-    this.notifySubscribersOf('viewInitialized');
+    this.preloadImages();
+  },
+
+  preloadImages() {
+    // refer to docs http://desandro.github.io/imagesloaded/
+    imagesLoadedInst = new imagesLoaded(_preloadImages, this.imagesPreloaded.bind(this));
+  },
+
+  imagesPreloaded() {
   },
 
 
   configureViews() {
-    // TODO need to init this aspect of the store before here
     var gameStates = ['TITLE', 'PLAYER_SELECT', 'WAITING_ON_PLAYER', 'MAIN_GAME', 'GAME_OVER']; //_appStore.getState().gameStates;
 
     this.setViewMountPoint('#contents');
@@ -58,7 +52,9 @@ let AppViewModule = Nori.createView({
     this.mapStateToViewComponent(gameStates[4], 'gameover', _screenGameOverFactory());
   },
 
-
+  /**
+   * Close all alert boxes on view changes so there are no left over messages displayed
+   */
   handleViewChange() {
     this.closeAllAlerts();
   }

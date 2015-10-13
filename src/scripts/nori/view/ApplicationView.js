@@ -5,8 +5,6 @@ import _domUtils from '../../nudoru/browser/DOMUtils.js';
 
 let ApplicationView = function () {
 
-  let _this;
-
   //----------------------------------------------------------------------------
   //  Initialization
   //----------------------------------------------------------------------------
@@ -16,8 +14,6 @@ let ApplicationView = function () {
    * @param scaffoldTemplates template IDs to attached to the body for the app
    */
   function initializeApplicationView(scaffoldTemplates) {
-    _this = this;
-
     attachApplicationScaffolding(scaffoldTemplates);
   }
 

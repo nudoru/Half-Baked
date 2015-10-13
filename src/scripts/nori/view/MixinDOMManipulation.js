@@ -1,18 +1,18 @@
 import is from '../../nudoru/util/is.js';
 
+/**
+ * DOM manipulation and animation helpers for ViewComponents
+ */
 let MixinDOMManipulation = function () {
 
   let _tweenedEls = [],
       _zIndex     = 1000;
 
-  function toTop(selector) {
-    let el = document.querySelector(selector);
-    if (el) {
-      el.style.zIndex = _zIndex++;
-    }
-    console.warn('MixinDOMManipulation, to top, selector not found ' + selector);
-  }
-
+  /**
+   * Returns the element. If passed a string will query DOM and return.
+   * @param selector
+   * @returns {*}
+   */
   function getElement(selector) {
     let el;
 
@@ -27,6 +27,14 @@ let MixinDOMManipulation = function () {
     }
 
     return el;
+  }
+
+  function toTop(selector) {
+    let el = document.querySelector(selector);
+    if (el) {
+      el.style.zIndex = _zIndex++;
+    }
+    console.warn('MixinDOMManipulation, to top, selector not found ' + selector);
   }
 
   function addTweenedElement(selector) {
@@ -46,7 +54,6 @@ let MixinDOMManipulation = function () {
     if (!el) {
       return;
     }
-    //TweenLite.killTweensOf(el);
     return TweenLite.to(el, dur, props);
   }
 
@@ -56,7 +63,6 @@ let MixinDOMManipulation = function () {
     if (!el) {
       return;
     }
-    //TweenLite.killTweensOf(el);
     return TweenLite.from(el, dur, props);
   }
 
@@ -66,7 +72,6 @@ let MixinDOMManipulation = function () {
     if (!el) {
       return;
     }
-    //TweenLite.killTweensOf(el);
     return TweenLite.fromTo(el, dur, startprops, endprops);
   }
 

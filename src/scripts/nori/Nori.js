@@ -27,6 +27,11 @@ let Nori = function () {
     return _router;
   }
 
+  /**
+   * Allow for optional external configuration data from outside of the compiled
+   * app bundle. For easy of settings tweaks after the build by non technical devs
+   * @returns {void|*}
+   */
   function getConfig() {
     return _.assign({}, (window.APP_CONFIG_DATA || {}));
   }
@@ -147,5 +152,3 @@ let Nori = function () {
 };
 
 export default Nori();
-
-

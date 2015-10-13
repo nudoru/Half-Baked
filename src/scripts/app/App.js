@@ -1,6 +1,6 @@
 import _rx from '../nori/utils/Rx.js';
 import _rest from '../nori/service/Rest.js';
-import _Socket from '../nori/service/SocketIO.js';
+import _socketIO from '../nori/service/SocketIO.js';
 import _appActions from './action/ActionCreator.js';
 import _appActionConstants from './action/ActionConstants.js';
 import _noriActions from '../nori/action/ActionCreator.js';
@@ -23,44 +23,27 @@ let App = Nori.createApplication({
   mixins: [],
 
   /**
-   * Create the main Nori App store and view.
-   */
-  store : _appStore,
-  view  : _appView,
-  socket: _Socket,
-
-  /**
    * Intialize the appilcation, view and store
    */
     initialize() {
-    this.socket.initialize();
-    this.socket.subscribe(this.handleSocketMessage.bind(this));
+    _socketIO.initialize();
+    _socketIO.subscribe(this.handleSocketMessage.bind(this));
 
-    this.view.initialize();
-    this.store.initialize();
-    this.store.subscribe(this.reactToStoreMutation.bind(this));
+    _appView.initialize();
+    _appStore.initialize();
+    _appStore.subscribe(this.reactToStoreMutation.bind(this));
     this.fetchQuestions(); // will call runapp on load
-  },
-
-  onViewInitialized() {},
-
-  /**
-   * After the store data is ready
-   */
-    onStoreInitialized() {
-    console.log('app, onstore initialized');
-    this.store.subscribe(this.reactToStoreMutation.bind(this));
-    this.runApplication();
   },
 
   /**
    * Remove the "Please wait" cover and start the app
+   * Called after questions fetched and parsed in to store
    */
     runApplication() {
-    this.view.removeLoadingMessage();
+    _appView.removeLoadingMessage();
 
     //'TITLE' 'PLAYER_SELECT' 'MAIN_GAME'
-    this.store.apply(_noriActions.changeStoreState({currentState: 'PLAYER_SELECT'}));
+    _appStore.apply(_noriActions.changeStoreState({currentState: 'PLAYER_SELECT'}));
   },
 
   //----------------------------------------------------------------------------
@@ -79,7 +62,7 @@ let App = Nori.createApplication({
    158 puzzle, contains HTML encoded
    166 comp intro
    */
-    fetchQuestions() {
+  fetchQuestions() {
     //https://market.mashape.com/pareshchouhan/trivia
     var getQuestions = _rest.request({
       method : 'GET',
@@ -93,14 +76,14 @@ let App = Nori.createApplication({
   onQuestionsSuccess(data) {
     console.log('Questions fetched');
 
-    let questions      = data.map(q => {
+    let questions    = data.map(q => {
       q.q_text             = _stringUtils.stripTags(_stringUtils.unescapeHTML(q.q_text));
       q.q_difficulty_level = _numUtils.rndNumber(1, 5);
       q.used               = false;
       return q;
     }), questionBank = _appActions.setQuestionBank(questions);
 
-    this.store.apply(questionBank);
+    _appStore.apply(questionBank);
     this.runApplication();
   },
 
@@ -113,7 +96,7 @@ let App = Nori.createApplication({
   //----------------------------------------------------------------------------
 
   reactToStoreMutation() {
-    var appState = this.store.getState(),
+    var appState = _appStore.getState(),
         type     = appState.lastActionType;
 
     console.log('APP, handle after action: ', type);
@@ -147,31 +130,27 @@ let App = Nori.createApplication({
     let local  = state.localPlayer.health,
         remote = state.remotePlayer.health;
 
-    if (local <= 0 || remote <= 0) {
-      return true;
-    }
-
-    return false;
+    return (local <= 0 || remote <= 0);
   },
 
   doGameOver() {
-    let appState          = this.store.getState(),
+    let appState          = _appStore.getState(),
         setGameOverScreen = _noriActions.changeStoreState({currentState: appState.gameStates[4]});
 
-    this.store.apply(setGameOverScreen);
+    _appStore.apply(setGameOverScreen);
   },
 
   handleLocalPlayerPropsUpdate() {
-    let appState = this.store.getState();
+    let appState = _appStore.getState();
 
-    this.socket.notifyServer(_socketIOEvents.SEND_PLAYER_DETAILS, {
+    _socketIO.notifyServer(_socketIOEvents.SEND_PLAYER_DETAILS, {
       roomID       : appState.session.roomID,
       playerDetails: appState.localPlayer
     });
   },
 
   handleGameReset() {
-    let appState = this.store.getState();
+    let appState = _appStore.getState();
     this.leaveRoom(appState.session.roomID);
   },
 
@@ -185,8 +164,8 @@ let App = Nori.createApplication({
 
   sendMyAnswer(isCorrect) {
     console.log('sending answer ...');
-    let appState = this.store.getState();
-    this.socket.notifyServer(_socketIOEvents.OPPONENT_ANSWERED, {
+    let appState = _appStore.getState();
+    _socketIO.notifyServer(_socketIOEvents.OPPONENT_ANSWERED, {
       roomID: appState.session.roomID,
       result: isCorrect
     });
@@ -230,11 +209,11 @@ let App = Nori.createApplication({
         this.handleOpponentAnswered(payload.payload);
         return;
       case (_socketIOEvents.SYSTEM_MESSAGE):
-        this.view.notify(payload.payload, payload.type, 'success');
+        _appView.notify(payload.payload, payload.type, 'success');
         return;
       case (_socketIOEvents.BROADCAST):
       case (_socketIOEvents.MESSAGE):
-        this.view.notify(payload.payload, payload.type, 'warning');
+        _appView.notify(payload.payload, payload.type, 'warning');
         return;
       case (_socketIOEvents.USER_DISCONNECTED):
         return;
@@ -248,37 +227,37 @@ let App = Nori.createApplication({
     let setSessionID = _appActions.setSessionProps({socketIOID: socketID}),
         setLocalID   = _appActions.setLocalPlayerProps({id: socketID});
 
-    this.store.apply([setSessionID, setLocalID]);
+    _appStore.apply([setSessionID, setLocalID]);
   },
 
   handleJoinNewlyCreatedRoom(roomID) {
-    let appState              = this.store.getState(),
+    let appState              = _appStore.getState(),
         setRoom               = _appActions.setSessionProps({roomID: roomID}),
         setWaitingScreenState = _noriActions.changeStoreState({currentState: appState.gameStates[2]});
 
-    this.store.apply([setRoom, setWaitingScreenState]);
+    _appStore.apply([setRoom, setWaitingScreenState]);
   },
 
   handleGameStart(payload) {
-    let appState           = this.store.getState(),
+    let appState           = _appStore.getState(),
         remotePlayer       = this.pluckRemotePlayer(payload.players),
         setRemotePlayer    = _appActions.setRemotePlayerProps(remotePlayer),
         setGameState       = _noriActions.changeStoreState({currentState: appState.gameStates[3]}),
         setCurrentQuestion = _appActions.setCurrentQuestion(null);
 
-    this.store.apply([setRemotePlayer, setGameState, setCurrentQuestion]);
+    _appStore.apply([setRemotePlayer, setGameState, setCurrentQuestion]);
   },
 
   pluckRemotePlayer(playersArry) {
-    let localPlayerID = this.store.getState().localPlayer.id;
+    let localPlayerID = _appStore.getState().localPlayer.id;
     return playersArry.filter(function (player) {
       return player.id !== localPlayerID;
     })[0];
   },
 
   handleGameAbort(payload) {
-    this.store.apply(_appActions.resetGame());
-    this.view.alert(payload.payload, payload.type);
+    _appStore.apply(_appActions.resetGame());
+    _appView.alert(payload.payload, payload.type);
   },
 
   handleUpdatedPlayerDetails(payload) {
@@ -287,28 +266,28 @@ let App = Nori.createApplication({
 
     console.log('setting player details');
 
-    this.store.apply(setRemotePlayer);
+    _appStore.apply(setRemotePlayer);
   },
 
   handleReceivedQuestion(question) {
     let setCurrentQuestion = _appActions.setCurrentQuestion(question);
-    this.store.apply(setCurrentQuestion);
+    _appStore.apply(setCurrentQuestion);
   },
 
   handleOpponentAnswered(payload) {
-    let state            = this.store.getState(),
+    let state            = _appStore.getState(),
         risk             = state.questionRisk,
         opponentAnswered = _appActions.opponentAnswered(payload.result),
         applyRisk        = _appActions.applyRisk(risk);
 
     if (payload.result) {
-      this.view.positiveAlert('They got it right! You lost ' + risk + ' health points.', 'Ouch!');
+      _appView.positiveAlert('They got it right! You lost ' + risk + ' health points.', 'Ouch!');
     } else {
-      this.view.negativeAlert('They missed it!', 'Sweet!');
+      _appView.negativeAlert('They missed it!', 'Sweet!');
       applyRisk = _appActions.applyRisk(0);
     }
 
-    this.store.apply([opponentAnswered, applyRisk]);
+    _appStore.apply([opponentAnswered, applyRisk]);
   },
 
   //----------------------------------------------------------------------------
@@ -316,38 +295,38 @@ let App = Nori.createApplication({
   //----------------------------------------------------------------------------
 
   createRoom: function () {
-    this.socket.notifyServer(_socketIOEvents.CREATE_ROOM, {
-      playerDetails: this.store.getState().localPlayer
+    _socketIO.notifyServer(_socketIOEvents.CREATE_ROOM, {
+      playerDetails: _appStore.getState().localPlayer
     });
   },
 
   joinRoom: function (roomID) {
-    this.socket.notifyServer(_socketIOEvents.JOIN_ROOM, {
+    _socketIO.notifyServer(_socketIOEvents.JOIN_ROOM, {
       roomID       : roomID,
-      playerDetails: this.store.getState().localPlayer
+      playerDetails: _appStore.getState().localPlayer
     });
   },
 
   leaveRoom: function (roomID) {
-    this.socket.notifyServer(_socketIOEvents.LEAVE_ROOM, {
+    _socketIO.notifyServer(_socketIOEvents.LEAVE_ROOM, {
       roomID: roomID
     });
 
-    this.store.apply(_appActions.setSessionProps({roomID: '0000'}));
+    _appStore.apply(_appActions.setSessionProps({roomID: '0000'}));
   },
 
   sendQuestion(difficulty) {
-    let appState        = this.store.getState(),
-        question        = this.store.getQuestionOfDifficulty(difficulty),
+    let appState        = _appStore.getState(),
+        question        = _appStore.getQuestionOfDifficulty(difficulty),
         risk            = Math.ceil(question.q_difficulty_level / 2),
         setSentQuestion = _appActions.setSentQuestion(question, risk);
 
-    this.socket.notifyServer(_socketIOEvents.SEND_QUESTION, {
+    _socketIO.notifyServer(_socketIOEvents.SEND_QUESTION, {
       roomID  : appState.session.roomID,
       question: question
     });
 
-    this.store.apply(setSentQuestion);
+    _appStore.apply(setSentQuestion);
   }
 
 });
