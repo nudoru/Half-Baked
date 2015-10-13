@@ -37,7 +37,7 @@ let MixinComponentViews = function () {
    * @returns {*}
    */
   function createComponentView(componentSource) {
-    return function (configProps) {
+    return function (initProps) {
 
       let componentAssembly, finalComponent, previousInitialize;
 
@@ -45,7 +45,6 @@ let MixinComponentViews = function () {
         _componentViewFactory(),
         _eventDelegatorFactory(),
         _observableFactory(),
-        //_stateObjFactory(),
         _immutableMapFactory(),
         componentSource
       ];
@@ -54,19 +53,21 @@ let MixinComponentViews = function () {
         componentAssembly = componentAssembly.concat(componentSource.mixins);
       }
 
-      finalComponent = Nori.assignArray({}, componentAssembly);
+      finalComponent     = Nori.assignArray({}, componentAssembly);
       finalComponent.key = _componentViewKeyIndex++;
 
       // Compose a new initialize function by inserting call to component super module
-      previousInitialize        = finalComponent.initialize;
+      previousInitialize = finalComponent.initialize;
+
       finalComponent.initialize = function initialize(initObj) {
         finalComponent.initializeComponent(initObj);
         previousInitialize.call(finalComponent, initObj);
       };
 
-      if (configProps) {
-        finalComponent.configuration = function () {
-          return configProps;
+      if (initProps) {
+        // Overwrite the function in the component
+        finalComponent.getDefaultProps = function () {
+          return initProps;
         };
       }
 

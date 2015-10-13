@@ -182,8 +182,8 @@ var App = Nori.createApplication({
 
     // View will show based on the current store state
     //this.store.setState({currentState: 'MAIN_GAME'});
-    //this.store.setState({currentState: 'PLAYER_SELECT'});
-    this.store.setState({ currentState: 'TITLE' });
+    this.store.setState({ currentState: 'PLAYER_SELECT' });
+    //this.store.setState({currentState: 'TITLE'});
   },
 
   //----------------------------------------------------------------------------
@@ -1027,7 +1027,7 @@ var Component = Nori.view().createComponentView({
         dlevel = undefined,
         dimage = 'null.png';
 
-    if (this.getConfigProps().target === 'local') {
+    if (this.getProps().target === 'local') {
       stats = appState.localPlayer;
       if (appState.currentQuestion) {
         localQ = true;
@@ -1056,7 +1056,7 @@ var Component = Nori.view().createComponentView({
   },
 
   getPlayState: function getPlayState(playState) {
-    var isLocal = this.getConfigProps().target === 'local',
+    var isLocal = this.getProps().target === 'local',
         local = playState.localQ,
         remote = playState.remoteQ;
 
@@ -1121,7 +1121,7 @@ var Component = Nori.view().createComponentView({
 
       endX = _nudoruBrowserDOMUtilsJs2['default'].position(foodImage).left;
 
-      if (this.getConfigProps().target === 'local') {
+      if (this.getProps().target === 'local') {
         startX = 700;
         endRot = -125;
         startS = 15;
@@ -3802,15 +3802,13 @@ var MixinComponentViews = function MixinComponentViews() {
    * @returns {*}
    */
   function createComponentView(componentSource) {
-    return function (configProps) {
+    return function (initProps) {
 
       var componentAssembly = undefined,
           finalComponent = undefined,
           previousInitialize = undefined;
 
-      componentAssembly = [(0, _ViewComponentJs2['default'])(), (0, _MixinEventDelegatorJs2['default'])(), (0, _utilsMixinObservableSubjectJs2['default'])(),
-      //_stateObjFactory(),
-      (0, _storeImmutableMapJs2['default'])(), componentSource];
+      componentAssembly = [(0, _ViewComponentJs2['default'])(), (0, _MixinEventDelegatorJs2['default'])(), (0, _utilsMixinObservableSubjectJs2['default'])(), (0, _storeImmutableMapJs2['default'])(), componentSource];
 
       if (componentSource.mixins) {
         componentAssembly = componentAssembly.concat(componentSource.mixins);
@@ -3821,14 +3819,16 @@ var MixinComponentViews = function MixinComponentViews() {
 
       // Compose a new initialize function by inserting call to component super module
       previousInitialize = finalComponent.initialize;
+
       finalComponent.initialize = function initialize(initObj) {
         finalComponent.initializeComponent(initObj);
         previousInitialize.call(finalComponent, initObj);
       };
 
-      if (configProps) {
-        finalComponent.configuration = function () {
-          return configProps;
+      if (initProps) {
+        // Overwrite the function in the component
+        finalComponent.getDefaultProps = function () {
+          return initProps;
         };
       }
 
@@ -4470,7 +4470,7 @@ var _nudoruUtilIsJs2 = _interopRequireDefault(_nudoruUtilIsJs);
 var ViewComponent = function ViewComponent() {
 
   var _isInitialized = false,
-      _configProps = undefined,
+      _props = undefined,
       _id = undefined,
       _templateObjCache = undefined,
       _html = undefined,
@@ -4482,12 +4482,13 @@ var ViewComponent = function ViewComponent() {
 
   /**
    * Initialization
-   * @param configProps
+   * @param initProps
    */
-  function initializeComponent(configProps) {
-    _configProps = this.configuration() || configProps;
-    _id = _configProps.id;
-    _mountPoint = _configProps.mountPoint;
+  function initializeComponent(initProps) {
+    _props = _.assign({}, this.getDefaultProps(), initProps);
+
+    _id = _props.id;
+    _mountPoint = _props.mountPoint;
 
     this.setState(this.getInitialState());
     this.setEvents(this.defineEvents());
@@ -4503,7 +4504,15 @@ var ViewComponent = function ViewComponent() {
     _isInitialized = true;
   }
 
-  function configuration() {
+  /**
+   * Override to set default props
+   *
+   * For a region, which is instantiated from the factory with props, this function
+   * will be overwritten by the code in MixinComponentView to return the passed
+   * initProps object
+   * @returns {undefined}
+   */
+  function getDefaultProps() {
     return undefined;
   }
 
@@ -4762,8 +4771,8 @@ var ViewComponent = function ViewComponent() {
     return _isInitialized;
   }
 
-  function getConfigProps() {
-    return _configProps;
+  function getProps() {
+    return _props;
   }
 
   function isMounted() {
@@ -4788,11 +4797,11 @@ var ViewComponent = function ViewComponent() {
 
   return {
     initializeComponent: initializeComponent,
-    configuration: configuration,
+    getDefaultProps: getDefaultProps,
     defineRegions: defineRegions,
     defineEvents: defineEvents,
     isInitialized: isInitialized,
-    getConfigProps: getConfigProps,
+    getProps: getProps,
     getInitialState: getInitialState,
     getID: getID,
     template: template,

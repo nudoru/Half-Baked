@@ -61,8 +61,8 @@ let App = Nori.createApplication({
 
     // View will show based on the current store state
     //this.store.setState({currentState: 'MAIN_GAME'});
-    //this.store.setState({currentState: 'PLAYER_SELECT'});
-    this.store.setState({currentState: 'TITLE'});
+    this.store.setState({currentState: 'PLAYER_SELECT'});
+    //this.store.setState({currentState: 'TITLE'});
   },
 
   //----------------------------------------------------------------------------

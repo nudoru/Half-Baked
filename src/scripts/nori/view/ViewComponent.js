@@ -12,7 +12,7 @@ import is from '../../nudoru/util/is.js';
 var ViewComponent = function () {
 
   let _isInitialized = false,
-      _configProps,
+      _props,
       _id,
       _templateObjCache,
       _html,
@@ -24,12 +24,13 @@ var ViewComponent = function () {
 
   /**
    * Initialization
-   * @param configProps
+   * @param initProps
    */
-  function initializeComponent(configProps) {
-    _configProps = this.configuration() || configProps;
-    _id          = _configProps.id;
-    _mountPoint  = _configProps.mountPoint;
+  function initializeComponent(initProps) {
+    _props = _.assign({}, this.getDefaultProps(), initProps);
+
+    _id         = _props.id;
+    _mountPoint = _props.mountPoint;
 
     this.setState(this.getInitialState());
     this.setEvents(this.defineEvents());
@@ -45,7 +46,15 @@ var ViewComponent = function () {
     _isInitialized = true;
   }
 
-  function configuration() {
+  /**
+   * Override to set default props
+   *
+   * For a region, which is instantiated from the factory with props, this function
+   * will be overwritten by the code in MixinComponentView to return the passed
+   * initProps object
+   * @returns {undefined}
+   */
+  function getDefaultProps() {
     return undefined;
   }
 
@@ -306,8 +315,8 @@ var ViewComponent = function () {
     return _isInitialized;
   }
 
-  function getConfigProps() {
-    return _configProps;
+  function getProps() {
+    return _props;
   }
 
   function isMounted() {
@@ -332,11 +341,11 @@ var ViewComponent = function () {
 
   return {
     initializeComponent  : initializeComponent,
-    configuration        : configuration,
+    getDefaultProps      : getDefaultProps,
     defineRegions        : defineRegions,
     defineEvents         : defineEvents,
     isInitialized        : isInitialized,
-    getConfigProps       : getConfigProps,
+    getProps             : getProps,
     getInitialState      : getInitialState,
     getID                : getID,
     template             : template,

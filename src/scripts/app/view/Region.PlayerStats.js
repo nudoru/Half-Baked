@@ -61,7 +61,7 @@ var Component = Nori.view().createComponentView({
         dlevel,
         dimage   = 'null.png';
 
-    if (this.getConfigProps().target === 'local') {
+    if (this.getProps().target === 'local') {
       stats = appState.localPlayer;
       if (appState.currentQuestion) {
         localQ = true;
@@ -90,7 +90,7 @@ var Component = Nori.view().createComponentView({
   },
 
   getPlayState(playState) {
-    let isLocal = this.getConfigProps().target === 'local',
+    let isLocal = this.getProps().target === 'local',
         local   = playState.localQ,
         remote  = playState.remoteQ;
 
@@ -154,7 +154,7 @@ var Component = Nori.view().createComponentView({
 
       endX = _domUtils.position(foodImage).left;
 
-      if (this.getConfigProps().target === 'local') {
+      if (this.getProps().target === 'local') {
         startX = 700;
         endRot = -125;
         startS = 15;
