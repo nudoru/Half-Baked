@@ -59,6 +59,8 @@ var ViewComponent = function () {
   }
 
   /**
+   * Override in implementation
+   *
    * Define DOM events to be attached after the element is mounted
    * @returns {undefined}
    */
@@ -68,15 +70,15 @@ var ViewComponent = function () {
 
   /**
    * Bind updates to the map ID to this view's update
-   * @param mapObj Object to subscribe to or ID. Should implement nori/store/MixinObservableStore
+   * @param observableStore Object to subscribe to or ID. Should implement nori/store/MixinObservableStore
    */
-  function bind(mapObj) {
-    if (!is.func(mapObj.subscribe)) {
-      console.warn('ViewComponent bind, must be observable: ' + mapObj);
+  function bind(observableStore) {
+    if (!is.func(observableStore.subscribe)) {
+      console.warn('ViewComponent bind, must be observable: ' + observableStore);
       return;
     }
 
-    mapObj.subscribe(this.update.bind(this));
+    observableStore.subscribe(this.update.bind(this));
   }
 
   /**
@@ -89,8 +91,8 @@ var ViewComponent = function () {
 
   function update() {
     let nextState = this.componentWillUpdate();
-    if (this.shouldComponentUpdate(nextState)) {
 
+    if (this.shouldComponentUpdate(nextState)) {
       this.setState(nextState);
 
       if (_isMounted) {
@@ -172,18 +174,18 @@ var ViewComponent = function () {
 
     if (this.delegateEvents) {
       if (this.shouldDelegateEvents()) {
-        // Pass true to automatically pass form element handlers the elements value or other status
+        // True to automatically pass form element handlers the elements value or other status
         this.delegateEvents(true);
       }
     }
 
     if (this.componentDidMount) {
+      //this.componentDidMount.bind(this);
+
+      // TODO fix this issue, shouldn't need this hack
       // This delay helps animation on components run on mount
-      //_mountDelay = _.delay(this.componentDidMount.bind(this), 10);
       _mountDelay = _.delay(this.mountAfterDelay.bind(this), 10);
     }
-
-    this.mountRegions();
 
     this.notifySubscribersOf('mount', this.getID());
   }
@@ -192,6 +194,8 @@ var ViewComponent = function () {
     if (_mountDelay) {
       window.clearTimeout(_mountDelay);
     }
+
+    this.mountRegions();
 
     this.componentDidMount();
   }
