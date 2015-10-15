@@ -11,27 +11,30 @@ import is from '../../nudoru/util/is.js';
 
 var ViewComponent = function () {
 
-  let _internalState = Object.create(null),
+  let _internalState = {},
+      _internalProps = {},
+      _publicState   = {},
+      _publicProps   = {},
       _isInitialized = false,
-      _props,
+      _isMounted     = false,
+      _regions       = {},
       _id,
       _templateObjCache,
       _html,
       _DOMElement,
       _mountPoint,
-      _mountDelay,
-      _regions       = {},
-      _isMounted     = false;
+      _mountDelay;
+
 
   /**
    * Initialization
    * @param initProps
    */
   function initializeComponent(initProps) {
-    _props = _.assign({}, this.getDefaultProps(), initProps);
+    setProps(_.assign({}, this.getDefaultProps(), initProps));
 
-    _id         = _props.id;
-    _mountPoint = _props.mountPoint;
+    _id         = _internalProps.id;
+    _mountPoint = _internalProps.mountPoint;
 
     this.setState(this.getInitialState());
     this.setEvents(this.defineEvents());
@@ -311,6 +314,9 @@ var ViewComponent = function () {
   //  Props and state
   //----------------------------------------------------------------------------
 
+  function getInitialState() {
+    this.setState({});
+  }
 
   function getState() {
     return _.assign({}, _internalState);
@@ -318,10 +324,16 @@ var ViewComponent = function () {
 
   function setState(nextState) {
     _internalState = _.assign({}, _internalState, nextState);
+    _publicState   = _.assign(_publicState , _internalState);
   }
 
   function getProps() {
-    return _.assign({}, _props);
+    return _.assign({}, _internalProps);
+  }
+
+  function setProps(nextProps) {
+    _internalProps = _.merge({}, _internalProps, nextProps);
+    _publicProps   = _.assign(_publicProps, _internalProps);
   }
 
   //----------------------------------------------------------------------------
@@ -334,10 +346,6 @@ var ViewComponent = function () {
 
   function isMounted() {
     return _isMounted;
-  }
-
-  function getInitialState() {
-    this.setState({});
   }
 
   function getID() {
@@ -354,14 +362,17 @@ var ViewComponent = function () {
 
   return {
     initializeComponent  : initializeComponent,
+    state                : _publicState,
+    props                : _publicProps,
+    getProps             : getProps,
+    setProps             : setProps,
+    getInitialState      : getInitialState,
     getState             : getState,
     setState             : setState,
     getDefaultProps      : getDefaultProps,
     defineRegions        : defineRegions,
     defineEvents         : defineEvents,
     isInitialized        : isInitialized,
-    getProps             : getProps,
-    getInitialState      : getInitialState,
     getID                : getID,
     template             : template,
     getDOMElement        : getDOMElement,

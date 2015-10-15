@@ -84,7 +84,7 @@ var Component = Nori.view().createComponentView({
    * Component HTML was attached to the DOM
    */
     componentDidMount() {
-    let state = this.getState();
+    let state = this.state;
 
     this.hideEl('#gameover__win');
     this.hideEl('#gameover__tie');

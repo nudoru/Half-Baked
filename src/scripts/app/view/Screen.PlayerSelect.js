@@ -73,7 +73,7 @@ var Component = Nori.view().createComponentView({
    * Component HTML was attached to the DOM
    */
   componentDidMount() {
-    document.querySelector('#select__playertype').value = this.getState().appearance;
+    document.querySelector('#select__playertype').value = this.state.appearance;
   },
 
   onCreateRoom() {

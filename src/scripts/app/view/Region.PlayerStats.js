@@ -61,7 +61,7 @@ var Component = Nori.view().createComponentView({
         dlevel,
         dimage   = 'null.png';
 
-    if (this.getProps().target === 'local') {
+    if (this.props.target === 'local') {
       stats = appState.localPlayer;
       if (appState.currentQuestion) {
         localQ = true;
@@ -90,7 +90,7 @@ var Component = Nori.view().createComponentView({
   },
 
   getPlayState(playState) {
-    let isLocal = this.getProps().target === 'local',
+    let isLocal = this.props.target === 'local',
         local   = playState.localQ,
         remote  = playState.remoteQ;
 
@@ -147,14 +147,14 @@ var Component = Nori.view().createComponentView({
 
   // TODO will not animate to local player
   animateFoodToss() {
-    if (this.getState().questionDifficultyImage !== 'null.png') {
+    if (this.state.questionDifficultyImage !== 'null.png') {
 
       let foodImage = this.getDOMElement().querySelector('.game__playerstats-food'),
           startS, startX, endRot;
 
       endX = _domUtils.position(foodImage).left;
 
-      if (this.getProps().target === 'local') {
+      if (this.props.target === 'local') {
         startX = 700;
         endRot = -125;
         startS = 15;

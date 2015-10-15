@@ -1029,7 +1029,7 @@ var Component = Nori.view().createComponentView({
         dlevel = undefined,
         dimage = 'null.png';
 
-    if (this.getProps().target === 'local') {
+    if (this.props.target === 'local') {
       stats = appState.localPlayer;
       if (appState.currentQuestion) {
         localQ = true;
@@ -1058,7 +1058,7 @@ var Component = Nori.view().createComponentView({
   },
 
   getPlayState: function getPlayState(playState) {
-    var isLocal = this.getProps().target === 'local',
+    var isLocal = this.props.target === 'local',
         local = playState.localQ,
         remote = playState.remoteQ;
 
@@ -1114,7 +1114,7 @@ var Component = Nori.view().createComponentView({
 
   // TODO will not animate to local player
   animateFoodToss: function animateFoodToss() {
-    if (this.getState().questionDifficultyImage !== 'null.png') {
+    if (this.state.questionDifficultyImage !== 'null.png') {
 
       var foodImage = this.getDOMElement().querySelector('.game__playerstats-food'),
           startS = undefined,
@@ -1123,7 +1123,7 @@ var Component = Nori.view().createComponentView({
 
       endX = _nudoruBrowserDOMUtilsJs2['default'].position(foodImage).left;
 
-      if (this.getProps().target === 'local') {
+      if (this.props.target === 'local') {
         startX = 700;
         endRot = -125;
         startS = 15;
@@ -1234,11 +1234,11 @@ var Component = Nori.view().createComponentView({
   },
 
   isCorrect: function isCorrect(choice) {
-    return parseInt(choice) === this.getState().question.q_correct_option;
+    return parseInt(choice) === this.state.question.q_correct_option;
   },
 
   scoreCorrect: function scoreCorrect() {
-    var qPoints = this.getState().question.q_difficulty_level,
+    var qPoints = this.state.question.q_difficulty_level,
         answeredCorrect = _actionActionCreatorJs2['default'].answeredCorrect(qPoints);
 
     this.clearTimer();
@@ -1311,7 +1311,7 @@ var Component = Nori.view().createComponentView({
   },
 
   hasQuestion: function hasQuestion() {
-    return this.getState().question;
+    return this.state.question;
   },
 
   /**
@@ -1357,7 +1357,7 @@ var Component = Nori.view().createComponentView({
       this.clearTimer();
     }
 
-    var viewState = this.getState();
+    var viewState = this.state;
     _timerValue = _baseMaxSeconds + (parseInt(viewState.question.q_difficulty_level) - 1) * 5;
 
     this.updateTimerText(_timerValue);
@@ -1511,7 +1511,7 @@ var Component = Nori.view().createComponentView({
    * Component HTML was attached to the DOM
    */
   componentDidMount: function componentDidMount() {
-    var state = this.getState();
+    var state = this.state;
 
     this.hideEl('#gameover__win');
     this.hideEl('#gameover__tie');
@@ -1688,7 +1688,7 @@ var Component = Nori.view().createComponentView({
   },
 
   isShowingCards: function isShowingCards() {
-    return this.getState().sentQuestion.q_difficulty_level === -1;
+    return this.state.sentQuestion.q_difficulty_level === -1;
   },
 
   animateDifficultyCards: function animateDifficultyCards() {
@@ -1837,7 +1837,7 @@ var Component = Nori.view().createComponentView({
    * Component HTML was attached to the DOM
    */
   componentDidMount: function componentDidMount() {
-    document.querySelector('#select__playertype').value = this.getState().appearance;
+    document.querySelector('#select__playertype').value = this.state.appearance;
   },
 
   onCreateRoom: function onCreateRoom() {
@@ -4482,27 +4482,29 @@ var _nudoruUtilIsJs2 = _interopRequireDefault(_nudoruUtilIsJs);
 
 var ViewComponent = function ViewComponent() {
 
-  var _internalState = Object.create(null),
+  var _internalState = {},
+      _internalProps = {},
+      _publicState = {},
+      _publicProps = {},
       _isInitialized = false,
-      _props = undefined,
+      _isMounted = false,
+      _regions = {},
       _id = undefined,
       _templateObjCache = undefined,
       _html = undefined,
       _DOMElement = undefined,
       _mountPoint = undefined,
-      _mountDelay = undefined,
-      _regions = {},
-      _isMounted = false;
+      _mountDelay = undefined;
 
   /**
    * Initialization
    * @param initProps
    */
   function initializeComponent(initProps) {
-    _props = _.assign({}, this.getDefaultProps(), initProps);
+    setProps(_.assign({}, this.getDefaultProps(), initProps));
 
-    _id = _props.id;
-    _mountPoint = _props.mountPoint;
+    _id = _internalProps.id;
+    _mountPoint = _internalProps.mountPoint;
 
     this.setState(this.getInitialState());
     this.setEvents(this.defineEvents());
@@ -4780,16 +4782,26 @@ var ViewComponent = function ViewComponent() {
   //  Props and state
   //----------------------------------------------------------------------------
 
+  function getInitialState() {
+    this.setState({});
+  }
+
   function getState() {
     return _.assign({}, _internalState);
   }
 
   function setState(nextState) {
     _internalState = _.assign({}, _internalState, nextState);
+    _publicState = _.assign(_publicState, _internalState);
   }
 
   function getProps() {
-    return _.assign({}, _props);
+    return _.assign({}, _internalProps);
+  }
+
+  function setProps(nextProps) {
+    _internalProps = _.merge({}, _internalProps, nextProps);
+    _publicProps = _.assign(_publicProps, _internalProps);
   }
 
   //----------------------------------------------------------------------------
@@ -4802,10 +4814,6 @@ var ViewComponent = function ViewComponent() {
 
   function isMounted() {
     return _isMounted;
-  }
-
-  function getInitialState() {
-    this.setState({});
   }
 
   function getID() {
@@ -4822,14 +4830,17 @@ var ViewComponent = function ViewComponent() {
 
   return {
     initializeComponent: initializeComponent,
+    state: _publicState,
+    props: _publicProps,
+    getProps: getProps,
+    setProps: setProps,
+    getInitialState: getInitialState,
     getState: getState,
     setState: setState,
     getDefaultProps: getDefaultProps,
     defineRegions: defineRegions,
     defineEvents: defineEvents,
     isInitialized: isInitialized,
-    getProps: getProps,
-    getInitialState: getInitialState,
     getID: getID,
     template: template,
     getDOMElement: getDOMElement,

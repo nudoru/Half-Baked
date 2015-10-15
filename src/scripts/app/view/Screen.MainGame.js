@@ -108,7 +108,7 @@ var Component = Nori.view().createComponentView({
   },
 
   isShowingCards() {
-    return (this.getState().sentQuestion.q_difficulty_level === -1);
+    return (this.state.sentQuestion.q_difficulty_level === -1);
   },
 
   animateDifficultyCards() {

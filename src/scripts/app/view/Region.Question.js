@@ -52,11 +52,11 @@ var Component = Nori.view().createComponentView({
   },
 
   isCorrect(choice) {
-    return parseInt(choice) === this.getState().question.q_correct_option;
+    return parseInt(choice) === this.state.question.q_correct_option;
   },
 
   scoreCorrect() {
-    let qPoints         = this.getState().question.q_difficulty_level,
+    let qPoints         = this.state.question.q_difficulty_level,
         answeredCorrect = _appActions.answeredCorrect(qPoints);
 
     this.clearTimer();
@@ -129,7 +129,7 @@ var Component = Nori.view().createComponentView({
   },
 
   hasQuestion() {
-    return this.getState().question;
+    return this.state.question;
   },
 
   /**
@@ -177,7 +177,7 @@ var Component = Nori.view().createComponentView({
       this.clearTimer();
     }
 
-    let viewState = this.getState();
+    let viewState = this.state;
     _timerValue   = _baseMaxSeconds + ((parseInt(viewState.question.q_difficulty_level) - 1) * 5);
 
     this.updateTimerText(_timerValue);
