@@ -4480,13 +4480,22 @@ var _nudoruUtilIsJs = require('../../nudoru/util/is.js');
 
 var _nudoruUtilIsJs2 = _interopRequireDefault(_nudoruUtilIsJs);
 
+// Lifecycle state constants
+var LS_NO_INIT = 0,
+    LS_INITED = 1,
+    LS_UPDATING = 2,
+    LS_RENDERING = 3,
+    LS_MOUNTED = 4,
+    LS_UNMOUNTED = 5,
+    LS_DISPOSED = 9;
+
 var ViewComponent = function ViewComponent() {
 
   var _internalState = {},
       _internalProps = {},
       _publicState = {},
       _publicProps = {},
-      _isInitialized = false,
+      _lifecycleState = LS_NO_INIT,
       _isMounted = false,
       _regions = {},
       _id = undefined,
@@ -4502,18 +4511,17 @@ var ViewComponent = function ViewComponent() {
    */
   function initializeComponent(initProps) {
     setProps(_.assign({}, this.getDefaultProps(), initProps));
+    this.setState(this.getInitialState());
+    this.setEvents(this.defineEvents());
 
     _id = _internalProps.id;
     _mountPoint = _internalProps.mountPoint;
-
-    this.setState(this.getInitialState());
-    this.setEvents(this.defineEvents());
 
     _regions = this.defineRegions();
 
     this.initializeRegions();
 
-    _isInitialized = true;
+    _lifecycleState = LS_INITED;
   }
 
   /**
@@ -4560,6 +4568,8 @@ var ViewComponent = function ViewComponent() {
   }
 
   function update() {
+    _lifecycleState = LS_UPDATING;
+
     var nextState = this.componentWillUpdate();
 
     if (this.shouldComponentUpdate(nextState)) {
@@ -4572,6 +4582,10 @@ var ViewComponent = function ViewComponent() {
       }
 
       this.updateRegions();
+    }
+
+    if (_lifecycleState === LS_UPDATING) {
+      _lifecycleState = LS_INITED;
     }
   }
 
@@ -4590,6 +4604,8 @@ var ViewComponent = function ViewComponent() {
    * @returns {*}
    */
   function componentRender() {
+    _lifecycleState = LS_RENDERING;
+
     if (!_templateObjCache) {
       _templateObjCache = this.template(this.getState());
     }
@@ -4633,6 +4649,8 @@ var ViewComponent = function ViewComponent() {
       return;
     }
 
+    _lifecycleState = LS_MOUNTED;
+
     _isMounted = true;
 
     _DOMElement = _utilsRendererJs2['default'].render({
@@ -4649,21 +4667,22 @@ var ViewComponent = function ViewComponent() {
 
     if (this.componentDidMount) {
       //this.componentDidMount.bind(this);
-
-      // TODO fix this issue, shouldn't need this hack
-      // This delay helps animation on components run on mount
-      _mountDelay = _.delay(this.mountAfterDelay.bind(this), 10);
+      _mountDelay = _.delay(this.mountAfterDelay.bind(this), 1);
     }
   }
 
+  /**
+   * HACK
+   * Experiencing issues with animations running in componentDidMount
+   * after renders and state changes. This delay fixes the issues.
+   */
   function mountAfterDelay() {
     if (_mountDelay) {
       window.clearTimeout(_mountDelay);
     }
 
-    this.mountRegions();
-
     this.componentDidMount();
+    this.mountRegions();
   }
 
   /**
@@ -4678,16 +4697,15 @@ var ViewComponent = function ViewComponent() {
    * Call after it's been added to a view
    */
   function componentDidMount() {}
-  // stub
 
   /**
    * Call when unloading
    */
-  function componentWillUnmount() {
-    // stub
-  }
+  function componentWillUnmount() {}
 
   function unmount() {
+
+    _lifecycleState = LS_UNMOUNTED;
 
     if (_mountDelay) {
       window.clearTimeout(_mountDelay);
@@ -4721,6 +4739,8 @@ var ViewComponent = function ViewComponent() {
     this.componentWillDispose();
     this.disposeRegions();
     this.unmount();
+
+    _lifecycleState = LS_DISPOSED;
   }
 
   function componentWillDispose() {}
@@ -4729,6 +4749,8 @@ var ViewComponent = function ViewComponent() {
   //----------------------------------------------------------------------------
   //  Regions
   //----------------------------------------------------------------------------
+
+  //TODO reduce code repetition
 
   function defineRegions() {
     return undefined;
@@ -4792,7 +4814,12 @@ var ViewComponent = function ViewComponent() {
 
   function setState(nextState) {
     _internalState = _.assign({}, _internalState, nextState);
+    // keeping the object reference
     _publicState = _.assign(_publicState, _internalState);
+
+    if (_publicState.onChange) {
+      _publicState.onChange.apply(this);
+    }
   }
 
   function getProps() {
@@ -4801,15 +4828,24 @@ var ViewComponent = function ViewComponent() {
 
   function setProps(nextProps) {
     _internalProps = _.merge({}, _internalProps, nextProps);
+    // keeping the object reference
     _publicProps = _.assign(_publicProps, _internalProps);
+
+    if (_publicProps.onChange) {
+      _publicProps.onChange.apply(this);
+    }
   }
 
   //----------------------------------------------------------------------------
   //  Accessors
   //----------------------------------------------------------------------------
 
+  function getLifeCycleState() {
+    return _lifecycleState;
+  }
+
   function isInitialized() {
-    return _isInitialized;
+    return _lifecycleState > LS_NO_INIT;
   }
 
   function isMounted() {
@@ -4840,6 +4876,7 @@ var ViewComponent = function ViewComponent() {
     getDefaultProps: getDefaultProps,
     defineRegions: defineRegions,
     defineEvents: defineEvents,
+    getLifeCycleState: getLifeCycleState,
     isInitialized: isInitialized,
     getID: getID,
     template: template,
