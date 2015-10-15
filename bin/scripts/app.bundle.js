@@ -4704,9 +4704,6 @@ var ViewComponent = function ViewComponent() {
   function componentWillUnmount() {}
 
   function unmount() {
-
-    _lifecycleState = LS_UNMOUNTED;
-
     if (_mountDelay) {
       window.clearTimeout(_mountDelay);
     }
@@ -4718,6 +4715,7 @@ var ViewComponent = function ViewComponent() {
 
     this.componentWillUnmount();
 
+    // NO
     //this.unmountRegions();
 
     _isMounted = false;
@@ -4733,6 +4731,8 @@ var ViewComponent = function ViewComponent() {
 
     _html = '';
     _DOMElement = null;
+
+    _lifecycleState = LS_UNMOUNTED;
   }
 
   function dispose() {
@@ -4813,6 +4813,10 @@ var ViewComponent = function ViewComponent() {
   }
 
   function setState(nextState) {
+    if (_.isEqual(_internalState, nextState)) {
+      return;
+    }
+
     _internalState = _.assign({}, _internalState, nextState);
     // keeping the object reference
     _publicState = _.assign(_publicState, _internalState);
@@ -4827,6 +4831,14 @@ var ViewComponent = function ViewComponent() {
   }
 
   function setProps(nextProps) {
+    if (_.isEqual(_internalProps, nextProps)) {
+      return;
+    }
+
+    if (this.componentWillReceiveProps) {
+      this.componentWillReceiveProps(nextProps);
+    }
+
     _internalProps = _.merge({}, _internalProps, nextProps);
     // keeping the object reference
     _publicProps = _.assign(_publicProps, _internalProps);
@@ -4835,6 +4847,8 @@ var ViewComponent = function ViewComponent() {
       _publicProps.onChange.apply(this);
     }
   }
+
+  function componentWillReceiveProps(nextProps) {}
 
   //----------------------------------------------------------------------------
   //  Accessors
@@ -4883,6 +4897,7 @@ var ViewComponent = function ViewComponent() {
     getDOMElement: getDOMElement,
     isMounted: isMounted,
     bind: bind,
+    componentWillReceiveProps: componentWillReceiveProps,
     componentWillUpdate: componentWillUpdate,
     shouldComponentUpdate: shouldComponentUpdate,
     update: update,

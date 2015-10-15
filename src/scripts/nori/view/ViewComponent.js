@@ -236,9 +236,6 @@ var ViewComponent = function () {
   }
 
   function unmount() {
-
-    _lifecycleState = LS_UNMOUNTED;
-
     if (_mountDelay) {
       window.clearTimeout(_mountDelay);
     }
@@ -250,6 +247,7 @@ var ViewComponent = function () {
 
     this.componentWillUnmount();
 
+    // NO
     //this.unmountRegions();
 
     _isMounted = false;
@@ -265,6 +263,8 @@ var ViewComponent = function () {
 
     _html       = '';
     _DOMElement = null;
+
+    _lifecycleState = LS_UNMOUNTED;
   }
 
   function dispose() {
@@ -346,6 +346,10 @@ var ViewComponent = function () {
   }
 
   function setState(nextState) {
+    if(_.isEqual(_internalState, nextState)) {
+      return;
+    }
+
     _internalState = _.assign({}, _internalState, nextState);
     // keeping the object reference
     _publicState = _.assign(_publicState, _internalState);
@@ -360,6 +364,14 @@ var ViewComponent = function () {
   }
 
   function setProps(nextProps) {
+    if(_.isEqual(_internalProps, nextProps)) {
+      return;
+    }
+
+    if(this.componentWillReceiveProps) {
+      this.componentWillReceiveProps(nextProps);
+    }
+
     _internalProps = _.merge({}, _internalProps, nextProps);
     // keeping the object reference
     _publicProps = _.assign(_publicProps, _internalProps);
@@ -367,6 +379,9 @@ var ViewComponent = function () {
     if (_publicProps.onChange) {
       _publicProps.onChange.apply(this);
     }
+  }
+
+  function componentWillReceiveProps(nextProps) {
   }
 
   //----------------------------------------------------------------------------
@@ -398,45 +413,46 @@ var ViewComponent = function () {
   //----------------------------------------------------------------------------
 
   return {
-    initializeComponent  : initializeComponent,
-    state                : _publicState,
-    props                : _publicProps,
-    getProps             : getProps,
-    setProps             : setProps,
-    getInitialState      : getInitialState,
-    getState             : getState,
-    setState             : setState,
-    getDefaultProps      : getDefaultProps,
-    defineRegions        : defineRegions,
-    defineEvents         : defineEvents,
-    getLifeCycleState    : getLifeCycleState,
-    isInitialized        : isInitialized,
-    getID                : getID,
-    template             : template,
-    getDOMElement        : getDOMElement,
-    isMounted            : isMounted,
-    bind                 : bind,
-    componentWillUpdate  : componentWillUpdate,
-    shouldComponentUpdate: shouldComponentUpdate,
-    update               : update,
-    componentRender      : componentRender,
-    render               : render,
-    mount                : mount,
-    shouldDelegateEvents : shouldDelegateEvents,
-    mountAfterDelay      : mountAfterDelay,
-    componentDidMount    : componentDidMount,
-    componentWillUnmount : componentWillUnmount,
-    unmount              : unmount,
-    dispose              : dispose,
-    componentWillDispose : componentWillDispose,
-    getRegion            : getRegion,
-    getRegionIDs         : getRegionIDs,
-    initializeRegions    : initializeRegions,
-    updateRegions        : updateRegions,
-    renderRegions        : renderRegions,
-    mountRegions         : mountRegions,
-    unmountRegions       : unmountRegions,
-    disposeRegions       : disposeRegions
+    initializeComponent      : initializeComponent,
+    state                    : _publicState,
+    props                    : _publicProps,
+    getProps                 : getProps,
+    setProps                 : setProps,
+    getInitialState          : getInitialState,
+    getState                 : getState,
+    setState                 : setState,
+    getDefaultProps          : getDefaultProps,
+    defineRegions            : defineRegions,
+    defineEvents             : defineEvents,
+    getLifeCycleState        : getLifeCycleState,
+    isInitialized            : isInitialized,
+    getID                    : getID,
+    template                 : template,
+    getDOMElement            : getDOMElement,
+    isMounted                : isMounted,
+    bind                     : bind,
+    componentWillReceiveProps: componentWillReceiveProps,
+    componentWillUpdate      : componentWillUpdate,
+    shouldComponentUpdate    : shouldComponentUpdate,
+    update                   : update,
+    componentRender          : componentRender,
+    render                   : render,
+    mount                    : mount,
+    shouldDelegateEvents     : shouldDelegateEvents,
+    mountAfterDelay          : mountAfterDelay,
+    componentDidMount        : componentDidMount,
+    componentWillUnmount     : componentWillUnmount,
+    unmount                  : unmount,
+    dispose                  : dispose,
+    componentWillDispose     : componentWillDispose,
+    getRegion                : getRegion,
+    getRegionIDs             : getRegionIDs,
+    initializeRegions        : initializeRegions,
+    updateRegions            : updateRegions,
+    renderRegions            : renderRegions,
+    mountRegions             : mountRegions,
+    unmountRegions           : unmountRegions,
+    disposeRegions           : disposeRegions
   };
 
 };
