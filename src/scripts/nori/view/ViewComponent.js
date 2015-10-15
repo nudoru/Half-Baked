@@ -11,7 +11,8 @@ import is from '../../nudoru/util/is.js';
 
 var ViewComponent = function () {
 
-  let _isInitialized = false,
+  let _internalState = Object.create(null),
+      _isInitialized = false,
       _props,
       _id,
       _templateObjCache,
@@ -36,10 +37,6 @@ var ViewComponent = function () {
     this.setEvents(this.defineEvents());
 
     _regions = this.defineRegions();
-
-    this.createSubject('update');
-    this.createSubject('mount');
-    this.createSubject('unmount');
 
     this.initializeRegions();
 
@@ -102,8 +99,6 @@ var ViewComponent = function () {
       }
 
       this.updateRegions();
-
-      this.notifySubscribersOf('update', this.getID());
     }
   }
 
@@ -186,8 +181,6 @@ var ViewComponent = function () {
       // This delay helps animation on components run on mount
       _mountDelay = _.delay(this.mountAfterDelay.bind(this), 10);
     }
-
-    this.notifySubscribersOf('mount', this.getID());
   }
 
   function mountAfterDelay() {
@@ -250,7 +243,6 @@ var ViewComponent = function () {
 
     _html       = '';
     _DOMElement = null;
-    this.notifySubscribersOf('unmount', this.getID());
   }
 
   function dispose() {
@@ -316,15 +308,28 @@ var ViewComponent = function () {
   }
 
   //----------------------------------------------------------------------------
+  //  Props and state
+  //----------------------------------------------------------------------------
+
+
+  function getState() {
+    return _.assign({}, _internalState);
+  }
+
+  function setState(nextState) {
+    _internalState = _.assign({}, _internalState, nextState);
+  }
+
+  function getProps() {
+    return _.assign({}, _props);
+  }
+
+  //----------------------------------------------------------------------------
   //  Accessors
   //----------------------------------------------------------------------------
 
   function isInitialized() {
     return _isInitialized;
-  }
-
-  function getProps() {
-    return _.assign({}, _props);
   }
 
   function isMounted() {
@@ -349,6 +354,8 @@ var ViewComponent = function () {
 
   return {
     initializeComponent  : initializeComponent,
+    getState             : getState,
+    setState             : setState,
     getDefaultProps      : getDefaultProps,
     defineRegions        : defineRegions,
     defineEvents         : defineEvents,

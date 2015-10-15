@@ -3775,18 +3775,6 @@ var _MixinEventDelegatorJs = require('./MixinEventDelegator.js');
 
 var _MixinEventDelegatorJs2 = _interopRequireDefault(_MixinEventDelegatorJs);
 
-var _utilsMixinObservableSubjectJs = require('../utils/MixinObservableSubject.js');
-
-var _utilsMixinObservableSubjectJs2 = _interopRequireDefault(_utilsMixinObservableSubjectJs);
-
-var _storeSimpleStoreJs = require('../store/SimpleStore.js');
-
-var _storeSimpleStoreJs2 = _interopRequireDefault(_storeSimpleStoreJs);
-
-var _storeImmutableMapJs = require('../store/ImmutableMap.js');
-
-var _storeImmutableMapJs2 = _interopRequireDefault(_storeImmutableMapJs);
-
 var MixinComponentViews = function MixinComponentViews() {
 
   var _componentViewMap = Object.create(null),
@@ -3820,7 +3808,7 @@ var MixinComponentViews = function MixinComponentViews() {
           finalComponent = undefined,
           previousInitialize = undefined;
 
-      componentAssembly = [(0, _ViewComponentJs2['default'])(), (0, _MixinEventDelegatorJs2['default'])(), (0, _utilsMixinObservableSubjectJs2['default'])(), (0, _storeImmutableMapJs2['default'])(), componentSource];
+      componentAssembly = [(0, _ViewComponentJs2['default'])(), (0, _MixinEventDelegatorJs2['default'])(), componentSource];
 
       if (componentSource.mixins) {
         componentAssembly = componentAssembly.concat(componentSource.mixins);
@@ -3898,7 +3886,7 @@ var MixinComponentViews = function MixinComponentViews() {
 exports['default'] = MixinComponentViews();
 module.exports = exports['default'];
 
-},{"../store/ImmutableMap.js":21,"../store/SimpleStore.js":23,"../utils/MixinObservableSubject.js":25,"./MixinEventDelegator.js":33,"./ViewComponent.js":36}],32:[function(require,module,exports){
+},{"./MixinEventDelegator.js":33,"./ViewComponent.js":36}],32:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -4494,7 +4482,8 @@ var _nudoruUtilIsJs2 = _interopRequireDefault(_nudoruUtilIsJs);
 
 var ViewComponent = function ViewComponent() {
 
-  var _isInitialized = false,
+  var _internalState = Object.create(null),
+      _isInitialized = false,
       _props = undefined,
       _id = undefined,
       _templateObjCache = undefined,
@@ -4519,10 +4508,6 @@ var ViewComponent = function ViewComponent() {
     this.setEvents(this.defineEvents());
 
     _regions = this.defineRegions();
-
-    this.createSubject('update');
-    this.createSubject('mount');
-    this.createSubject('unmount');
 
     this.initializeRegions();
 
@@ -4585,8 +4570,6 @@ var ViewComponent = function ViewComponent() {
       }
 
       this.updateRegions();
-
-      this.notifySubscribersOf('update', this.getID());
     }
   }
 
@@ -4669,8 +4652,6 @@ var ViewComponent = function ViewComponent() {
       // This delay helps animation on components run on mount
       _mountDelay = _.delay(this.mountAfterDelay.bind(this), 10);
     }
-
-    this.notifySubscribersOf('mount', this.getID());
   }
 
   function mountAfterDelay() {
@@ -4732,7 +4713,6 @@ var ViewComponent = function ViewComponent() {
 
     _html = '';
     _DOMElement = null;
-    this.notifySubscribersOf('unmount', this.getID());
   }
 
   function dispose() {
@@ -4797,15 +4777,27 @@ var ViewComponent = function ViewComponent() {
   }
 
   //----------------------------------------------------------------------------
+  //  Props and state
+  //----------------------------------------------------------------------------
+
+  function getState() {
+    return _.assign({}, _internalState);
+  }
+
+  function setState(nextState) {
+    _internalState = _.assign({}, _internalState, nextState);
+  }
+
+  function getProps() {
+    return _.assign({}, _props);
+  }
+
+  //----------------------------------------------------------------------------
   //  Accessors
   //----------------------------------------------------------------------------
 
   function isInitialized() {
     return _isInitialized;
-  }
-
-  function getProps() {
-    return _.assign({}, _props);
   }
 
   function isMounted() {
@@ -4830,6 +4822,8 @@ var ViewComponent = function ViewComponent() {
 
   return {
     initializeComponent: initializeComponent,
+    getState: getState,
+    setState: setState,
     getDefaultProps: getDefaultProps,
     defineRegions: defineRegions,
     defineEvents: defineEvents,
