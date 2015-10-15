@@ -921,11 +921,11 @@ var AppViewModule = Nori.createView({
 
     this.setViewMountPoint('#contents');
 
-    this.mapStateToViewComponent(gameStates[0], 'title', (0, _ScreenTitleJs2['default'])());
-    this.mapStateToViewComponent(gameStates[1], 'playerselect', (0, _ScreenPlayerSelectJs2['default'])());
-    this.mapStateToViewComponent(gameStates[2], 'waitingonplayer', (0, _ScreenWaitingOnPlayerJs2['default'])());
-    this.mapStateToViewComponent(gameStates[3], 'game', (0, _ScreenMainGameJs2['default'])());
-    this.mapStateToViewComponent(gameStates[4], 'gameover', (0, _ScreenGameOverJs2['default'])());
+    this.mapConditionToViewComponent(gameStates[0], 'title', (0, _ScreenTitleJs2['default'])());
+    this.mapConditionToViewComponent(gameStates[1], 'playerselect', (0, _ScreenPlayerSelectJs2['default'])());
+    this.mapConditionToViewComponent(gameStates[2], 'waitingonplayer', (0, _ScreenWaitingOnPlayerJs2['default'])());
+    this.mapConditionToViewComponent(gameStates[3], 'game', (0, _ScreenMainGameJs2['default'])());
+    this.mapConditionToViewComponent(gameStates[4], 'gameover', (0, _ScreenGameOverJs2['default'])());
   },
 
   /**
@@ -2639,7 +2639,7 @@ var _vendorImmutableMinJs = require('../../vendor/immutable.min.js');
 var _vendorImmutableMinJs2 = _interopRequireDefault(_vendorImmutableMinJs);
 
 var ImmutableMap = function ImmutableMap() {
-  var _map = _vendorImmutableMinJs2['default'].OrderedMap();
+  var _map = _vendorImmutableMinJs2['default'].Map();
 
   /**
    * Returns the Map object
@@ -2662,12 +2662,11 @@ var ImmutableMap = function ImmutableMap() {
    * @param next
    */
   function setState(next) {
-    var c = getState(),
-        d = _.assign({}, c, next);
-
-    _map = _vendorImmutableMinJs2['default'].OrderedMap(_vendorImmutableMinJs2['default'].fromJS(d));
-
-    //_map = _map.merge(next);
+    //let c = getState(),
+    //    d = _.assign({}, c, next);
+    //
+    //_map  = immutable.Map(immutable.fromJS(d));
+    _map = _map.merge(next);
   }
 
   function toJSON() {
@@ -3778,7 +3777,10 @@ var _MixinEventDelegatorJs2 = _interopRequireDefault(_MixinEventDelegatorJs);
 var MixinComponentViews = function MixinComponentViews() {
 
   var _componentViewMap = Object.create(null),
-      _componentViewKeyIndex = 0;
+      _componentViewKeyIndex = 0,
+      _currentViewID = undefined,
+      _defaultMountPoint = undefined,
+      _viewIDMap = Object.create(null);
 
   /**
    * Map a component to a mounting point. If a string is passed,
@@ -3872,6 +3874,65 @@ var MixinComponentViews = function MixinComponentViews() {
   }
 
   //----------------------------------------------------------------------------
+  //  Conditional view such as routes or states
+  //  Must be augmented with mixins for state and route change monitoring
+  //----------------------------------------------------------------------------
+
+  /**
+   * Set the location for the view to mount on route changes, any contents will
+   * be removed prior
+   * @param elID
+   */
+  function setViewMountPoint(elID) {
+    _defaultMountPoint = elID;
+  }
+
+  function getViewMountPoint() {
+    return _defaultMountPoint;
+  }
+
+  /**
+   * Map a route to a module view controller
+   * @param templateID
+   * @param component
+   */
+  function mapConditionToViewComponent(condition, templateID, component) {
+    _viewIDMap[condition] = templateID;
+    mapViewComponent(templateID, component, _defaultMountPoint);
+  }
+
+  /**
+   * Show a view (in response to a route change)
+   * @param condition
+   */
+  function showViewForCondition(condition) {
+    var componentID = _viewIDMap[condition];
+    if (!componentID) {
+      console.warn("No view mapped for route: " + condition);
+      return;
+    }
+
+    removeCurrentView();
+
+    _currentViewID = componentID;
+    showViewComponent(_currentViewID);
+
+    // Transition new view in
+    TweenLite.set(_defaultMountPoint, { alpha: 0 });
+    TweenLite.to(_defaultMountPoint, 0.25, { alpha: 1, ease: Quad.easeOut });
+  }
+
+  /**
+   * Remove the currently displayed view
+   */
+  function removeCurrentView() {
+    if (_currentViewID) {
+      getComponentViewMap()[_currentViewID].controller.dispose();
+    }
+    _currentViewID = '';
+  }
+
+  //----------------------------------------------------------------------------
   //  API
   //----------------------------------------------------------------------------
 
@@ -3879,7 +3940,11 @@ var MixinComponentViews = function MixinComponentViews() {
     mapViewComponent: mapViewComponent,
     createComponentView: createComponentView,
     showViewComponent: showViewComponent,
-    getComponentViewMap: getComponentViewMap
+    getComponentViewMap: getComponentViewMap,
+    showViewForCondition: showViewForCondition,
+    setViewMountPoint: setViewMountPoint,
+    getViewMountPoint: getViewMountPoint,
+    mapConditionToViewComponent: mapConditionToViewComponent
   };
 };
 
@@ -4335,7 +4400,7 @@ exports['default'] = MixinNudoruControls();
 module.exports = exports['default'];
 
 },{"../../nudoru/components/MessageBoxCreator.js":40,"../../nudoru/components/MessageBoxView.js":41,"../../nudoru/components/ModalCoverView.js":42,"../../nudoru/components/ToastView.js":43,"../../nudoru/components/ToolTipView.js":44}],35:[function(require,module,exports){
-Object.defineProperty(exports, '__esModule', {
+Object.defineProperty(exports, "__esModule", {
   value: true
 });
 /*  weak */
@@ -4346,113 +4411,40 @@ Object.defineProperty(exports, '__esModule', {
 
 var MixinStoreStateViews = function MixinStoreStateViews() {
 
-  var _this = undefined,
-      _watchedStore = undefined,
-      _currentViewID = undefined,
-      _currentStoreState = undefined,
-      _stateViewMountPoint = undefined,
-      _stateViewIDMap = Object.create(null);
+  var _observedStore = undefined,
+      _currentStoreState = undefined;
 
   /**
    * Set up listeners
    */
   function initializeStateViews(store) {
-    _this = this; // mitigation, Due to events, scope may be set to the window object
-    _watchedStore = store;
+    _observedStore = store;
 
-    this.createSubject('viewChange');
-
-    _watchedStore.subscribe(function onStateChange() {
-      handleStateChange();
-    });
+    _observedStore.subscribe(onStateChange.bind(this));
   }
 
-  /**
-   * Show route from URL hash on change
-   * @param routeObj
-   */
-  function handleStateChange() {
-    showViewForCurrentStoreState();
+  function onStateChange() {
+    showViewForChangedCondition.bind(this)();
   }
 
-  function showViewForCurrentStoreState() {
-    var state = _watchedStore.getState().currentState;
+  function showViewForChangedCondition() {
+    var state = _observedStore.getState().currentState;
     if (state) {
       if (state !== _currentStoreState) {
         _currentStoreState = state;
-        showStateViewComponent.bind(_this)(_currentStoreState);
+        this.showViewForCondition(_currentStoreState);
       }
     }
   }
 
-  /**
-   * Set the location for the view to mount on route changes, any contents will
-   * be removed prior
-   * @param elID
-   */
-  function setViewMountPoint(elID) {
-    _stateViewMountPoint = elID;
-  }
-
-  function getViewMountPoint() {
-    return _stateViewMountPoint;
-  }
-
-  /**
-   * Map a route to a module view controller
-   * @param templateID
-   * @param componentIDorObj
-   */
-  function mapStateToViewComponent(state, templateID, componentIDorObj) {
-    _stateViewIDMap[state] = templateID;
-    this.mapViewComponent(templateID, componentIDorObj, _stateViewMountPoint);
-  }
-
-  /**
-   * Show a view (in response to a route change)
-   * @param state
-   */
-  function showStateViewComponent(state) {
-    var componentID = _stateViewIDMap[state];
-    if (!componentID) {
-      console.warn("No view mapped for route: " + state);
-      return;
-    }
-
-    removeCurrentView();
-
-    _currentViewID = componentID;
-    this.showViewComponent(_currentViewID);
-
-    // Transition new view in
-    TweenLite.set(_stateViewMountPoint, { alpha: 0 });
-    TweenLite.to(_stateViewMountPoint, 0.25, { alpha: 1, ease: Quad.easeOut });
-
-    this.notifySubscribersOf('viewChange', componentID);
-  }
-
-  /**
-   * Remove the currently displayed view
-   */
-  function removeCurrentView() {
-    if (_currentViewID) {
-      _this.getComponentViewMap()[_currentViewID].controller.dispose();
-    }
-    _currentViewID = '';
-  }
-
   return {
     initializeStateViews: initializeStateViews,
-    showViewForCurrentStoreState: showViewForCurrentStoreState,
-    showStateViewComponent: showStateViewComponent,
-    setViewMountPoint: setViewMountPoint,
-    getViewMountPoint: getViewMountPoint,
-    mapStateToViewComponent: mapStateToViewComponent
+    showViewForChangedState: showViewForChangedCondition
   };
 };
 
-exports['default'] = MixinStoreStateViews();
-module.exports = exports['default'];
+exports["default"] = MixinStoreStateViews();
+module.exports = exports["default"];
 
 },{}],36:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
@@ -4821,7 +4813,7 @@ var ViewComponent = function ViewComponent() {
     // keeping the object reference
     _publicState = _.assign(_publicState, _internalState);
 
-    if (_publicState.onChange) {
+    if (typeof _publicState.onChange === 'function') {
       _publicState.onChange.apply(this);
     }
   }
@@ -4835,7 +4827,7 @@ var ViewComponent = function ViewComponent() {
       return;
     }
 
-    if (this.componentWillReceiveProps) {
+    if (this.componentWillReceiveProps && _lifecycleState > LS_INITED) {
       this.componentWillReceiveProps(nextProps);
     }
 
@@ -4843,7 +4835,7 @@ var ViewComponent = function ViewComponent() {
     // keeping the object reference
     _publicProps = _.assign(_publicProps, _internalProps);
 
-    if (_publicProps.onChange) {
+    if (typeof _publicProps.onChange === 'function') {
       _publicProps.onChange.apply(this);
     }
   }
