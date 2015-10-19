@@ -48,7 +48,7 @@ var ViewComponent = function () {
    * @param initProps
    */
   function initializeComponent(initProps) {
-    setProps(_.assign({}, this.getDefaultProps(), initProps));
+    this.setProps(_.assign({}, this.getDefaultProps(), initProps));
 
     this.setState(this.getInitialState());
     this.setEvents(this.defineEvents());
@@ -147,6 +147,10 @@ var ViewComponent = function () {
       return;
     }
 
+    // Cache these for next render call
+    _lastRenderedState = _.assign({}, _internalState);
+    _lastRenderedProps = _.assign({}, _internalProps);
+
     let wasMounted = _isMounted;
     if(_isMounted) {
       this.unmount();
@@ -158,17 +162,13 @@ var ViewComponent = function () {
       _templateObjCache = this.template(_internalState);
     }
 
-    // Cache these for next render call
-    _lastRenderedState = _.assign({}, _internalState);
-    _lastRenderedProps = _.assign({}, _internalProps);
-
     _html = this.render(this.getState());
-
-    this.renderRegions();
 
     if(wasMounted) {
       this.mount();
     }
+
+    this.renderRegions();
   }
 
   /**
@@ -219,12 +219,12 @@ var ViewComponent = function () {
 
     _lifecycleState = LS_MOUNTED;
 
-    _isMounted = true;
-
     _DOMElement = (_renderer.render({
       target: _mountPoint,
       html  : _html
     }));
+
+    _isMounted = true;
 
     if (typeof this.delegateEvents === 'function') {
       if (this.shouldDelegateEvents()) {
@@ -414,6 +414,10 @@ var ViewComponent = function () {
 
     if (typeof _publicProps.onChange === 'function') {
       _publicProps.onChange.apply(this);
+    }
+
+    if(_lifecycleState > LS_INITED) {
+      this.update();
     }
   }
 
