@@ -14,7 +14,7 @@ let _questionChangeObs = null,
 /**
  * Module for a dynamic application view for a route or a persistent view
  */
-var Component = Nori.view().createComponentView({
+var Component = Nori.view().createComponent({
 
   mixins: [
     _mixinDOMManipulation
@@ -27,8 +27,7 @@ var Component = Nori.view().createComponentView({
    * initialized from app view
    * @param configProps
    */
-    initialize(configProps) {
-    this.bind(_appStore);
+    initialize(initProps) {
   },
 
   /**

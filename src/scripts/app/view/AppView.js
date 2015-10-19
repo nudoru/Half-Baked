@@ -46,7 +46,7 @@ let AppViewModule = Nori.createView({
     this.setViewMountPoint('#contents');
 
     this.mapConditionToViewComponent(gameStates[0], 'title', _screenTitleFactory());
-    this.mapConditionToViewComponent(gameStates[1], 'playerselect', _screenPlayerSelectFactory());
+    this.mapConditionToViewComponent(gameStates[1], 'playerselect', _screenPlayerSelectFactory({test:'foobar'}));
     this.mapConditionToViewComponent(gameStates[2], 'waitingonplayer', _screenWaitingOnPlayerFactory());
     this.mapConditionToViewComponent(gameStates[3], 'game', _screenMainGameFactory());
     this.mapConditionToViewComponent(gameStates[4], 'gameover', _screenGameOverFactory());

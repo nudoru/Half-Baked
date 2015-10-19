@@ -922,7 +922,7 @@ var AppViewModule = Nori.createView({
     this.setViewMountPoint('#contents');
 
     this.mapConditionToViewComponent(gameStates[0], 'title', (0, _ScreenTitleJs2['default'])());
-    this.mapConditionToViewComponent(gameStates[1], 'playerselect', (0, _ScreenPlayerSelectJs2['default'])());
+    this.mapConditionToViewComponent(gameStates[1], 'playerselect', (0, _ScreenPlayerSelectJs2['default'])({ test: 'foobar' }));
     this.mapConditionToViewComponent(gameStates[2], 'waitingonplayer', (0, _ScreenWaitingOnPlayerJs2['default'])());
     this.mapConditionToViewComponent(gameStates[3], 'game', (0, _ScreenMainGameJs2['default'])());
     this.mapConditionToViewComponent(gameStates[4], 'gameover', (0, _ScreenGameOverJs2['default'])());
@@ -984,7 +984,7 @@ var _difficultyImages = ['pastry_cookie01.png', 'pastry_poptart01.png', 'pastry_
 /**
  * Module for a dynamic application view for a route or a persistent view
  */
-var Component = Nori.view().createComponentView({
+var Component = Nori.view().createComponent({
 
   mixins: [_noriViewMixinDOMManipulationJs2['default']],
 
@@ -994,9 +994,7 @@ var Component = Nori.view().createComponentView({
    * initialized from app view
    * @param configProps
    */
-  initialize: function initialize(configProps) {
-    this.bind(_storeAppStore2['default']); // Reducer store, map id string or map object
-  },
+  initialize: function initialize(initProps) {},
 
   /**
    * Create an object to be used to define events on DOM elements
@@ -1199,7 +1197,7 @@ var _questionChangeObs = null,
 /**
  * Module for a dynamic application view for a route or a persistent view
  */
-var Component = Nori.view().createComponentView({
+var Component = Nori.view().createComponent({
 
   mixins: [_noriViewMixinDOMManipulationJs2['default']],
 
@@ -1209,9 +1207,7 @@ var Component = Nori.view().createComponentView({
    * initialized from app view
    * @param configProps
    */
-  initialize: function initialize(configProps) {
-    this.bind(_storeAppStore2['default']);
-  },
+  initialize: function initialize(initProps) {},
 
   /**
    * Create an object to be used to define events on DOM elements
@@ -1437,7 +1433,7 @@ var _noriViewMixinDOMManipulationJs2 = _interopRequireDefault(_noriViewMixinDOMM
 /**
  * Module for a dynamic application view for a route or a persistent view
  */
-var Component = Nori.view().createComponentView({
+var Component = Nori.view().createComponent({
 
   mixins: [_noriViewMixinDOMManipulationJs2['default']],
 
@@ -1598,7 +1594,7 @@ var _cardAnimationSub = null;
 /**
  * Module for a dynamic application view for a route or a persistent view
  */
-var Component = Nori.view().createComponentView({
+var Component = Nori.view().createComponent({
 
   mixins: [_noriViewMixinDOMManipulationJs2['default']],
 
@@ -1607,24 +1603,29 @@ var Component = Nori.view().createComponentView({
    * initialized from app view
    * @param configProps
    */
-  initialize: function initialize(configProps) {
-    this.bind(_storeAppStore2['default']);
+  initialize: function initialize(initProps) {},
+
+  getDefaultProps: function getDefaultProps() {
+    return { bind: _storeAppStore2['default'] };
   },
 
   defineRegions: function defineRegions() {
     return {
       localPlayerStats: (0, _RegionPlayerStatsJs2['default'])({
         id: 'game__playerstats',
+        bind: _storeAppStore2['default'],
         mountPoint: '#game__localplayerstats',
         target: 'local'
       }),
       remotePlayerStats: (0, _RegionPlayerStatsJs2['default'])({
         id: 'game__playerstats',
+        bind: _storeAppStore2['default'],
         mountPoint: '#game__remoteplayerstats',
         target: 'remote'
       }),
       questionView: (0, _RegionQuestionJs2['default'])({
         id: 'game__question',
+        bind: _storeAppStore2['default'],
         mountPoint: '#game__questionarea'
       })
     };
@@ -1769,20 +1770,20 @@ var _actionActionCreatorJs = require('../action/ActionCreator.js');
 
 var _actionActionCreatorJs2 = _interopRequireDefault(_actionActionCreatorJs);
 
-var _roomNumberLength = 4;
+var ROOM_NUMBER_LENGTH = 4;
 
 /**
  * Module for a dynamic application view for a route or a persistent view
  */
-var Component = Nori.view().createComponentView({
+var Component = Nori.view().createComponent({
 
   /**
    * Initialize and bind, called once on first render. Parent component is
    * initialized from app view
    * @param configProps
    */
-  initialize: function initialize(configProps) {
-    //
+  initialize: function initialize(initProps) {
+    console.log('Initializing with', initProps);
   },
 
   /**
@@ -1851,7 +1852,7 @@ var Component = Nori.view().createComponentView({
     if (this.validateRoomID(roomID)) {
       _App2['default'].joinRoom(roomID);
     } else {
-      _AppView2['default'].alert('The room ID is not correct. Does it contain letters or is less than ' + _roomNumberLength + ' digits?', 'Bad Room ID');
+      _AppView2['default'].alert('The room ID is not correct. Does it contain letters or is less than ' + ROOM_NUMBER_LENGTH + ' digits?', 'Bad Room ID');
     }
   },
 
@@ -1874,7 +1875,7 @@ var Component = Nori.view().createComponentView({
   validateRoomID: function validateRoomID(roomID) {
     if (isNaN(parseInt(roomID))) {
       return false;
-    } else if (roomID.length !== _roomNumberLength) {
+    } else if (roomID.length !== ROOM_NUMBER_LENGTH) {
       return false;
     }
     return true;
@@ -1918,7 +1919,7 @@ var _noriUtilsTemplatingJs2 = _interopRequireDefault(_noriUtilsTemplatingJs);
 /**
  * Module for a dynamic application view for a route or a persistent view
  */
-var Component = Nori.view().createComponentView({
+var Component = Nori.view().createComponent({
 
   /**
    * Initialize and bind, called once on first render. Parent component is
@@ -2004,7 +2005,7 @@ var _actionActionCreatorJs2 = _interopRequireDefault(_actionActionCreatorJs);
 /**
  * Module for a dynamic application view for a route or a persistent view
  */
-var Component = Nori.view().createComponentView({
+var Component = Nori.view().createComponent({
 
   /**
    * Initialize and bind, called once on first render. Parent component is
@@ -3394,11 +3395,12 @@ var MixinComponentViews = function MixinComponentViews() {
    * @param customizer Custom module source
    * @returns {*}
    */
-  function createComponentView(customizer) {
+  function createComponent(customizer) {
     return function (initProps) {
-
+      console.log('Factory creating', initProps);
       var finalComponent = undefined,
-          previousInitialize = undefined;
+          previousInitialize = undefined,
+          previousGetDefaultProps = undefined;
 
       customizer.mixins = customizer.mixins || [];
       customizer.mixins.push((0, _ViewComponentJs2['default'])());
@@ -3409,6 +3411,7 @@ var MixinComponentViews = function MixinComponentViews() {
 
       // Compose a new initialize function by inserting call to component super module
       previousInitialize = finalComponent.initialize;
+      previousGetDefaultProps = finalComponent.getDefaultProps;
 
       finalComponent.initialize = function initialize(props) {
         finalComponent.initializeComponent(props);
@@ -3418,7 +3421,8 @@ var MixinComponentViews = function MixinComponentViews() {
       if (initProps) {
         // Overwrite the function in the component
         finalComponent.getDefaultProps = function () {
-          return initProps;
+          return _.merge({}, previousGetDefaultProps.call(finalComponent), initProps);
+          //return initProps;
         };
       }
 
@@ -3449,7 +3453,7 @@ var MixinComponentViews = function MixinComponentViews() {
       componentView.controller.update();
     }
 
-    componentView.controller.componentRender();
+    componentView.controller.renderComponent();
     componentView.controller.mount();
   }
 
@@ -3526,7 +3530,7 @@ var MixinComponentViews = function MixinComponentViews() {
 
   return {
     mapViewComponent: mapViewComponent,
-    createComponentView: createComponentView,
+    createComponent: createComponent,
     showViewComponent: showViewComponent,
     getComponentViewMap: getComponentViewMap,
     showViewForCondition: showViewForCondition,
@@ -4048,6 +4052,12 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'd
  * Must be extended with custom modules
  */
 
+/*
+
+ var component = Nori.view().createComponent(
+
+ */
+
 var _utilsTemplatingJs = require('../utils/Templating.js');
 
 var _utilsTemplatingJs2 = _interopRequireDefault(_utilsTemplatingJs);
@@ -4075,6 +4085,8 @@ var ViewComponent = function ViewComponent() {
       _internalProps = {},
       _publicState = {},
       _publicProps = {},
+      _lastRenderedState = {},
+      _lastRenderedProps = {},
       _lifecycleState = LS_NO_INIT,
       _isMounted = false,
       _regions = {},
@@ -4090,7 +4102,12 @@ var ViewComponent = function ViewComponent() {
    * @param initProps
    */
   function initializeComponent(initProps) {
+    console.log("Base with", initProps);
+
     setProps(_.assign({}, this.getDefaultProps(), initProps));
+
+    console.log('final props: ', this.props);
+
     this.setState(this.getInitialState());
     this.setEvents(this.defineEvents());
 
@@ -4098,6 +4115,10 @@ var ViewComponent = function ViewComponent() {
     _mountPoint = _internalProps.mountPoint;
 
     _regions = this.defineRegions();
+
+    if (_internalProps.bind) {
+      this.bind(_internalProps.bind);
+    }
 
     this.initializeRegions();
 
@@ -4157,7 +4178,7 @@ var ViewComponent = function ViewComponent() {
 
       if (_isMounted) {
         this.unmount();
-        this.componentRender();
+        this.renderComponent();
         this.mount();
       }
 
@@ -4181,18 +4202,42 @@ var ViewComponent = function ViewComponent() {
 
   /**
    * Render it, need to add it to a parent container, handled in higher level view
+   * @param force If true, will force a render
    * @returns {*}
    */
-  function componentRender() {
+  function renderComponent() {
+    var force = arguments.length <= 0 || arguments[0] === undefined ? false : arguments[0];
+
+    console.log(shouldComponentRender(), force);
+    if (!shouldComponentRender() && !force) {
+      console.log(this.getID(), ' not rendering');
+      return;
+    }
+
     _lifecycleState = LS_RENDERING;
 
     if (!_templateObjCache) {
-      _templateObjCache = this.template(this.getState());
+      _templateObjCache = this.template(_internalState);
     }
+
+    _lastRenderedState = _.assign({}, _internalState);
+    _lastRenderedProps = _.assign({}, _internalProps);
 
     _html = this.render(this.getState());
 
     this.renderRegions();
+  }
+
+  /**
+   * Should it rerender because of a state or prop change. Returns true if state
+   * or props are different from last render call
+   * @returns {boolean}
+   */
+  function shouldComponentRender() {
+    var isStateEq = _.isEqual(_lastRenderedState, _internalState),
+        isPropsEq = _.isEqual(_lastRenderedProps, _internalProps);
+
+    return !isStateEq || !isPropsEq;
   }
 
   /**
@@ -4358,7 +4403,7 @@ var ViewComponent = function ViewComponent() {
 
   function renderRegions() {
     getRegionIDs().forEach(function (region) {
-      _regions[region].componentRender();
+      _regions[region].renderComponent();
     });
   }
 
@@ -4481,7 +4526,8 @@ var ViewComponent = function ViewComponent() {
     componentWillUpdate: componentWillUpdate,
     shouldComponentUpdate: shouldComponentUpdate,
     update: update,
-    componentRender: componentRender,
+    shouldComponentRender: shouldComponentRender,
+    renderComponent: renderComponent,
     render: render,
     mount: mount,
     shouldDelegateEvents: shouldDelegateEvents,

@@ -13,7 +13,7 @@ let _difficultyImages = ['pastry_cookie01.png', 'pastry_poptart01.png', 'pastry_
 /**
  * Module for a dynamic application view for a route or a persistent view
  */
-var Component = Nori.view().createComponentView({
+var Component = Nori.view().createComponent({
 
   mixins: [
     _mixinDOMManipulation
@@ -25,8 +25,7 @@ var Component = Nori.view().createComponentView({
    * initialized from app view
    * @param configProps
    */
-    initialize(configProps) {
-    this.bind(_appStore); // Reducer store, map id string or map object
+    initialize(initProps) {
   },
 
 

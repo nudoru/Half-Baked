@@ -36,10 +36,10 @@ let MixinComponentViews = function () {
    * @param customizer Custom module source
    * @returns {*}
    */
-  function createComponentView(customizer) {
+  function createComponent(customizer) {
     return function (initProps) {
-
-      let finalComponent, previousInitialize;
+      console.log('Factory creating',initProps);
+      let finalComponent, previousInitialize, previousGetDefaultProps;
 
       customizer.mixins = customizer.mixins || [];
       customizer.mixins.push(_componentViewFactory());
@@ -50,6 +50,7 @@ let MixinComponentViews = function () {
 
       // Compose a new initialize function by inserting call to component super module
       previousInitialize = finalComponent.initialize;
+      previousGetDefaultProps = finalComponent.getDefaultProps;
 
       finalComponent.initialize = function initialize(props) {
         finalComponent.initializeComponent(props);
@@ -59,7 +60,8 @@ let MixinComponentViews = function () {
       if (initProps) {
         // Overwrite the function in the component
         finalComponent.getDefaultProps = function () {
-          return initProps;
+          return _.merge({}, previousGetDefaultProps.call(finalComponent), initProps);
+          //return initProps;
         };
       }
 
@@ -90,7 +92,7 @@ let MixinComponentViews = function () {
       componentView.controller.update();
     }
 
-    componentView.controller.componentRender();
+    componentView.controller.renderComponent();
     componentView.controller.mount();
   }
 
@@ -167,7 +169,7 @@ let MixinComponentViews = function () {
 
   return {
     mapViewComponent           : mapViewComponent,
-    createComponentView        : createComponentView,
+    createComponent        : createComponent,
     showViewComponent          : showViewComponent,
     getComponentViewMap        : getComponentViewMap,
     showViewForCondition       : showViewForCondition,

@@ -16,7 +16,7 @@ let _cardAnimationSub = null;
 /**
  * Module for a dynamic application view for a route or a persistent view
  */
-var Component = Nori.view().createComponentView({
+var Component = Nori.view().createComponent({
 
   mixins: [
     _mixinDOMManipulation
@@ -27,24 +27,30 @@ var Component = Nori.view().createComponentView({
    * initialized from app view
    * @param configProps
    */
-    initialize (configProps) {
-    this.bind(_appStore);
+    initialize (initProps) {
+  },
+
+  getDefaultProps() {
+    return {bind: _appStore};
   },
 
   defineRegions () {
     return {
       localPlayerStats : _regionPlayerStats({
         id        : 'game__playerstats',
+        bind      : _appStore,
         mountPoint: '#game__localplayerstats',
         target    : 'local'
       }),
       remotePlayerStats: _regionPlayerStats({
         id        : 'game__playerstats',
+        bind      : _appStore,
         mountPoint: '#game__remoteplayerstats',
         target    : 'remote'
       }),
       questionView     : _regionQuestion({
         id        : 'game__question',
+        bind      : _appStore,
         mountPoint: '#game__questionarea'
       })
     };

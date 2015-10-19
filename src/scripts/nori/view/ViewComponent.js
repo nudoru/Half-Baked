@@ -5,6 +5,12 @@
  * Must be extended with custom modules
  */
 
+/*
+
+ var component = Nori.view().createComponent(
+
+ */
+
 import _template from '../utils/Templating.js';
 import _renderer from '../utils/Renderer.js';
 import is from '../../nudoru/util/is.js';
@@ -20,13 +26,15 @@ const LS_NO_INIT   = 0,
 
 var ViewComponent = function () {
 
-  let _internalState  = {},
-      _internalProps  = {},
-      _publicState    = {},
-      _publicProps    = {},
-      _lifecycleState = LS_NO_INIT,
-      _isMounted      = false,
-      _regions        = {},
+  let _internalState     = {},
+      _internalProps     = {},
+      _publicState       = {},
+      _publicProps       = {},
+      _lastRenderedState = {},
+      _lastRenderedProps = {},
+      _lifecycleState    = LS_NO_INIT,
+      _isMounted         = false,
+      _regions           = {},
       _id,
       _templateObjCache,
       _html,
@@ -40,7 +48,12 @@ var ViewComponent = function () {
    * @param initProps
    */
   function initializeComponent(initProps) {
+    console.log("Base with", initProps);
+
     setProps(_.assign({}, this.getDefaultProps(), initProps));
+
+    console.log('final props: ', this.props);
+
     this.setState(this.getInitialState());
     this.setEvents(this.defineEvents());
 
@@ -48,6 +61,10 @@ var ViewComponent = function () {
     _mountPoint = _internalProps.mountPoint;
 
     _regions = this.defineRegions();
+
+    if (_internalProps.bind) {
+      this.bind(_internalProps.bind);
+    }
 
     this.initializeRegions();
 
@@ -107,7 +124,7 @@ var ViewComponent = function () {
 
       if (_isMounted) {
         this.unmount();
-        this.componentRender();
+        this.renderComponent();
         this.mount();
       }
 
@@ -131,18 +148,40 @@ var ViewComponent = function () {
 
   /**
    * Render it, need to add it to a parent container, handled in higher level view
+   * @param force If true, will force a render
    * @returns {*}
    */
-  function componentRender() {
+  function renderComponent(force = false) {
+    console.log(shouldComponentRender(), force);
+    if(!shouldComponentRender() && !force) {
+      console.log(this.getID(), ' not rendering');
+      return;
+    }
+
     _lifecycleState = LS_RENDERING;
 
     if (!_templateObjCache) {
-      _templateObjCache = this.template(this.getState());
+      _templateObjCache = this.template(_internalState);
     }
+
+    _lastRenderedState = _.assign({}, _internalState);
+    _lastRenderedProps = _.assign({}, _internalProps);
 
     _html = this.render(this.getState());
 
     this.renderRegions();
+  }
+
+  /**
+   * Should it rerender because of a state or prop change. Returns true if state
+   * or props are different from last render call
+   * @returns {boolean}
+   */
+  function shouldComponentRender() {
+    let isStateEq = _.isEqual(_lastRenderedState, _internalState),
+        isPropsEq = _.isEqual(_lastRenderedProps, _internalProps);
+
+    return !(isStateEq) || !(isPropsEq);
   }
 
   /**
@@ -311,7 +350,7 @@ var ViewComponent = function () {
 
   function renderRegions() {
     getRegionIDs().forEach(region => {
-      _regions[region].componentRender();
+      _regions[region].renderComponent();
     });
   }
 
@@ -346,7 +385,7 @@ var ViewComponent = function () {
   }
 
   function setState(nextState) {
-    if(_.isEqual(_internalState, nextState)) {
+    if (_.isEqual(_internalState, nextState)) {
       return;
     }
 
@@ -364,11 +403,11 @@ var ViewComponent = function () {
   }
 
   function setProps(nextProps) {
-    if(_.isEqual(_internalProps, nextProps)) {
+    if (_.isEqual(_internalProps, nextProps)) {
       return;
     }
 
-    if(this.componentWillReceiveProps && _lifecycleState > LS_INITED) {
+    if (this.componentWillReceiveProps && _lifecycleState > LS_INITED) {
       this.componentWillReceiveProps(nextProps);
     }
 
@@ -435,7 +474,8 @@ var ViewComponent = function () {
     componentWillUpdate      : componentWillUpdate,
     shouldComponentUpdate    : shouldComponentUpdate,
     update                   : update,
-    componentRender          : componentRender,
+    shouldComponentRender    : shouldComponentRender,
+    renderComponent          : renderComponent,
     render                   : render,
     mount                    : mount,
     shouldDelegateEvents     : shouldDelegateEvents,

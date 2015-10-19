@@ -4,7 +4,7 @@ var view = require('./AppView.js');
  * Module for a dynamic application view for a route or a persistent view
  */
 
-var Component = view.createComponentView({
+var Component = view.createComponent({
   /**
    * Mixins are other modules/objects that multiple components share, provides
    * common functionality between then.

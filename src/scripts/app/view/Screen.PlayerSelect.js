@@ -5,20 +5,20 @@ import _appStore from '../store/AppStore';
 import _template from '../../nori/utils/Templating.js';
 import _appActions from '../action/ActionCreator.js';
 
-let _roomNumberLength = 4;
+const ROOM_NUMBER_LENGTH = 4;
 
 /**
  * Module for a dynamic application view for a route or a persistent view
  */
-var Component = Nori.view().createComponentView({
+var Component = Nori.view().createComponent({
 
   /**
    * Initialize and bind, called once on first render. Parent component is
    * initialized from app view
    * @param configProps
    */
-  initialize(configProps) {
-    //
+  initialize(initProps) {
+    console.log('Initializing with',initProps)
   },
 
   /**
@@ -87,7 +87,7 @@ var Component = Nori.view().createComponentView({
     if (this.validateRoomID(roomID)) {
       _app.joinRoom(roomID);
     } else {
-      _appView.alert('The room ID is not correct. Does it contain letters or is less than '+_roomNumberLength+' digits?', 'Bad Room ID');
+      _appView.alert('The room ID is not correct. Does it contain letters or is less than '+ROOM_NUMBER_LENGTH+' digits?', 'Bad Room ID');
     }
   },
 
@@ -110,7 +110,7 @@ var Component = Nori.view().createComponentView({
   validateRoomID(roomID) {
     if (isNaN(parseInt(roomID))) {
       return false;
-    } else if (roomID.length !== _roomNumberLength) {
+    } else if (roomID.length !== ROOM_NUMBER_LENGTH) {
       return false;
     }
     return true;
