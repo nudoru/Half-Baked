@@ -201,7 +201,7 @@ var App = Nori.createApplication({
       url: 'https://pareshchouhan-trivia-v1.p.mashape.com/v1/getQuizQuestionsByCategory?categoryId=' + _restQuestionCategory + '&limit=' + _restNumQuestions + '&page=1',
       headers: [{ 'X-Mashape-Key': 'tPxKgDvrkqmshg8zW4olS87hzF7Ap1vi63rjsnUuVw1sBHV9KJ' }],
       json: true
-    }).subscribe(this.onQuestionsSuccess.bind(this), this.onQuestionError);
+    }).then(this.onQuestionsSuccess.bind(this), this.onQuestionError);
   },
 
   onQuestionsSuccess: function onQuestionsSuccess(data) {
@@ -466,7 +466,7 @@ var App = Nori.createApplication({
 exports['default'] = App;
 module.exports = exports['default'];
 
-},{"../nori/action/ActionCreator.js":17,"../nori/service/Rest.js":18,"../nori/service/SocketIO.js":19,"../nori/service/SocketIOEvents.js":20,"../nori/utils/Rx.js":28,"../nudoru/core/NumberUtils.js":46,"../nudoru/core/StringUtils.js":48,"./action/ActionConstants.js":3,"./action/ActionCreator.js":4,"./store/AppStore.js":5,"./view/AppView.js":6}],3:[function(require,module,exports){
+},{"../nori/action/ActionCreator.js":17,"../nori/service/Rest.js":18,"../nori/service/SocketIO.js":19,"../nori/service/SocketIOEvents.js":20,"../nori/utils/Rx.js":26,"../nudoru/core/NumberUtils.js":44,"../nudoru/core/StringUtils.js":45,"./action/ActionConstants.js":3,"./action/ActionCreator.js":4,"./store/AppStore.js":5,"./view/AppView.js":6}],3:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -848,7 +848,7 @@ var AppStore = AppStoreModule();
 exports['default'] = AppStore;
 module.exports = exports['default'];
 
-},{"../../nori/action/ActionConstants.js":16,"../../nudoru/core/ArrayUtils.js":45,"../../nudoru/core/NumberUtils.js":46,"../../nudoru/core/StringUtils.js":48,"../action/ActionConstants.js":3}],6:[function(require,module,exports){
+},{"../../nori/action/ActionConstants.js":16,"../../nudoru/core/ArrayUtils.js":43,"../../nudoru/core/NumberUtils.js":44,"../../nudoru/core/StringUtils.js":45,"../action/ActionConstants.js":3}],6:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -942,7 +942,7 @@ var AppView = AppViewModule();
 exports['default'] = AppView;
 module.exports = exports['default'];
 
-},{"../../nori/view/ApplicationView.js":30,"../../nori/view/MixinNudoruControls.js":34,"../../nori/view/MixinStoreStateViews.js":35,"../store/AppStore.js":5,"./Screen.GameOver.js":9,"./Screen.MainGame.js":10,"./Screen.PlayerSelect.js":11,"./Screen.Title.js":12,"./Screen.WaitingOnPlayer.js":13}],7:[function(require,module,exports){
+},{"../../nori/view/ApplicationView.js":28,"../../nori/view/MixinNudoruControls.js":32,"../../nori/view/MixinStoreStateViews.js":33,"../store/AppStore.js":5,"./Screen.GameOver.js":9,"./Screen.MainGame.js":10,"./Screen.PlayerSelect.js":11,"./Screen.Title.js":12,"./Screen.WaitingOnPlayer.js":13}],7:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -1156,7 +1156,7 @@ var Component = Nori.view().createComponentView({
 exports['default'] = Component;
 module.exports = exports['default'];
 
-},{"../../nori/action/ActionCreator":17,"../../nori/utils/Rx.js":28,"../../nori/utils/Templating.js":29,"../../nori/view/MixinDOMManipulation.js":32,"../../nudoru/browser/DOMUtils.js":38,"../store/AppStore":5,"./AppView":6}],8:[function(require,module,exports){
+},{"../../nori/action/ActionCreator":17,"../../nori/utils/Rx.js":26,"../../nori/utils/Templating.js":27,"../../nori/view/MixinDOMManipulation.js":30,"../../nudoru/browser/DOMUtils.js":36,"../store/AppStore":5,"./AppView":6}],8:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -1403,7 +1403,7 @@ var Component = Nori.view().createComponentView({
 exports['default'] = Component;
 module.exports = exports['default'];
 
-},{"../../nori/action/ActionCreator":17,"../../nori/utils/Templating.js":29,"../../nori/view/MixinDOMManipulation.js":32,"../../vendor/rxjs/rx.lite.min.js":51,"../action/ActionCreator.js":4,"../store/AppStore":5,"./AppView":6}],9:[function(require,module,exports){
+},{"../../nori/action/ActionCreator":17,"../../nori/utils/Templating.js":27,"../../nori/view/MixinDOMManipulation.js":30,"../../vendor/rxjs/rx.lite.min.js":48,"../action/ActionCreator.js":4,"../store/AppStore":5,"./AppView":6}],9:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -1538,7 +1538,7 @@ var Component = Nori.view().createComponentView({
 exports['default'] = Component;
 module.exports = exports['default'];
 
-},{"../../nori/action/ActionCreator":17,"../../nori/utils/Templating.js":29,"../../nori/view/MixinDOMManipulation.js":32,"../action/ActionCreator.js":4,"../store/AppStore":5,"./AppView":6}],10:[function(require,module,exports){
+},{"../../nori/action/ActionCreator":17,"../../nori/utils/Templating.js":27,"../../nori/view/MixinDOMManipulation.js":30,"../action/ActionCreator.js":4,"../store/AppStore":5,"./AppView":6}],10:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -1738,7 +1738,7 @@ var Component = Nori.view().createComponentView({
 exports['default'] = Component;
 module.exports = exports['default'];
 
-},{"../../nori/action/ActionCreator":17,"../../nori/utils/Rx.js":28,"../../nori/utils/Templating.js":29,"../../nori/view/MixinDOMManipulation.js":32,"../../nudoru/browser/DOMUtils.js":38,"../../nudoru/core/NumberUtils.js":46,"../App":2,"../action/ActionCreator.js":4,"../store/AppStore":5,"./AppView":6,"./Region.PlayerStats.js":7,"./Region.Question.js":8}],11:[function(require,module,exports){
+},{"../../nori/action/ActionCreator":17,"../../nori/utils/Rx.js":26,"../../nori/utils/Templating.js":27,"../../nori/view/MixinDOMManipulation.js":30,"../../nudoru/browser/DOMUtils.js":36,"../../nudoru/core/NumberUtils.js":44,"../App":2,"../action/ActionCreator.js":4,"../store/AppStore":5,"./AppView":6,"./Region.PlayerStats.js":7,"./Region.Question.js":8}],11:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -1892,7 +1892,7 @@ var Component = Nori.view().createComponentView({
 exports['default'] = Component;
 module.exports = exports['default'];
 
-},{"../../nori/action/ActionCreator":17,"../../nori/utils/Templating.js":29,"../App":2,"../action/ActionCreator.js":4,"../store/AppStore":5,"./AppView":6}],12:[function(require,module,exports){
+},{"../../nori/action/ActionCreator":17,"../../nori/utils/Templating.js":27,"../App":2,"../action/ActionCreator.js":4,"../store/AppStore":5,"./AppView":6}],12:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -1974,7 +1974,7 @@ var Component = Nori.view().createComponentView({
 exports['default'] = Component;
 module.exports = exports['default'];
 
-},{"../../nori/action/ActionCreator":17,"../../nori/utils/Templating.js":29,"../store/AppStore":5,"./AppView":6}],13:[function(require,module,exports){
+},{"../../nori/action/ActionCreator":17,"../../nori/utils/Templating.js":27,"../store/AppStore":5,"./AppView":6}],13:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -2073,7 +2073,7 @@ var Component = Nori.view().createComponentView({
 exports['default'] = Component;
 module.exports = exports['default'];
 
-},{"../../nori/action/ActionCreator":17,"../../nori/utils/Templating.js":29,"../action/ActionCreator.js":4,"../store/AppStore":5,"./AppView":6}],14:[function(require,module,exports){
+},{"../../nori/action/ActionCreator":17,"../../nori/utils/Templating.js":27,"../action/ActionCreator.js":4,"../store/AppStore":5,"./AppView":6}],14:[function(require,module,exports){
 /**
  * Initial file for the Application
  */
@@ -2100,7 +2100,7 @@ module.exports = exports['default'];
   }
 })();
 
-},{"./app/App.js":2,"./nori/Nori.js":15,"./nudoru/browser/BrowserInfo.js":37}],15:[function(require,module,exports){
+},{"./app/App.js":2,"./nori/Nori.js":15,"./nudoru/browser/BrowserInfo.js":35}],15:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -2113,9 +2113,9 @@ var _utilsMixinObservableSubjectJs = require('./utils/MixinObservableSubject.js'
 
 var _utilsMixinObservableSubjectJs2 = _interopRequireDefault(_utilsMixinObservableSubjectJs);
 
-var _storeMixinReducerStoreJs = require('./store/MixinReducerStore.js');
+var _storeReducerStoreJs = require('./store/ReducerStore.js');
 
-var _storeMixinReducerStoreJs2 = _interopRequireDefault(_storeMixinReducerStoreJs);
+var _storeReducerStoreJs2 = _interopRequireDefault(_storeReducerStoreJs);
 
 var _viewMixinComponentViewsJs = require('./view/MixinComponentViews.js');
 
@@ -2124,14 +2124,6 @@ var _viewMixinComponentViewsJs2 = _interopRequireDefault(_viewMixinComponentView
 var _viewMixinEventDelegatorJs = require('./view/MixinEventDelegator.js');
 
 var _viewMixinEventDelegatorJs2 = _interopRequireDefault(_viewMixinEventDelegatorJs);
-
-var _utilsDispatcherJs = require('./utils/Dispatcher.js');
-
-var _utilsDispatcherJs2 = _interopRequireDefault(_utilsDispatcherJs);
-
-var _utilsRouterJs = require('./utils/Router.js');
-
-var _utilsRouterJs2 = _interopRequireDefault(_utilsRouterJs);
 
 var Nori = function Nori() {
 
@@ -2145,14 +2137,6 @@ var Nori = function Nori() {
   //  Accessors
   //----------------------------------------------------------------------------
 
-  function getDispatcher() {
-    return _utilsDispatcherJs2['default'];
-  }
-
-  function getRouter() {
-    return _utilsRouterJs2['default'];
-  }
-
   /**
    * Allow for optional external configuration data from outside of the compiled
    * app bundle. For easy of settings tweaks after the build by non technical devs
@@ -2160,10 +2144,6 @@ var Nori = function Nori() {
    */
   function getConfig() {
     return _.assign({}, window.APP_CONFIG_DATA || {});
-  }
-
-  function getCurrentRoute() {
-    return _utilsRouterJs2['default'].getCurrentRoute();
   }
 
   function view() {
@@ -2175,11 +2155,11 @@ var Nori = function Nori() {
   }
 
   //----------------------------------------------------------------------------
-  //  Template parts
+  //  Templates
   //----------------------------------------------------------------------------
 
   _storeTemplate = createStore({
-    mixins: [_storeMixinReducerStoreJs2['default'], (0, _utilsMixinObservableSubjectJs2['default'])()]
+    mixins: [_storeReducerStoreJs2['default'], (0, _utilsMixinObservableSubjectJs2['default'])()]
   })();
 
   _viewTemplate = createView({
@@ -2187,7 +2167,7 @@ var Nori = function Nori() {
   })();
 
   //----------------------------------------------------------------------------
-  //  Factories - concatenative inheritance, decorators
+  //  Factories
   //----------------------------------------------------------------------------
 
   /**
@@ -2203,51 +2183,55 @@ var Nori = function Nori() {
   }
 
   /**
-   * Create a new Nori application instance
-   * @param custom
-   * @returns {*}
+   * Return a new Nori class by combining a template and customizer with mixins
+   * @param template
+   * @param customizer
+   * @returns {Function}
    */
-  function createApplication(custom) {
-    custom.mixins.push(this);
-    return buildFromMixins(custom);
-  }
-
-  /**
-   * Creates main application store
-   * @param custom
-   * @returns {*}
-   */
-  function createStore(custom) {
-    return function cs() {
-      return _.assign({}, _storeTemplate, buildFromMixins(custom));
-    };
-  }
-
-  /**
-   * Creates main application view
-   * @param custom
-   * @returns {*}
-   */
-  function createView(custom) {
-    return function cv() {
-      return _.assign({}, _viewTemplate, buildFromMixins(custom));
+  function createClass(template, customizer) {
+    template = template || {};
+    return function factory() {
+      return _.assign({}, template, buildFromMixins(customizer));
     };
   }
 
   /**
    * Mixes in the modules specified in the custom application object
-   * @param sourceObject
+   * @param customizer
    * @returns {*}
    */
-  function buildFromMixins(sourceObject) {
-    var mixins = undefined;
-
-    if (sourceObject.mixins) {
-      mixins = sourceObject.mixins;
-    }
-
-    mixins.push(sourceObject);
+  function buildFromMixins(customizer) {
+    var mixins = customizer.mixins || [];
+    mixins.push(customizer);
     return assignArray({}, mixins);
+  }
+
+  /**
+   * Create a new Nori application instance
+   * @param customizer
+   * @returns {*}
+   */
+  function createApplication(customizer) {
+    customizer.mixins.push(this);
+    return createClass({}, customizer)();
+  }
+
+  /**
+   * Creates main application store
+   * @param customizer
+   * @returns {*}
+   */
+  function createStore(customizer) {
+    return createClass(_storeTemplate, customizer);
+  }
+
+  /**
+   * Creates main application view
+   * @param customizer
+   * @returns {*}
+   */
+  function createView(customizer) {
+    return createClass(_viewTemplate, customizer);
   }
 
   //----------------------------------------------------------------------------
@@ -2256,15 +2240,13 @@ var Nori = function Nori() {
 
   return {
     config: getConfig,
-    dispatcher: getDispatcher,
-    router: getRouter,
     view: view,
     store: store,
+    createClass: createClass,
     createApplication: createApplication,
     createStore: createStore,
     createView: createView,
     buildFromMixins: buildFromMixins,
-    getCurrentRoute: getCurrentRoute,
     assignArray: assignArray
   };
 };
@@ -2272,7 +2254,7 @@ var Nori = function Nori() {
 exports['default'] = Nori();
 module.exports = exports['default'];
 
-},{"./store/MixinReducerStore.js":22,"./utils/Dispatcher.js":24,"./utils/MixinObservableSubject.js":25,"./utils/Router.js":27,"./view/MixinComponentViews.js":31,"./view/MixinEventDelegator.js":33}],16:[function(require,module,exports){
+},{"./store/ReducerStore.js":22,"./utils/MixinObservableSubject.js":24,"./view/MixinComponentViews.js":29,"./view/MixinEventDelegator.js":31}],16:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -2323,14 +2305,11 @@ module.exports = exports['default'];
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-
 /*  weak */
 
 /**
  * Ajax / Rest module.
- * Returns an RxJS Obervable
+ * Returns a Promise
  *
  * Usage:
  *
@@ -2389,9 +2368,8 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'd
  *
  */
 
-var _vendorRxjsRxLiteMinJs = require('../../vendor/rxjs/rx.lite.min.js');
-
-var _vendorRxjsRxLiteMinJs2 = _interopRequireDefault(_vendorRxjsRxLiteMinJs);
+//import Rxjs from '../../vendor/rxjs/rx.lite.min.js';
+//import BB from '../../vendor/bluebird.min.js';
 
 var Rest = function Rest() {
 
@@ -2404,7 +2382,8 @@ var Rest = function Rest() {
         headers = reqObj.headers || [],
         data = reqObj.data || null;
 
-    return new _vendorRxjsRxLiteMinJs2['default'].Observable.create(function makeReq(observer) {
+    //return new Rxjs.Observable.create(function makeReq(observer) {
+    return new Promise(function makeReq(resolve, reject) {
       xhr.open(method, url, true);
 
       xhr.onreadystatechange = function () {
@@ -2412,9 +2391,11 @@ var Rest = function Rest() {
           if (xhr.status >= 200 && xhr.status < 300) {
             try {
               if (json) {
-                observer.onNext(JSON.parse(xhr.responseText));
+                //observer.onNext(JSON.parse(xhr.responseText));
+                resolve(JSON.parse(xhr.responseText));
               } else {
-                observer.onError(xhr.responseText);
+                //observer.onError(xhr.responseText);
+                reject(xhr.responseText);
               }
             } catch (e) {
               handleError('Result', 'Error parsing result. Status: ' + xhr.status + ', Response: ' + xhr.response);
@@ -2457,7 +2438,8 @@ var Rest = function Rest() {
 
       function handleError(type, message) {
         message = message || '';
-        observer.onError(type + ' ' + message);
+        //observer.onError(type + ' ' + message);
+        reject(type + ' ' + message);
       }
     });
   }
@@ -2470,7 +2452,7 @@ var Rest = function Rest() {
 exports['default'] = Rest();
 module.exports = exports['default'];
 
-},{"../../vendor/rxjs/rx.lite.min.js":51}],19:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -2588,7 +2570,7 @@ var SocketIOConnector = function SocketIOConnector() {
 exports['default'] = SocketIOConnector();
 module.exports = exports['default'];
 
-},{"../../vendor/rxjs/rx.lite.min.js":51,"./SocketIOEvents.js":20}],20:[function(require,module,exports){
+},{"../../vendor/rxjs/rx.lite.min.js":48,"./SocketIOEvents.js":20}],20:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -2694,7 +2676,7 @@ var ImmutableMap = function ImmutableMap() {
 exports['default'] = ImmutableMap;
 module.exports = exports['default'];
 
-},{"../../vendor/immutable.min.js":50}],22:[function(require,module,exports){
+},{"../../vendor/immutable.min.js":47}],22:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -2726,7 +2708,7 @@ var _ImmutableMapJs = require('./ImmutableMap.js');
 
 var _ImmutableMapJs2 = _interopRequireDefault(_ImmutableMapJs);
 
-var MixinReducerStore = function MixinReducerStore() {
+var ReducerStore = function ReducerStore() {
   var _this = undefined,
       _state = undefined,
       _stateReducers = [];
@@ -2777,7 +2759,7 @@ var MixinReducerStore = function MixinReducerStore() {
    */
   function initializeReducerStore() {
     if (!this.createSubject) {
-      console.warn('nori/store/MixinReducerStore needs nori/utils/MixinObservableSubject to notify');
+      console.warn('nori/store/ReducerStore needs nori/utils/MixinObservableSubject to notify');
     }
 
     _this = this;
@@ -2865,10 +2847,10 @@ var MixinReducerStore = function MixinReducerStore() {
   };
 };
 
-exports['default'] = MixinReducerStore();
+exports['default'] = ReducerStore();
 module.exports = exports['default'];
 
-},{"../../nudoru/util/is.js":49,"./ImmutableMap.js":21,"./SimpleStore.js":23}],23:[function(require,module,exports){
+},{"../../nudoru/util/is.js":46,"./ImmutableMap.js":21,"./SimpleStore.js":23}],23:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -2918,251 +2900,6 @@ exports['default'] = SimpleStore;
 module.exports = exports['default'];
 
 },{}],24:[function(require,module,exports){
-Object.defineProperty(exports, '__esModule', {
-  value: true
-});
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-
-/*  weak */
-
-/*
- Matt Perkins, 6/12/15
-
- publish payload object
-
- {
- type: EVT_TYPE,
- payload: {
- key: value
- }
- }
-
- */
-
-var _vendorRxjsRxLiteMinJs = require('../../vendor/rxjs/rx.lite.min.js');
-
-var _vendorRxjsRxLiteMinJs2 = _interopRequireDefault(_vendorRxjsRxLiteMinJs);
-
-var Dispatcher = function Dispatcher() {
-
-  var _subjectMap = {},
-      _receiverMap = {},
-      _id = 0,
-      _log = [],
-      _queue = [],
-      _timerObservable = undefined,
-      _timerSubscription = undefined,
-      _timerPausable = undefined;
-
-  /**
-   * Add an event as observable
-   * @param evtStr Event name string
-   * @param handler onNext() subscription function
-   * @param onceOrContext optional, either the context to execute the hander or once bool
-   * @param once will complete/dispose after one fire
-   * @returns {*}
-   */
-  function subscribe(evtStr, handler, onceOrContext, once) {
-    var handlerContext = window;
-
-    //console.log('dispatcher subscribe', evtStr, handler, onceOrContext, once);
-
-    if (is.falsey(evtStr)) {
-      console.warn('Dispatcher: Fasley event string passed for handler', handler);
-    }
-
-    if (is.falsey(handler)) {
-      console.warn('Dispatcher: Fasley handler passed for event string', evtStr);
-    }
-
-    if (onceOrContext || onceOrContext === false) {
-      if (onceOrContext === true || onceOrContext === false) {
-        once = onceOrContext;
-      } else {
-        handlerContext = onceOrContext;
-      }
-    }
-
-    if (!_subjectMap[evtStr]) {
-      _subjectMap[evtStr] = [];
-    }
-
-    var subject = new _vendorRxjsRxLiteMinJs2['default'].Subject();
-
-    _subjectMap[evtStr].push({
-      once: once,
-      priority: 0,
-      handler: handler,
-      context: handlerContext,
-      subject: subject,
-      type: 0
-    });
-
-    return subject.subscribe(handler.bind(handlerContext));
-  }
-
-  /**
-   * Initialize the event processing timer or resume a paused timer
-   */
-  function initTimer() {
-    if (_timerObservable) {
-      _timerPausable.onNext(true);
-      return;
-    }
-
-    _timerPausable = new _vendorRxjsRxLiteMinJs2['default'].Subject();
-    _timerObservable = _vendorRxjsRxLiteMinJs2['default'].Observable.interval(1).pausable(_timerPausable);
-    _timerSubscription = _timerObservable.subscribe(processNextEvent);
-  }
-
-  /**
-   * Shift next event to handle off of the queue and dispatch it
-   */
-  function processNextEvent() {
-    var evt = _queue.shift();
-    if (evt) {
-      dispatchToReceivers(evt);
-      dispatchToSubscribers(evt);
-    } else {
-      _timerPausable.onNext(false);
-    }
-  }
-
-  /**
-   * Push event to the stack and begin execution
-   * @param payloadObj type:String, payload:data
-   * @param data
-   */
-  function publish(payloadObj) {
-    _log.push(payloadObj);
-    _queue.push(payloadObj);
-
-    initTimer();
-  }
-
-  /**
-   * Send the payload to all receivers
-   * @param payload
-   */
-  function dispatchToReceivers(payload) {
-    for (var id in _receiverMap) {
-      _receiverMap[id].handler(payload);
-    }
-  }
-
-  /**
-   * Subscribers receive all payloads for a given event type while handlers are targeted
-   * @param payload
-   */
-  function dispatchToSubscribers(payload) {
-    var subscribers = _subjectMap[payload.type],
-        i;
-    if (!subscribers) {
-      return;
-    }
-
-    i = subscribers.length;
-
-    while (i--) {
-      var subjObj = subscribers[i];
-      if (subjObj.type === 0) {
-        subjObj.subject.onNext(payload);
-      }
-      if (subjObj.once) {
-        unsubscribe(payload.type, subjObj.handler);
-      }
-    }
-  }
-
-  /**
-   * Remove a handler
-   * @param evtStr
-   * @param hander
-   */
-  function unsubscribe(evtStr, handler) {
-    if (_subjectMap[evtStr] === undefined) {
-      return;
-    }
-
-    var subscribers = _subjectMap[evtStr],
-        handlerIdx = -1;
-
-    for (var i = 0, len = subscribers.length; i < len; i++) {
-      if (subscribers[i].handler === handler) {
-        handlerIdx = i;
-        subscribers[i].subject.onCompleted();
-        subscribers[i].subject.dispose();
-        subscribers[i] = null;
-      }
-    }
-
-    if (handlerIdx === -1) {
-      return;
-    }
-
-    subscribers.splice(handlerIdx, 1);
-
-    if (subscribers.length === 0) {
-      delete _subjectMap[evtStr];
-    }
-  }
-
-  /**
-   * Return a copy of the log array
-   * @returns {Array.<T>}
-   */
-  function getLog() {
-    return _log.slice(0);
-  }
-
-  /**
-   * Simple receiver implementation based on Flux
-   * Registered receivers will get every published event
-   * https://github.com/facebook/flux/blob/master/src/Dispatcher.js
-   *
-   * Usage:
-   *
-   * _dispatcher.registerReceiver(function (payload) {
-       *    console.log('receiving, ',payload);
-       * });
-   *
-   * @param handler
-   * @returns {string}
-   */
-  function registerReceiver(handler) {
-    var id = 'ID_' + _id++;
-    _receiverMap[id] = {
-      id: id,
-      handler: handler
-    };
-    return id;
-  }
-
-  /**
-   * Remove a receiver handler
-   * @param id
-   */
-  function unregisterReceiver(id) {
-    if (_receiverMap.hasOwnProperty(id)) {
-      delete _receiverMap[id];
-    }
-  }
-
-  return {
-    subscribe: subscribe,
-    unsubscribe: unsubscribe,
-    publish: publish,
-    getLog: getLog,
-    registerReceiver: registerReceiver,
-    unregisterReceiver: unregisterReceiver
-  };
-};
-
-exports['default'] = Dispatcher();
-module.exports = exports['default'];
-
-},{"../../vendor/rxjs/rx.lite.min.js":51}],25:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -3249,7 +2986,7 @@ var MixinObservableSubject = function MixinObservableSubject() {
 exports['default'] = MixinObservableSubject;
 module.exports = exports['default'];
 
-},{"../../nudoru/util/is.js":49,"../../vendor/rxjs/rx.lite.min.js":51}],26:[function(require,module,exports){
+},{"../../nudoru/util/is.js":46,"../../vendor/rxjs/rx.lite.min.js":48}],25:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -3302,153 +3039,7 @@ var Renderer = function Renderer() {
 exports['default'] = Renderer();
 module.exports = exports['default'];
 
-},{"../../nudoru/browser/DOMUtils.js":38}],27:[function(require,module,exports){
-Object.defineProperty(exports, '__esModule', {
-  value: true
-});
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-
-/*  weak */
-
-/**
- * Simple router
- * Supporting IE9 so using hashes instead of the history API for now
- */
-
-var _nudoruCoreObjectUtilsJs = require('../../nudoru/core/ObjectUtils.js');
-
-var _nudoruCoreObjectUtilsJs2 = _interopRequireDefault(_nudoruCoreObjectUtilsJs);
-
-var _vendorRxjsRxLiteMinJs = require('../../vendor/rxjs/rx.lite.min.js');
-
-var _vendorRxjsRxLiteMinJs2 = _interopRequireDefault(_vendorRxjsRxLiteMinJs);
-
-var Router = function Router() {
-
-  var _subject = new _vendorRxjsRxLiteMinJs2['default'].Subject(),
-      _hashChangeObservable = undefined;
-
-  /**
-   * Set event handlers
-   */
-  function initialize() {
-    _hashChangeObservable = _vendorRxjsRxLiteMinJs2['default'].Observable.fromEvent(window, 'hashchange').subscribe(notifySubscribers);
-  }
-
-  /**
-   * subscribe a handler to the url change events
-   * @param handler
-   * @returns {*}
-   */
-  function subscribe(handler) {
-    return _subject.subscribe(handler);
-  }
-
-  /**
-   * Notify of a change in route
-   * @param fromApp True if the route was caused by an app event not URL or history change
-   */
-  function notifySubscribers() {
-    var eventPayload = {
-      routeObj: getCurrentRoute(), // { route:, data: }
-      fragment: getURLFragment()
-    };
-
-    _subject.onNext(eventPayload);
-  }
-
-  /**
-   * Parses the route and query string from the current URL fragment
-   * @returns {{route: string, query: {}}}
-   */
-  function getCurrentRoute() {
-    var fragment = getURLFragment(),
-        parts = fragment.split('?'),
-        route = '/' + parts[0],
-        queryStr = decodeURIComponent(parts[1]),
-        queryStrObj = parseQueryStr(queryStr);
-
-    if (queryStr === '=undefined') {
-      queryStrObj = {};
-    }
-
-    return { route: route, data: queryStrObj };
-  }
-
-  /**
-   * Parses a query string into key/value pairs
-   * @param queryStr
-   * @returns {{}}
-   */
-  function parseQueryStr(queryStr) {
-    var obj = {},
-        parts = queryStr.split('&');
-
-    // TODO refactor with Array.reduce
-    parts.forEach(function (pairStr) {
-      var pairArr = pairStr.split('=');
-      obj[pairArr[0]] = pairArr[1];
-    });
-
-    return obj;
-  }
-
-  /**
-   * Combines a route and data object into a proper URL hash fragment
-   * @param route
-   * @param dataObj
-   */
-  function set(route, dataObj) {
-    var path = route,
-        data = [];
-    if (!_nudoruCoreObjectUtilsJs2['default'].isNull(dataObj)) {
-      path += "?";
-      for (var prop in dataObj) {
-        if (prop !== 'undefined' && dataObj.hasOwnProperty(prop)) {
-          data.push(prop + '=' + encodeURIComponent(dataObj[prop]));
-        }
-      }
-      path += data.join('&');
-    }
-
-    updateURLFragment(path);
-  }
-
-  /**
-   * Returns everything after the 'whatever.html#' in the URL
-   * Leading and trailing slashes are removed
-   * @returns {string}
-   */
-  function getURLFragment() {
-    var fragment = location.hash.slice(1);
-    return fragment.toString().replace(/\/$/, '').replace(/^\//, '');
-  }
-
-  /**
-   * Set the URL hash fragment
-   * @param path
-   */
-  function updateURLFragment(path) {
-    window.location.hash = path;
-  }
-
-  return {
-    initialize: initialize,
-    subscribe: subscribe,
-    notifySubscribers: notifySubscribers,
-    getCurrentRoute: getCurrentRoute,
-    set: set
-  };
-};
-
-var r = Router();
-r.initialize();
-
-exports['default'] = r;
-module.exports = exports['default'];
-
-},{"../../nudoru/core/ObjectUtils.js":47,"../../vendor/rxjs/rx.lite.min.js":51}],28:[function(require,module,exports){
+},{"../../nudoru/browser/DOMUtils.js":36}],26:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -3506,7 +3097,7 @@ exports['default'] = {
 };
 module.exports = exports['default'];
 
-},{"../../nudoru/util/is.js":49,"../../vendor/rxjs/rx.lite.min.js":51}],29:[function(require,module,exports){
+},{"../../nudoru/util/is.js":46,"../../vendor/rxjs/rx.lite.min.js":48}],27:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -3682,7 +3273,7 @@ var Templating = function Templating() {
 exports['default'] = Templating();
 module.exports = exports['default'];
 
-},{"../../nudoru/browser/DOMUtils.js":38}],30:[function(require,module,exports){
+},{"../../nudoru/browser/DOMUtils.js":36}],28:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -3753,7 +3344,7 @@ var ApplicationView = function ApplicationView() {
 exports['default'] = ApplicationView();
 module.exports = exports['default'];
 
-},{"../../nudoru/browser/DOMUtils.js":38,"../utils/Templating.js":29}],31:[function(require,module,exports){
+},{"../../nudoru/browser/DOMUtils.js":36,"../utils/Templating.js":27}],29:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -3800,31 +3391,28 @@ var MixinComponentViews = function MixinComponentViews() {
 
   /**
    * Factory to create component view modules by concating multiple source objects
-   * @param componentSource Custom module source
+   * @param customizer Custom module source
    * @returns {*}
    */
-  function createComponentView(componentSource) {
+  function createComponentView(customizer) {
     return function (initProps) {
 
-      var componentAssembly = undefined,
-          finalComponent = undefined,
+      var finalComponent = undefined,
           previousInitialize = undefined;
 
-      componentAssembly = [(0, _ViewComponentJs2['default'])(), (0, _MixinEventDelegatorJs2['default'])(), componentSource];
+      customizer.mixins = customizer.mixins || [];
+      customizer.mixins.push((0, _ViewComponentJs2['default'])());
+      customizer.mixins.push((0, _MixinEventDelegatorJs2['default'])());
 
-      if (componentSource.mixins) {
-        componentAssembly = componentAssembly.concat(componentSource.mixins);
-      }
-
-      finalComponent = Nori.assignArray({}, componentAssembly);
+      finalComponent = Nori.buildFromMixins(customizer);
       finalComponent.key = _componentViewKeyIndex++;
 
       // Compose a new initialize function by inserting call to component super module
       previousInitialize = finalComponent.initialize;
 
-      finalComponent.initialize = function initialize(initObj) {
-        finalComponent.initializeComponent(initObj);
-        previousInitialize.call(finalComponent, initObj);
+      finalComponent.initialize = function initialize(props) {
+        finalComponent.initializeComponent(props);
+        previousInitialize.call(finalComponent, props);
       };
 
       if (initProps) {
@@ -3951,7 +3539,7 @@ var MixinComponentViews = function MixinComponentViews() {
 exports['default'] = MixinComponentViews();
 module.exports = exports['default'];
 
-},{"./MixinEventDelegator.js":33,"./ViewComponent.js":36}],32:[function(require,module,exports){
+},{"./MixinEventDelegator.js":31,"./ViewComponent.js":34}],30:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -4081,7 +3669,7 @@ var MixinDOMManipulation = function MixinDOMManipulation() {
 exports['default'] = MixinDOMManipulation();
 module.exports = exports['default'];
 
-},{"../../nudoru/util/is.js":49}],33:[function(require,module,exports){
+},{"../../nudoru/util/is.js":46}],31:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -4282,7 +3870,7 @@ var MixinEventDelegator = function MixinEventDelegator() {
 exports['default'] = MixinEventDelegator;
 module.exports = exports['default'];
 
-},{"../../nudoru/browser/BrowserInfo.js":37,"../../nudoru/util/is.js":49,"../utils/Rx.js":28}],34:[function(require,module,exports){
+},{"../../nudoru/browser/BrowserInfo.js":35,"../../nudoru/util/is.js":46,"../utils/Rx.js":26}],32:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -4399,7 +3987,7 @@ var MixinNudoruControls = function MixinNudoruControls() {
 exports['default'] = MixinNudoruControls();
 module.exports = exports['default'];
 
-},{"../../nudoru/components/MessageBoxCreator.js":40,"../../nudoru/components/MessageBoxView.js":41,"../../nudoru/components/ModalCoverView.js":42,"../../nudoru/components/ToastView.js":43,"../../nudoru/components/ToolTipView.js":44}],35:[function(require,module,exports){
+},{"../../nudoru/components/MessageBoxCreator.js":38,"../../nudoru/components/MessageBoxView.js":39,"../../nudoru/components/ModalCoverView.js":40,"../../nudoru/components/ToastView.js":41,"../../nudoru/components/ToolTipView.js":42}],33:[function(require,module,exports){
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
@@ -4446,7 +4034,7 @@ var MixinStoreStateViews = function MixinStoreStateViews() {
 exports["default"] = MixinStoreStateViews();
 module.exports = exports["default"];
 
-},{}],36:[function(require,module,exports){
+},{}],34:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -4650,14 +4238,14 @@ var ViewComponent = function ViewComponent() {
       html: _html
     });
 
-    if (this.delegateEvents) {
+    if (typeof this.delegateEvents === 'function') {
       if (this.shouldDelegateEvents()) {
         // True to automatically pass form element handlers the elements value or other status
         this.delegateEvents(true);
       }
     }
 
-    if (this.componentDidMount) {
+    if (typeof this.componentDidMount === 'function') {
       //this.componentDidMount.bind(this);
       _mountDelay = _.delay(this.mountAfterDelay.bind(this), 1);
     }
@@ -4701,7 +4289,7 @@ var ViewComponent = function ViewComponent() {
     }
 
     // Tweens are present in the MixinDOMManipulation. This is convenience
-    if (this.killTweens) {
+    if (typeof this.killTweens === 'function') {
       this.killTweens();
     }
 
@@ -4712,7 +4300,7 @@ var ViewComponent = function ViewComponent() {
 
     _isMounted = false;
 
-    if (this.undelegateEvents) {
+    if (typeof this.undelegateEvents === 'function') {
       this.undelegateEvents();
     }
 
@@ -4917,7 +4505,7 @@ var ViewComponent = function ViewComponent() {
 exports['default'] = ViewComponent;
 module.exports = exports['default'];
 
-},{"../../nudoru/util/is.js":49,"../utils/Renderer.js":26,"../utils/Templating.js":29}],37:[function(require,module,exports){
+},{"../../nudoru/util/is.js":46,"../utils/Renderer.js":25,"../utils/Templating.js":27}],35:[function(require,module,exports){
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
@@ -4986,7 +4574,7 @@ var browserInfo = {
 exports["default"] = browserInfo;
 module.exports = exports["default"];
 
-},{}],38:[function(require,module,exports){
+},{}],36:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -5196,7 +4784,7 @@ exports['default'] = {
 };
 module.exports = exports['default'];
 
-},{}],39:[function(require,module,exports){
+},{}],37:[function(require,module,exports){
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
@@ -5247,7 +4835,7 @@ exports["default"] = {
 };
 module.exports = exports["default"];
 
-},{}],40:[function(require,module,exports){
+},{}],38:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -5357,7 +4945,7 @@ var MessageBoxCreator = function MessageBoxCreator() {
 exports['default'] = MessageBoxCreator();
 module.exports = exports['default'];
 
-},{"./MessageBoxView":41}],41:[function(require,module,exports){
+},{"./MessageBoxView":39}],39:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -5659,7 +5247,7 @@ var MessageBoxView = function MessageBoxView() {
 exports['default'] = MessageBoxView();
 module.exports = exports['default'];
 
-},{"../../nori/utils/Templating.js":29,"../../nudoru/browser/BrowserInfo.js":37,"../../nudoru/browser/DOMUtils.js":38,"../../nudoru/browser/ThreeDTransforms.js":39,"../../vendor/rxjs/rx.lite.min.js":51,"./ModalCoverView.js":42}],42:[function(require,module,exports){
+},{"../../nori/utils/Templating.js":27,"../../nudoru/browser/BrowserInfo.js":35,"../../nudoru/browser/DOMUtils.js":36,"../../nudoru/browser/ThreeDTransforms.js":37,"../../vendor/rxjs/rx.lite.min.js":48,"./ModalCoverView.js":40}],40:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -5806,7 +5394,7 @@ var ModalCoverView = function ModalCoverView() {
 exports['default'] = ModalCoverView();
 module.exports = exports['default'];
 
-},{"../../nudoru/browser/BrowserInfo.js":37,"../../vendor/rxjs/rx.lite.min.js":51}],43:[function(require,module,exports){
+},{"../../nudoru/browser/BrowserInfo.js":35,"../../vendor/rxjs/rx.lite.min.js":48}],41:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -5969,7 +5557,7 @@ var ToastView = function ToastView() {
 exports['default'] = ToastView();
 module.exports = exports['default'];
 
-},{"../../nori/utils/Templating.js":29,"../../nudoru/browser/BrowserInfo.js":37,"../../nudoru/browser/DOMUtils.js":38,"../../nudoru/browser/ThreeDTransforms.js":39,"../../vendor/rxjs/rx.lite.min.js":51}],44:[function(require,module,exports){
+},{"../../nori/utils/Templating.js":27,"../../nudoru/browser/BrowserInfo.js":35,"../../nudoru/browser/DOMUtils.js":36,"../../nudoru/browser/ThreeDTransforms.js":37,"../../vendor/rxjs/rx.lite.min.js":48}],42:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -6251,7 +5839,7 @@ var ToolTipView = function ToolTipView() {
 exports['default'] = ToolTipView();
 module.exports = exports['default'];
 
-},{"../../nori/utils/Templating.js":29,"../../nudoru/browser/DOMUtils.js":38,"../../vendor/rxjs/rx.lite.min.js":51}],45:[function(require,module,exports){
+},{"../../nori/utils/Templating.js":27,"../../nudoru/browser/DOMUtils.js":36,"../../vendor/rxjs/rx.lite.min.js":48}],43:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -6344,7 +5932,7 @@ exports['default'] = {
 };
 module.exports = exports['default'];
 
-},{"./NumberUtils.js":46}],46:[function(require,module,exports){
+},{"./NumberUtils.js":44}],44:[function(require,module,exports){
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
@@ -6376,221 +5964,7 @@ exports["default"] = {
 };
 module.exports = exports["default"];
 
-},{}],47:[function(require,module,exports){
-Object.defineProperty(exports, '__esModule', {
-  value: true
-});
-exports['default'] = {
-
-  /**
-   * Test for
-   * Object {"": undefined}
-   * Object {undefined: undefined}
-   * @param obj
-   * @returns {boolean}
-   */
-  isNull: function isNull(obj) {
-    var isnull = false;
-
-    if (is.falsey(obj)) {
-      return true;
-    }
-
-    for (var prop in obj) {
-      if (prop === undefined || obj[prop] === undefined) {
-        isnull = true;
-      }
-      break;
-    }
-
-    return isnull;
-  },
-
-  dynamicSort: function dynamicSort(property) {
-    return function (a, b) {
-      return a[property] < b[property] ? -1 : a[property] > b[property] ? 1 : 0;
-    };
-  },
-
-  searchObjects: (function (_searchObjects) {
-    function searchObjects(_x, _x2, _x3) {
-      return _searchObjects.apply(this, arguments);
-    }
-
-    searchObjects.toString = function () {
-      return _searchObjects.toString();
-    };
-
-    return searchObjects;
-  })(function (obj, key, val) {
-    var objects = [];
-    for (var i in obj) {
-      if (typeof obj[i] === 'object') {
-        objects = objects.concat(searchObjects(obj[i], key, val));
-      } else if (i === key && obj[key] === val) {
-        objects.push(obj);
-      }
-    }
-    return objects;
-  }),
-
-  getObjectFromString: function getObjectFromString(obj, str) {
-    var i = 0,
-        path = str.split('.'),
-        len = path.length;
-
-    for (; i < len; i++) {
-      obj = obj[path[i]];
-    }
-    return obj;
-  },
-
-  getObjectIndexFromId: function getObjectIndexFromId(obj, id) {
-    if (typeof obj === "object") {
-      for (var i = 0; i < obj.length; i++) {
-        if (typeof obj[i] !== "undefined" && typeof obj[i].id !== "undefined" && obj[i].id === id) {
-          return i;
-        }
-      }
-    }
-    return false;
-  },
-
-  // extend and deep extend from http://youmightnotneedjquery.com/
-  extend: function extend(out) {
-    out = out || {};
-
-    for (var i = 1; i < arguments.length; i++) {
-      if (!arguments[i]) {
-        continue;
-      }
-
-      for (var key in arguments[i]) {
-        if (arguments[i].hasOwnProperty(key)) {
-          out[key] = arguments[i][key];
-        }
-      }
-    }
-
-    return out;
-  },
-
-  deepExtend: (function (_deepExtend) {
-    function deepExtend(_x4) {
-      return _deepExtend.apply(this, arguments);
-    }
-
-    deepExtend.toString = function () {
-      return _deepExtend.toString();
-    };
-
-    return deepExtend;
-  })(function (out) {
-    out = out || {};
-
-    for (var i = 1; i < arguments.length; i++) {
-      var obj = arguments[i];
-
-      if (!obj) {
-        continue;
-      }
-
-      for (var key in obj) {
-        if (obj.hasOwnProperty(key)) {
-          if (typeof obj[key] === 'object') {
-            deepExtend(out[key], obj[key]);
-          } else {
-            out[key] = obj[key];
-          }
-        }
-      }
-    }
-
-    return out;
-  }),
-
-  /**
-   * Simplified implementation of Stamps - http://ericleads.com/2014/02/prototypal-inheritance-with-stamps/
-   * https://www.barkweb.co.uk/blog/object-composition-and-prototypical-inheritance-in-javascript
-   *
-   * Prototype object requires a methods object, private closures and state is optional
-   *
-   * @param prototype
-   * @returns New object using prototype.methods as source
-   */
-  basicFactory: function basicFactory(prototype) {
-    var proto = prototype,
-        obj = Object.create(proto.methods);
-
-    if (proto.hasOwnProperty('closure')) {
-      proto.closures.forEach(function (closure) {
-        closure.call(obj);
-      });
-    }
-
-    if (proto.hasOwnProperty('state')) {
-      for (var key in proto.state) {
-        obj[key] = proto.state[key];
-      }
-    }
-
-    return obj;
-  },
-
-  /**
-   * Copyright 2013-2014 Facebook, Inc.
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   * http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   *
-   */
-  /**
-   * Constructs an enumeration with keys equal to their value.
-   *
-   * https://github.com/STRML/keymirror
-   *
-   * For example:
-   *
-   *   var COLORS = keyMirror({blue: null, red: null});
-   *   var myColor = COLORS.blue;
-   *   var isColorValid = !!COLORS[myColor];
-   *
-   * The last line could not be performed if the values of the generated enum were
-   * not equal to their keys.
-   *
-   *   Input:  {key1: val1, key2: val2}
-   *   Output: {key1: key1, key2: key2}
-   *
-   * @param {object} obj
-   * @return {object}
-   */
-  keyMirror: function keyMirror(obj) {
-    var ret = {};
-    var key;
-    if (!(obj instanceof Object && !Array.isArray(obj))) {
-      throw new Error('keyMirror(...): Argument must be an object.');
-    }
-    for (key in obj) {
-      if (obj.hasOwnProperty(key)) {
-        ret[key] = key;
-      }
-    }
-    return ret;
-  }
-
-};
-module.exports = exports['default'];
-
-},{}],48:[function(require,module,exports){
+},{}],45:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -6644,7 +6018,7 @@ exports['default'] = {
 };
 module.exports = exports['default'];
 
-},{}],49:[function(require,module,exports){
+},{}],46:[function(require,module,exports){
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
@@ -6692,7 +6066,7 @@ exports["default"] = {
 };
 module.exports = exports["default"];
 
-},{}],50:[function(require,module,exports){
+},{}],47:[function(require,module,exports){
 /**
  *  Copyright (c) 2014-2015, Facebook, Inc.
  *  All rights reserved.
@@ -8279,7 +7653,7 @@ module.exports = exports["default"];
     } }), l.prototype.has = un.includes, Xe(x, p.prototype), Xe(k, v.prototype), Xe(A, l.prototype), Xe(V, p.prototype), Xe(Y, v.prototype), Xe(Q, l.prototype);var an = { Iterable: _, Seq: O, Collection: H, Map: Lt, OrderedMap: Ie, List: fe, Stack: Ee, Set: Ae, OrderedSet: Le, Record: Ce, Range: Ye, Repeat: Qe, is: X, fromJS: F };return an;
 });
 
-},{}],51:[function(require,module,exports){
+},{}],48:[function(require,module,exports){
 (function (process,global){
 /* Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.*/
 (function (a) {

@@ -70,7 +70,7 @@ let App = Nori.createApplication({
       url    : 'https://pareshchouhan-trivia-v1.p.mashape.com/v1/getQuizQuestionsByCategory?categoryId=' + _restQuestionCategory + '&limit=' + _restNumQuestions + '&page=1',
       headers: [{'X-Mashape-Key': 'tPxKgDvrkqmshg8zW4olS87hzF7Ap1vi63rjsnUuVw1sBHV9KJ'}],
       json   : true
-    }).subscribe(this.onQuestionsSuccess.bind(this), this.onQuestionError);
+    }).then(this.onQuestionsSuccess.bind(this), this.onQuestionError);
   },
 
   onQuestionsSuccess(data) {

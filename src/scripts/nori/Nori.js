@@ -1,11 +1,9 @@
 /* @flow weak */
 
 import _mixinObservableSubject from './utils/MixinObservableSubject.js';
-import _mixinReducerStore from './store/MixinReducerStore.js';
+import _mixinReducerStore from './store/ReducerStore.js';
 import _mixinComponentViews from './view/MixinComponentViews.js';
 import _mixinEventDelegator from './view/MixinEventDelegator.js';
-import _dispatcher from './utils/Dispatcher.js';
-import _router from './utils/Router.js';
 
 let Nori = function () {
 
@@ -19,14 +17,6 @@ let Nori = function () {
   //  Accessors
   //----------------------------------------------------------------------------
 
-  function getDispatcher() {
-    return _dispatcher;
-  }
-
-  function getRouter() {
-    return _router;
-  }
-
   /**
    * Allow for optional external configuration data from outside of the compiled
    * app bundle. For easy of settings tweaks after the build by non technical devs
@@ -34,10 +24,6 @@ let Nori = function () {
    */
   function getConfig() {
     return _.assign({}, (window.APP_CONFIG_DATA || {}));
-  }
-
-  function getCurrentRoute() {
-    return _router.getCurrentRoute();
   }
 
   function view() {
@@ -49,7 +35,7 @@ let Nori = function () {
   }
 
   //----------------------------------------------------------------------------
-  //  Template parts
+  //  Templates
   //----------------------------------------------------------------------------
 
   _storeTemplate = createStore({
@@ -68,7 +54,7 @@ let Nori = function () {
   })();
 
   //----------------------------------------------------------------------------
-  //  Factories - concatenative inheritance, decorators
+  //  Factories
   //----------------------------------------------------------------------------
 
   /**
@@ -84,51 +70,55 @@ let Nori = function () {
   }
 
   /**
-   * Create a new Nori application instance
-   * @param custom
-   * @returns {*}
+   * Return a new Nori class by combining a template and customizer with mixins
+   * @param template
+   * @param customizer
+   * @returns {Function}
    */
-  function createApplication(custom) {
-    custom.mixins.push(this);
-    return buildFromMixins(custom);
-  }
-
-  /**
-   * Creates main application store
-   * @param custom
-   * @returns {*}
-   */
-  function createStore(custom) {
-    return function cs() {
-      return _.assign({}, _storeTemplate, buildFromMixins(custom));
-    };
-  }
-
-  /**
-   * Creates main application view
-   * @param custom
-   * @returns {*}
-   */
-  function createView(custom) {
-    return function cv() {
-      return _.assign({}, _viewTemplate, buildFromMixins(custom));
+  function createClass(template, customizer) {
+    template = template || {};
+    return function factory() {
+      return _.assign({}, template, buildFromMixins(customizer));
     };
   }
 
   /**
    * Mixes in the modules specified in the custom application object
-   * @param sourceObject
+   * @param customizer
    * @returns {*}
    */
-  function buildFromMixins(sourceObject) {
-    let mixins;
-
-    if (sourceObject.mixins) {
-      mixins = sourceObject.mixins;
-    }
-
-    mixins.push(sourceObject);
+  function buildFromMixins(customizer) {
+    let mixins = customizer.mixins || [];
+    mixins.push(customizer);
     return assignArray({}, mixins);
+  }
+
+  /**
+   * Create a new Nori application instance
+   * @param customizer
+   * @returns {*}
+   */
+  function createApplication(customizer) {
+    customizer.mixins.push(this);
+    return createClass({}, customizer)();
+  }
+
+  /**
+   * Creates main application store
+   * @param customizer
+   * @returns {*}
+   */
+  function createStore(customizer) {
+    return createClass(_storeTemplate, customizer);
+  }
+
+  /**
+   * Creates main application view
+   * @param customizer
+   * @returns {*}
+   */
+  function createView(customizer) {
+    return createClass(_viewTemplate, customizer);
   }
 
   //----------------------------------------------------------------------------
@@ -137,15 +127,13 @@ let Nori = function () {
 
   return {
     config           : getConfig,
-    dispatcher       : getDispatcher,
-    router           : getRouter,
     view             : view,
     store            : store,
+    createClass      : createClass,
     createApplication: createApplication,
     createStore      : createStore,
     createView       : createView,
     buildFromMixins  : buildFromMixins,
-    getCurrentRoute  : getCurrentRoute,
     assignArray      : assignArray
   };
 
