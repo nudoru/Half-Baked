@@ -3397,7 +3397,6 @@ var MixinComponentViews = function MixinComponentViews() {
    */
   function createComponent(customizer) {
     return function (initProps) {
-      console.log('Factory creating', initProps);
       var finalComponent = undefined,
           previousInitialize = undefined,
           previousGetDefaultProps = undefined;
@@ -3422,7 +3421,6 @@ var MixinComponentViews = function MixinComponentViews() {
         // Overwrite the function in the component
         finalComponent.getDefaultProps = function () {
           return _.merge({}, previousGetDefaultProps.call(finalComponent), initProps);
-          //return initProps;
         };
       }
 
@@ -4102,11 +4100,7 @@ var ViewComponent = function ViewComponent() {
    * @param initProps
    */
   function initializeComponent(initProps) {
-    console.log("Base with", initProps);
-
     setProps(_.assign({}, this.getDefaultProps(), initProps));
-
-    console.log('final props: ', this.props);
 
     this.setState(this.getInitialState());
     this.setEvents(this.defineEvents());
@@ -4175,13 +4169,7 @@ var ViewComponent = function ViewComponent() {
 
     if (this.shouldComponentUpdate(nextState)) {
       this.setState(nextState);
-
-      if (_isMounted) {
-        this.unmount();
-        this.renderComponent();
-        this.mount();
-      }
-
+      this.renderComponent();
       this.updateRegions();
     }
 
@@ -4208,10 +4196,14 @@ var ViewComponent = function ViewComponent() {
   function renderComponent() {
     var force = arguments.length <= 0 || arguments[0] === undefined ? false : arguments[0];
 
-    console.log(shouldComponentRender(), force);
     if (!shouldComponentRender() && !force) {
-      console.log(this.getID(), ' not rendering');
+      console.log(this.getID(), ' Same state and props, not rendering');
       return;
+    }
+
+    var wasMounted = _isMounted;
+    if (_isMounted) {
+      this.unmount();
     }
 
     _lifecycleState = LS_RENDERING;
@@ -4220,12 +4212,17 @@ var ViewComponent = function ViewComponent() {
       _templateObjCache = this.template(_internalState);
     }
 
+    // Cache these for next render call
     _lastRenderedState = _.assign({}, _internalState);
     _lastRenderedProps = _.assign({}, _internalProps);
 
     _html = this.render(this.getState());
 
     this.renderRegions();
+
+    if (wasMounted) {
+      this.mount();
+    }
   }
 
   /**
@@ -4333,15 +4330,12 @@ var ViewComponent = function ViewComponent() {
       window.clearTimeout(_mountDelay);
     }
 
-    // Tweens are present in the MixinDOMManipulation. This is convenience
+    // Tweens are present in the MixinDOMManipulation. For convenience, killing here
     if (typeof this.killTweens === 'function') {
       this.killTweens();
     }
 
     this.componentWillUnmount();
-
-    // NO
-    //this.unmountRegions();
 
     _isMounted = false;
 
@@ -4349,6 +4343,7 @@ var ViewComponent = function ViewComponent() {
       this.undelegateEvents();
     }
 
+    // Just clear the contents
     _utilsRendererJs2['default'].render({
       target: _mountPoint,
       html: ''

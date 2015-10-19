@@ -38,7 +38,6 @@ let MixinComponentViews = function () {
    */
   function createComponent(customizer) {
     return function (initProps) {
-      console.log('Factory creating',initProps);
       let finalComponent, previousInitialize, previousGetDefaultProps;
 
       customizer.mixins = customizer.mixins || [];
@@ -61,7 +60,6 @@ let MixinComponentViews = function () {
         // Overwrite the function in the component
         finalComponent.getDefaultProps = function () {
           return _.merge({}, previousGetDefaultProps.call(finalComponent), initProps);
-          //return initProps;
         };
       }
 

@@ -48,11 +48,7 @@ var ViewComponent = function () {
    * @param initProps
    */
   function initializeComponent(initProps) {
-    console.log("Base with", initProps);
-
     setProps(_.assign({}, this.getDefaultProps(), initProps));
-
-    console.log('final props: ', this.props);
 
     this.setState(this.getInitialState());
     this.setEvents(this.defineEvents());
@@ -121,13 +117,7 @@ var ViewComponent = function () {
 
     if (this.shouldComponentUpdate(nextState)) {
       this.setState(nextState);
-
-      if (_isMounted) {
-        this.unmount();
-        this.renderComponent();
-        this.mount();
-      }
-
+      this.renderComponent();
       this.updateRegions();
     }
 
@@ -152,10 +142,14 @@ var ViewComponent = function () {
    * @returns {*}
    */
   function renderComponent(force = false) {
-    console.log(shouldComponentRender(), force);
     if(!shouldComponentRender() && !force) {
-      console.log(this.getID(), ' not rendering');
+      console.log(this.getID(), ' Same state and props, not rendering');
       return;
+    }
+
+    let wasMounted = _isMounted;
+    if(_isMounted) {
+      this.unmount();
     }
 
     _lifecycleState = LS_RENDERING;
@@ -164,12 +158,17 @@ var ViewComponent = function () {
       _templateObjCache = this.template(_internalState);
     }
 
+    // Cache these for next render call
     _lastRenderedState = _.assign({}, _internalState);
     _lastRenderedProps = _.assign({}, _internalProps);
 
     _html = this.render(this.getState());
 
     this.renderRegions();
+
+    if(wasMounted) {
+      this.mount();
+    }
   }
 
   /**
@@ -279,15 +278,12 @@ var ViewComponent = function () {
       window.clearTimeout(_mountDelay);
     }
 
-    // Tweens are present in the MixinDOMManipulation. This is convenience
+    // Tweens are present in the MixinDOMManipulation. For convenience, killing here
     if (typeof this.killTweens === 'function') {
       this.killTweens();
     }
 
     this.componentWillUnmount();
-
-    // NO
-    //this.unmountRegions();
 
     _isMounted = false;
 
@@ -295,6 +291,7 @@ var ViewComponent = function () {
       this.undelegateEvents();
     }
 
+    // Just clear the contents
     _renderer.render({
       target: _mountPoint,
       html  : ''
