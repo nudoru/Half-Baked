@@ -18,7 +18,6 @@ var Component = Nori.view().createComponent({
    * @param configProps
    */
   initialize(initProps) {
-    console.log('Initializing with',initProps)
   },
 
   /**

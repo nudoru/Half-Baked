@@ -28,29 +28,27 @@ var Component = Nori.view().createComponent({
    * @param configProps
    */
     initialize (initProps) {
+    this.bind(_appStore, this.onStoreUpdate.bind(this));
   },
 
-  getDefaultProps() {
-    return {bind: _appStore};
+  onStoreUpdate() {
+    this.setState(this.getGameState());
   },
 
   defineRegions () {
     return {
       localPlayerStats : _regionPlayerStats({
         id        : 'game__playerstats',
-        bind      : _appStore,
         mountPoint: '#game__localplayerstats',
         target    : 'local'
       }),
       remotePlayerStats: _regionPlayerStats({
         id        : 'game__playerstats',
-        bind      : _appStore,
         mountPoint: '#game__remoteplayerstats',
         target    : 'remote'
       }),
       questionView     : _regionQuestion({
         id        : 'game__question',
-        bind      : _appStore,
         mountPoint: '#game__questionarea'
       })
     };
@@ -73,13 +71,6 @@ var Component = Nori.view().createComponent({
    * Set initial state properties. Call once on first render
    */
     getInitialState () {
-    return this.getGameState();
-  },
-
-  /**
-   * State change on bound stores (map, etc.) Return nextState object
-   */
-    componentWillUpdate () {
     return this.getGameState();
   },
 

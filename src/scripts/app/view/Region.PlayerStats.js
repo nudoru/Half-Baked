@@ -26,8 +26,12 @@ var Component = Nori.view().createComponent({
    * @param configProps
    */
     initialize(initProps) {
+    this.bind(_appStore, this.onStoreUpdate.bind(this));
   },
 
+  onStoreUpdate() {
+    this.setState(this.getHUDState());
+  },
 
   /**
    * Create an object to be used to define events on DOM elements
@@ -41,13 +45,6 @@ var Component = Nori.view().createComponent({
    * Set initial state properties. Call once on first render
    */
     getInitialState() {
-    return this.getHUDState();
-  },
-
-  /**
-   * State change on bound stores (map, etc.) Return nextState object
-   */
-    componentWillUpdate() {
     return this.getHUDState();
   },
 

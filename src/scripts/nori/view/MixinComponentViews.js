@@ -80,17 +80,18 @@ let MixinComponentViews = function () {
     }
 
     if (!componentView.controller.isInitialized()) {
+      // Not initialized, set props
       mountPoint = mountPoint || componentView.mountPoint;
       componentView.controller.initialize({
         id        : componentID,
         template  : componentView.htmlTemplate,
         mountPoint: mountPoint
       });
-    } else {
-      componentView.controller.update();
     }
 
-    componentView.controller.renderComponent();
+    // Force render
+    componentView.controller.renderComponent(true);
+    // wasn't mounted before, so mount it
     componentView.controller.mount();
   }
 

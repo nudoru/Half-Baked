@@ -994,7 +994,13 @@ var Component = Nori.view().createComponent({
    * initialized from app view
    * @param configProps
    */
-  initialize: function initialize(initProps) {},
+  initialize: function initialize(initProps) {
+    this.bind(_storeAppStore2['default'], this.onStoreUpdate.bind(this));
+  },
+
+  onStoreUpdate: function onStoreUpdate() {
+    this.setState(this.getHUDState());
+  },
 
   /**
    * Create an object to be used to define events on DOM elements
@@ -1008,13 +1014,6 @@ var Component = Nori.view().createComponent({
    * Set initial state properties. Call once on first render
    */
   getInitialState: function getInitialState() {
-    return this.getHUDState();
-  },
-
-  /**
-   * State change on bound stores (map, etc.) Return nextState object
-   */
-  componentWillUpdate: function componentWillUpdate() {
     return this.getHUDState();
   },
 
@@ -1207,7 +1206,13 @@ var Component = Nori.view().createComponent({
    * initialized from app view
    * @param configProps
    */
-  initialize: function initialize(initProps) {},
+  initialize: function initialize(initProps) {
+    this.bind(_storeAppStore2['default'], this.onStoreUpdate.bind(this));
+  },
+
+  onStoreUpdate: function onStoreUpdate() {
+    this.setState(this.getQuestionState());
+  },
 
   /**
    * Create an object to be used to define events on DOM elements
@@ -1279,13 +1284,6 @@ var Component = Nori.view().createComponent({
    * Set initial state properties. Call once on first render
    */
   getInitialState: function getInitialState() {
-    return this.getQuestionState();
-  },
-
-  /**
-   * State change on bound stores (map, etc.) Return nextState object
-   */
-  componentWillUpdate: function componentWillUpdate() {
     return this.getQuestionState();
   },
 
@@ -1603,29 +1601,28 @@ var Component = Nori.view().createComponent({
    * initialized from app view
    * @param configProps
    */
-  initialize: function initialize(initProps) {},
+  initialize: function initialize(initProps) {
+    this.bind(_storeAppStore2['default'], this.onStoreUpdate.bind(this));
+  },
 
-  getDefaultProps: function getDefaultProps() {
-    return { bind: _storeAppStore2['default'] };
+  onStoreUpdate: function onStoreUpdate() {
+    this.setState(this.getGameState());
   },
 
   defineRegions: function defineRegions() {
     return {
       localPlayerStats: (0, _RegionPlayerStatsJs2['default'])({
         id: 'game__playerstats',
-        bind: _storeAppStore2['default'],
         mountPoint: '#game__localplayerstats',
         target: 'local'
       }),
       remotePlayerStats: (0, _RegionPlayerStatsJs2['default'])({
         id: 'game__playerstats',
-        bind: _storeAppStore2['default'],
         mountPoint: '#game__remoteplayerstats',
         target: 'remote'
       }),
       questionView: (0, _RegionQuestionJs2['default'])({
         id: 'game__question',
-        bind: _storeAppStore2['default'],
         mountPoint: '#game__questionarea'
       })
     };
@@ -1648,13 +1645,6 @@ var Component = Nori.view().createComponent({
    * Set initial state properties. Call once on first render
    */
   getInitialState: function getInitialState() {
-    return this.getGameState();
-  },
-
-  /**
-   * State change on bound stores (map, etc.) Return nextState object
-   */
-  componentWillUpdate: function componentWillUpdate() {
     return this.getGameState();
   },
 
@@ -1782,9 +1772,7 @@ var Component = Nori.view().createComponent({
    * initialized from app view
    * @param configProps
    */
-  initialize: function initialize(initProps) {
-    console.log('Initializing with', initProps);
-  },
+  initialize: function initialize(initProps) {},
 
   /**
    * Create an object to be used to define events on DOM elements
@@ -3441,17 +3429,18 @@ var MixinComponentViews = function MixinComponentViews() {
     }
 
     if (!componentView.controller.isInitialized()) {
+      // Not initialized, set props
       mountPoint = mountPoint || componentView.mountPoint;
       componentView.controller.initialize({
         id: componentID,
         template: componentView.htmlTemplate,
         mountPoint: mountPoint
       });
-    } else {
-      componentView.controller.update();
     }
 
-    componentView.controller.renderComponent();
+    // Force render
+    componentView.controller.renderComponent(true);
+    // wasn't mounted before, so mount it
     componentView.controller.mount();
   }
 
@@ -4050,12 +4039,6 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'd
  * Must be extended with custom modules
  */
 
-/*
-
- var component = Nori.view().createComponent(
-
- */
-
 var _utilsTemplatingJs = require('../utils/Templating.js');
 
 var _utilsTemplatingJs2 = _interopRequireDefault(_utilsTemplatingJs);
@@ -4083,8 +4066,8 @@ var ViewComponent = function ViewComponent() {
       _internalProps = {},
       _publicState = {},
       _publicProps = {},
-      _lastRenderedState = {},
-      _lastRenderedProps = {},
+      _lastState = {},
+      _lastProps = {},
       _lifecycleState = LS_NO_INIT,
       _isMounted = false,
       _regions = {},
@@ -4102,22 +4085,35 @@ var ViewComponent = function ViewComponent() {
   function initializeComponent(initProps) {
     this.setProps(_.assign({}, this.getDefaultProps(), initProps));
 
-    this.setState(this.getInitialState());
-    this.setEvents(this.defineEvents());
-
     _id = _internalProps.id;
-    _mountPoint = _internalProps.mountPoint;
+    if (!_id) {
+      throw new Error('Cannot initialize Component without an ID');
+    }
 
+    _mountPoint = _internalProps.mountPoint;
     _regions = this.defineRegions();
 
-    if (_internalProps.bind) {
-      this.bind(_internalProps.bind);
-    }
+    this.setState(this.getInitialState());
+    this.setEvents(this.defineEvents());
 
     this.initializeRegions();
 
     _lifecycleState = LS_INITED;
   }
+
+  /**
+   * Override in implementation
+   *
+   * Define DOM events to be attached after the element is mounted
+   * @returns {undefined}
+   */
+  function defineEvents() {
+    return undefined;
+  }
+
+  //----------------------------------------------------------------------------
+  //  Props and state
+  //----------------------------------------------------------------------------
 
   /**
    * Override to set default props
@@ -4131,62 +4127,103 @@ var ViewComponent = function ViewComponent() {
     return undefined;
   }
 
-  /**
-   * Override in implementation
-   *
-   * Define DOM events to be attached after the element is mounted
-   * @returns {undefined}
-   */
-  function defineEvents() {
-    return undefined;
+  function getInitialState() {
+    return {};
   }
 
-  /**
-   * Bind updates to the map ID to this view's update
-   * @param observableStore Object to subscribe to or ID. Should implement nori/store/MixinObservableStore
-   */
-  function bind(observableStore) {
-    if (!_nudoruUtilIsJs2['default'].func(observableStore.subscribe)) {
-      console.warn('ViewComponent bind, must be observable: ' + observableStore);
+  function getState() {
+    return _.assign({}, _internalState);
+  }
+
+  function shouldSetState(nextState) {
+    return !_.isEqual(_internalState, nextState);
+  }
+
+  function getProps() {
+    return _.assign({}, _internalProps);
+  }
+
+  function shouldSetProps(nextProps) {
+    return !_.isEqual(_internalProps, nextProps);
+  }
+
+  function shouldComponentUpdate(nextState, nextProps) {
+    var isStateEq = _.isEqual(nextState, _internalState),
+        isPropsEq = _.isEqual(nextProps, _internalProps);
+
+    return !isStateEq || !isPropsEq;
+  }
+
+  function setState(nextState) {
+    nextState = nextState || this.getInitialState();
+
+    if (!shouldSetState(nextState)) {
       return;
     }
 
-    observableStore.subscribe(this.update.bind(this));
+    if (typeof this.componentWillUpdate === 'function' && _lifecycleState > LS_INITED) {
+      this.componentWillUpdate(_publicProps, nextState);
+    }
+
+    _lastState = _.assign({}, _internalState);
+    _internalState = _.assign({}, _internalState, nextState);
+    // keeping the object reference
+    _publicState = _.assign(_publicState, _internalState);
+
+    if (typeof _publicState.onChange === 'function') {
+      _publicState.onChange.apply(this);
+    }
+
+    this.renderAfterPropsOrStateChange();
+  }
+
+  /**
+   * Before new props are updated
+   */
+  function componentWillReceiveProps(nextProps) {}
+
+  function setProps(nextProps) {
+    nextProps = nextProps || this.getInitialState();
+
+    if (!shouldSetProps(nextProps)) {
+      return;
+    }
+
+    if (typeof this.componentWillReceiveProps === 'function' && _lifecycleState > LS_INITED) {
+      this.componentWillReceiveProps(nextProps);
+    }
+
+    if (typeof this.componentWillUpdate === 'function' && _lifecycleState > LS_INITED) {
+      this.componentWillUpdate(nextProps, _internalState);
+    }
+
+    _lastProps = _.assign({}, _internalProps);
+    _internalProps = _.merge({}, _internalProps, nextProps);
+    // keeping the object reference
+    _publicProps = _.assign(_publicProps, _internalProps);
+
+    if (typeof _publicProps.onChange === 'function') {
+      _publicProps.onChange.apply(this);
+    }
+
+    this.renderAfterPropsOrStateChange();
+  }
+
+  function renderAfterPropsOrStateChange() {
+    if (_lifecycleState > LS_INITED) {
+      this.renderComponent();
+      if (typeof this.componentDidUpdate === 'function') {
+        this.componentDidUpdate(_lastProps, _lastState);
+      }
+    }
   }
 
   /**
    * Before the view updates and a rerender occurs
-   * Returns nextState of component
    */
-  function componentWillUpdate() {
-    return this.getState();
-  }
+  function componentWillUpdate(nextProps, nextState) {}
 
-  function update() {
-    _lifecycleState = LS_UPDATING;
-
-    var nextState = this.componentWillUpdate();
-
-    if (this.shouldComponentUpdate(nextState)) {
-      this.setState(nextState);
-      this.renderComponent();
-      this.updateRegions();
-    }
-
-    if (_lifecycleState === LS_UPDATING) {
-      _lifecycleState = LS_INITED;
-    }
-  }
-
-  /**
-   * Compare current state and next state to determine if updating should occur
-   * If the next state exists and it's not equal to the current state
-   * @param nextState
-   * @returns {*}
-   */
-  function shouldComponentUpdate(nextState) {
-    return !_.isEqual(this.getState(), nextState);
-  }
+  function componentDidUpdate(lastProps, lastState) {}
 
   /**
    * Render it, need to add it to a parent container, handled in higher level view
@@ -4196,17 +4233,9 @@ var ViewComponent = function ViewComponent() {
   function renderComponent() {
     var force = arguments.length <= 0 || arguments[0] === undefined ? false : arguments[0];
 
-    if (!shouldComponentRender() && !force) {
-      console.log(this.getID(), ' Same state and props, not rendering');
-      return;
-    }
-
-    // Cache these for next render call
-    _lastRenderedState = _.assign({}, _internalState);
-    _lastRenderedProps = _.assign({}, _internalProps);
-
     var wasMounted = _isMounted;
-    if (_isMounted) {
+    if (wasMounted) {
+      console.log(this.getID(), 'unmounting');
       this.unmount();
     }
 
@@ -4223,18 +4252,6 @@ var ViewComponent = function ViewComponent() {
     }
 
     this.renderRegions();
-  }
-
-  /**
-   * Should it rerender because of a state or prop change. Returns true if state
-   * or props are different from last render call
-   * @returns {boolean}
-   */
-  function shouldComponentRender() {
-    var isStateEq = _.isEqual(_lastRenderedState, _internalState),
-        isPropsEq = _.isEqual(_lastRenderedProps, _internalProps);
-
-    return !isStateEq || !isPropsEq;
   }
 
   /**
@@ -4266,6 +4283,12 @@ var ViewComponent = function ViewComponent() {
    * @param mountEl
    */
   function mount() {
+    // TODO why aren't components unmounting on change first?
+    if (_isMounted) {
+      console.warn('Component ' + _id + ' is already mounted');
+      return;
+    }
+
     if (!_html || _html.length === 0) {
       console.warn('Component ' + _id + ' cannot mount with no HTML. Call render() first?');
       return;
@@ -4288,7 +4311,6 @@ var ViewComponent = function ViewComponent() {
     }
 
     if (typeof this.componentDidMount === 'function') {
-      //this.componentDidMount.bind(this);
       _mountDelay = _.delay(this.mountAfterDelay.bind(this), 1);
     }
   }
@@ -4390,12 +4412,6 @@ var ViewComponent = function ViewComponent() {
     });
   }
 
-  function updateRegions() {
-    getRegionIDs().forEach(function (region) {
-      _regions[region].update();
-    });
-  }
-
   function renderRegions() {
     getRegionIDs().forEach(function (region) {
       _regions[region].renderComponent();
@@ -4421,60 +4437,6 @@ var ViewComponent = function ViewComponent() {
   }
 
   //----------------------------------------------------------------------------
-  //  Props and state
-  //----------------------------------------------------------------------------
-
-  function getInitialState() {
-    this.setState({});
-  }
-
-  function getState() {
-    return _.assign({}, _internalState);
-  }
-
-  function setState(nextState) {
-    if (_.isEqual(_internalState, nextState)) {
-      return;
-    }
-
-    _internalState = _.assign({}, _internalState, nextState);
-    // keeping the object reference
-    _publicState = _.assign(_publicState, _internalState);
-
-    if (typeof _publicState.onChange === 'function') {
-      _publicState.onChange.apply(this);
-    }
-  }
-
-  function getProps() {
-    return _.assign({}, _internalProps);
-  }
-
-  function setProps(nextProps) {
-    if (_.isEqual(_internalProps, nextProps)) {
-      return;
-    }
-
-    if (this.componentWillReceiveProps && _lifecycleState > LS_INITED) {
-      this.componentWillReceiveProps(nextProps);
-    }
-
-    _internalProps = _.merge({}, _internalProps, nextProps);
-    // keeping the object reference
-    _publicProps = _.assign(_publicProps, _internalProps);
-
-    if (typeof _publicProps.onChange === 'function') {
-      _publicProps.onChange.apply(this);
-    }
-
-    if (_lifecycleState > LS_INITED) {
-      this.update();
-    }
-  }
-
-  function componentWillReceiveProps(nextProps) {}
-
-  //----------------------------------------------------------------------------
   //  Accessors
   //----------------------------------------------------------------------------
 
@@ -4496,6 +4458,23 @@ var ViewComponent = function ViewComponent() {
 
   function getDOMElement() {
     return _DOMElement;
+  }
+
+  //----------------------------------------------------------------------------
+  //  Utility
+  //----------------------------------------------------------------------------
+
+  /**
+   * Bind updates from a store to a function
+   * @param observable Object to subscribe to or ID. Should implement nori/store/MixinObservableStore
+   */
+  function bind(observable, func) {
+    if (!_nudoruUtilIsJs2['default'].func(observable.subscribe)) {
+      console.warn('ViewComponent bind, must be observable: ' + observable);
+      return;
+    }
+
+    observable.subscribe(func);
   }
 
   //----------------------------------------------------------------------------
@@ -4523,9 +4502,9 @@ var ViewComponent = function ViewComponent() {
     bind: bind,
     componentWillReceiveProps: componentWillReceiveProps,
     componentWillUpdate: componentWillUpdate,
+    componentDidUpdate: componentDidUpdate,
     shouldComponentUpdate: shouldComponentUpdate,
-    update: update,
-    shouldComponentRender: shouldComponentRender,
+    renderAfterPropsOrStateChange: renderAfterPropsOrStateChange,
     renderComponent: renderComponent,
     render: render,
     mount: mount,
@@ -4539,7 +4518,6 @@ var ViewComponent = function ViewComponent() {
     getRegion: getRegion,
     getRegionIDs: getRegionIDs,
     initializeRegions: initializeRegions,
-    updateRegions: updateRegions,
     renderRegions: renderRegions,
     mountRegions: mountRegions,
     unmountRegions: unmountRegions,

@@ -28,6 +28,11 @@ var Component = Nori.view().createComponent({
    * @param configProps
    */
     initialize(initProps) {
+    this.bind(_appStore, this.onStoreUpdate.bind(this));
+  },
+
+  onStoreUpdate() {
+    this.setState(this.getQuestionState());
   },
 
   /**
@@ -100,13 +105,6 @@ var Component = Nori.view().createComponent({
    * Set initial state properties. Call once on first render
    */
     getInitialState() {
-    return this.getQuestionState();
-  },
-
-  /**
-   * State change on bound stores (map, etc.) Return nextState object
-   */
-    componentWillUpdate() {
     return this.getQuestionState();
   },
 
