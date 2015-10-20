@@ -4054,10 +4054,9 @@ var _nudoruUtilIsJs2 = _interopRequireDefault(_nudoruUtilIsJs);
 // Lifecycle state constants
 var LS_NO_INIT = 0,
     LS_INITED = 1,
-    LS_UPDATING = 2,
-    LS_RENDERING = 3,
-    LS_MOUNTED = 4,
-    LS_UNMOUNTED = 5,
+    LS_RENDERING = 2,
+    LS_MOUNTED = 3,
+    LS_UNMOUNTED = 4,
     LS_DISPOSED = 9;
 
 var ViewComponent = function ViewComponent() {
@@ -4127,33 +4126,65 @@ var ViewComponent = function ViewComponent() {
     return undefined;
   }
 
+  /**
+   * Get the initial state of the component
+   * @returns {{}}
+   */
   function getInitialState() {
     return {};
   }
 
+  /**
+   * Get the current state
+   * @returns {void|*}
+   */
   function getState() {
     return _.assign({}, _internalState);
   }
 
+  /**
+   * Compare next state with current state and return true if they're different
+   * @param nextState
+   * @returns {boolean}
+   */
   function shouldSetState(nextState) {
     return !_.isEqual(_internalState, nextState);
   }
 
+  /**
+   * Get the current props
+   * @returns {void|*}
+   */
   function getProps() {
     return _.assign({}, _internalProps);
   }
 
+  /**
+   * Compare the next props with current props and return true if they're different
+   * @param nextProps
+   * @returns {boolean}
+   */
   function shouldSetProps(nextProps) {
     return !_.isEqual(_internalProps, nextProps);
   }
 
-  function shouldComponentUpdate(nextState, nextProps) {
+  /**
+   * Compares next state and props, returns true if one or both are different than current
+   * @param nextState
+   * @param nextProps
+   * @returns {boolean}
+   */
+  function shouldComponentUpdate(nextProps, nextState) {
     var isStateEq = _.isEqual(nextState, _internalState),
         isPropsEq = _.isEqual(nextProps, _internalProps);
 
     return !isStateEq || !isPropsEq;
   }
 
+  /**
+   * Sets the next state and trigger a rerender
+   * @param nextState
+   */
   function setState(nextState) {
     nextState = nextState || this.getInitialState();
 
@@ -4182,6 +4213,10 @@ var ViewComponent = function ViewComponent() {
    */
   function componentWillReceiveProps(nextProps) {}
 
+  /**
+   * Set new props and trigger rerender
+   * @param nextProps
+   */
   function setProps(nextProps) {
     nextProps = nextProps || this.getInitialState();
 
@@ -4209,6 +4244,9 @@ var ViewComponent = function ViewComponent() {
     this.renderAfterPropsOrStateChange();
   }
 
+  /**
+   * Handle rerendering after props or state change
+   */
   function renderAfterPropsOrStateChange() {
     if (_lifecycleState > LS_INITED) {
       this.renderComponent();
@@ -4223,6 +4261,9 @@ var ViewComponent = function ViewComponent() {
    */
   function componentWillUpdate(nextProps, nextState) {}
 
+  /**
+   * After the updates render to the DOM
+   */
   function componentDidUpdate(lastProps, lastState) {}
 
   /**
@@ -4234,6 +4275,7 @@ var ViewComponent = function ViewComponent() {
     var force = arguments.length <= 0 || arguments[0] === undefined ? false : arguments[0];
 
     var wasMounted = _isMounted;
+
     if (wasMounted) {
       console.log(this.getID(), 'unmounting');
       this.unmount();
@@ -4242,7 +4284,7 @@ var ViewComponent = function ViewComponent() {
     _lifecycleState = LS_RENDERING;
 
     if (!_templateObjCache) {
-      _templateObjCache = this.template(_internalState);
+      _templateObjCache = this.template(this.getState());
     }
 
     _html = this.render(this.getState());
@@ -4265,7 +4307,8 @@ var ViewComponent = function ViewComponent() {
    */
   function template(state) {
     // assumes the template ID matches the component's ID as passed on initialize
-    var html = _utilsTemplatingJs2['default'].getSource(this.getID());
+    var templateId = this.getProps().template || this.getID(),
+        html = _utilsTemplatingJs2['default'].getSource(templateId);
     return _.template(html);
   }
 
