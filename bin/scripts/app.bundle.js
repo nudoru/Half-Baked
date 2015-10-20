@@ -4175,6 +4175,9 @@ var ViewComponent = function ViewComponent() {
    * @returns {boolean}
    */
   function shouldComponentUpdate(nextProps, nextState) {
+    nextProps = nextProps || _internalProps;
+    nextState = nextState || _internalState;
+
     var isStateEq = _.isEqual(nextState, _internalState),
         isPropsEq = _.isEqual(nextProps, _internalProps);
 
@@ -4186,9 +4189,14 @@ var ViewComponent = function ViewComponent() {
    * @param nextState
    */
   function setState(nextState) {
+    if (_lifecycleState === LS_RENDERING) {
+      console.warn('Can\'t update state during rendering', this.getID());
+      return;
+    }
+
     nextState = nextState || this.getInitialState();
 
-    if (!shouldSetState(nextState)) {
+    if (!shouldComponentUpdate(null, nextState)) {
       return;
     }
 
@@ -4218,14 +4226,17 @@ var ViewComponent = function ViewComponent() {
    * @param nextProps
    */
   function setProps(nextProps) {
-    nextProps = nextProps || this.getInitialState();
-
-    if (!shouldSetProps(nextProps)) {
+    if (_lifecycleState === LS_RENDERING) {
+      console.warn('Can\'t update props during rendering', this.getID());
       return;
     }
 
-    if (typeof this.componentWillReceiveProps === 'function' && _lifecycleState > LS_INITED) {
+    if (typeof this.componentWillReceiveProps === 'function' && _lifecycleState >= LS_INITED) {
       this.componentWillReceiveProps(nextProps);
+    }
+
+    if (!shouldComponentUpdate(nextProps, null)) {
+      return;
     }
 
     if (typeof this.componentWillUpdate === 'function' && _lifecycleState > LS_INITED) {
@@ -4277,7 +4288,6 @@ var ViewComponent = function ViewComponent() {
     var wasMounted = _isMounted;
 
     if (wasMounted) {
-      console.log(this.getID(), 'unmounting');
       this.unmount();
     }
 
@@ -4328,7 +4338,7 @@ var ViewComponent = function ViewComponent() {
   function mount() {
     // TODO why aren't components unmounting on change first?
     if (_isMounted) {
-      console.warn('Component ' + _id + ' is already mounted');
+      //console.warn('Component ' + _id + ' is already mounted');
       return;
     }
 
