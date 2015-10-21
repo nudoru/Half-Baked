@@ -87,7 +87,7 @@ var Component = Nori.view().createComponent({
     _app.sendQuestion(difficulty);
   },
 
-  shouldDelegateEvents() {
+  shouldDelegateEvents(props, state) {
     return this.isShowingCards();
   },
 
@@ -132,7 +132,7 @@ var Component = Nori.view().createComponent({
     componentWillUnmount(){
   },
 
-  template(state) {
+  template(props, state) {
     if (state.sentQuestion.q_difficulty_level === -1) {
       var cardsHTML = _template.getSource('game__choose');
       return _.template(cardsHTML);
@@ -145,8 +145,8 @@ var Component = Nori.view().createComponent({
   /**
    * Only renders if there is a current question
    */
-    render(state) {
-    return this.template(state)(state);
+    render(props, state) {
+    return this.template(props, state)(state);
   },
 
   componentWillDispose(){

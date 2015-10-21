@@ -84,7 +84,7 @@ var ViewComponent = function () {
    * @returns {undefined}
    */
   function getDefaultProps() {
-    return undefined;
+    return {};
   }
 
   /**
@@ -132,7 +132,7 @@ var ViewComponent = function () {
    * @param nextState
    */
   function setState(nextState) {
-    if(_lifecycleState === LS_RENDERING) {
+    if (_lifecycleState === LS_RENDERING) {
       console.warn('Can\'t update state during rendering', this.getID());
       return;
     }
@@ -171,7 +171,7 @@ var ViewComponent = function () {
    * @param nextProps
    */
   function setProps(nextProps) {
-    if(_lifecycleState === LS_RENDERING) {
+    if (_lifecycleState === LS_RENDERING) {
       console.warn('Can\'t update props during rendering', this.getID());
       return;
     }
@@ -239,10 +239,10 @@ var ViewComponent = function () {
     _lifecycleState = LS_RENDERING;
 
     if (!_templateObjCache) {
-      _templateObjCache = this.template(this.getState());
+      _templateObjCache = this.template(this.getProps(), this.getState());
     }
 
-    _html = this.render(this.getState());
+    _html = this.render(this.getProps(), this.getState());
 
     if (wasMounted) {
       this.mount();
@@ -260,9 +260,9 @@ var ViewComponent = function () {
    *
    * @returns {Function}
    */
-  function template(state) {
+  function template(props, state) {
     // assumes the template ID matches the component's ID as passed on initialize
-    let templateId = this.getProps().template || this.getID(),
+    let templateId = props.template || this.getID(),
         html       = _template.getSource(templateId);
     return _.template(html);
   }
@@ -272,7 +272,7 @@ var ViewComponent = function () {
    * Should return HTML
    * @returns {*}
    */
-  function render(state) {
+  function render(props, state) {
     return _templateObjCache(state);
   }
 
@@ -302,7 +302,7 @@ var ViewComponent = function () {
     _isMounted = true;
 
     if (typeof this.delegateEvents === 'function') {
-      if (this.shouldDelegateEvents()) {
+      if (this.shouldDelegateEvents(this.getProps(), this.getState())) {
         // True to automatically pass form element handlers the elements value or other status
         this.delegateEvents(true);
       }
@@ -331,7 +331,7 @@ var ViewComponent = function () {
    * Override to delegate events or not based on some state trigger
    * @returns {boolean}
    */
-  function shouldDelegateEvents() {
+  function shouldDelegateEvents(props, state) {
     return true;
   }
 
@@ -483,41 +483,41 @@ var ViewComponent = function () {
   //----------------------------------------------------------------------------
 
   return {
-    initializeComponent          : initializeComponent,
-    state                        : _publicState,
-    props                        : _publicProps,
-    getProps                     : getProps,
-    setProps                     : setProps,
-    getInitialState              : getInitialState,
-    getState                     : getState,
-    setState                     : setState,
-    getDefaultProps              : getDefaultProps,
-    defineRegions                : defineRegions,
-    defineEvents                 : defineEvents,
-    getLifeCycleState            : getLifeCycleState,
-    isInitialized                : isInitialized,
-    getID                        : getID,
-    template                     : template,
-    getDOMElement                : getDOMElement,
-    isMounted                    : isMounted,
-    bind                         : bind,
-    componentWillReceiveProps    : componentWillReceiveProps,
-    componentWillUpdate          : componentWillUpdate,
-    componentDidUpdate           : componentDidUpdate,
-    shouldComponentUpdate        : shouldComponentUpdate,
+    initializeComponent           : initializeComponent,
+    state                         : _publicState,
+    props                         : _publicProps,
+    getProps                      : getProps,
+    setProps                      : setProps,
+    getInitialState               : getInitialState,
+    getState                      : getState,
+    setState                      : setState,
+    getDefaultProps               : getDefaultProps,
+    defineRegions                 : defineRegions,
+    defineEvents                  : defineEvents,
+    getLifeCycleState             : getLifeCycleState,
+    isInitialized                 : isInitialized,
+    getID                         : getID,
+    template                      : template,
+    getDOMElement                 : getDOMElement,
+    isMounted                     : isMounted,
+    bind                          : bind,
+    componentWillReceiveProps     : componentWillReceiveProps,
+    componentWillUpdate           : componentWillUpdate,
+    componentDidUpdate            : componentDidUpdate,
+    shouldComponentUpdate         : shouldComponentUpdate,
     $renderAfterPropsOrStateChange: $renderAfterPropsOrStateChange,
     $renderComponent              : $renderComponent,
-    render                       : render,
-    mount                        : mount,
-    shouldDelegateEvents         : shouldDelegateEvents,
+    render                        : render,
+    mount                         : mount,
+    shouldDelegateEvents          : shouldDelegateEvents,
     $mountAfterDelay              : $mountAfterDelay,
-    componentDidMount            : componentDidMount,
-    componentWillUnmount         : componentWillUnmount,
-    unmount                      : unmount,
-    dispose                      : dispose,
-    componentWillDispose         : componentWillDispose,
-    getRegion                    : getRegion,
-    getRegionIDs                 : getRegionIDs,
+    componentDidMount             : componentDidMount,
+    componentWillUnmount          : componentWillUnmount,
+    unmount                       : unmount,
+    dispose                       : dispose,
+    componentWillDispose          : componentWillDispose,
+    getRegion                     : getRegion,
+    getRegionIDs                  : getRegionIDs,
     $initializeRegions            : $initializeRegions,
     $renderRegions                : $renderRegions,
     $mountRegions                 : $mountRegions,

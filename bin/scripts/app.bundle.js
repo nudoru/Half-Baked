@@ -1287,7 +1287,7 @@ var Component = Nori.view().createComponent({
     return this.getQuestionState();
   },
 
-  template: function template() {
+  template: function template(props, state) {
     var html = _noriViewTemplatingJs2['default'].getSource('game__question');
     return _.template(html);
   },
@@ -1295,8 +1295,8 @@ var Component = Nori.view().createComponent({
   /**
    * Only renders if there is a current question
    */
-  render: function render(state) {
-    if (this.hasQuestion()) {
+  render: function render(props, state) {
+    if (state.question) {
       _AppView2['default'].closeAllAlerts();
       return this.template()(state);
     }
@@ -1304,22 +1304,18 @@ var Component = Nori.view().createComponent({
     return '<div></div>';
   },
 
-  hasQuestion: function hasQuestion() {
-    return this.state.question;
-  },
-
   /**
    * Only attach events to buttons if there is a question!
    */
-  shouldDelegateEvents: function shouldDelegateEvents() {
-    return this.hasQuestion();
+  shouldDelegateEvents: function shouldDelegateEvents(props, state) {
+    return state.question;
   },
 
   /**
    * Component HTML was attached to the DOM
    */
   componentDidMount: function componentDidMount() {
-    if (this.hasQuestion()) {
+    if (this.state.question) {
       this.startTimer();
       this.animateChoices();
     } else {
@@ -1661,7 +1657,7 @@ var Component = Nori.view().createComponent({
     _App2['default'].sendQuestion(difficulty);
   },
 
-  shouldDelegateEvents: function shouldDelegateEvents() {
+  shouldDelegateEvents: function shouldDelegateEvents(props, state) {
     return this.isShowingCards();
   },
 
@@ -1705,7 +1701,7 @@ var Component = Nori.view().createComponent({
    */
   componentWillUnmount: function componentWillUnmount() {},
 
-  template: function template(state) {
+  template: function template(props, state) {
     if (state.sentQuestion.q_difficulty_level === -1) {
       var cardsHTML = _noriViewTemplatingJs2['default'].getSource('game__choose');
       return _.template(cardsHTML);
@@ -1718,8 +1714,8 @@ var Component = Nori.view().createComponent({
   /**
    * Only renders if there is a current question
    */
-  render: function render(state) {
-    return this.template(state)(state);
+  render: function render(props, state) {
+    return this.template(props, state)(state);
   },
 
   componentWillDispose: function componentWillDispose() {}
@@ -4125,7 +4121,7 @@ var ViewComponent = function ViewComponent() {
    * @returns {undefined}
    */
   function getDefaultProps() {
-    return undefined;
+    return {};
   }
 
   /**
@@ -4278,10 +4274,10 @@ var ViewComponent = function ViewComponent() {
     _lifecycleState = LS_RENDERING;
 
     if (!_templateObjCache) {
-      _templateObjCache = this.template(this.getState());
+      _templateObjCache = this.template(this.getProps(), this.getState());
     }
 
-    _html = this.render(this.getState());
+    _html = this.render(this.getProps(), this.getState());
 
     if (wasMounted) {
       this.mount();
@@ -4299,9 +4295,9 @@ var ViewComponent = function ViewComponent() {
    *
    * @returns {Function}
    */
-  function template(state) {
+  function template(props, state) {
     // assumes the template ID matches the component's ID as passed on initialize
-    var templateId = this.getProps().template || this.getID(),
+    var templateId = props.template || this.getID(),
         html = _viewTemplatingJs2['default'].getSource(templateId);
     return _.template(html);
   }
@@ -4311,7 +4307,7 @@ var ViewComponent = function ViewComponent() {
    * Should return HTML
    * @returns {*}
    */
-  function render(state) {
+  function render(props, state) {
     return _templateObjCache(state);
   }
 
@@ -4341,7 +4337,7 @@ var ViewComponent = function ViewComponent() {
     _isMounted = true;
 
     if (typeof this.delegateEvents === 'function') {
-      if (this.shouldDelegateEvents()) {
+      if (this.shouldDelegateEvents(this.getProps(), this.getState())) {
         // True to automatically pass form element handlers the elements value or other status
         this.delegateEvents(true);
       }
@@ -4370,7 +4366,7 @@ var ViewComponent = function ViewComponent() {
    * Override to delegate events or not based on some state trigger
    * @returns {boolean}
    */
-  function shouldDelegateEvents() {
+  function shouldDelegateEvents(props, state) {
     return true;
   }
 

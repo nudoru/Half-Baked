@@ -108,7 +108,7 @@ var Component = Nori.view().createComponent({
     return this.getQuestionState();
   },
 
-  template() {
+  template(props, state) {
     var html = _template.getSource('game__question');
     return _.template(html);
   },
@@ -116,8 +116,8 @@ var Component = Nori.view().createComponent({
   /**
    * Only renders if there is a current question
    */
-    render(state) {
-    if (this.hasQuestion()) {
+    render(props, state) {
+    if (state.question) {
       _appView.closeAllAlerts();
       return this.template()(state);
     }
@@ -125,22 +125,18 @@ var Component = Nori.view().createComponent({
     return '<div></div>';
   },
 
-  hasQuestion() {
-    return this.state.question;
-  },
-
   /**
    * Only attach events to buttons if there is a question!
    */
-    shouldDelegateEvents() {
-    return this.hasQuestion();
+    shouldDelegateEvents(props, state) {
+    return state.question;
   },
 
   /**
    * Component HTML was attached to the DOM
    */
     componentDidMount() {
-    if (this.hasQuestion()) {
+    if (this.state.question) {
       this.startTimer();
       this.animateChoices();
     } else {
