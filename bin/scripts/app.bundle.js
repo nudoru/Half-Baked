@@ -3557,6 +3557,9 @@ var MixinEventDelegator = function MixinEventDelegator() {
     tag = el.tagName.toLowerCase();
     type = el.getAttribute('type');
 
+    /**
+     * Convencince for form element handlers
+     */
     if (autoForm) {
       if (tag === 'input' || tag === 'textarea') {
         if (!type || type === 'text') {
