@@ -28,7 +28,7 @@ let MixinEventDelegator = function () {
    * 'evtStr selector':callback
    * 'evtStr selector, evtStr selector': sharedCallback
    */
-  function delegateEvents(autoForm, eventObj) {
+  function delegateEvents(eventObj, autoForm) {
     if (!eventObj) {
       return;
     }

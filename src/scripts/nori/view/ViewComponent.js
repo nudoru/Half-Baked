@@ -84,7 +84,9 @@ var ViewComponent = function () {
    * @returns {undefined}
    */
   function getDefaultProps() {
-    return {};
+    return {
+      autoFormEvents: true
+    };
   }
 
   /**
@@ -304,7 +306,7 @@ var ViewComponent = function () {
     if (typeof this.delegateEvents === 'function') {
       if (this.shouldDelegateEvents(this.getProps(), this.getState())) {
         // True to automatically pass form element handlers the elements value or other status
-        this.delegateEvents(true, this.getDOMEvents());
+        this.delegateEvents(this.getDOMEvents(), this.getProps().autoFormEvents);
       }
     }
 
