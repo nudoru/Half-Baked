@@ -22,7 +22,7 @@ var Component = Nori.view().createComponent({
    * Create an object to be used to define events on DOM elements
    * @returns {}
    */
-  defineEvents() {
+  getDOMEvents() {
     return {
       'click #waiting__button-skip'() {
         _appStore.apply(_noriActions.changeStoreState({currentState: _appStore.getState().gameStates[3]}));

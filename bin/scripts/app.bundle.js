@@ -1006,7 +1006,7 @@ var Component = Nori.view().createComponent({
    * Create an object to be used to define events on DOM elements
    * @returns {}
    */
-  defineEvents: function defineEvents() {
+  getDOMEvents: function getDOMEvents() {
     return null;
   },
 
@@ -1218,7 +1218,7 @@ var Component = Nori.view().createComponent({
    * Create an object to be used to define events on DOM elements
    * @returns {}
    */
-  defineEvents: function defineEvents() {
+  getDOMEvents: function getDOMEvents() {
     return {
       'click #question__choice_1, click #question__choice_2, click #question__choice_3, click #question__choice_4': this.pickChoice.bind(this)
     };
@@ -1444,7 +1444,7 @@ var Component = Nori.view().createComponent({
    * Create an object to be used to define events on DOM elements
    * @returns {}
    */
-  defineEvents: function defineEvents() {
+  getDOMEvents: function getDOMEvents() {
     return {
       'click #gameover__button-replay': function clickGameover__buttonReplay() {
         _storeAppStore2['default'].apply(_actionActionCreatorJs2['default'].resetGame());
@@ -1628,7 +1628,7 @@ var Component = Nori.view().createComponent({
    * Create an object to be used to define events on DOM elements
    * @returns {}
    */
-  defineEvents: function defineEvents() {
+  getDOMEvents: function getDOMEvents() {
     return {
       'click #game__button-skip': function clickGame__buttonSkip() {
         _storeAppStore2['default'].apply(_noriActionActionCreator2['default'].changeStoreState({ currentState: _storeAppStore2['default'].getState().gameStates[4] }));
@@ -1774,7 +1774,7 @@ var Component = Nori.view().createComponent({
    * Create an object to be used to define events on DOM elements
    * @returns {}
    */
-  defineEvents: function defineEvents() {
+  getDOMEvents: function getDOMEvents() {
     return {
       'blur #select__playername': this.setPlayerName.bind(this),
       'change #select__playertype': this.setPlayerAppearance.bind(this),
@@ -1918,7 +1918,7 @@ var Component = Nori.view().createComponent({
    * Create an object to be used to define events on DOM elements
    * @returns {}
    */
-  defineEvents: function defineEvents() {
+  getDOMEvents: function getDOMEvents() {
     return {
       'click #title__button-start': function clickTitle__buttonStart() {
         _storeAppStore2['default'].apply(_noriActionActionCreator2['default'].changeStoreState({ currentState: _storeAppStore2['default'].getState().gameStates[1] }));
@@ -2004,7 +2004,7 @@ var Component = Nori.view().createComponent({
    * Create an object to be used to define events on DOM elements
    * @returns {}
    */
-  defineEvents: function defineEvents() {
+  getDOMEvents: function getDOMEvents() {
     return {
       'click #waiting__button-skip': function clickWaiting__buttonSkip() {
         _storeAppStore2['default'].apply(_noriActionActionCreator2['default'].changeStoreState({ currentState: _storeAppStore2['default'].getState().gameStates[3] }));
@@ -3465,35 +3465,26 @@ var _nudoruUtilIsJs2 = _interopRequireDefault(_nudoruUtilIsJs);
 
 var MixinEventDelegator = function MixinEventDelegator() {
 
-  var _eventsMap = undefined,
-      _eventSubscribers = undefined;
-
-  function setEvents(evtObj) {
-    _eventsMap = evtObj;
-  }
-
-  function getEvents() {
-    return _eventsMap;
-  }
+  var _eventSubscribers = undefined;
 
   /**
    * Automates setting events on DOM elements.
    * 'evtStr selector':callback
    * 'evtStr selector, evtStr selector': sharedCallback
    */
-  function delegateEvents(autoForm) {
-    if (!_eventsMap) {
+  function delegateEvents(autoForm, eventObj) {
+    if (!eventObj) {
       return;
     }
 
     _eventSubscribers = Object.create(null);
 
-    for (var evtStrings in _eventsMap) {
-      if (_eventsMap.hasOwnProperty(evtStrings)) {
+    for (var evtStrings in eventObj) {
+      if (eventObj.hasOwnProperty(evtStrings)) {
         var _ret = (function () {
 
           var mappings = evtStrings.split(','),
-              eventHandler = _eventsMap[evtStrings];
+              eventHandler = eventObj[evtStrings];
 
           if (!_nudoruUtilIsJs2['default'].func(eventHandler)) {
             console.warn('EventDelegator, handler for ' + evtStrings + ' is not a function');
@@ -3514,7 +3505,7 @@ var MixinEventDelegator = function MixinEventDelegator() {
               eventStr = convertMouseToTouchEventStr(eventStr);
             }
 
-            _eventSubscribers[evtMap] = createHandler(selector, eventStr, eventHandler, autoForm);
+            _eventSubscribers[evtMap] = createSubscriber(selector, eventStr, eventHandler, autoForm);
           });
           /* jshint +W083 */
         })();
@@ -3552,14 +3543,14 @@ var MixinEventDelegator = function MixinEventDelegator() {
    * @param autoForm True to automatically pass common form element data to the handler
    * @returns {*}
    */
-  function createHandler(selector, eventStr, handler, autoForm) {
+  function createSubscriber(selector, eventStr, handler, autoForm) {
     var observable = _utilsRxJs2['default'].dom(selector, eventStr),
         el = document.querySelector(selector),
         tag = undefined,
         type = undefined;
 
     if (!el) {
-      console.warn('MixinEventDelegator, createHandler, Element not found:', selector);
+      console.warn('MixinEventDelegator, createSubscriber, Element not found:', selector);
       return;
     }
 
@@ -3600,8 +3591,9 @@ var MixinEventDelegator = function MixinEventDelegator() {
   /**
    * Cleanly remove events
    */
-  function undelegateEvents() {
-    if (!_eventsMap) {
+  function undelegateEvents(eventObj) {
+
+    if (!eventObj) {
       return;
     }
 
@@ -3618,8 +3610,6 @@ var MixinEventDelegator = function MixinEventDelegator() {
   }
 
   return {
-    setEvents: setEvents,
-    getEvents: getEvents,
     undelegateEvents: undelegateEvents,
     delegateEvents: delegateEvents
   };
@@ -4091,7 +4081,7 @@ var ViewComponent = function ViewComponent() {
     _regions = this.defineRegions();
 
     this.setState(this.getInitialState());
-    this.setEvents(this.defineEvents());
+    //this.setEvents(this.getDOMEvents());
 
     this.$initializeRegions();
 
@@ -4104,7 +4094,7 @@ var ViewComponent = function ViewComponent() {
    * Define DOM events to be attached after the element is mounted
    * @returns {undefined}
    */
-  function defineEvents() {
+  function getDOMEvents() {
     return undefined;
   }
 
@@ -4339,7 +4329,7 @@ var ViewComponent = function ViewComponent() {
     if (typeof this.delegateEvents === 'function') {
       if (this.shouldDelegateEvents(this.getProps(), this.getState())) {
         // True to automatically pass form element handlers the elements value or other status
-        this.delegateEvents(true);
+        this.delegateEvents(true, this.getDOMEvents());
       }
     }
 
@@ -4395,7 +4385,7 @@ var ViewComponent = function ViewComponent() {
     _isMounted = false;
 
     if (typeof this.undelegateEvents === 'function') {
-      this.undelegateEvents();
+      this.undelegateEvents(this.getDOMEvents());
     }
 
     // Just clear the contents
@@ -4525,7 +4515,7 @@ var ViewComponent = function ViewComponent() {
     setState: setState,
     getDefaultProps: getDefaultProps,
     defineRegions: defineRegions,
-    defineEvents: defineEvents,
+    getDOMEvents: getDOMEvents,
     getLifeCycleState: getLifeCycleState,
     isInitialized: isInitialized,
     getID: getID,

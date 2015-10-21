@@ -39,7 +39,7 @@ var Component = Nori.view().createComponent({
    * Create an object to be used to define events on DOM elements
    * @returns {}
    */
-    defineEvents() {
+    getDOMEvents() {
     return {
       'click #question__choice_1, click #question__choice_2, click #question__choice_3, click #question__choice_4': this.pickChoice.bind(this)
     };

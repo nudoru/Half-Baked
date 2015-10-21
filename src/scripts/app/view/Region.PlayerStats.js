@@ -37,7 +37,7 @@ var Component = Nori.view().createComponent({
    * Create an object to be used to define events on DOM elements
    * @returns {}
    */
-    defineEvents() {
+    getDOMEvents() {
     return null;
   },
 

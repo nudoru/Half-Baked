@@ -21,34 +21,25 @@ import is from '../../nudoru/util/is.js';
 
 let MixinEventDelegator = function () {
 
-  let _eventsMap,
-      _eventSubscribers;
-
-  function setEvents(evtObj) {
-    _eventsMap = evtObj;
-  }
-
-  function getEvents() {
-    return _eventsMap;
-  }
+  let _eventSubscribers;
 
   /**
    * Automates setting events on DOM elements.
    * 'evtStr selector':callback
    * 'evtStr selector, evtStr selector': sharedCallback
    */
-  function delegateEvents(autoForm) {
-    if (!_eventsMap) {
+  function delegateEvents(autoForm, eventObj) {
+    if (!eventObj) {
       return;
     }
 
     _eventSubscribers = Object.create(null);
 
-    for (var evtStrings in _eventsMap) {
-      if (_eventsMap.hasOwnProperty(evtStrings)) {
+    for (var evtStrings in eventObj) {
+      if (eventObj.hasOwnProperty(evtStrings)) {
 
         let mappings     = evtStrings.split(','),
-            eventHandler = _eventsMap[evtStrings];
+            eventHandler = eventObj[evtStrings];
 
         if (!is.func(eventHandler)) {
           console.warn('EventDelegator, handler for ' + evtStrings + ' is not a function');
@@ -67,7 +58,7 @@ let MixinEventDelegator = function () {
             eventStr = convertMouseToTouchEventStr(eventStr);
           }
 
-          _eventSubscribers[evtMap] = createHandler(selector, eventStr, eventHandler, autoForm);
+          _eventSubscribers[evtMap] = createSubscriber(selector, eventStr, eventHandler, autoForm);
         });
         /* jshint +W083 */
       }
@@ -102,13 +93,13 @@ let MixinEventDelegator = function () {
    * @param autoForm True to automatically pass common form element data to the handler
    * @returns {*}
    */
-  function createHandler(selector, eventStr, handler, autoForm) {
+  function createSubscriber(selector, eventStr, handler, autoForm) {
     let observable = _rx.dom(selector, eventStr),
         el         = document.querySelector(selector),
         tag, type;
 
     if (!el) {
-      console.warn('MixinEventDelegator, createHandler, Element not found:', selector);
+      console.warn('MixinEventDelegator, createSubscriber, Element not found:', selector);
       return;
     }
 
@@ -141,8 +132,9 @@ let MixinEventDelegator = function () {
   /**
    * Cleanly remove events
    */
-  function undelegateEvents() {
-    if (!_eventsMap) {
+  function undelegateEvents(eventObj) {
+
+    if (!eventObj) {
       return;
     }
 
@@ -159,8 +151,6 @@ let MixinEventDelegator = function () {
   }
 
   return {
-    setEvents       : setEvents,
-    getEvents       : getEvents,
     undelegateEvents: undelegateEvents,
     delegateEvents  : delegateEvents
   };

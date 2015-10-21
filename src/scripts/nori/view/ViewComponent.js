@@ -54,7 +54,7 @@ var ViewComponent = function () {
     _regions    = this.defineRegions();
 
     this.setState(this.getInitialState());
-    this.setEvents(this.defineEvents());
+    //this.setEvents(this.getDOMEvents());
 
     this.$initializeRegions();
 
@@ -67,7 +67,7 @@ var ViewComponent = function () {
    * Define DOM events to be attached after the element is mounted
    * @returns {undefined}
    */
-  function defineEvents() {
+  function getDOMEvents() {
     return undefined;
   }
 
@@ -304,7 +304,7 @@ var ViewComponent = function () {
     if (typeof this.delegateEvents === 'function') {
       if (this.shouldDelegateEvents(this.getProps(), this.getState())) {
         // True to automatically pass form element handlers the elements value or other status
-        this.delegateEvents(true);
+        this.delegateEvents(true, this.getDOMEvents());
       }
     }
 
@@ -362,7 +362,7 @@ var ViewComponent = function () {
     _isMounted = false;
 
     if (typeof this.undelegateEvents === 'function') {
-      this.undelegateEvents();
+      this.undelegateEvents(this.getDOMEvents());
     }
 
     // Just clear the contents
@@ -493,7 +493,7 @@ var ViewComponent = function () {
     setState                      : setState,
     getDefaultProps               : getDefaultProps,
     defineRegions                 : defineRegions,
-    defineEvents                  : defineEvents,
+    getDOMEvents                  : getDOMEvents,
     getLifeCycleState             : getLifeCycleState,
     isInitialized                 : isInitialized,
     getID                         : getID,

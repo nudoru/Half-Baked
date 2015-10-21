@@ -34,7 +34,7 @@ var Component = view.createComponent({
    * Create an object to be used to define events on DOM elements
    * @returns {}
    */
-  //defineEvents: function() {
+  //getDOMEvents: function() {
   //  return {
   //    'click #button-id': handleButton
   //  };

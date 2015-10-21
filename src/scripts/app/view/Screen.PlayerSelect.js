@@ -24,7 +24,7 @@ var Component = Nori.view().createComponent({
    * Create an object to be used to define events on DOM elements
    * @returns {}
    */
-  defineEvents() {
+  getDOMEvents() {
     return {
       'blur #select__playername'        : this.setPlayerName.bind(this),
       'change #select__playertype'      : this.setPlayerAppearance.bind(this),
