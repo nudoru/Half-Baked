@@ -2,7 +2,7 @@ import _noriActions from '../../nori/action/ActionCreator';
 import _app from '../App';
 import _appView from './AppView';
 import _appStore from '../store/AppStore';
-import _template from '../../nori/utils/Templating.js';
+import _template from '../../nori/view/Templating.js';
 import _appActions from '../action/ActionCreator.js';
 
 const ROOM_NUMBER_LENGTH = 4;

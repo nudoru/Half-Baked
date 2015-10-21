@@ -90,7 +90,7 @@ let MixinComponentViews = function () {
     }
 
     // Force render
-    componentView.controller.renderComponent(true);
+    componentView.controller.$renderComponent(true);
     // wasn't mounted before, so mount it
     componentView.controller.mount();
   }

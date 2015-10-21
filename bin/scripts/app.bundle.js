@@ -466,7 +466,7 @@ var App = Nori.createApplication({
 exports['default'] = App;
 module.exports = exports['default'];
 
-},{"../nori/action/ActionCreator.js":17,"../nori/service/Rest.js":18,"../nori/service/SocketIO.js":19,"../nori/service/SocketIOEvents.js":20,"../nori/utils/Rx.js":26,"../nudoru/core/NumberUtils.js":44,"../nudoru/core/StringUtils.js":45,"./action/ActionConstants.js":3,"./action/ActionCreator.js":4,"./store/AppStore.js":5,"./view/AppView.js":6}],3:[function(require,module,exports){
+},{"../nori/action/ActionCreator.js":17,"../nori/service/Rest.js":18,"../nori/service/SocketIO.js":19,"../nori/service/SocketIOEvents.js":20,"../nori/utils/Rx.js":25,"../nudoru/core/NumberUtils.js":44,"../nudoru/core/StringUtils.js":45,"./action/ActionConstants.js":3,"./action/ActionCreator.js":4,"./store/AppStore.js":5,"./view/AppView.js":6}],3:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -942,7 +942,7 @@ var AppView = AppViewModule();
 exports['default'] = AppView;
 module.exports = exports['default'];
 
-},{"../../nori/view/ApplicationView.js":28,"../../nori/view/MixinNudoruControls.js":32,"../../nori/view/MixinStoreStateViews.js":33,"../store/AppStore.js":5,"./Screen.GameOver.js":9,"./Screen.MainGame.js":10,"./Screen.PlayerSelect.js":11,"./Screen.Title.js":12,"./Screen.WaitingOnPlayer.js":13}],7:[function(require,module,exports){
+},{"../../nori/view/ApplicationView.js":26,"../../nori/view/MixinNudoruControls.js":30,"../../nori/view/MixinStoreStateViews.js":31,"../store/AppStore.js":5,"./Screen.GameOver.js":9,"./Screen.MainGame.js":10,"./Screen.PlayerSelect.js":11,"./Screen.Title.js":12,"./Screen.WaitingOnPlayer.js":13}],7:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -961,9 +961,9 @@ var _storeAppStore = require('../store/AppStore');
 
 var _storeAppStore2 = _interopRequireDefault(_storeAppStore);
 
-var _noriUtilsTemplatingJs = require('../../nori/utils/Templating.js');
+var _noriViewTemplatingJs = require('../../nori/view/Templating.js');
 
-var _noriUtilsTemplatingJs2 = _interopRequireDefault(_noriUtilsTemplatingJs);
+var _noriViewTemplatingJs2 = _interopRequireDefault(_noriViewTemplatingJs);
 
 var _noriViewMixinDOMManipulationJs = require('../../nori/view/MixinDOMManipulation.js');
 
@@ -1153,7 +1153,7 @@ var Component = Nori.view().createComponent({
 exports['default'] = Component;
 module.exports = exports['default'];
 
-},{"../../nori/action/ActionCreator":17,"../../nori/utils/Rx.js":26,"../../nori/utils/Templating.js":27,"../../nori/view/MixinDOMManipulation.js":30,"../../nudoru/browser/DOMUtils.js":36,"../store/AppStore":5,"./AppView":6}],8:[function(require,module,exports){
+},{"../../nori/action/ActionCreator":17,"../../nori/utils/Rx.js":25,"../../nori/view/MixinDOMManipulation.js":28,"../../nori/view/Templating.js":33,"../../nudoru/browser/DOMUtils.js":36,"../store/AppStore":5,"./AppView":6}],8:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -1176,9 +1176,9 @@ var _actionActionCreatorJs = require('../action/ActionCreator.js');
 
 var _actionActionCreatorJs2 = _interopRequireDefault(_actionActionCreatorJs);
 
-var _noriUtilsTemplatingJs = require('../../nori/utils/Templating.js');
+var _noriViewTemplatingJs = require('../../nori/view/Templating.js');
 
-var _noriUtilsTemplatingJs2 = _interopRequireDefault(_noriUtilsTemplatingJs);
+var _noriViewTemplatingJs2 = _interopRequireDefault(_noriViewTemplatingJs);
 
 var _vendorRxjsRxLiteMinJs = require('../../vendor/rxjs/rx.lite.min.js');
 
@@ -1288,7 +1288,7 @@ var Component = Nori.view().createComponent({
   },
 
   template: function template() {
-    var html = _noriUtilsTemplatingJs2['default'].getSource('game__question');
+    var html = _noriViewTemplatingJs2['default'].getSource('game__question');
     return _.template(html);
   },
 
@@ -1397,7 +1397,7 @@ var Component = Nori.view().createComponent({
 exports['default'] = Component;
 module.exports = exports['default'];
 
-},{"../../nori/action/ActionCreator":17,"../../nori/utils/Templating.js":27,"../../nori/view/MixinDOMManipulation.js":30,"../../vendor/rxjs/rx.lite.min.js":48,"../action/ActionCreator.js":4,"../store/AppStore":5,"./AppView":6}],9:[function(require,module,exports){
+},{"../../nori/action/ActionCreator":17,"../../nori/view/MixinDOMManipulation.js":28,"../../nori/view/Templating.js":33,"../../vendor/rxjs/rx.lite.min.js":48,"../action/ActionCreator.js":4,"../store/AppStore":5,"./AppView":6}],9:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -1416,9 +1416,9 @@ var _storeAppStore = require('../store/AppStore');
 
 var _storeAppStore2 = _interopRequireDefault(_storeAppStore);
 
-var _noriUtilsTemplatingJs = require('../../nori/utils/Templating.js');
+var _noriViewTemplatingJs = require('../../nori/view/Templating.js');
 
-var _noriUtilsTemplatingJs2 = _interopRequireDefault(_noriUtilsTemplatingJs);
+var _noriViewTemplatingJs2 = _interopRequireDefault(_noriViewTemplatingJs);
 
 var _actionActionCreatorJs = require('../action/ActionCreator.js');
 
@@ -1532,7 +1532,7 @@ var Component = Nori.view().createComponent({
 exports['default'] = Component;
 module.exports = exports['default'];
 
-},{"../../nori/action/ActionCreator":17,"../../nori/utils/Templating.js":27,"../../nori/view/MixinDOMManipulation.js":30,"../action/ActionCreator.js":4,"../store/AppStore":5,"./AppView":6}],10:[function(require,module,exports){
+},{"../../nori/action/ActionCreator":17,"../../nori/view/MixinDOMManipulation.js":28,"../../nori/view/Templating.js":33,"../action/ActionCreator.js":4,"../store/AppStore":5,"./AppView":6}],10:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -1555,9 +1555,9 @@ var _storeAppStore = require('../store/AppStore');
 
 var _storeAppStore2 = _interopRequireDefault(_storeAppStore);
 
-var _noriUtilsTemplatingJs = require('../../nori/utils/Templating.js');
+var _noriViewTemplatingJs = require('../../nori/view/Templating.js');
 
-var _noriUtilsTemplatingJs2 = _interopRequireDefault(_noriUtilsTemplatingJs);
+var _noriViewTemplatingJs2 = _interopRequireDefault(_noriViewTemplatingJs);
 
 var _actionActionCreatorJs = require('../action/ActionCreator.js');
 
@@ -1707,10 +1707,10 @@ var Component = Nori.view().createComponent({
 
   template: function template(state) {
     if (state.sentQuestion.q_difficulty_level === -1) {
-      var cardsHTML = _noriUtilsTemplatingJs2['default'].getSource('game__choose');
+      var cardsHTML = _noriViewTemplatingJs2['default'].getSource('game__choose');
       return _.template(cardsHTML);
     } else {
-      var remoteHTML = _noriUtilsTemplatingJs2['default'].getSource('game__remote');
+      var remoteHTML = _noriViewTemplatingJs2['default'].getSource('game__remote');
       return _.template(remoteHTML);
     }
   },
@@ -1729,7 +1729,7 @@ var Component = Nori.view().createComponent({
 exports['default'] = Component;
 module.exports = exports['default'];
 
-},{"../../nori/action/ActionCreator":17,"../../nori/utils/Rx.js":26,"../../nori/utils/Templating.js":27,"../../nori/view/MixinDOMManipulation.js":30,"../../nudoru/browser/DOMUtils.js":36,"../../nudoru/core/NumberUtils.js":44,"../App":2,"../action/ActionCreator.js":4,"../store/AppStore":5,"./AppView":6,"./Region.PlayerStats.js":7,"./Region.Question.js":8}],11:[function(require,module,exports){
+},{"../../nori/action/ActionCreator":17,"../../nori/utils/Rx.js":25,"../../nori/view/MixinDOMManipulation.js":28,"../../nori/view/Templating.js":33,"../../nudoru/browser/DOMUtils.js":36,"../../nudoru/core/NumberUtils.js":44,"../App":2,"../action/ActionCreator.js":4,"../store/AppStore":5,"./AppView":6,"./Region.PlayerStats.js":7,"./Region.Question.js":8}],11:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -1752,9 +1752,9 @@ var _storeAppStore = require('../store/AppStore');
 
 var _storeAppStore2 = _interopRequireDefault(_storeAppStore);
 
-var _noriUtilsTemplatingJs = require('../../nori/utils/Templating.js');
+var _noriViewTemplatingJs = require('../../nori/view/Templating.js');
 
-var _noriUtilsTemplatingJs2 = _interopRequireDefault(_noriUtilsTemplatingJs);
+var _noriViewTemplatingJs2 = _interopRequireDefault(_noriViewTemplatingJs);
 
 var _actionActionCreatorJs = require('../action/ActionCreator.js');
 
@@ -1881,7 +1881,7 @@ var Component = Nori.view().createComponent({
 exports['default'] = Component;
 module.exports = exports['default'];
 
-},{"../../nori/action/ActionCreator":17,"../../nori/utils/Templating.js":27,"../App":2,"../action/ActionCreator.js":4,"../store/AppStore":5,"./AppView":6}],12:[function(require,module,exports){
+},{"../../nori/action/ActionCreator":17,"../../nori/view/Templating.js":33,"../App":2,"../action/ActionCreator.js":4,"../store/AppStore":5,"./AppView":6}],12:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -1900,9 +1900,9 @@ var _storeAppStore = require('../store/AppStore');
 
 var _storeAppStore2 = _interopRequireDefault(_storeAppStore);
 
-var _noriUtilsTemplatingJs = require('../../nori/utils/Templating.js');
+var _noriViewTemplatingJs = require('../../nori/view/Templating.js');
 
-var _noriUtilsTemplatingJs2 = _interopRequireDefault(_noriUtilsTemplatingJs);
+var _noriViewTemplatingJs2 = _interopRequireDefault(_noriViewTemplatingJs);
 
 /**
  * Module for a dynamic application view for a route or a persistent view
@@ -1963,7 +1963,7 @@ var Component = Nori.view().createComponent({
 exports['default'] = Component;
 module.exports = exports['default'];
 
-},{"../../nori/action/ActionCreator":17,"../../nori/utils/Templating.js":27,"../store/AppStore":5,"./AppView":6}],13:[function(require,module,exports){
+},{"../../nori/action/ActionCreator":17,"../../nori/view/Templating.js":33,"../store/AppStore":5,"./AppView":6}],13:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -1982,9 +1982,9 @@ var _storeAppStore = require('../store/AppStore');
 
 var _storeAppStore2 = _interopRequireDefault(_storeAppStore);
 
-var _noriUtilsTemplatingJs = require('../../nori/utils/Templating.js');
+var _noriViewTemplatingJs = require('../../nori/view/Templating.js');
 
-var _noriUtilsTemplatingJs2 = _interopRequireDefault(_noriUtilsTemplatingJs);
+var _noriViewTemplatingJs2 = _interopRequireDefault(_noriViewTemplatingJs);
 
 var _actionActionCreatorJs = require('../action/ActionCreator.js');
 
@@ -2062,7 +2062,7 @@ var Component = Nori.view().createComponent({
 exports['default'] = Component;
 module.exports = exports['default'];
 
-},{"../../nori/action/ActionCreator":17,"../../nori/utils/Templating.js":27,"../action/ActionCreator.js":4,"../store/AppStore":5,"./AppView":6}],14:[function(require,module,exports){
+},{"../../nori/action/ActionCreator":17,"../../nori/view/Templating.js":33,"../action/ActionCreator.js":4,"../store/AppStore":5,"./AppView":6}],14:[function(require,module,exports){
 /**
  * Initial file for the Application
  */
@@ -2243,7 +2243,7 @@ var Nori = function Nori() {
 exports['default'] = Nori();
 module.exports = exports['default'];
 
-},{"./store/ReducerStore.js":22,"./utils/MixinObservableSubject.js":24,"./view/MixinComponentViews.js":29,"./view/MixinEventDelegator.js":31}],16:[function(require,module,exports){
+},{"./store/ReducerStore.js":22,"./utils/MixinObservableSubject.js":24,"./view/MixinComponentViews.js":27,"./view/MixinEventDelegator.js":29}],16:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -2985,59 +2985,6 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'd
 /*  weak */
 
 /**
- * Utility to handle all view DOM attachment tasks
- */
-
-var _nudoruBrowserDOMUtilsJs = require('../../nudoru/browser/DOMUtils.js');
-
-var _nudoruBrowserDOMUtilsJs2 = _interopRequireDefault(_nudoruBrowserDOMUtilsJs);
-
-var Renderer = function Renderer() {
-  function render(_ref) {
-    var target = _ref.target;
-    var html = _ref.html;
-    var callback = _ref.callback;
-
-    var domEl = undefined,
-        mountPoint = document.querySelector(target),
-        currentHTML = mountPoint.innerHTML;
-
-    if (html) {
-      domEl = _nudoruBrowserDOMUtilsJs2['default'].HTMLStrToNode(html);
-      if (html !== currentHTML) {
-        // TODO experiment with the jsdiff function
-        mountPoint.innerHTML = '';
-        mountPoint.appendChild(domEl);
-      } else {
-        console.log('> is SAME');
-      }
-    }
-
-    if (callback) {
-      callback(domEl);
-    }
-
-    return domEl;
-  }
-
-  return {
-    render: render
-  };
-};
-
-exports['default'] = Renderer();
-module.exports = exports['default'];
-
-},{"../../nudoru/browser/DOMUtils.js":36}],26:[function(require,module,exports){
-Object.defineProperty(exports, '__esModule', {
-  value: true
-});
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-
-/*  weak */
-
-/**
  * RxJS Helpers
  * @type {{dom: Function, from: Function, interval: Function, doEvery: Function, just: Function, empty: Function}}
  */
@@ -3086,7 +3033,7 @@ exports['default'] = {
 };
 module.exports = exports['default'];
 
-},{"../../nudoru/util/is.js":46,"../../vendor/rxjs/rx.lite.min.js":48}],27:[function(require,module,exports){
+},{"../../nudoru/util/is.js":46,"../../vendor/rxjs/rx.lite.min.js":48}],26:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -3095,185 +3042,9 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'd
 
 /*  weak */
 
-/*
- Simple wrapper for Underscore / HTML templates
- Matt Perkins
- 4/7/15
- */
+var _viewTemplatingJs = require('../view/Templating.js');
 
-var _nudoruBrowserDOMUtilsJs = require('../../nudoru/browser/DOMUtils.js');
-
-var _nudoruBrowserDOMUtilsJs2 = _interopRequireDefault(_nudoruBrowserDOMUtilsJs);
-
-var Templating = function Templating() {
-
-  var _templateMap = Object.create(null),
-      _templateHTMLCache = Object.create(null),
-      _templateCache = Object.create(null);
-
-  function addTemplate(id, html) {
-    _templateMap[id] = html;
-  }
-
-  function getSourceFromTemplateMap(id) {
-    var source = _templateMap[id];
-    if (source) {
-      return cleanTemplateHTML(source);
-    }
-    return;
-  }
-
-  function getSourceFromHTML(id) {
-    var src = document.getElementById(id),
-        srchtml = undefined;
-
-    if (src) {
-      srchtml = src.innerHTML;
-    } else {
-      console.warn('nudoru/core/Templating, template not found: "' + id + '"');
-      srchtml = '<div>Template not found: ' + id + '</div>';
-    }
-
-    return cleanTemplateHTML(srchtml);
-  }
-
-  /**
-   * Get the template html from the script tag with id
-   * @param id
-   * @returns {*}
-   */
-  function getSource(id) {
-    if (_templateHTMLCache[id]) {
-      return _templateHTMLCache[id];
-    }
-
-    var sourcehtml = getSourceFromTemplateMap(id);
-
-    if (!sourcehtml) {
-      sourcehtml = getSourceFromHTML(id);
-    }
-
-    _templateHTMLCache[id] = sourcehtml;
-    return sourcehtml;
-  }
-
-  /**
-   * Returns all IDs belonging to text/template type script tags
-   * @returns {Array}
-   */
-  function getAllTemplateIDs() {
-    var scriptTags = Array.prototype.slice.call(document.getElementsByTagName('script'), 0);
-
-    return scriptTags.filter(function (tag) {
-      return tag.getAttribute('type') === 'text/template';
-    }).map(function (tag) {
-      return tag.getAttribute('id');
-    });
-  }
-
-  /**
-   * Returns an underscore template
-   * @param id
-   * @returns {*}
-   */
-  function getTemplate(id) {
-    if (_templateCache[id]) {
-      return _templateCache[id];
-    }
-    var templ = _.template(getSource(id));
-    _templateCache[id] = templ;
-    return templ;
-  }
-
-  /**
-   * Processes the template and returns HTML
-   * @param id
-   * @param obj
-   * @returns {*}
-   */
-  function asHTML(id, obj) {
-    var temp = getTemplate(id);
-    return temp(obj);
-  }
-
-  /**
-   * Processes the template and returns an HTML Element
-   * @param id
-   * @param obj
-   * @returns {*}
-   */
-  function asElement(id, obj) {
-    return _nudoruBrowserDOMUtilsJs2['default'].HTMLStrToNode(asHTML(id, obj));
-  }
-
-  /**
-   * Cleans template HTML
-   */
-  function cleanTemplateHTML(str) {
-    return str.trim();
-  }
-
-  /**
-   * Remove returns, spaces and tabs
-   * @param str
-   * @returns {XML|string}
-   */
-  function removeWhiteSpace(str) {
-    return str.replace(/(\r\n|\n|\r|\t)/gm, '').replace(/>\s+</g, '><');
-  }
-
-  /**
-   * Iterate over all templates, clean them up and log
-   * Util for SharePoint projects, <script> blocks aren't allowed
-   * So this helps create the blocks for insertion in to the DOM
-   */
-  function processForDOMInsertion() {
-    var ids = getAllTemplateIDs();
-    ids.forEach(function (id) {
-      var src = removeWhiteSpace(getSource(id));
-    });
-  }
-
-  /**
-   * Add a template script tag to the DOM
-   * Util for SharePoint projects, <script> blocks aren't allowed
-   * @param id
-   * @param html
-   */
-  //function addClientSideTemplateToDOM(id, html) {
-  //  var s       = document.createElement('script');
-  //  s.type      = 'text/template';
-  //  s.id        = id;
-  //  s.innerHTML = html;
-  //  document.getElementsByTagName('head')[0].appendChild(s);
-  //}
-
-  return {
-    addTemplate: addTemplate,
-    getSource: getSource,
-    getAllTemplateIDs: getAllTemplateIDs,
-    processForDOMInsertion: processForDOMInsertion,
-    getTemplate: getTemplate,
-    asHTML: asHTML,
-    asElement: asElement
-  };
-};
-
-exports['default'] = Templating();
-module.exports = exports['default'];
-
-},{"../../nudoru/browser/DOMUtils.js":36}],28:[function(require,module,exports){
-Object.defineProperty(exports, '__esModule', {
-  value: true
-});
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-
-/*  weak */
-
-var _utilsTemplatingJs = require('../utils/Templating.js');
-
-var _utilsTemplatingJs2 = _interopRequireDefault(_utilsTemplatingJs);
+var _viewTemplatingJs2 = _interopRequireDefault(_viewTemplatingJs);
 
 var _nudoruBrowserDOMUtilsJs = require('../../nudoru/browser/DOMUtils.js');
 
@@ -3305,7 +3076,7 @@ var ApplicationView = function ApplicationView() {
     var bodyEl = document.querySelector('body');
 
     templates.forEach(function (templ) {
-      bodyEl.appendChild(_nudoruBrowserDOMUtilsJs2['default'].HTMLStrToNode(_utilsTemplatingJs2['default'].getSource(templ, {})));
+      bodyEl.appendChild(_nudoruBrowserDOMUtilsJs2['default'].HTMLStrToNode(_viewTemplatingJs2['default'].getSource(templ, {})));
     });
   }
 
@@ -3333,7 +3104,7 @@ var ApplicationView = function ApplicationView() {
 exports['default'] = ApplicationView();
 module.exports = exports['default'];
 
-},{"../../nudoru/browser/DOMUtils.js":36,"../utils/Templating.js":27}],29:[function(require,module,exports){
+},{"../../nudoru/browser/DOMUtils.js":36,"../view/Templating.js":33}],27:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -3439,7 +3210,7 @@ var MixinComponentViews = function MixinComponentViews() {
     }
 
     // Force render
-    componentView.controller.renderComponent(true);
+    componentView.controller.$renderComponent(true);
     // wasn't mounted before, so mount it
     componentView.controller.mount();
   }
@@ -3530,7 +3301,7 @@ var MixinComponentViews = function MixinComponentViews() {
 exports['default'] = MixinComponentViews();
 module.exports = exports['default'];
 
-},{"./MixinEventDelegator.js":31,"./ViewComponent.js":34}],30:[function(require,module,exports){
+},{"./MixinEventDelegator.js":29,"./ViewComponent.js":34}],28:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -3660,7 +3431,7 @@ var MixinDOMManipulation = function MixinDOMManipulation() {
 exports['default'] = MixinDOMManipulation();
 module.exports = exports['default'];
 
-},{"../../nudoru/util/is.js":46}],31:[function(require,module,exports){
+},{"../../nudoru/util/is.js":46}],29:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -3861,7 +3632,7 @@ var MixinEventDelegator = function MixinEventDelegator() {
 exports['default'] = MixinEventDelegator;
 module.exports = exports['default'];
 
-},{"../../nudoru/browser/BrowserInfo.js":35,"../../nudoru/util/is.js":46,"../utils/Rx.js":26}],32:[function(require,module,exports){
+},{"../../nudoru/browser/BrowserInfo.js":35,"../../nudoru/util/is.js":46,"../utils/Rx.js":25}],30:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -3978,7 +3749,7 @@ var MixinNudoruControls = function MixinNudoruControls() {
 exports['default'] = MixinNudoruControls();
 module.exports = exports['default'];
 
-},{"../../nudoru/components/MessageBoxCreator.js":38,"../../nudoru/components/MessageBoxView.js":39,"../../nudoru/components/ModalCoverView.js":40,"../../nudoru/components/ToastView.js":41,"../../nudoru/components/ToolTipView.js":42}],33:[function(require,module,exports){
+},{"../../nudoru/components/MessageBoxCreator.js":38,"../../nudoru/components/MessageBoxView.js":39,"../../nudoru/components/ModalCoverView.js":40,"../../nudoru/components/ToastView.js":41,"../../nudoru/components/ToolTipView.js":42}],31:[function(require,module,exports){
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
@@ -4025,7 +3796,236 @@ var MixinStoreStateViews = function MixinStoreStateViews() {
 exports["default"] = MixinStoreStateViews();
 module.exports = exports["default"];
 
-},{}],34:[function(require,module,exports){
+},{}],32:[function(require,module,exports){
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+/*  weak */
+
+/**
+ * Utility to handle all view DOM attachment tasks
+ */
+
+var _nudoruBrowserDOMUtilsJs = require('../../nudoru/browser/DOMUtils.js');
+
+var _nudoruBrowserDOMUtilsJs2 = _interopRequireDefault(_nudoruBrowserDOMUtilsJs);
+
+var Renderer = function Renderer() {
+  function render(_ref) {
+    var target = _ref.target;
+    var html = _ref.html;
+    var callback = _ref.callback;
+
+    var domEl = undefined,
+        mountPoint = document.querySelector(target),
+        currentHTML = mountPoint.innerHTML;
+
+    if (html) {
+      domEl = _nudoruBrowserDOMUtilsJs2['default'].HTMLStrToNode(html);
+      if (html !== currentHTML) {
+        // TODO experiment with the jsdiff function
+        mountPoint.innerHTML = '';
+        mountPoint.appendChild(domEl);
+      } else {
+        console.log('> is SAME');
+      }
+    }
+
+    if (callback) {
+      callback(domEl);
+    }
+
+    return domEl;
+  }
+
+  return {
+    render: render
+  };
+};
+
+exports['default'] = Renderer();
+module.exports = exports['default'];
+
+},{"../../nudoru/browser/DOMUtils.js":36}],33:[function(require,module,exports){
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+/*  weak */
+
+/*
+ Simple wrapper for Underscore / HTML templates
+ Matt Perkins
+ 4/7/15
+ */
+
+var _nudoruBrowserDOMUtilsJs = require('../../nudoru/browser/DOMUtils.js');
+
+var _nudoruBrowserDOMUtilsJs2 = _interopRequireDefault(_nudoruBrowserDOMUtilsJs);
+
+var Templating = function Templating() {
+
+  var _templateMap = Object.create(null),
+      _templateHTMLCache = Object.create(null),
+      _templateCache = Object.create(null);
+
+  function addTemplate(id, html) {
+    _templateMap[id] = html;
+  }
+
+  function getSourceFromTemplateMap(id) {
+    var source = _templateMap[id];
+    if (source) {
+      return cleanTemplateHTML(source);
+    }
+    return;
+  }
+
+  function getSourceFromHTML(id) {
+    var src = document.getElementById(id),
+        srchtml = undefined;
+
+    if (src) {
+      srchtml = src.innerHTML;
+    } else {
+      console.warn('nudoru/core/Templating, template not found: "' + id + '"');
+      srchtml = '<div>Template not found: ' + id + '</div>';
+    }
+
+    return cleanTemplateHTML(srchtml);
+  }
+
+  /**
+   * Get the template html from the script tag with id
+   * @param id
+   * @returns {*}
+   */
+  function getSource(id) {
+    if (_templateHTMLCache[id]) {
+      return _templateHTMLCache[id];
+    }
+
+    var sourcehtml = getSourceFromTemplateMap(id);
+
+    if (!sourcehtml) {
+      sourcehtml = getSourceFromHTML(id);
+    }
+
+    _templateHTMLCache[id] = sourcehtml;
+    return sourcehtml;
+  }
+
+  /**
+   * Returns all IDs belonging to text/template type script tags
+   * @returns {Array}
+   */
+  function getAllTemplateIDs() {
+    var scriptTags = Array.prototype.slice.call(document.getElementsByTagName('script'), 0);
+
+    return scriptTags.filter(function (tag) {
+      return tag.getAttribute('type') === 'text/template';
+    }).map(function (tag) {
+      return tag.getAttribute('id');
+    });
+  }
+
+  /**
+   * Returns an underscore template
+   * @param id
+   * @returns {*}
+   */
+  function getTemplate(id) {
+    if (_templateCache[id]) {
+      return _templateCache[id];
+    }
+    var templ = _.template(getSource(id));
+    _templateCache[id] = templ;
+    return templ;
+  }
+
+  /**
+   * Processes the template and returns HTML
+   * @param id
+   * @param obj
+   * @returns {*}
+   */
+  function asHTML(id, obj) {
+    var temp = getTemplate(id);
+    return temp(obj);
+  }
+
+  /**
+   * Processes the template and returns an HTML Element
+   * @param id
+   * @param obj
+   * @returns {*}
+   */
+  function asElement(id, obj) {
+    return _nudoruBrowserDOMUtilsJs2['default'].HTMLStrToNode(asHTML(id, obj));
+  }
+
+  /**
+   * Cleans template HTML
+   */
+  function cleanTemplateHTML(str) {
+    return str.trim();
+  }
+
+  /**
+   * Remove returns, spaces and tabs
+   * @param str
+   * @returns {XML|string}
+   */
+  function removeWhiteSpace(str) {
+    return str.replace(/(\r\n|\n|\r|\t)/gm, '').replace(/>\s+</g, '><');
+  }
+
+  /**
+   * Iterate over all templates, clean them up and log
+   * Util for SharePoint projects, <script> blocks aren't allowed
+   * So this helps create the blocks for insertion in to the DOM
+   */
+  function processForDOMInsertion() {
+    var ids = getAllTemplateIDs();
+    ids.forEach(function (id) {
+      var src = removeWhiteSpace(getSource(id));
+    });
+  }
+
+  /**
+   * Add a template script tag to the DOM
+   * Util for SharePoint projects, <script> blocks aren't allowed
+   * @param id
+   * @param html
+   */
+  //function addClientSideTemplateToDOM(id, html) {
+  //  var s       = document.createElement('script');
+  //  s.type      = 'text/template';
+  //  s.id        = id;
+  //  s.innerHTML = html;
+  //  document.getElementsByTagName('head')[0].appendChild(s);
+  //}
+
+  return {
+    addTemplate: addTemplate,
+    getSource: getSource,
+    getAllTemplateIDs: getAllTemplateIDs,
+    processForDOMInsertion: processForDOMInsertion,
+    getTemplate: getTemplate,
+    asHTML: asHTML,
+    asElement: asElement
+  };
+};
+
+exports['default'] = Templating();
+module.exports = exports['default'];
+
+},{"../../nudoru/browser/DOMUtils.js":36}],34:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -4037,15 +4037,17 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'd
 /**
  * Base module for components
  * Must be extended with custom modules
+ *
+ * Functions beginning with $ should be treated as private
  */
 
-var _utilsTemplatingJs = require('../utils/Templating.js');
+var _viewTemplatingJs = require('../view/Templating.js');
 
-var _utilsTemplatingJs2 = _interopRequireDefault(_utilsTemplatingJs);
+var _viewTemplatingJs2 = _interopRequireDefault(_viewTemplatingJs);
 
-var _utilsRendererJs = require('../utils/Renderer.js');
+var _viewRendererJs = require('../view/Renderer.js');
 
-var _utilsRendererJs2 = _interopRequireDefault(_utilsRendererJs);
+var _viewRendererJs2 = _interopRequireDefault(_viewRendererJs);
 
 var _nudoruUtilIsJs = require('../../nudoru/util/is.js');
 
@@ -4095,7 +4097,7 @@ var ViewComponent = function ViewComponent() {
     this.setState(this.getInitialState());
     this.setEvents(this.defineEvents());
 
-    this.initializeRegions();
+    this.$initializeRegions();
 
     _lifecycleState = LS_INITED;
   }
@@ -4143,29 +4145,11 @@ var ViewComponent = function ViewComponent() {
   }
 
   /**
-   * Compare next state with current state and return true if they're different
-   * @param nextState
-   * @returns {boolean}
-   */
-  function shouldSetState(nextState) {
-    return !_.isEqual(_internalState, nextState);
-  }
-
-  /**
    * Get the current props
    * @returns {void|*}
    */
   function getProps() {
     return _.assign({}, _internalProps);
-  }
-
-  /**
-   * Compare the next props with current props and return true if they're different
-   * @param nextProps
-   * @returns {boolean}
-   */
-  function shouldSetProps(nextProps) {
-    return !_.isEqual(_internalProps, nextProps);
   }
 
   /**
@@ -4213,7 +4197,7 @@ var ViewComponent = function ViewComponent() {
       _publicState.onChange.apply(this);
     }
 
-    this.renderAfterPropsOrStateChange();
+    this.$renderAfterPropsOrStateChange();
   }
 
   /**
@@ -4252,15 +4236,15 @@ var ViewComponent = function ViewComponent() {
       _publicProps.onChange.apply(this);
     }
 
-    this.renderAfterPropsOrStateChange();
+    this.$renderAfterPropsOrStateChange();
   }
 
   /**
    * Handle rerendering after props or state change
    */
-  function renderAfterPropsOrStateChange() {
+  function $renderAfterPropsOrStateChange() {
     if (_lifecycleState > LS_INITED) {
-      this.renderComponent();
+      this.$renderComponent();
       if (typeof this.componentDidUpdate === 'function') {
         this.componentDidUpdate(_lastProps, _lastState);
       }
@@ -4282,7 +4266,7 @@ var ViewComponent = function ViewComponent() {
    * @param force If true, will force a render
    * @returns {*}
    */
-  function renderComponent() {
+  function $renderComponent() {
     var force = arguments.length <= 0 || arguments[0] === undefined ? false : arguments[0];
 
     var wasMounted = _isMounted;
@@ -4303,7 +4287,7 @@ var ViewComponent = function ViewComponent() {
       this.mount();
     }
 
-    this.renderRegions();
+    this.$renderRegions();
   }
 
   /**
@@ -4318,7 +4302,7 @@ var ViewComponent = function ViewComponent() {
   function template(state) {
     // assumes the template ID matches the component's ID as passed on initialize
     var templateId = this.getProps().template || this.getID(),
-        html = _utilsTemplatingJs2['default'].getSource(templateId);
+        html = _viewTemplatingJs2['default'].getSource(templateId);
     return _.template(html);
   }
 
@@ -4349,7 +4333,7 @@ var ViewComponent = function ViewComponent() {
 
     _lifecycleState = LS_MOUNTED;
 
-    _DOMElement = _utilsRendererJs2['default'].render({
+    _DOMElement = _viewRendererJs2['default'].render({
       target: _mountPoint,
       html: _html
     });
@@ -4364,7 +4348,7 @@ var ViewComponent = function ViewComponent() {
     }
 
     if (typeof this.componentDidMount === 'function') {
-      _mountDelay = _.delay(this.mountAfterDelay.bind(this), 1);
+      _mountDelay = _.delay(this.$mountAfterDelay.bind(this), 1);
     }
   }
 
@@ -4373,13 +4357,13 @@ var ViewComponent = function ViewComponent() {
    * Experiencing issues with animations running in componentDidMount
    * after renders and state changes. This delay fixes the issues.
    */
-  function mountAfterDelay() {
+  function $mountAfterDelay() {
     if (_mountDelay) {
       window.clearTimeout(_mountDelay);
     }
 
     this.componentDidMount();
-    this.mountRegions();
+    this.$mountRegions();
   }
 
   /**
@@ -4419,7 +4403,7 @@ var ViewComponent = function ViewComponent() {
     }
 
     // Just clear the contents
-    _utilsRendererJs2['default'].render({
+    _viewRendererJs2['default'].render({
       target: _mountPoint,
       html: ''
     });
@@ -4432,7 +4416,7 @@ var ViewComponent = function ViewComponent() {
 
   function dispose() {
     this.componentWillDispose();
-    this.disposeRegions();
+    this.$disposeRegions();
     this.unmount();
 
     _lifecycleState = LS_DISPOSED;
@@ -4459,31 +4443,31 @@ var ViewComponent = function ViewComponent() {
     return _regions ? Object.keys(_regions) : [];
   }
 
-  function initializeRegions() {
+  function $initializeRegions() {
     getRegionIDs().forEach(function (region) {
       _regions[region].initialize();
     });
   }
 
-  function renderRegions() {
+  function $renderRegions() {
     getRegionIDs().forEach(function (region) {
-      _regions[region].renderComponent();
+      _regions[region].$renderComponent();
     });
   }
 
-  function mountRegions() {
+  function $mountRegions() {
     getRegionIDs().forEach(function (region) {
       _regions[region].mount();
     });
   }
 
-  function unmountRegions() {
+  function $unmountRegions() {
     getRegionIDs().forEach(function (region) {
       _regions[region].unmount();
     });
   }
 
-  function disposeRegions() {
+  function $disposeRegions() {
     getRegionIDs().forEach(function (region) {
       _regions[region].dispose();
     });
@@ -4557,12 +4541,12 @@ var ViewComponent = function ViewComponent() {
     componentWillUpdate: componentWillUpdate,
     componentDidUpdate: componentDidUpdate,
     shouldComponentUpdate: shouldComponentUpdate,
-    renderAfterPropsOrStateChange: renderAfterPropsOrStateChange,
-    renderComponent: renderComponent,
+    $renderAfterPropsOrStateChange: $renderAfterPropsOrStateChange,
+    $renderComponent: $renderComponent,
     render: render,
     mount: mount,
     shouldDelegateEvents: shouldDelegateEvents,
-    mountAfterDelay: mountAfterDelay,
+    $mountAfterDelay: $mountAfterDelay,
     componentDidMount: componentDidMount,
     componentWillUnmount: componentWillUnmount,
     unmount: unmount,
@@ -4570,18 +4554,18 @@ var ViewComponent = function ViewComponent() {
     componentWillDispose: componentWillDispose,
     getRegion: getRegion,
     getRegionIDs: getRegionIDs,
-    initializeRegions: initializeRegions,
-    renderRegions: renderRegions,
-    mountRegions: mountRegions,
-    unmountRegions: unmountRegions,
-    disposeRegions: disposeRegions
+    $initializeRegions: $initializeRegions,
+    $renderRegions: $renderRegions,
+    $mountRegions: $mountRegions,
+    $unmountRegions: $unmountRegions,
+    $disposeRegions: $disposeRegions
   };
 };
 
 exports['default'] = ViewComponent;
 module.exports = exports['default'];
 
-},{"../../nudoru/util/is.js":46,"../utils/Renderer.js":25,"../utils/Templating.js":27}],35:[function(require,module,exports){
+},{"../../nudoru/util/is.js":46,"../view/Renderer.js":32,"../view/Templating.js":33}],35:[function(require,module,exports){
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
@@ -5055,7 +5039,7 @@ var MessageBoxView = function MessageBoxView() {
       _mountPoint,
       _buttonIconTemplateID = 'messagebox--button-icon',
       _buttonNoIconTemplateID = 'messagebox--button-noicon',
-      _template = require('../../nori/utils/Templating.js'),
+      _template = require('../../nori/view/Templating.js'),
       _modal = require('./ModalCoverView.js'),
       _browserInfo = require('../../nudoru/browser/BrowserInfo.js'),
       _domUtils = require('../../nudoru/browser/DOMUtils.js'),
@@ -5323,7 +5307,7 @@ var MessageBoxView = function MessageBoxView() {
 exports['default'] = MessageBoxView();
 module.exports = exports['default'];
 
-},{"../../nori/utils/Templating.js":27,"../../nudoru/browser/BrowserInfo.js":35,"../../nudoru/browser/DOMUtils.js":36,"../../nudoru/browser/ThreeDTransforms.js":37,"../../vendor/rxjs/rx.lite.min.js":48,"./ModalCoverView.js":40}],40:[function(require,module,exports){
+},{"../../nori/view/Templating.js":33,"../../nudoru/browser/BrowserInfo.js":35,"../../nudoru/browser/DOMUtils.js":36,"../../nudoru/browser/ThreeDTransforms.js":37,"../../vendor/rxjs/rx.lite.min.js":48,"./ModalCoverView.js":40}],40:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -5501,7 +5485,7 @@ var ToastView = function ToastView() {
     'danger': 'toast__danger'
   },
       _mountPoint,
-      _template = require('../../nori/utils/Templating.js'),
+      _template = require('../../nori/view/Templating.js'),
       _browserInfo = require('../../nudoru/browser/BrowserInfo.js'),
       _domUtils = require('../../nudoru/browser/DOMUtils.js'),
       _componentUtils = require('../../nudoru/browser/ThreeDTransforms.js');
@@ -5633,7 +5617,7 @@ var ToastView = function ToastView() {
 exports['default'] = ToastView();
 module.exports = exports['default'];
 
-},{"../../nori/utils/Templating.js":27,"../../nudoru/browser/BrowserInfo.js":35,"../../nudoru/browser/DOMUtils.js":36,"../../nudoru/browser/ThreeDTransforms.js":37,"../../vendor/rxjs/rx.lite.min.js":48}],42:[function(require,module,exports){
+},{"../../nori/view/Templating.js":33,"../../nudoru/browser/BrowserInfo.js":35,"../../nudoru/browser/DOMUtils.js":36,"../../nudoru/browser/ThreeDTransforms.js":37,"../../vendor/rxjs/rx.lite.min.js":48}],42:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -5686,7 +5670,7 @@ var ToolTipView = function ToolTipView() {
     'TL': 'tooltip__topleft'
   },
       _mountPoint,
-      _template = require('../../nori/utils/Templating.js'),
+      _template = require('../../nori/view/Templating.js'),
       _domUtils = require('../../nudoru/browser/DOMUtils.js');
 
   function initialize(elID) {
@@ -5915,7 +5899,7 @@ var ToolTipView = function ToolTipView() {
 exports['default'] = ToolTipView();
 module.exports = exports['default'];
 
-},{"../../nori/utils/Templating.js":27,"../../nudoru/browser/DOMUtils.js":36,"../../vendor/rxjs/rx.lite.min.js":48}],43:[function(require,module,exports){
+},{"../../nori/view/Templating.js":33,"../../nudoru/browser/DOMUtils.js":36,"../../vendor/rxjs/rx.lite.min.js":48}],43:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });

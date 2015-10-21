@@ -3,10 +3,12 @@
 /**
  * Base module for components
  * Must be extended with custom modules
+ *
+ * Functions beginning with $ should be treated as private
  */
 
-import _template from '../utils/Templating.js';
-import _renderer from '../utils/Renderer.js';
+import _template from '../view/Templating.js';
+import _renderer from '../view/Renderer.js';
 import is from '../../nudoru/util/is.js';
 
 // Lifecycle state constants
@@ -54,7 +56,7 @@ var ViewComponent = function () {
     this.setState(this.getInitialState());
     this.setEvents(this.defineEvents());
 
-    this.initializeRegions();
+    this.$initializeRegions();
 
     _lifecycleState = LS_INITED;
   }
@@ -102,29 +104,11 @@ var ViewComponent = function () {
   }
 
   /**
-   * Compare next state with current state and return true if they're different
-   * @param nextState
-   * @returns {boolean}
-   */
-  function shouldSetState(nextState) {
-    return !(_.isEqual(_internalState, nextState));
-  }
-
-  /**
    * Get the current props
    * @returns {void|*}
    */
   function getProps() {
     return _.assign({}, _internalProps);
-  }
-
-  /**
-   * Compare the next props with current props and return true if they're different
-   * @param nextProps
-   * @returns {boolean}
-   */
-  function shouldSetProps(nextProps) {
-    return !(_.isEqual(_internalProps, nextProps));
   }
 
   /**
@@ -173,7 +157,7 @@ var ViewComponent = function () {
       _publicState.onChange.apply(this);
     }
 
-    this.renderAfterPropsOrStateChange();
+    this.$renderAfterPropsOrStateChange();
   }
 
   /**
@@ -213,15 +197,15 @@ var ViewComponent = function () {
       _publicProps.onChange.apply(this);
     }
 
-    this.renderAfterPropsOrStateChange();
+    this.$renderAfterPropsOrStateChange();
   }
 
   /**
    * Handle rerendering after props or state change
    */
-  function renderAfterPropsOrStateChange() {
+  function $renderAfterPropsOrStateChange() {
     if (_lifecycleState > LS_INITED) {
-      this.renderComponent();
+      this.$renderComponent();
       if (typeof this.componentDidUpdate === 'function') {
         this.componentDidUpdate(_lastProps, _lastState);
       }
@@ -245,7 +229,7 @@ var ViewComponent = function () {
    * @param force If true, will force a render
    * @returns {*}
    */
-  function renderComponent(force = false) {
+  function $renderComponent(force = false) {
     let wasMounted = _isMounted;
 
     if (wasMounted) {
@@ -264,7 +248,7 @@ var ViewComponent = function () {
       this.mount();
     }
 
-    this.renderRegions();
+    this.$renderRegions();
   }
 
   /**
@@ -325,7 +309,7 @@ var ViewComponent = function () {
     }
 
     if (typeof this.componentDidMount === 'function') {
-      _mountDelay = _.delay(this.mountAfterDelay.bind(this), 1);
+      _mountDelay = _.delay(this.$mountAfterDelay.bind(this), 1);
     }
   }
 
@@ -334,13 +318,13 @@ var ViewComponent = function () {
    * Experiencing issues with animations running in componentDidMount
    * after renders and state changes. This delay fixes the issues.
    */
-  function mountAfterDelay() {
+  function $mountAfterDelay() {
     if (_mountDelay) {
       window.clearTimeout(_mountDelay);
     }
 
     this.componentDidMount();
-    this.mountRegions();
+    this.$mountRegions();
   }
 
   /**
@@ -395,7 +379,7 @@ var ViewComponent = function () {
 
   function dispose() {
     this.componentWillDispose();
-    this.disposeRegions();
+    this.$disposeRegions();
     this.unmount();
 
     _lifecycleState = LS_DISPOSED;
@@ -423,31 +407,31 @@ var ViewComponent = function () {
     return _regions ? Object.keys(_regions) : [];
   }
 
-  function initializeRegions() {
+  function $initializeRegions() {
     getRegionIDs().forEach(region => {
       _regions[region].initialize();
     });
   }
 
-  function renderRegions() {
+  function $renderRegions() {
     getRegionIDs().forEach(region => {
-      _regions[region].renderComponent();
+      _regions[region].$renderComponent();
     });
   }
 
-  function mountRegions() {
+  function $mountRegions() {
     getRegionIDs().forEach(region => {
       _regions[region].mount();
     });
   }
 
-  function unmountRegions() {
+  function $unmountRegions() {
     getRegionIDs().forEach(region => {
       _regions[region].unmount();
     });
   }
 
-  function disposeRegions() {
+  function $disposeRegions() {
     getRegionIDs().forEach(region => {
       _regions[region].dispose();
     });
@@ -521,12 +505,12 @@ var ViewComponent = function () {
     componentWillUpdate          : componentWillUpdate,
     componentDidUpdate           : componentDidUpdate,
     shouldComponentUpdate        : shouldComponentUpdate,
-    renderAfterPropsOrStateChange: renderAfterPropsOrStateChange,
-    renderComponent              : renderComponent,
+    $renderAfterPropsOrStateChange: $renderAfterPropsOrStateChange,
+    $renderComponent              : $renderComponent,
     render                       : render,
     mount                        : mount,
     shouldDelegateEvents         : shouldDelegateEvents,
-    mountAfterDelay              : mountAfterDelay,
+    $mountAfterDelay              : $mountAfterDelay,
     componentDidMount            : componentDidMount,
     componentWillUnmount         : componentWillUnmount,
     unmount                      : unmount,
@@ -534,11 +518,11 @@ var ViewComponent = function () {
     componentWillDispose         : componentWillDispose,
     getRegion                    : getRegion,
     getRegionIDs                 : getRegionIDs,
-    initializeRegions            : initializeRegions,
-    renderRegions                : renderRegions,
-    mountRegions                 : mountRegions,
-    unmountRegions               : unmountRegions,
-    disposeRegions               : disposeRegions
+    $initializeRegions            : $initializeRegions,
+    $renderRegions                : $renderRegions,
+    $mountRegions                 : $mountRegions,
+    $unmountRegions               : $unmountRegions,
+    $disposeRegions               : $disposeRegions
   };
 
 };

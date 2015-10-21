@@ -1,6 +1,6 @@
 /* @flow weak */
 
-import _template from '../utils/Templating.js';
+import _template from '../view/Templating.js';
 import _domUtils from '../../nudoru/browser/DOMUtils.js';
 
 let ApplicationView = function () {
