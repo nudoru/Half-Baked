@@ -2,7 +2,6 @@
 
 import _mixinReducerStore from './store/ReducerStore.js';
 import _mixinComponentViews from './view/MixinComponentViews.js';
-import _mixinEventDelegator from './view/MixinEventDelegator.js';
 
 import assignArray from '../nudoru/core/AssignArray.js';
 import buildFromMixins from '../nudoru/core/BuildFromMixins.js';
@@ -43,14 +42,13 @@ let Nori = function () {
 
   _storeTemplate = createStore({
     mixins: [
-      _mixinReducerStore
+      _mixinReducerStore()
     ]
   })();
 
   _viewTemplate = createView({
     mixins: [
-      _mixinComponentViews,
-      _mixinEventDelegator()
+      _mixinComponentViews()
     ]
   })();
 

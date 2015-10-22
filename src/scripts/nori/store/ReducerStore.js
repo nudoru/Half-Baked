@@ -171,4 +171,4 @@ let ReducerStore = function () {
 
 };
 
-export default ReducerStore();
+export default ReducerStore;

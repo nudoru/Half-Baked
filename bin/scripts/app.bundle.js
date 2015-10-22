@@ -896,7 +896,7 @@ var _imagesLoadedInst = undefined,
 
 var AppViewModule = Nori.createView({
 
-  mixins: [_noriViewApplicationViewJs2['default'], _noriViewMixinNudoruControlsJs2['default'], _noriViewMixinStoreStateViewsJs2['default']],
+  mixins: [(0, _noriViewApplicationViewJs2['default'])(), (0, _noriViewMixinNudoruControlsJs2['default'])(), (0, _noriViewMixinStoreStateViewsJs2['default'])()],
 
   initialize: function initialize() {
     this.initializeApplicationView(['applicationscaffold', 'applicationcomponentsscaffold']);
@@ -2094,10 +2094,6 @@ var _viewMixinComponentViewsJs = require('./view/MixinComponentViews.js');
 
 var _viewMixinComponentViewsJs2 = _interopRequireDefault(_viewMixinComponentViewsJs);
 
-var _viewMixinEventDelegatorJs = require('./view/MixinEventDelegator.js');
-
-var _viewMixinEventDelegatorJs2 = _interopRequireDefault(_viewMixinEventDelegatorJs);
-
 var _nudoruCoreAssignArrayJs = require('../nudoru/core/AssignArray.js');
 
 var _nudoruCoreAssignArrayJs2 = _interopRequireDefault(_nudoruCoreAssignArrayJs);
@@ -2144,11 +2140,11 @@ var Nori = function Nori() {
   //----------------------------------------------------------------------------
 
   _storeTemplate = createStore({
-    mixins: [_storeReducerStoreJs2['default']]
+    mixins: [(0, _storeReducerStoreJs2['default'])()]
   })();
 
   _viewTemplate = createView({
-    mixins: [_viewMixinComponentViewsJs2['default'], (0, _viewMixinEventDelegatorJs2['default'])()]
+    mixins: [(0, _viewMixinComponentViewsJs2['default'])()]
   })();
 
   //----------------------------------------------------------------------------
@@ -2201,7 +2197,7 @@ var Nori = function Nori() {
 exports['default'] = Nori();
 module.exports = exports['default'];
 
-},{"../nudoru/core/AssignArray.js":44,"../nudoru/core/BuildFromMixins.js":45,"../nudoru/core/CreateClass.js":46,"./store/ReducerStore.js":22,"./view/MixinComponentViews.js":26,"./view/MixinEventDelegator.js":28}],16:[function(require,module,exports){
+},{"../nudoru/core/AssignArray.js":44,"../nudoru/core/BuildFromMixins.js":45,"../nudoru/core/CreateClass.js":46,"./store/ReducerStore.js":22,"./view/MixinComponentViews.js":26}],16:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -2819,7 +2815,7 @@ var ReducerStore = function ReducerStore() {
   };
 };
 
-exports['default'] = ReducerStore();
+exports['default'] = ReducerStore;
 module.exports = exports['default'];
 
 },{"../../nudoru/util/is.js":49,"../../vendor/rxjs/rx.lite.min.js":51,"./ImmutableMap.js":21,"./SimpleStore.js":23}],23:[function(require,module,exports){
@@ -2997,9 +2993,7 @@ var ApplicationViewModule = function ApplicationViewModule() {
   };
 };
 
-var ApplicationView = ApplicationViewModule();
-
-exports['default'] = ApplicationView;
+exports['default'] = ApplicationViewModule;
 module.exports = exports['default'];
 
 },{"../../nudoru/browser/DOMUtils.js":35,"../view/Templating.js":32}],26:[function(require,module,exports){
@@ -3200,7 +3194,7 @@ var MixinComponentViews = function MixinComponentViews() {
   };
 };
 
-exports['default'] = MixinComponentViews();
+exports['default'] = MixinComponentViews;
 module.exports = exports['default'];
 
 },{"../../nudoru/core/BuildFromMixins.js":45,"./MixinEventDelegator.js":28,"./ViewComponent.js":33}],27:[function(require,module,exports){
@@ -3625,7 +3619,7 @@ var MixinNudoruControls = function MixinNudoruControls() {
   };
 };
 
-exports['default'] = MixinNudoruControls();
+exports['default'] = MixinNudoruControls;
 module.exports = exports['default'];
 
 },{"../../nudoru/components/MessageBoxCreator.js":38,"../../nudoru/components/MessageBoxView.js":39,"../../nudoru/components/ModalCoverView.js":40,"../../nudoru/components/ToastView.js":41,"../../nudoru/components/ToolTipView.js":42}],30:[function(require,module,exports){
@@ -3648,7 +3642,6 @@ var MixinStoreStateViews = function MixinStoreStateViews() {
    */
   function initializeStateViews(store) {
     _observedStore = store;
-
     _observedStore.subscribe(onStateChange.bind(this));
   }
 
@@ -3672,7 +3665,7 @@ var MixinStoreStateViews = function MixinStoreStateViews() {
   };
 };
 
-exports["default"] = MixinStoreStateViews();
+exports["default"] = MixinStoreStateViews;
 module.exports = exports["default"];
 
 },{}],31:[function(require,module,exports){

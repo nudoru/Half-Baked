@@ -15,9 +15,9 @@ let _imagesLoadedInst,
 let AppViewModule = Nori.createView({
 
   mixins: [
-    _mixinApplicationView,
-    _mixinNudoruControls,
-    _mixinStoreStateViews
+    _mixinApplicationView(),
+    _mixinNudoruControls(),
+    _mixinStoreStateViews()
   ],
 
   initialize() {

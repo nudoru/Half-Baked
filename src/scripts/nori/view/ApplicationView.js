@@ -55,6 +55,5 @@ let ApplicationViewModule = function () {
 
 };
 
-let ApplicationView = ApplicationViewModule();
 
-export default ApplicationView;
+export default ApplicationViewModule;

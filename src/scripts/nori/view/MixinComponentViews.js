@@ -49,7 +49,7 @@ let MixinComponentViews = function () {
       finalComponent.key = _componentViewKeyIndex++;
 
       // Compose a new initialize function by inserting call to component super module
-      previousInitialize = finalComponent.initialize;
+      previousInitialize      = finalComponent.initialize;
       previousGetDefaultProps = finalComponent.getDefaultProps;
 
       finalComponent.initialize = function initialize(props) {
@@ -169,7 +169,7 @@ let MixinComponentViews = function () {
 
   return {
     mapViewComponent           : mapViewComponent,
-    createComponent        : createComponent,
+    createComponent            : createComponent,
     showViewComponent          : showViewComponent,
     getComponentViewMap        : getComponentViewMap,
     showViewForCondition       : showViewForCondition,
@@ -180,4 +180,4 @@ let MixinComponentViews = function () {
 
 };
 
-export default MixinComponentViews();
+export default MixinComponentViews;
