@@ -93,6 +93,15 @@ let TemplatingModule = function () {
   }
 
   /**
+   * Returns an underscore template
+   * @param id
+   * @returns {*}
+   */
+  function getTemplateFromHTML(html) {
+    return _.template(cleanTemplateHTML(html));
+  }
+
+  /**
    * Processes the template and returns HTML
    * @param id
    * @param obj
@@ -134,12 +143,12 @@ let TemplatingModule = function () {
    * Util for SharePoint projects, <script> blocks aren't allowed
    * So this helps create the blocks for insertion in to the DOM
    */
-  function processForDOMInsertion() {
-    let ids = getAllTemplateIDs();
-    ids.forEach(id => {
-      var src = removeWhiteSpace(getSource(id));
-    });
-  }
+  //function processForDOMInsertion() {
+  //  let ids = getAllTemplateIDs();
+  //  ids.forEach(id => {
+  //    var src = removeWhiteSpace(getSource(id));
+  //  });
+  //}
 
   /**
    * Add a template script tag to the DOM
@@ -159,8 +168,8 @@ let TemplatingModule = function () {
     addTemplate           : addTemplate,
     getSource             : getSource,
     getAllTemplateIDs     : getAllTemplateIDs,
-    processForDOMInsertion: processForDOMInsertion,
     getTemplate           : getTemplate,
+    getTemplateFromHTML   : getTemplateFromHTML,
     asHTML                : asHTML,
     asElement             : asElement
   };

@@ -22,7 +22,7 @@ let ApplicationViewModule = function () {
       return;
     }
 
-    let bodyEl = document.querySelector('body');
+    let bodyEl        = document.querySelector('body');
 
     templates.forEach(function (templ) {
       bodyEl.appendChild(DOMUtils.HTMLStrToNode(Template.getSource(templ, {})));

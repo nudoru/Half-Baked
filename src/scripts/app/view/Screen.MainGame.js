@@ -10,12 +10,9 @@ import _numUtils from '../../nudoru/core/NumberUtils.js';
 import _domUtils from '../../nudoru/browser/DOMUtils.js';
 import _mixinDOMManipulation from '../../nori/view/MixinDOMManipulation.js';
 import _rx from '../../nori/utils/Rx.js';
-import _ from '../../vendor/lodash.min.js';
+import Template from '../../nori/view/Templating.js';
 
 let _cardAnimationSub = null;
-
-// Switch Lodash to use Mustache style templates
-_.templateSettings.interpolate = /{{([\s\S]+?)}}/g;
 
 /**
  * Module for a dynamic application view for a route or a persistent view
@@ -138,12 +135,10 @@ var Component = Nori.view().createComponent({
 
   template(props, state) {
     if (state.sentQuestion.q_difficulty_level === -1) {
-      var cardsHTML = _template.getSource('game__choose');
-      return _.template(cardsHTML);
-    } else {
-      var remoteHTML = _template.getSource('game__remote');
-      return _.template(remoteHTML);
+      return Template.getTemplate('game__choose');
     }
+
+    return Template.getTemplate('game__remote');
   },
 
   /**

@@ -12,9 +12,6 @@ import Template from '../view/Templating.js';
 import Renderer from '../view/Renderer.js';
 import Is from '../../nudoru/util/is.js';
 
-// Switch Lodash to use Mustache style templates
-_.templateSettings.interpolate = /{{([\s\S]+?)}}/g;
-
 // Lifecycle state constants
 const LS_NO_INIT   = 0,
       LS_INITED    = 1,
@@ -40,7 +37,6 @@ var ViewComponent = function () {
       _DOMElement,
       _mountPoint,
       _mountDelay;
-
 
   /**
    * Initialization
@@ -268,9 +264,8 @@ var ViewComponent = function () {
    */
   function template(props, state) {
     // assumes the template ID matches the component's ID as passed on initialize
-    let templateId = props.template || this.getID(),
-        html       = Template.getSource(templateId);
-    return _.template(html);
+    let templateId = props.template || this.getID();
+    return Template.getTemplate(templateId);
   }
 
   /**

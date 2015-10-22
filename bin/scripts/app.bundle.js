@@ -955,10 +955,6 @@ var _storeAppStore = require('../store/AppStore');
 
 var _storeAppStore2 = _interopRequireDefault(_storeAppStore);
 
-var _noriViewTemplatingJs = require('../../nori/view/Templating.js');
-
-var _noriViewTemplatingJs2 = _interopRequireDefault(_noriViewTemplatingJs);
-
 var _noriViewMixinDOMManipulationJs = require('../../nori/view/MixinDOMManipulation.js');
 
 var _noriViewMixinDOMManipulationJs2 = _interopRequireDefault(_noriViewMixinDOMManipulationJs);
@@ -1147,7 +1143,7 @@ var Component = Nori.view().createComponent({
 exports['default'] = Component;
 module.exports = exports['default'];
 
-},{"../../nori/action/ActionCreator":17,"../../nori/utils/Rx.js":23,"../../nori/view/MixinDOMManipulation.js":26,"../../nori/view/Templating.js":30,"../../nudoru/browser/DOMUtils.js":33,"../store/AppStore":5,"./AppView":6}],8:[function(require,module,exports){
+},{"../../nori/action/ActionCreator":17,"../../nori/utils/Rx.js":23,"../../nori/view/MixinDOMManipulation.js":26,"../../nudoru/browser/DOMUtils.js":33,"../store/AppStore":5,"./AppView":6}],8:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -1178,21 +1174,16 @@ var _vendorRxjsRxLiteMinJs = require('../../vendor/rxjs/rx.lite.min.js');
 
 var _vendorRxjsRxLiteMinJs2 = _interopRequireDefault(_vendorRxjsRxLiteMinJs);
 
+var _noriViewTemplatingJs3 = _interopRequireDefault(_noriViewTemplatingJs);
+
 var _noriViewMixinDOMManipulationJs = require('../../nori/view/MixinDOMManipulation.js');
 
 var _noriViewMixinDOMManipulationJs2 = _interopRequireDefault(_noriViewMixinDOMManipulationJs);
-
-var _vendorLodashMinJs = require('../../vendor/lodash.min.js');
-
-var _vendorLodashMinJs2 = _interopRequireDefault(_vendorLodashMinJs);
 
 var _questionChangeObs = null,
     _timerObservable = null,
     _baseMaxSeconds = 10,
     _timerValue = 0;
-
-// Switch Lodash to use Mustache style templates
-_vendorLodashMinJs2['default'].templateSettings.interpolate = /{{([\s\S]+?)}}/g;
 
 /**
  * Module for a dynamic application view for a route or a persistent view
@@ -1289,8 +1280,7 @@ var Component = Nori.view().createComponent({
   },
 
   template: function template(props, state) {
-    var html = _noriViewTemplatingJs2['default'].getSource('game__question');
-    return _vendorLodashMinJs2['default'].template(html);
+    return _noriViewTemplatingJs3['default'].getTemplate('game__question');
   },
 
   /**
@@ -1394,7 +1384,7 @@ var Component = Nori.view().createComponent({
 exports['default'] = Component;
 module.exports = exports['default'];
 
-},{"../../nori/action/ActionCreator":17,"../../nori/view/MixinDOMManipulation.js":26,"../../nori/view/Templating.js":30,"../../vendor/lodash.min.js":50,"../../vendor/rxjs/rx.lite.min.js":51,"../action/ActionCreator.js":4,"../store/AppStore":5,"./AppView":6}],9:[function(require,module,exports){
+},{"../../nori/action/ActionCreator":17,"../../nori/view/MixinDOMManipulation.js":26,"../../nori/view/Templating.js":30,"../../vendor/rxjs/rx.lite.min.js":51,"../action/ActionCreator.js":4,"../store/AppStore":5,"./AppView":6}],9:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -1584,14 +1574,9 @@ var _noriUtilsRxJs = require('../../nori/utils/Rx.js');
 
 var _noriUtilsRxJs2 = _interopRequireDefault(_noriUtilsRxJs);
 
-var _vendorLodashMinJs = require('../../vendor/lodash.min.js');
-
-var _vendorLodashMinJs2 = _interopRequireDefault(_vendorLodashMinJs);
+var _noriViewTemplatingJs3 = _interopRequireDefault(_noriViewTemplatingJs);
 
 var _cardAnimationSub = null;
-
-// Switch Lodash to use Mustache style templates
-_vendorLodashMinJs2['default'].templateSettings.interpolate = /{{([\s\S]+?)}}/g;
 
 /**
  * Module for a dynamic application view for a route or a persistent view
@@ -1711,12 +1696,10 @@ var Component = Nori.view().createComponent({
 
   template: function template(props, state) {
     if (state.sentQuestion.q_difficulty_level === -1) {
-      var cardsHTML = _noriViewTemplatingJs2['default'].getSource('game__choose');
-      return _vendorLodashMinJs2['default'].template(cardsHTML);
-    } else {
-      var remoteHTML = _noriViewTemplatingJs2['default'].getSource('game__remote');
-      return _vendorLodashMinJs2['default'].template(remoteHTML);
+      return _noriViewTemplatingJs3['default'].getTemplate('game__choose');
     }
+
+    return _noriViewTemplatingJs3['default'].getTemplate('game__remote');
   },
 
   /**
@@ -1733,7 +1716,7 @@ var Component = Nori.view().createComponent({
 exports['default'] = Component;
 module.exports = exports['default'];
 
-},{"../../nori/action/ActionCreator":17,"../../nori/utils/Rx.js":23,"../../nori/view/MixinDOMManipulation.js":26,"../../nori/view/Templating.js":30,"../../nudoru/browser/DOMUtils.js":33,"../../nudoru/core/NumberUtils.js":46,"../../vendor/lodash.min.js":50,"../App":2,"../action/ActionCreator.js":4,"../store/AppStore":5,"./AppView":6,"./Region.PlayerStats.js":7,"./Region.Question.js":8}],11:[function(require,module,exports){
+},{"../../nori/action/ActionCreator":17,"../../nori/utils/Rx.js":23,"../../nori/view/MixinDOMManipulation.js":26,"../../nori/view/Templating.js":30,"../../nudoru/browser/DOMUtils.js":33,"../../nudoru/core/NumberUtils.js":46,"../App":2,"../action/ActionCreator.js":4,"../store/AppStore":5,"./AppView":6,"./Region.PlayerStats.js":7,"./Region.Question.js":8}],11:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -3669,6 +3652,15 @@ var TemplatingModule = function TemplatingModule() {
   }
 
   /**
+   * Returns an underscore template
+   * @param id
+   * @returns {*}
+   */
+  function getTemplateFromHTML(html) {
+    return _vendorLodashMinJs2['default'].template(cleanTemplateHTML(html));
+  }
+
+  /**
    * Processes the template and returns HTML
    * @param id
    * @param obj
@@ -3710,12 +3702,12 @@ var TemplatingModule = function TemplatingModule() {
    * Util for SharePoint projects, <script> blocks aren't allowed
    * So this helps create the blocks for insertion in to the DOM
    */
-  function processForDOMInsertion() {
-    var ids = getAllTemplateIDs();
-    ids.forEach(function (id) {
-      var src = removeWhiteSpace(getSource(id));
-    });
-  }
+  //function processForDOMInsertion() {
+  //  let ids = getAllTemplateIDs();
+  //  ids.forEach(id => {
+  //    var src = removeWhiteSpace(getSource(id));
+  //  });
+  //}
 
   /**
    * Add a template script tag to the DOM
@@ -3735,8 +3727,8 @@ var TemplatingModule = function TemplatingModule() {
     addTemplate: addTemplate,
     getSource: getSource,
     getAllTemplateIDs: getAllTemplateIDs,
-    processForDOMInsertion: processForDOMInsertion,
     getTemplate: getTemplate,
+    getTemplateFromHTML: getTemplateFromHTML,
     asHTML: asHTML,
     asElement: asElement
   };
@@ -3778,9 +3770,6 @@ var _viewRendererJs2 = _interopRequireDefault(_viewRendererJs);
 var _nudoruUtilIsJs = require('../../nudoru/util/is.js');
 
 var _nudoruUtilIsJs2 = _interopRequireDefault(_nudoruUtilIsJs);
-
-// Switch Lodash to use Mustache style templates
-_vendorLodashMinJs2['default'].templateSettings.interpolate = /{{([\s\S]+?)}}/g;
 
 // Lifecycle state constants
 var LS_NO_INIT = 0,
@@ -4032,9 +4021,8 @@ var ViewComponent = function ViewComponent() {
    */
   function template(props, state) {
     // assumes the template ID matches the component's ID as passed on initialize
-    var templateId = props.template || this.getID(),
-        html = _viewTemplatingJs2['default'].getSource(templateId);
-    return _vendorLodashMinJs2['default'].template(html);
+    var templateId = props.template || this.getID();
+    return _viewTemplatingJs2['default'].getTemplate(templateId);
   }
 
   /**

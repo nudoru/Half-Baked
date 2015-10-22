@@ -4,16 +4,13 @@ import _appStore from '../store/AppStore';
 import _appActions from '../action/ActionCreator.js';
 import _template from '../../nori/view/Templating.js';
 import Rxjs from '../../vendor/rxjs/rx.lite.min.js';
+import Template from '../../nori/view/Templating.js';
 import _mixinDOMManipulation from '../../nori/view/MixinDOMManipulation.js';
-import _ from '../../vendor/lodash.min.js';
 
 let _questionChangeObs = null,
     _timerObservable   = null,
     _baseMaxSeconds    = 10,
     _timerValue        = 0;
-
-// Switch Lodash to use Mustache style templates
-_.templateSettings.interpolate = /{{([\s\S]+?)}}/g;
 
 /**
  * Module for a dynamic application view for a route or a persistent view
@@ -113,8 +110,7 @@ var Component = Nori.view().createComponent({
   },
 
   template(props, state) {
-    var html = _template.getSource('game__question');
-    return _.template(html);
+    return Template.getTemplate('game__question');
   },
 
   /**

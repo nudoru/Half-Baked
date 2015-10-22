@@ -1,7 +1,6 @@
 import _noriActions from '../../nori/action/ActionCreator';
 import _appView from './AppView';
 import _appStore from '../store/AppStore';
-import _template from '../../nori/view/Templating.js';
 import _mixinDOMManipulation from '../../nori/view/MixinDOMManipulation.js';
 import _domUtils from '../../nudoru/browser/DOMUtils.js';
 import _rx from '../../nori/utils/Rx.js';
