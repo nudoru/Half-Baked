@@ -1,13 +1,9 @@
 /* @flow weak */
 
-import _template from '../view/Templating.js';
-import _domUtils from '../../nudoru/browser/DOMUtils.js';
+import Template from '../view/Templating.js';
+import DOMUtils from '../../nudoru/browser/DOMUtils.js';
 
 let ApplicationViewModule = function () {
-
-  //----------------------------------------------------------------------------
-  //  Initialization
-  //----------------------------------------------------------------------------
 
   /**
    * Initialize
@@ -29,7 +25,7 @@ let ApplicationViewModule = function () {
     let bodyEl = document.querySelector('body');
 
     templates.forEach(function (templ) {
-      bodyEl.appendChild(_domUtils.HTMLStrToNode(_template.getSource(templ, {})));
+      bodyEl.appendChild(DOMUtils.HTMLStrToNode(Template.getSource(templ, {})));
     });
   }
 
@@ -43,10 +39,6 @@ let ApplicationViewModule = function () {
     cover.parentNode.removeChild(cover);
     cover.removeChild(message);
   }
-
-  //----------------------------------------------------------------------------
-  //  API
-  //----------------------------------------------------------------------------
 
   return {
     initializeApplicationView: initializeApplicationView,

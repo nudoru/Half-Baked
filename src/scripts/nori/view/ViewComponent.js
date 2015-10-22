@@ -7,9 +7,9 @@
  * Functions beginning with $ should be treated as private
  */
 
-import _template from '../view/Templating.js';
-import _renderer from '../view/Renderer.js';
-import is from '../../nudoru/util/is.js';
+import Template from '../view/Templating.js';
+import Renderer from '../view/Renderer.js';
+import Is from '../../nudoru/util/is.js';
 
 // Lifecycle state constants
 const LS_NO_INIT   = 0,
@@ -265,7 +265,7 @@ var ViewComponent = function () {
   function template(props, state) {
     // assumes the template ID matches the component's ID as passed on initialize
     let templateId = props.template || this.getID(),
-        html       = _template.getSource(templateId);
+        html       = Template.getSource(templateId);
     return _.template(html);
   }
 
@@ -296,7 +296,7 @@ var ViewComponent = function () {
 
     _lifecycleState = LS_MOUNTED;
 
-    _DOMElement = (_renderer.render({
+    _DOMElement = (Renderer.render({
       target: _mountPoint,
       html  : _html
     }));
@@ -368,7 +368,7 @@ var ViewComponent = function () {
     }
 
     // Just clear the contents
-    _renderer.render({
+    Renderer.render({
       target: _mountPoint,
       html  : ''
     });
@@ -472,7 +472,7 @@ var ViewComponent = function () {
    * @param observable Object to subscribe to or ID. Should implement nori/store/MixinObservableStore
    */
   function bind(observable, func) {
-    if (!is.func(observable.subscribe)) {
+    if (!Is.func(observable.subscribe)) {
       console.warn('ViewComponent bind, must be observable: ' + observable);
       return;
     }

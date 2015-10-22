@@ -4,9 +4,9 @@
  * Mixin view that allows for component views
  */
 
-import _componentViewFactory from './ViewComponent.js';
-import _eventDelegatorFactory from './MixinEventDelegator.js';
-import buildFromMixins from '../../nudoru/core/BuildFromMixins.js';
+import ViewComponentFactory from './ViewComponent.js';
+import EventDelegatorFactory from './MixinEventDelegator.js';
+import BuildFromMixins from '../../nudoru/core/BuildFromMixins.js';
 
 let MixinComponentViews = function () {
 
@@ -42,10 +42,10 @@ let MixinComponentViews = function () {
       let finalComponent, previousInitialize, previousGetDefaultProps;
 
       customizer.mixins = customizer.mixins || [];
-      customizer.mixins.push(_componentViewFactory());
-      customizer.mixins.push(_eventDelegatorFactory());
+      customizer.mixins.push(ViewComponentFactory());
+      customizer.mixins.push(EventDelegatorFactory());
 
-      finalComponent     = buildFromMixins(customizer);
+      finalComponent     = BuildFromMixins(customizer);
       finalComponent.key = _componentViewKeyIndex++;
 
       // Compose a new initialize function by inserting call to component super module
@@ -143,7 +143,7 @@ let MixinComponentViews = function () {
       return;
     }
 
-    removeCurrentView();
+    $removeCurrentView();
 
     _currentViewID = componentID;
     showViewComponent(_currentViewID);
@@ -156,7 +156,7 @@ let MixinComponentViews = function () {
   /**
    * Remove the currently displayed view
    */
-  function removeCurrentView() {
+  function $removeCurrentView() {
     if (_currentViewID) {
       getComponentViewMap()[_currentViewID].controller.dispose();
     }

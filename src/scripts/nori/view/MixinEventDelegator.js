@@ -15,10 +15,10 @@
  *
  */
 
-import _rx from '../utils/Rx.js';
-import _browserInfo from '../../nudoru/browser/BrowserInfo.js';
-import convertMouseToTouchEventStr from '../../nudoru/browser/MouseToTouchEvents.js'
-import is from '../../nudoru/util/is.js';
+import Rx from '../utils/Rx.js';
+import BrowserInfo from '../../nudoru/browser/BrowserInfo.js';
+import MouseToTouchEventStr from '../../nudoru/browser/MouseToTouchEvents.js'
+import Is from '../../nudoru/util/is.js';
 
 let MixinEventDelegator = function () {
 
@@ -42,7 +42,7 @@ let MixinEventDelegator = function () {
         let mappings     = evtStrings.split(','),
             eventHandler = eventObj[evtStrings];
 
-        if (!is.func(eventHandler)) {
+        if (!Is.func(eventHandler)) {
           console.warn('EventDelegator, handler for ' + evtStrings + ' is not a function');
           return;
         }
@@ -55,8 +55,8 @@ let MixinEventDelegator = function () {
           let eventStr = evtMap.split(' ')[0].trim(),
               selector = evtMap.split(' ')[1].trim();
 
-          if (_browserInfo.mobile.any()) {
-            eventStr = convertMouseToTouchEventStr(eventStr);
+          if (BrowserInfo.mobile.any()) {
+            eventStr = MouseToTouchEventStr(eventStr);
           }
 
           _eventSubscribers[evtMap] = $createSubscriber(selector, eventStr, eventHandler, autoForm);
@@ -75,7 +75,7 @@ let MixinEventDelegator = function () {
    * @returns {*}
    */
   function $createSubscriber(selector, eventStr, handler, autoForm) {
-    let observable = _rx.dom(selector, eventStr),
+    let observable = Rx.dom(selector, eventStr),
         el         = document.querySelector(selector),
         tag, type;
 

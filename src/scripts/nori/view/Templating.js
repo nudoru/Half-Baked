@@ -6,7 +6,7 @@
  4/7/15
  */
 
-import _DOMUtils from '../../nudoru/browser/DOMUtils.js';
+import DOMUtils from '../../nudoru/browser/DOMUtils.js';
 
 let TemplatingModule = function () {
 
@@ -106,7 +106,7 @@ let TemplatingModule = function () {
    * @returns {*}
    */
   function asElement(id, obj) {
-    return _DOMUtils.HTMLStrToNode(asHTML(id, obj));
+    return DOMUtils.HTMLStrToNode(asHTML(id, obj));
   }
 
   /**

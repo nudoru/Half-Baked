@@ -2866,10 +2866,6 @@ var _nudoruBrowserDOMUtilsJs2 = _interopRequireDefault(_nudoruBrowserDOMUtilsJs)
 
 var ApplicationViewModule = function ApplicationViewModule() {
 
-  //----------------------------------------------------------------------------
-  //  Initialization
-  //----------------------------------------------------------------------------
-
   /**
    * Initialize
    * @param scaffoldTemplates template IDs to attached to the body for the app
@@ -2904,10 +2900,6 @@ var ApplicationViewModule = function ApplicationViewModule() {
     cover.parentNode.removeChild(cover);
     cover.removeChild(message);
   }
-
-  //----------------------------------------------------------------------------
-  //  API
-  //----------------------------------------------------------------------------
 
   return {
     initializeApplicationView: initializeApplicationView,
@@ -3080,7 +3072,7 @@ var MixinComponentViews = function MixinComponentViews() {
       return;
     }
 
-    removeCurrentView();
+    $removeCurrentView();
 
     _currentViewID = componentID;
     showViewComponent(_currentViewID);
@@ -3093,7 +3085,7 @@ var MixinComponentViews = function MixinComponentViews() {
   /**
    * Remove the currently displayed view
    */
-  function removeCurrentView() {
+  function $removeCurrentView() {
     if (_currentViewID) {
       getComponentViewMap()[_currentViewID].controller.dispose();
     }
@@ -3133,7 +3125,7 @@ var _nudoruUtilIsJs2 = _interopRequireDefault(_nudoruUtilIsJs);
 /**
  * DOM manipulation and animation helpers for ViewComponents
  */
-var MixinDOMManipulation = function MixinDOMManipulation() {
+var MixinDOMManipulationModule = function MixinDOMManipulationModule() {
 
   var _tweenedEls = [],
       _zIndex = 1000;
@@ -3246,7 +3238,9 @@ var MixinDOMManipulation = function MixinDOMManipulation() {
   };
 };
 
-exports['default'] = MixinDOMManipulation();
+var MixinDOMManipulation = MixinDOMManipulationModule();
+
+exports['default'] = MixinDOMManipulation;
 module.exports = exports['default'];
 
 },{"../../nudoru/util/is.js":48}],27:[function(require,module,exports){

@@ -4,7 +4,7 @@
  * Utility to handle all view DOM attachment tasks
  */
 
-import _domUtils from '../../nudoru/browser/DOMUtils.js';
+import DOMUtils from '../../nudoru/browser/DOMUtils.js';
 
 let RendererModule = function () {
   function render({target, html, callback}) {
@@ -13,7 +13,7 @@ let RendererModule = function () {
         currentHTML = mountPoint.innerHTML;
 
     if (html) {
-      domEl = _domUtils.HTMLStrToNode(html);
+      domEl = DOMUtils.HTMLStrToNode(html);
       if (html !== currentHTML) {
         // TODO experiment with the jsdiff function
         mountPoint.innerHTML = '';
