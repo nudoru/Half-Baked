@@ -2947,14 +2947,14 @@ var ApplicationViewModule = function ApplicationViewModule() {
    * @param scaffoldTemplates template IDs to attached to the body for the app
    */
   function initializeApplicationView(scaffoldTemplates) {
-    attachApplicationScaffolding(scaffoldTemplates);
+    $attachApplicationScaffolding(scaffoldTemplates);
   }
 
   /**
    * Attach app HTML structure
    * @param templates
    */
-  function attachApplicationScaffolding(templates) {
+  function $attachApplicationScaffolding(templates) {
     if (!templates) {
       return;
     }
@@ -3403,7 +3403,7 @@ var MixinEventDelegator = function MixinEventDelegator() {
               eventStr = (0, _nudoruBrowserMouseToTouchEventsJs2['default'])(eventStr);
             }
 
-            _eventSubscribers[evtMap] = createSubscriber(selector, eventStr, eventHandler, autoForm);
+            _eventSubscribers[evtMap] = $createSubscriber(selector, eventStr, eventHandler, autoForm);
           });
           /* jshint +W083 */
         })();
@@ -3421,14 +3421,14 @@ var MixinEventDelegator = function MixinEventDelegator() {
    * @param autoForm True to automatically pass common form element data to the handler
    * @returns {*}
    */
-  function createSubscriber(selector, eventStr, handler, autoForm) {
+  function $createSubscriber(selector, eventStr, handler, autoForm) {
     var observable = _utilsRxJs2['default'].dom(selector, eventStr),
         el = document.querySelector(selector),
         tag = undefined,
         type = undefined;
 
     if (!el) {
-      console.warn('MixinEventDelegator, createSubscriber, Element not found:', selector);
+      console.warn('MixinEventDelegator, $createSubscriber, Element not found:', selector);
       return;
     }
 
@@ -3636,10 +3636,10 @@ var MixinStoreStateViews = function MixinStoreStateViews() {
    */
   function initializeStateViews(store) {
     _observedStore = store;
-    _observedStore.subscribe(onStateChange.bind(this));
+    _observedStore.subscribe($onStateChange.bind(this));
   }
 
-  function onStateChange() {
+  function $onStateChange() {
     showViewForChangedCondition.bind(this)();
   }
 
@@ -3679,7 +3679,7 @@ var _nudoruBrowserDOMUtilsJs = require('../../nudoru/browser/DOMUtils.js');
 
 var _nudoruBrowserDOMUtilsJs2 = _interopRequireDefault(_nudoruBrowserDOMUtilsJs);
 
-var Renderer = function Renderer() {
+var RendererModule = function RendererModule() {
   function render(_ref) {
     var target = _ref.target;
     var html = _ref.html;
@@ -3712,7 +3712,9 @@ var Renderer = function Renderer() {
   };
 };
 
-exports['default'] = Renderer();
+var Renderer = RendererModule();
+
+exports['default'] = Renderer;
 module.exports = exports['default'];
 
 },{"../../nudoru/browser/DOMUtils.js":35}],32:[function(require,module,exports){
@@ -3734,7 +3736,7 @@ var _nudoruBrowserDOMUtilsJs = require('../../nudoru/browser/DOMUtils.js');
 
 var _nudoruBrowserDOMUtilsJs2 = _interopRequireDefault(_nudoruBrowserDOMUtilsJs);
 
-var Templating = function Templating() {
+var TemplatingModule = function TemplatingModule() {
 
   var _templateMap = Object.create(null),
       _templateHTMLCache = Object.create(null),
@@ -3888,7 +3890,9 @@ var Templating = function Templating() {
   };
 };
 
-exports['default'] = Templating();
+var Templating = TemplatingModule();
+
+exports['default'] = Templating;
 module.exports = exports['default'];
 
 },{"../../nudoru/browser/DOMUtils.js":35}],33:[function(require,module,exports){

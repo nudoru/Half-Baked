@@ -90,4 +90,4 @@ let MixinBrowserEvents = function () {
 
 };
 
-export default MixinBrowserEvents();
+export default MixinBrowserEvents;

@@ -14,14 +14,14 @@ let ApplicationViewModule = function () {
    * @param scaffoldTemplates template IDs to attached to the body for the app
    */
   function initializeApplicationView(scaffoldTemplates) {
-    attachApplicationScaffolding(scaffoldTemplates);
+    $attachApplicationScaffolding(scaffoldTemplates);
   }
 
   /**
    * Attach app HTML structure
    * @param templates
    */
-  function attachApplicationScaffolding(templates) {
+  function $attachApplicationScaffolding(templates) {
     if (!templates) {
       return;
     }

@@ -8,7 +8,7 @@
 
 import _DOMUtils from '../../nudoru/browser/DOMUtils.js';
 
-let Templating = function () {
+let TemplatingModule = function () {
 
   let _templateMap       = Object.create(null),
       _templateHTMLCache = Object.create(null),
@@ -163,4 +163,6 @@ let Templating = function () {
 
 };
 
-export default Templating();
+let Templating = TemplatingModule();
+
+export default Templating;

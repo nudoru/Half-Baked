@@ -59,7 +59,7 @@ let MixinEventDelegator = function () {
             eventStr = convertMouseToTouchEventStr(eventStr);
           }
 
-          _eventSubscribers[evtMap] = createSubscriber(selector, eventStr, eventHandler, autoForm);
+          _eventSubscribers[evtMap] = $createSubscriber(selector, eventStr, eventHandler, autoForm);
         });
         /* jshint +W083 */
       }
@@ -74,13 +74,13 @@ let MixinEventDelegator = function () {
    * @param autoForm True to automatically pass common form element data to the handler
    * @returns {*}
    */
-  function createSubscriber(selector, eventStr, handler, autoForm) {
+  function $createSubscriber(selector, eventStr, handler, autoForm) {
     let observable = _rx.dom(selector, eventStr),
         el         = document.querySelector(selector),
         tag, type;
 
     if (!el) {
-      console.warn('MixinEventDelegator, createSubscriber, Element not found:', selector);
+      console.warn('MixinEventDelegator, $createSubscriber, Element not found:', selector);
       return;
     }
 

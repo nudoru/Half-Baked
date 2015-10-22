@@ -6,7 +6,7 @@
 
 import _domUtils from '../../nudoru/browser/DOMUtils.js';
 
-let Renderer = function () {
+let RendererModule = function () {
   function render({target, html, callback}) {
     let domEl,
         mountPoint  = document.querySelector(target),
@@ -36,4 +36,6 @@ let Renderer = function () {
 
 };
 
-export default Renderer();
+let Renderer = RendererModule();
+
+export default Renderer;

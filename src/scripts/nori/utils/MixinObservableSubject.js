@@ -9,7 +9,7 @@
 
 import Rxjs from '../../vendor/rxjs/rx.lite.min.js';
 
-let MixinObservableSubject = function () {
+export default function() {
 
   let _subjectMap = {};
 
@@ -44,6 +44,4 @@ let MixinObservableSubject = function () {
     notify   : notify
   };
 
-};
-
-export default MixinObservableSubject;
+}
