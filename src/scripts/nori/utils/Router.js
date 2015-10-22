@@ -5,7 +5,7 @@
  * Supporting IE9 so using hashes instead of the history API for now
  */
 
-import _objUtils from '../../nudoru/core/ObjectUtils.js';
+import ObjUtils from '../../nudoru/core/ObjectUtils.js';
 import Rxjs from '../../vendor/rxjs/rx.lite.min.js';
 
 let Router = function () {
@@ -86,7 +86,7 @@ let Router = function () {
   function set(route, dataObj) {
     let path = route,
         data = [];
-    if (!_objUtils.isNull(dataObj)) {
+    if (!ObjUtils.isNull(dataObj)) {
       path += "?";
       for (var prop in dataObj) {
         if (prop !== 'undefined' && dataObj.hasOwnProperty(prop)) {

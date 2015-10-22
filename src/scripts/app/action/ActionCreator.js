@@ -5,7 +5,7 @@ import _appStore from '../store/AppStore.js';
  * Purely for convenience, an Event ("action") Creator ala Flux spec. Follow
  * guidelines for creating actions: https://github.com/acdlite/flux-standard-action
  */
-var ActionCreator = {
+export default {
 
   setQuestionBank(data) {
     return {
@@ -163,5 +163,3 @@ var ActionCreator = {
   }
 
 };
-
-export default ActionCreator;

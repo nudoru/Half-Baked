@@ -12,13 +12,12 @@
  */
 
 import Rxjs from '../../vendor/rxjs/rx.lite.min.js';
-import is from '../../nudoru/util/is.js';
-import _stateObjFactory from './SimpleStore.js';
-import _immutableMapFactory from './ImmutableMap.js';
+import Is from '../../nudoru/util/is.js';
+import ImmutableMapFactory from './ImmutableMap.js';
 
 let ReducerStore = function () {
   let _this,
-      _state,
+      _stateObject,
       _stateReducers = [],
       _subject       = new Rxjs.Subject();
 
@@ -27,11 +26,11 @@ let ReducerStore = function () {
   //----------------------------------------------------------------------------
 
   /**
-   * _state might not exist if subscribers are added before this store is initialized
+   * _stateObject might not exist if subscribers are added before this store is initialized
    */
   function getState() {
-    if (_state) {
-      return _state.getState();
+    if (_stateObject) {
+      return _stateObject.getState();
     }
     return {};
   }
@@ -44,7 +43,7 @@ let ReducerStore = function () {
    */
   function setState(nextstate = this.initialState()) {
     if (!_.isEqual(nextstate, getState())) {
-      _state.setState(nextstate);
+      _stateObject.setState(nextstate);
       _this.notify({});
     }
   }
@@ -66,7 +65,7 @@ let ReducerStore = function () {
    */
   function initializeReducerStore() {
     _this = this;
-    _state = _immutableMapFactory();
+    _stateObject = ImmutableMapFactory();
   }
 
   function initialState() {
@@ -79,7 +78,7 @@ let ReducerStore = function () {
    * @param actionObjOrArry Array of actions or a single action to reduce from
    */
   function apply(actionObjOrArry) {
-    if (is.array(actionObjOrArry)) {
+    if (Is.array(actionObjOrArry)) {
       actionObjOrArry.forEach(actionObj => applyReducers(actionObj));
     } else {
       applyReducers(actionObjOrArry);

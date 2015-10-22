@@ -1,6 +1,6 @@
 import _appStore from '../store/AppStore.js';
 import _mixinApplicationView from '../../nori/view/ApplicationView.js';
-import _mixinNudoruControls from '../../nori/view/MixinNudoruControls.js';
+import _mixinNudoruControls from '../../nudoru/components/MixinNudoruControls.js';
 import _mixinStoreStateViews from '../../nori/view/MixinStoreStateViews.js';
 import _screenTitleFactory from './Screen.Title.js';
 import _screenPlayerSelectFactory from './Screen.PlayerSelect.js';

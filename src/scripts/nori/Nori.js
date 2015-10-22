@@ -1,11 +1,10 @@
 /* @flow weak */
 
-import _mixinReducerStore from './store/ReducerStore.js';
-import _mixinComponentViews from './view/MixinComponentViews.js';
-
-import assignArray from '../nudoru/core/AssignArray.js';
-import buildFromMixins from '../nudoru/core/BuildFromMixins.js';
-import createClass from '../nudoru/core/CreateClass.js';
+import MixinReducerStore from './store/ReducerStore.js';
+import MixinComponentViews from './view/MixinComponentViews.js';
+import AssignArray from '../nudoru/core/AssignArray.js';
+import BuildFromMixins from '../nudoru/core/BuildFromMixins.js';
+import CreateClass from '../nudoru/core/CreateClass.js';
 
 let Nori = function () {
 
@@ -42,13 +41,13 @@ let Nori = function () {
 
   _storeTemplate = createStore({
     mixins: [
-      _mixinReducerStore()
+      MixinReducerStore()
     ]
   })();
 
   _viewTemplate = createView({
     mixins: [
-      _mixinComponentViews()
+      MixinComponentViews()
     ]
   })();
 
@@ -64,7 +63,7 @@ let Nori = function () {
   function createApplication(customizer) {
     customizer.mixins = customizer.mixins || [];
     customizer.mixins.push(this);
-    return createClass({}, customizer)();
+    return CreateClass({}, customizer)();
   }
 
   /**
@@ -73,7 +72,7 @@ let Nori = function () {
    * @returns {*}
    */
   function createStore(customizer) {
-    return createClass(_storeTemplate, customizer);
+    return CreateClass(_storeTemplate, customizer);
   }
 
   /**
@@ -82,7 +81,7 @@ let Nori = function () {
    * @returns {*}
    */
   function createView(customizer) {
-    return createClass(_viewTemplate, customizer);
+    return CreateClass(_viewTemplate, customizer);
   }
 
   //----------------------------------------------------------------------------
