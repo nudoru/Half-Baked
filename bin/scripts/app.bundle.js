@@ -2707,14 +2707,7 @@ var ReducerStore = function ReducerStore() {
    */
   function initializeReducerStore() {
     _this = this;
-    //_state = _stateObjFactory();
     _state = (0, _ImmutableMapJs2['default'])();
-
-    //if (!_stateReducers) {
-    //  throw new Error('ReducerStore, must set a reducer before initialization');
-    //}
-    // Set initial state from empty event
-    //applyReducers({});
   }
 
   function initialState() {
@@ -2749,6 +2742,7 @@ var ReducerStore = function ReducerStore() {
    * @returns {*|{}}
    */
   function applyReducersToState(state, action) {
+    // TODO should or be this.getDefaultState()?
     state = state || {};
     return _stateReducers.reduce(function (nextState, reducerFunc) {
       return reducerFunc(nextState, action);
