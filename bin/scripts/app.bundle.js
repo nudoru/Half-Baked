@@ -149,12 +149,12 @@ var _restNumQuestions = 300,
  * bootstrapping the app and possibly handling socket/server interaction.
  * Any additional functionality should be handled in a specific module.
  */
-var App = Nori.createApplication({
+var App = Nori.createClass({
 
   mixins: [],
 
   /**
-   * Intialize the appilcation, view and store
+   * Initialize the application, view and store
    */
   initialize: function initialize() {
     _noriServiceSocketIOJs2['default'].initialize();
@@ -461,7 +461,7 @@ var App = Nori.createApplication({
     _storeAppStoreJs2['default'].apply(setSentQuestion);
   }
 
-});
+})();
 
 exports['default'] = App;
 module.exports = exports['default'];
@@ -2168,6 +2168,10 @@ var Nori = function Nori() {
   //  Factories
   //----------------------------------------------------------------------------
 
+  function createClass(customizer) {
+    return (0, _nudoruCoreCreateClassJs2['default'])({}, customizer);
+  }
+
   /**
    * Create a new Nori application instance
    * @param customizer
@@ -2205,6 +2209,7 @@ var Nori = function Nori() {
     config: getConfig,
     view: view,
     store: store,
+    createClass: createClass,
     createApplication: createApplication,
     createStore: createStore,
     createView: createView

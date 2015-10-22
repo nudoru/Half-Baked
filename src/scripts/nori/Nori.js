@@ -13,7 +13,6 @@ let Nori = function () {
       _viewTemplate;
 
 
-
   //----------------------------------------------------------------------------
   //  Accessors
   //----------------------------------------------------------------------------
@@ -55,6 +54,10 @@ let Nori = function () {
   //  Factories
   //----------------------------------------------------------------------------
 
+  function createClass(customizer) {
+    return CreateClass({}, customizer);
+  }
+
   /**
    * Create a new Nori application instance
    * @param customizer
@@ -92,6 +95,7 @@ let Nori = function () {
     config           : getConfig,
     view             : view,
     store            : store,
+    createClass      : createClass,
     createApplication: createApplication,
     createStore      : createStore,
     createView       : createView

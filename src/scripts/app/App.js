@@ -18,12 +18,12 @@ const _restNumQuestions     = 300,
  * bootstrapping the app and possibly handling socket/server interaction.
  * Any additional functionality should be handled in a specific module.
  */
-let App = Nori.createApplication({
+let App = Nori.createClass({
 
   mixins: [],
 
   /**
-   * Intialize the appilcation, view and store
+   * Initialize the application, view and store
    */
     initialize() {
     _socketIO.initialize();
@@ -329,6 +329,6 @@ let App = Nori.createApplication({
     _appStore.apply(setSentQuestion);
   }
 
-});
+})();
 
 export default App;
