@@ -5,7 +5,8 @@
  * @returns {Function}
  */
 
-import buildFromMixins from './BuildFromMixins.js'
+import buildFromMixins from './BuildFromMixins.js';
+import _ from '../../vendor/lodash.min.js';
 
 export default function(template, customizer) {
   template = template || {};

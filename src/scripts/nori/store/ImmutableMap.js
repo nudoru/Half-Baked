@@ -7,6 +7,7 @@
  */
 
 import Immutable from '../../vendor/immutable.min.js';
+import _ from '../../vendor/lodash.min.js';
 
 let ImmutableMap = function () {
   let _map = Immutable.Map();

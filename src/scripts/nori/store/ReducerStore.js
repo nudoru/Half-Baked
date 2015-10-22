@@ -12,6 +12,7 @@
  */
 
 import Rxjs from '../../vendor/rxjs/rx.lite.min.js';
+import _ from '../../vendor/lodash.min.js';
 import Is from '../../nudoru/util/is.js';
 import ImmutableMapFactory from './ImmutableMap.js';
 

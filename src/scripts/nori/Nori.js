@@ -5,14 +5,14 @@ import MixinComponentViews from './view/MixinComponentViews.js';
 import AssignArray from '../nudoru/core/AssignArray.js';
 import BuildFromMixins from '../nudoru/core/BuildFromMixins.js';
 import CreateClass from '../nudoru/core/CreateClass.js';
+import _ from '../vendor/lodash.min.js';
 
 let Nori = function () {
 
   let _storeTemplate,
       _viewTemplate;
 
-  // Switch Lodash to use Mustache style templates
-  _.templateSettings.interpolate = /{{([\s\S]+?)}}/g;
+
 
   //----------------------------------------------------------------------------
   //  Accessors

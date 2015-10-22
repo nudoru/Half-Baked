@@ -7,9 +7,13 @@
  * Functions beginning with $ should be treated as private
  */
 
+import _ from '../../vendor/lodash.min.js';
 import Template from '../view/Templating.js';
 import Renderer from '../view/Renderer.js';
 import Is from '../../nudoru/util/is.js';
+
+// Switch Lodash to use Mustache style templates
+_.templateSettings.interpolate = /{{([\s\S]+?)}}/g;
 
 // Lifecycle state constants
 const LS_NO_INIT   = 0,

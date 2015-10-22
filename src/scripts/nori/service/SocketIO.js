@@ -2,6 +2,7 @@
 
 import SocketIOEvents from './SocketIOEvents.js';
 import Rxjs from '../../vendor/rxjs/rx.lite.min.js';
+import _ from '../../vendor/lodash.min.js';
 
 let SocketIOConnectorModule = function () {
 

@@ -4,6 +4,7 @@ import _appActionConstants from '../action/ActionConstants.js';
 import _stringUtils from '../../nudoru/core/StringUtils.js';
 import _numUtils from '../../nudoru/core/NumberUtils.js';
 import _arrayUtils from '../../nudoru/core/ArrayUtils.js';
+import _ from '../../vendor/lodash.min.js';
 
 const _mockAppearence = ['Biege', 'Blue', 'Green', 'Pink', 'Yellow'],
       _mockNames      = ['Bagel', 'Loaf', 'Bready', 'Twist', 'Cupcake', 'Cake', 'Batter', 'Cookie', 'Donut', 'Bun', 'Biscuit', 'Flakey', 'Gluten', 'Croissant', 'Dough', 'Knead', 'Sugar', 'Flour', 'Butter', 'Yeast', 'Icing', 'Frost', 'Eggy', 'Fondant', 'Mix', 'Fluffy', 'Whip', 'Chip', 'Honey', 'Eclaire'];

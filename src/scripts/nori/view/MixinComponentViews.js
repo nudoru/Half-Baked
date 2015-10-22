@@ -4,6 +4,7 @@
  * Mixin view that allows for component views
  */
 
+import _ from '../../vendor/lodash.min.js';
 import ViewComponentFactory from './ViewComponent.js';
 import EventDelegatorFactory from './MixinEventDelegator.js';
 import BuildFromMixins from '../../nudoru/core/BuildFromMixins.js';
