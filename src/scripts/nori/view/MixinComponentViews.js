@@ -6,6 +6,7 @@
 
 import _componentViewFactory from './ViewComponent.js';
 import _eventDelegatorFactory from './MixinEventDelegator.js';
+import buildFromMixins from '../../nudoru/core/BuildFromMixins.js';
 
 let MixinComponentViews = function () {
 
@@ -44,7 +45,7 @@ let MixinComponentViews = function () {
       customizer.mixins.push(_componentViewFactory());
       customizer.mixins.push(_eventDelegatorFactory());
 
-      finalComponent     = Nori.buildFromMixins(customizer);
+      finalComponent     = buildFromMixins(customizer);
       finalComponent.key = _componentViewKeyIndex++;
 
       // Compose a new initialize function by inserting call to component super module

@@ -11,6 +11,7 @@
  * Created 8/13/15
  */
 
+import Rxjs from '../../vendor/rxjs/rx.lite.min.js';
 import is from '../../nudoru/util/is.js';
 import _stateObjFactory from './SimpleStore.js';
 import _immutableMapFactory from './ImmutableMap.js';
@@ -18,7 +19,8 @@ import _immutableMapFactory from './ImmutableMap.js';
 let ReducerStore = function () {
   let _this,
       _state,
-      _stateReducers = [];
+      _stateReducers = [],
+      _subject       = new Rxjs.Subject();
 
   //----------------------------------------------------------------------------
   //  Accessors
@@ -43,7 +45,7 @@ let ReducerStore = function () {
   function setState(nextstate = this.initialState()) {
     if (!_.isEqual(nextstate, getState())) {
       _state.setState(nextstate);
-      _this.notifySubscribers({});
+      _this.notify({});
     }
   }
 
@@ -63,10 +65,6 @@ let ReducerStore = function () {
    * Set up event listener/receiver
    */
   function initializeReducerStore() {
-    if (!this.createSubject) {
-      console.warn('nori/store/ReducerStore needs nori/utils/MixinObservableSubject to notify');
-    }
-
     _this = this;
     //_state = _stateObjFactory();
     _state = _immutableMapFactory();
@@ -132,6 +130,28 @@ let ReducerStore = function () {
    */
 
   //----------------------------------------------------------------------------
+  //  Update events
+  //----------------------------------------------------------------------------
+
+  /**
+   * Subscribe handler to updates. If the handler is a string, the new subject
+   * will be created.
+   * @param handler
+   * @returns {*}
+   */
+  function subscribe(handler) {
+    return _subject.subscribe(handler);
+  }
+
+  /**
+   * Dispatch updated to subscribers
+   * @param payload
+   */
+  function notify(payload) {
+    _subject.onNext(payload);
+  }
+
+  //----------------------------------------------------------------------------
   //  API
   //----------------------------------------------------------------------------
 
@@ -144,7 +164,9 @@ let ReducerStore = function () {
     setReducers           : setReducers,
     addReducer            : addReducer,
     applyReducers         : applyReducers,
-    applyReducersToState  : applyReducersToState
+    applyReducersToState  : applyReducersToState,
+    subscribe             : subscribe,
+    notify                : notify
   };
 
 };

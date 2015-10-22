@@ -1,9 +1,12 @@
 /* @flow weak */
 
-import _mixinObservableSubject from './utils/MixinObservableSubject.js';
 import _mixinReducerStore from './store/ReducerStore.js';
 import _mixinComponentViews from './view/MixinComponentViews.js';
 import _mixinEventDelegator from './view/MixinEventDelegator.js';
+
+import assignArray from '../nudoru/core/AssignArray.js';
+import buildFromMixins from '../nudoru/core/BuildFromMixins.js';
+import createClass from '../nudoru/core/CreateClass.js';
 
 let Nori = function () {
 
@@ -40,16 +43,14 @@ let Nori = function () {
 
   _storeTemplate = createStore({
     mixins: [
-      _mixinReducerStore,
-      _mixinObservableSubject()
+      _mixinReducerStore
     ]
   })();
 
   _viewTemplate = createView({
     mixins: [
       _mixinComponentViews,
-      _mixinEventDelegator(),
-      _mixinObservableSubject()
+      _mixinEventDelegator()
     ]
   })();
 
@@ -58,47 +59,12 @@ let Nori = function () {
   //----------------------------------------------------------------------------
 
   /**
-   * Merges a collection of objects
-   * @param target
-   * @param sourceArray
-   * @returns {*}
-   */
-  function assignArray(target, sourceArray) {
-    return sourceArray.reduce((tgt, mixin) => {
-      return _.assign(tgt, mixin);
-    }, target);
-  }
-
-  /**
-   * Return a new Nori class by combining a template and customizer with mixins
-   * @param template
-   * @param customizer
-   * @returns {Function}
-   */
-  function createClass(template, customizer) {
-    template = template || {};
-    return function factory() {
-      return _.assign({}, template, buildFromMixins(customizer));
-    };
-  }
-
-  /**
-   * Mixes in the modules specified in the custom application object
-   * @param customizer
-   * @returns {*}
-   */
-  function buildFromMixins(customizer) {
-    let mixins = customizer.mixins || [];
-    mixins.push(customizer);
-    return assignArray({}, mixins);
-  }
-
-  /**
    * Create a new Nori application instance
    * @param customizer
    * @returns {*}
    */
   function createApplication(customizer) {
+    customizer.mixins = customizer.mixins || [];
     customizer.mixins.push(this);
     return createClass({}, customizer)();
   }
@@ -129,12 +95,9 @@ let Nori = function () {
     config           : getConfig,
     view             : view,
     store            : store,
-    createClass      : createClass,
     createApplication: createApplication,
     createStore      : createStore,
-    createView       : createView,
-    buildFromMixins  : buildFromMixins,
-    assignArray      : assignArray
+    createView       : createView
   };
 
 };

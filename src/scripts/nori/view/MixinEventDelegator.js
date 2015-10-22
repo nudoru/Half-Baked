@@ -17,6 +17,7 @@
 
 import _rx from '../utils/Rx.js';
 import _browserInfo from '../../nudoru/browser/BrowserInfo.js';
+import convertMouseToTouchEventStr from '../../nudoru/browser/MouseToTouchEvents.js'
 import is from '../../nudoru/util/is.js';
 
 let MixinEventDelegator = function () {
@@ -62,26 +63,6 @@ let MixinEventDelegator = function () {
         });
         /* jshint +W083 */
       }
-    }
-  }
-
-  /**
-   * Map common mouse events to touch equivalents
-   * @param eventStr
-   * @returns {*}
-   */
-  function convertMouseToTouchEventStr(eventStr) {
-    switch (eventStr) {
-      case('click'):
-        return 'touchend';
-      case('mousedown'):
-        return 'touchstart';
-      case('mouseup'):
-        return 'touchend';
-      case('mousemove'):
-        return 'touchmove';
-      default:
-        return eventStr;
     }
   }
 

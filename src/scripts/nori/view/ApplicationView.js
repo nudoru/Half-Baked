@@ -3,7 +3,7 @@
 import _template from '../view/Templating.js';
 import _domUtils from '../../nudoru/browser/DOMUtils.js';
 
-let ApplicationView = function () {
+let ApplicationViewModule = function () {
 
   //----------------------------------------------------------------------------
   //  Initialization
@@ -55,4 +55,6 @@ let ApplicationView = function () {
 
 };
 
-export default ApplicationView();
+let ApplicationView = ApplicationViewModule();
+
+export default ApplicationView;

@@ -26,7 +26,6 @@ let AppViewModule = Nori.createView({
     this.initializeNudoruControls();
 
     this.configureViews();
-    this.subscribe('viewChange', this.handleViewChange.bind(this));
 
     this.preloadImages();
   },
@@ -51,13 +50,6 @@ let AppViewModule = Nori.createView({
     this.mapConditionToViewComponent(gameStates[3], 'game', _screenMainGameFactory());
     this.mapConditionToViewComponent(gameStates[4], 'gameover', _screenGameOverFactory());
   },
-
-  /**
-   * Close all alert boxes on view changes so there are no left over messages displayed
-   */
-  handleViewChange() {
-    this.closeAllAlerts();
-  }
 
 });
 
