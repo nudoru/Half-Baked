@@ -2636,14 +2636,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'd
 /*  weak */
 
 /**
- * Mixin for Nori stores to add functionality similar to Redux' Reducer and single
- * object state tree concept. Mixin should be composed to nori/store/ApplicationStore
- * during creation of main AppStore
- *
- * https://gaearon.github.io/redux/docs/api/Store.html
- * https://gaearon.github.io/redux/docs/basics/Reducers.html
- *
- * Created 8/13/15
+ * Store modeled after Redux
  */
 
 var _vendorRxjsRxLiteMinJs = require('../../vendor/rxjs/rx.lite.min.js');
@@ -2658,13 +2651,15 @@ var _nudoruUtilIsJs = require('../../nudoru/util/is.js');
 
 var _nudoruUtilIsJs2 = _interopRequireDefault(_nudoruUtilIsJs);
 
-var _ImmutableMapJs = require('./ImmutableMap.js');
+var _ImmutableStoreJs = require('./ImmutableStore.js');
 
-var _ImmutableMapJs2 = _interopRequireDefault(_ImmutableMapJs);
+var _ImmutableStoreJs2 = _interopRequireDefault(_ImmutableStoreJs);
 
 var ReducerStore = function ReducerStore() {
   var _this = undefined,
-      _stateObject = undefined,
+      _isReducing = false,
+      _queue = [],
+      _stateObject = (0, _ImmutableStoreJs2['default'])(),
       _stateReducers = [],
       _subject = new _vendorRxjsRxLiteMinJs2['default'].Subject();
 
@@ -2676,10 +2671,7 @@ var ReducerStore = function ReducerStore() {
    * _stateObject might not exist if subscribers are added before this store is initialized
    */
   function getState() {
-    if (_stateObject) {
-      return _stateObject.getState();
-    }
-    return {};
+    return _stateObject.getState();
   }
 
   /**
@@ -2714,7 +2706,6 @@ var ReducerStore = function ReducerStore() {
    */
   function initializeReducerStore() {
     _this = this;
-    _stateObject = (0, _ImmutableMapJs2['default'])();
   }
 
   function initialState() {
@@ -2728,16 +2719,27 @@ var ReducerStore = function ReducerStore() {
    */
   function apply(actionObjOrArry) {
     if (_nudoruUtilIsJs2['default'].array(actionObjOrArry)) {
-      actionObjOrArry.forEach(function (actionObj) {
-        return applyReducers(actionObj);
-      });
+      _queue = _queue.concat(actionObjOrArry);
     } else {
-      applyReducers(actionObjOrArry);
+      _queue.push(actionObjOrArry);
+    }
+
+    processActionQueue(getState());
+  }
+
+  function processActionQueue(state) {
+    while (_queue.length) {
+      var actionObject = _queue.shift();
+      applyReducers(state, actionObject);
     }
   }
 
-  function applyReducers(actionObject) {
-    var nextState = applyReducersToState(getState(), actionObject);
+  function applyReducers(state, actionObject) {
+    if (typeof actionObject.type === 'undefined') {
+      console.warn('Reducer store, cannot apply undefined action type');
+      return;
+    }
+    var nextState = applyReducersToState(state, actionObject);
     setState(nextState);
   }
 
@@ -2749,11 +2751,21 @@ var ReducerStore = function ReducerStore() {
    * @returns {*|{}}
    */
   function applyReducersToState(state, action) {
-    // TODO should or be this.getDefaultState()?
+    var nextState = undefined;
+
+    // TODO {} or this.getDefaultState()?
     state = state || {};
-    return _stateReducers.reduce(function (nextState, reducerFunc) {
-      return reducerFunc(nextState, action);
-    }, state);
+
+    try {
+      nextState = _stateReducers.reduce(function (nextState, reducerFunc) {
+        return reducerFunc(nextState, action);
+      }, state);
+    } catch (e) {
+      console.warn('Reducer store, error applying reducers', e);
+      nextState = state;
+    }
+
+    return nextState;
   }
 
   /**
@@ -2779,20 +2791,10 @@ var ReducerStore = function ReducerStore() {
   //  Update events
   //----------------------------------------------------------------------------
 
-  /**
-   * Subscribe handler to updates. If the handler is a string, the new subject
-   * will be created.
-   * @param handler
-   * @returns {*}
-   */
   function subscribe(handler) {
     return _subject.subscribe(handler);
   }
 
-  /**
-   * Dispatch updated to subscribers
-   * @param payload
-   */
   function notify(payload) {
     _subject.onNext(payload);
   }
@@ -2819,7 +2821,7 @@ var ReducerStore = function ReducerStore() {
 exports['default'] = ReducerStore;
 module.exports = exports['default'];
 
-},{"../../nudoru/util/is.js":48,"../../vendor/lodash.min.js":50,"../../vendor/rxjs/rx.lite.min.js":51,"./ImmutableMap.js":21}],23:[function(require,module,exports){
+},{"../../nudoru/util/is.js":48,"../../vendor/lodash.min.js":50,"../../vendor/rxjs/rx.lite.min.js":51,"./ImmutableStore.js":21}],23:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
