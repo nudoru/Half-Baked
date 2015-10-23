@@ -1,5 +1,5 @@
 import _appStore from '../store/AppStore.js';
-import _mixinApplicationView from '../../nori/view/ApplicationView.js';
+import _mixinApplicationView from '../../nori/view/MixinApplicationView.js';
 import _mixinNudoruControls from '../../nudoru/components/MixinNudoruControls.js';
 import _mixinStoreStateViews from '../../nori/view/MixinStoreStateViews.js';
 import _screenTitleFactory from './Screen.Title.js';
@@ -45,10 +45,21 @@ let AppViewModule = Nori.createView({
     this.setViewMountPoint('#contents');
 
     this.mapConditionToViewComponent(gameStates[0], 'title', _screenTitleFactory());
-    this.mapConditionToViewComponent(gameStates[1], 'playerselect', _screenPlayerSelectFactory({test:'foobar'}));
+    this.mapConditionToViewComponent(gameStates[1], 'playerselect', _screenPlayerSelectFactory({test: 'foobar'}));
     this.mapConditionToViewComponent(gameStates[2], 'waitingonplayer', _screenWaitingOnPlayerFactory());
     this.mapConditionToViewComponent(gameStates[3], 'game', _screenMainGameFactory());
     this.mapConditionToViewComponent(gameStates[4], 'gameover', _screenGameOverFactory());
+  },
+
+  /**
+   * After app initialization, remove the loading message
+   */
+    removeLoadingMessage() {
+    let cover   = document.querySelector('#initialization__cover'),
+        message = document.querySelector('.initialization__message');
+
+    cover.parentNode.removeChild(cover);
+    cover.removeChild(message);
   },
 
 });
