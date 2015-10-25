@@ -721,13 +721,11 @@ var AppStoreModule = Nori.createStore({
   initialize: function initialize() {
     this.setReducers([this.gameStateReducer.bind(this), this.playerResponseStateReducer.bind(this), this.opponentResponseStateReducer.bind(this)]);
 
+    // Will set to initial state
     this.initializeReducerStore();
-
-    // Will default state to initial state defaults
-    this.setState();
   },
 
-  initialState: function initialState() {
+  getDefaultState: function getDefaultState() {
     return {
       lastActionType: '',
       gameStates: ['TITLE', 'PLAYER_SELECT', 'WAITING_ON_PLAYER', 'MAIN_GAME', 'GAME_OVER'],
@@ -1014,7 +1012,7 @@ var Component = Nori.view().createComponent({
   /**
    * Set initial state properties. Call once on first render
    */
-  getInitialState: function getInitialState() {
+  getDefaultState: function getDefaultState() {
     return this.getHUDState();
   },
 
@@ -1286,7 +1284,7 @@ var Component = Nori.view().createComponent({
   /**
    * Set initial state properties. Call once on first render
    */
-  getInitialState: function getInitialState() {
+  getDefaultState: function getDefaultState() {
     return this.getQuestionState();
   },
 
@@ -1457,7 +1455,7 @@ var Component = Nori.view().createComponent({
   /**
    * Set initial state properties. Call once on first render
    */
-  getInitialState: function getInitialState() {
+  getDefaultState: function getDefaultState() {
     var appState = _storeAppStore2['default'].getState(),
         state = {
       name: appState.localPlayer.name,
@@ -1644,7 +1642,7 @@ var Component = Nori.view().createComponent({
   /**
    * Set initial state properties. Call once on first render
    */
-  getInitialState: function getInitialState() {
+  getDefaultState: function getDefaultState() {
     return this.getGameState();
   },
 
@@ -1805,7 +1803,7 @@ var Component = Nori.view().createComponent({
   /**
    * Set initial state properties. Call once on first render
    */
-  getInitialState: function getInitialState() {
+  getDefaultState: function getDefaultState() {
     var appState = _storeAppStore2['default'].getState();
     return {
       name: appState.localPlayer.name,
@@ -1817,7 +1815,7 @@ var Component = Nori.view().createComponent({
    * State change on bound stores (map, etc.) Return nextState object
    */
   componentWillUpdate: function componentWillUpdate() {
-    return this.getInitialState();
+    return this.getDefaultState();
   },
 
   /**
@@ -1931,7 +1929,7 @@ var Component = Nori.view().createComponent({
   /**
    * Set initial state properties. Call once on first render
    */
-  getInitialState: function getInitialState() {
+  getDefaultState: function getDefaultState() {
     return {};
   },
 
@@ -2020,7 +2018,7 @@ var Component = Nori.view().createComponent({
   /**
    * Set initial state properties. Call once on first render
    */
-  getInitialState: function getInitialState() {
+  getDefaultState: function getDefaultState() {
     var appState = _storeAppStore2['default'].getState();
     return {
       name: appState.localPlayer.name,
@@ -2134,7 +2132,7 @@ var Nori = function Nori() {
    * app bundle. For easy of settings tweaks after the build by non technical devs
    * @returns {void|*}
    */
-  function getConfig() {
+  function config() {
     return _vendorLodashMinJs2['default'].assign({}, window.APP_CONFIG_DATA || {});
   }
 
@@ -2200,7 +2198,7 @@ var Nori = function Nori() {
   //----------------------------------------------------------------------------
 
   return {
-    config: getConfig,
+    config: config,
     view: view,
     store: store,
     createClass: createClass,
@@ -2568,14 +2566,10 @@ var _vendorLodashMinJs = require('../../vendor/lodash.min.js');
 
 var _vendorLodashMinJs2 = _interopRequireDefault(_vendorLodashMinJs);
 
-var _nudoruUtilIsJs = require('../../nudoru/util/is.js');
-
-var _nudoruUtilIsJs2 = _interopRequireDefault(_nudoruUtilIsJs);
-
-var ReducerStore = function ReducerStore() {
+exports['default'] = function () {
   var _this = undefined,
+      _internalState = undefined,
       _actionQueue = [],
-      _internalState = {},
       _stateReducers = [],
       _subject = new _vendorRxjsRxLiteMinJs2['default'].Subject();
 
@@ -2585,21 +2579,6 @@ var ReducerStore = function ReducerStore() {
 
   function getState() {
     return _vendorLodashMinJs2['default'].assign({}, _internalState);
-  }
-
-  /**
-   * Set the state of the store. Will default to initial state shape returned from
-   * initialState() function. Will only update the state if it's not equal to
-   * current
-   * @param nextstate
-   */
-  function setState() {
-    var nextState = arguments.length <= 0 || arguments[0] === undefined ? this.initialState() : arguments[0];
-
-    if (!_vendorLodashMinJs2['default'].isEqual(nextState, _internalState)) {
-      _internalState = _vendorLodashMinJs2['default'].assign({}, _internalState, nextState);
-      _this.notify({});
-    }
   }
 
   function setReducers(reducerArray) {
@@ -2619,9 +2598,10 @@ var ReducerStore = function ReducerStore() {
    */
   function initializeReducerStore() {
     _this = this;
+    _this.apply({ type: '@@initialize@@' });
   }
 
-  function initialState() {
+  function getDefaultState() {
     return {};
   }
 
@@ -2631,19 +2611,23 @@ var ReducerStore = function ReducerStore() {
    * @param actionObjOrArry Array of actions or a single action to reduce from
    */
   function apply(actionObjOrArry) {
-    if (_nudoruUtilIsJs2['default'].array(actionObjOrArry)) {
+    if (_stateReducers.length === 0) {
+      throw new Error('ReducerStore must have at least one reducer set');
+    }
+
+    if (Array.isArray(actionObjOrArry)) {
       _actionQueue = _actionQueue.concat(actionObjOrArry);
     } else {
       _actionQueue.push(actionObjOrArry);
     }
 
-    processActionQueue(getState());
+    processActionQueue(_internalState);
   }
 
   function processActionQueue(state) {
     while (_actionQueue.length) {
       var actionObject = _actionQueue.shift();
-      applyReducers(state, actionObject);
+      _this.applyReducers(state, actionObject);
     }
   }
 
@@ -2652,8 +2636,13 @@ var ReducerStore = function ReducerStore() {
       console.warn('Reducer store, cannot apply undefined action type');
       return;
     }
-    var nextState = applyReducersToState(state, actionObject);
-    setState(nextState);
+
+    var nextState = _this.reduceToState(actionObject, state);
+
+    if (!_vendorLodashMinJs2['default'].isEqual(_internalState, nextState)) {
+      _internalState = nextState;
+      _this.notify();
+    }
   }
 
   /**
@@ -2663,11 +2652,10 @@ var ReducerStore = function ReducerStore() {
    * @param action
    * @returns {*|{}}
    */
-  function applyReducersToState(state, action) {
-    var nextState = undefined;
+  function reduceToState(action) {
+    var state = arguments.length <= 1 || arguments[1] === undefined ? this.getDefaultState() : arguments[1];
 
-    // TODO {} or this.getDefaultState()?
-    state = state || {};
+    var nextState = undefined;
 
     try {
       nextState = _stateReducers.reduce(function (nextState, reducerFunc) {
@@ -2718,23 +2706,22 @@ var ReducerStore = function ReducerStore() {
 
   return {
     initializeReducerStore: initializeReducerStore,
-    initialState: initialState,
+    getDefaultState: getDefaultState,
     getState: getState,
-    setState: setState,
     apply: apply,
     setReducers: setReducers,
     addReducer: addReducer,
     applyReducers: applyReducers,
-    applyReducersToState: applyReducersToState,
+    reduceToState: reduceToState,
     subscribe: subscribe,
     notify: notify
   };
 };
 
-exports['default'] = ReducerStore;
+;
 module.exports = exports['default'];
 
-},{"../../nudoru/util/is.js":47,"../../vendor/lodash.min.js":48,"../../vendor/rxjs/rx.lite.min.js":49}],22:[function(require,module,exports){
+},{"../../vendor/lodash.min.js":48,"../../vendor/rxjs/rx.lite.min.js":49}],22:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -3823,7 +3810,7 @@ var ViewComponent = function ViewComponent() {
     _mountPoint = _internalProps.mountPoint;
     _children = this.defineChildren();
 
-    this.setState(this.getInitialState());
+    this.setState(this.getDefaultState());
     //this.setEvents(this.getDOMEvents());
 
     this.$initializeChildren();
@@ -3863,7 +3850,7 @@ var ViewComponent = function ViewComponent() {
    * Get the initial state of the component
    * @returns {{}}
    */
-  function getInitialState() {
+  function getDefaultState() {
     return {};
   }
 
@@ -3893,7 +3880,7 @@ var ViewComponent = function ViewComponent() {
       return;
     }
 
-    nextState = nextState || this.getInitialState();
+    nextState = nextState || this.getDefaultState();
 
     if (!shouldComponentUpdate(null, nextState)) {
       return;
@@ -4233,11 +4220,11 @@ var ViewComponent = function ViewComponent() {
   //----------------------------------------------------------------------------
 
   return {
-    initializeComponent: initializeComponent,
     state: _publicState,
     props: _publicProps,
+    initializeComponent: initializeComponent,
     setProps: setProps,
-    getInitialState: getInitialState,
+    getDefaultState: getDefaultState,
     setState: setState,
     getDefaultProps: getDefaultProps,
     defineChildren: defineChildren,

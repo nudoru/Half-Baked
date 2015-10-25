@@ -53,7 +53,7 @@ var Component = Nori.view().createComponent({
   /**
    * Set initial state properties. Call once on first render
    */
-  getInitialState() {
+  getDefaultState() {
     var appState = _appStore.getState();
     return {
       name      : appState.localPlayer.name,
@@ -65,7 +65,7 @@ var Component = Nori.view().createComponent({
    * State change on bound stores (map, etc.) Return nextState object
    */
   componentWillUpdate() {
-    return this.getInitialState();
+    return this.getDefaultState();
   },
 
   /**

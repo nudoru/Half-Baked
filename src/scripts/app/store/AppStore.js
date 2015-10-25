@@ -28,13 +28,11 @@ let AppStoreModule = Nori.createStore({
       this.playerResponseStateReducer.bind(this),
       this.opponentResponseStateReducer.bind(this)]);
 
+    // Will set to initial state
     this.initializeReducerStore();
-
-    // Will default state to initial state defaults
-    this.setState();
   },
 
-  initialState() {
+  getDefaultState() {
     return {
       lastActionType  : '',
       gameStates      : ['TITLE', 'PLAYER_SELECT', 'WAITING_ON_PLAYER', 'MAIN_GAME', 'GAME_OVER'],

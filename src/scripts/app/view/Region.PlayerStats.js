@@ -43,7 +43,7 @@ var Component = Nori.view().createComponent({
   /**
    * Set initial state properties. Call once on first render
    */
-    getInitialState() {
+    getDefaultState() {
     return this.getHUDState();
   },
 

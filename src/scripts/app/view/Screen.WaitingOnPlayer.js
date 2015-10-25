@@ -36,7 +36,7 @@ var Component = Nori.view().createComponent({
   /**
    * Set initial state properties. Call once on first render
    */
-  getInitialState() {
+  getDefaultState() {
     var appState = _appStore.getState();
     return {
       name      : appState.localPlayer.name,
