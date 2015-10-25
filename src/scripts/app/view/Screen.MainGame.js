@@ -4,8 +4,8 @@ import _appView from './AppView';
 import _appStore from '../store/AppStore';
 import _template from '../../nori/view/Templating.js';
 import _appActions from '../action/ActionCreator.js';
-import _regionPlayerStats from './Region.PlayerStats.js';
-import _regionQuestion from './Region.Question.js';
+import _childPlayerStats from './Region.PlayerStats.js';
+import _childQuestion from './Region.Question.js';
 import _numUtils from '../../nudoru/core/NumberUtils.js';
 import _domUtils from '../../nudoru/browser/DOMUtils.js';
 import _mixinDOMManipulation from '../../nori/view/MixinDOMManipulation.js';
@@ -36,19 +36,19 @@ var Component = Nori.view().createComponent({
     this.setState(this.getGameState());
   },
 
-  defineRegions () {
+  defineChildren () {
     return {
-      localPlayerStats : _regionPlayerStats({
+      localPlayerStats : _childPlayerStats({
         id        : 'game__playerstats',
         mountPoint: '#game__localplayerstats',
         target    : 'local'
       }),
-      remotePlayerStats: _regionPlayerStats({
+      remotePlayerStats: _childPlayerStats({
         id        : 'game__playerstats',
         mountPoint: '#game__remoteplayerstats',
         target    : 'remote'
       }),
-      questionView     : _regionQuestion({
+      questionView     : _childQuestion({
         id        : 'game__question',
         mountPoint: '#game__questionarea'
       })
