@@ -17,6 +17,7 @@
 import _ from '../../vendor/lodash.min.js';
 import Template from '../view/Templating.js';
 import Renderer from '../view/Renderer.js';
+import DOMUtils from '../../nudoru/browser/DOMUtils.js';
 
 // Lifecycle state constants
 const LS_NO_INIT   = 0,
@@ -37,6 +38,7 @@ let ViewComponent = function () {
       _lifecycleState = LS_NO_INIT,
       _isMounted      = false,
       _children       = {},
+      _parent,
       _id,
       _templateObjCache,
       _html,
@@ -51,16 +53,25 @@ let ViewComponent = function () {
   function initializeComponent(initProps) {
     this.setProps(_.assign({}, this.getDefaultProps(), initProps));
 
-    _id = _internalProps.id;
-    if (!_id) {
+    if (_internalProps.hasOwnProperty('id')) {
+      _id = _internalProps.id;
+    } else {
       throw new Error('Cannot initialize Component without an ID');
     }
 
-    _mountPoint = _internalProps.mountPoint;
+    if (_internalProps.hasOwnProperty('mountPoint')) {
+      _mountPoint = _internalProps.mountPoint;
+    } else {
+      throw new Error('Cannot initialize Component without a mount selector');
+    }
+
+    if (_internalProps.hasOwnProperty('parent')) {
+      _parent = _internalProps.parent;
+    }
+
     _children   = this.defineChildren();
 
     this.setState(this.getDefaultState());
-    //this.setEvents(this.getDOMEvents());
 
     this.$initializeChildren();
 
@@ -285,6 +296,7 @@ let ViewComponent = function () {
     _lifecycleState = LS_MOUNTED;
 
     _DOMElement = (Renderer.render({
+      key   : this.key,
       target: _mountPoint,
       html  : _html
     }));
@@ -355,11 +367,7 @@ let ViewComponent = function () {
       this.undelegateEvents(this.getDOMEvents());
     }
 
-    // Just clear the contents
-    Renderer.render({
-      target: _mountPoint,
-      html  : ''
-    });
+    DOMUtils.removeAllElements(document.querySelector(_mountPoint));
 
     _html       = '';
     _DOMElement = null;
@@ -399,7 +407,7 @@ let ViewComponent = function () {
 
   function $initializeChildren() {
     getChildIDs().forEach(region => {
-      _children[region].initialize();
+      _children[region].initialize({parent: this});
     });
   }
 
@@ -473,8 +481,8 @@ let ViewComponent = function () {
   //----------------------------------------------------------------------------
 
   return {
-    state                         : _publicState,
-    props                         : _publicProps,
+    state: _publicState,
+    props: _publicProps,
     initializeComponent,
     setProps,
     getDefaultState,

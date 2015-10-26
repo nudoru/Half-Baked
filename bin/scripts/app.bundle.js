@@ -163,7 +163,9 @@ var App = Nori.createClass({
     _viewAppViewJs2['default'].initialize();
     _storeAppStoreJs2['default'].initialize();
     _storeAppStoreJs2['default'].subscribe(this.reactToStoreMutation.bind(this));
-    this.fetchQuestions(); // will call runapp on load
+
+    // will call runapp on load
+    this.fetchQuestions();
   },
 
   /**
@@ -227,11 +229,11 @@ var App = Nori.createClass({
   // Handle FROM store
   //----------------------------------------------------------------------------
 
-  reactToStoreMutation: function reactToStoreMutation() {
-    var appState = _storeAppStoreJs2['default'].getState(),
-        type = appState.lastActionType;
+  reactToStoreMutation: function reactToStoreMutation(_ref) {
+    var type = _ref.type;
+    var state = _ref.state;
 
-    console.log('APP, handle after action: ', type);
+    console.log('APP, store mut: ', type);
 
     if (type === _actionActionConstantsJs2['default'].SET_LOCAL_PLAYER_PROPS) {
       this.handleLocalPlayerPropsUpdate();
@@ -247,7 +249,7 @@ var App = Nori.createClass({
       this.handleGameReset();
     }
 
-    if (this.shouldGameEnd(appState)) {
+    if (this.shouldGameEnd(state)) {
       console.log('app, game should end');
       this.doGameOver();
     }
@@ -359,7 +361,8 @@ var App = Nori.createClass({
     var setSessionID = _actionActionCreatorJs2['default'].setSessionProps({ socketIOID: socketID }),
         setLocalID = _actionActionCreatorJs2['default'].setLocalPlayerProps({ id: socketID });
 
-    _storeAppStoreJs2['default'].apply([setSessionID, setLocalID]);
+    _storeAppStoreJs2['default'].apply(setSessionID);
+    _storeAppStoreJs2['default'].apply(setLocalID);
   },
 
   handleJoinNewlyCreatedRoom: function handleJoinNewlyCreatedRoom(roomID) {
@@ -367,7 +370,8 @@ var App = Nori.createClass({
         setRoom = _actionActionCreatorJs2['default'].setSessionProps({ roomID: roomID }),
         setWaitingScreenState = _noriActionActionCreatorJs2['default'].changeStoreState({ currentState: appState.gameStates[2] });
 
-    _storeAppStoreJs2['default'].apply([setRoom, setWaitingScreenState]);
+    _storeAppStoreJs2['default'].apply(setRoom);
+    _storeAppStoreJs2['default'].apply(setWaitingScreenState);
   },
 
   handleGameStart: function handleGameStart(payload) {
@@ -377,7 +381,9 @@ var App = Nori.createClass({
         setGameState = _noriActionActionCreatorJs2['default'].changeStoreState({ currentState: appState.gameStates[3] }),
         setCurrentQuestion = _actionActionCreatorJs2['default'].setCurrentQuestion(null);
 
-    _storeAppStoreJs2['default'].apply([setRemotePlayer, setGameState, setCurrentQuestion]);
+    _storeAppStoreJs2['default'].apply(setRemotePlayer);
+    _storeAppStoreJs2['default'].apply(setGameState);
+    _storeAppStoreJs2['default'].apply(setCurrentQuestion);
   },
 
   pluckRemotePlayer: function pluckRemotePlayer(playersArry) {
@@ -419,7 +425,8 @@ var App = Nori.createClass({
       applyRisk = _actionActionCreatorJs2['default'].applyRisk(0);
     }
 
-    _storeAppStoreJs2['default'].apply([opponentAnswered, applyRisk]);
+    _storeAppStoreJs2['default'].apply(opponentAnswered);
+    _storeAppStoreJs2['default'].apply(applyRisk);
   },
 
   //----------------------------------------------------------------------------
@@ -2558,6 +2565,10 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'd
  * Store modeled after Redux
  */
 
+var _nudoruUtilIsJs = require('../../nudoru/util/is.js');
+
+var _nudoruUtilIsJs2 = _interopRequireDefault(_nudoruUtilIsJs);
+
 var _vendorRxjsRxLiteMinJs = require('../../vendor/rxjs/rx.lite.min.js');
 
 var _vendorRxjsRxLiteMinJs2 = _interopRequireDefault(_vendorRxjsRxLiteMinJs);
@@ -2566,10 +2577,10 @@ var _vendorLodashMinJs = require('../../vendor/lodash.min.js');
 
 var _vendorLodashMinJs2 = _interopRequireDefault(_vendorLodashMinJs);
 
+var STORE_INITIALIZE_TYPE = '$$$initstore$$$';
+
 exports['default'] = function () {
-  var _this = undefined,
-      _internalState = undefined,
-      _actionQueue = [],
+  var _internalState = undefined,
       _stateReducers = [],
       _subject = new _vendorRxjsRxLiteMinJs2['default'].Subject();
 
@@ -2594,13 +2605,15 @@ exports['default'] = function () {
   //----------------------------------------------------------------------------
 
   /**
-   * Set up event listener/receiver
+   * Run the the reducers with the default state
    */
   function initializeReducerStore() {
-    _this = this;
-    _this.apply({ type: '@@initialize@@' });
+    this.apply({ type: STORE_INITIALIZE_TYPE });
   }
 
+  /**
+   * Returns the default state "shape"
+   */
   function getDefaultState() {
     return {};
   }
@@ -2608,40 +2621,41 @@ exports['default'] = function () {
   /**
    * Apply the action object to the reducers to change state
    * are sent to all reducers to update the state
-   * @param actionObjOrArry Array of actions or a single action to reduce from
    */
-  function apply(actionObjOrArry) {
+  function apply(action) {
     if (_stateReducers.length === 0) {
       throw new Error('ReducerStore must have at least one reducer set');
     }
-
-    if (Array.isArray(actionObjOrArry)) {
-      _actionQueue = _actionQueue.concat(actionObjOrArry);
-    } else {
-      _actionQueue.push(actionObjOrArry);
-    }
-
-    processActionQueue(_internalState);
-  }
-
-  function processActionQueue(state) {
-    while (_actionQueue.length) {
-      var actionObject = _actionQueue.shift();
-      _this.applyReducers(state, actionObject);
+    if (isValidAction(action)) {
+      // Apply called as the result of an event/subscription. Fix context back to
+      // correct scope
+      applyReducers.bind(this)(action, _internalState);
     }
   }
 
-  function applyReducers(state, actionObject) {
-    if (typeof actionObject.type === 'undefined') {
+  function isValidAction(action) {
+    if (!_nudoruUtilIsJs2['default'].object(action)) {
+      console.warn('ReducerStore, action must be plain JS object', action);
+      return false;
+    }
+
+    if (typeof action.type === 'undefined') {
       console.warn('Reducer store, cannot apply undefined action type');
-      return;
+      return false;
     }
 
-    var nextState = _this.reduceToState(actionObject, state);
+    return true;
+  }
 
+  function applyReducers(action, state) {
+    state = state || this.getDefaultState();
+
+    var nextState = this.reduceToNextState(action, state);
+
+    // Don't update the state if it's the same
     if (!_vendorLodashMinJs2['default'].isEqual(_internalState, nextState)) {
       _internalState = nextState;
-      _this.notify();
+      this.notify(action.type, this.getState());
     }
   }
 
@@ -2652,9 +2666,7 @@ exports['default'] = function () {
    * @param action
    * @returns {*|{}}
    */
-  function reduceToState(action) {
-    var state = arguments.length <= 1 || arguments[1] === undefined ? this.getDefaultState() : arguments[1];
-
+  function reduceToNextState(action, state) {
     var nextState = undefined;
 
     try {
@@ -2677,8 +2689,8 @@ exports['default'] = function () {
         switch (event.type) {
           case _noriActionConstants.MODEL_DATA_CHANGED:
             // can compose other reducers
-            // return _.merge({}, state, otherStateTransformer(state));
-            return _.merge({}, state, {prop: event.payload.value});
+            // return _.assign({}, state, otherStateTransformer(state));
+            return _.assign({}, state, {prop: event.payload.value});
           case undefined:
             return state;
           default:
@@ -2696,8 +2708,8 @@ exports['default'] = function () {
     return _subject.subscribe(handler);
   }
 
-  function notify(payload) {
-    _subject.onNext(payload);
+  function notify(type, state) {
+    _subject.onNext({ type: type, state: state });
   }
 
   //----------------------------------------------------------------------------
@@ -2712,16 +2724,15 @@ exports['default'] = function () {
     setReducers: setReducers,
     addReducer: addReducer,
     applyReducers: applyReducers,
-    reduceToState: reduceToState,
+    reduceToNextState: reduceToNextState,
     subscribe: subscribe,
     notify: notify
   };
 };
 
-;
 module.exports = exports['default'];
 
-},{"../../vendor/lodash.min.js":48,"../../vendor/rxjs/rx.lite.min.js":49}],22:[function(require,module,exports){
+},{"../../nudoru/util/is.js":47,"../../vendor/lodash.min.js":48,"../../vendor/rxjs/rx.lite.min.js":49}],22:[function(require,module,exports){
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -3504,13 +3515,21 @@ var _nudoruBrowserDOMUtilsJs2 = _interopRequireDefault(_nudoruBrowserDOMUtilsJs)
 
 var RendererModule = function RendererModule() {
   function render(_ref) {
+    var key = _ref.key;
     var target = _ref.target;
     var html = _ref.html;
     var callback = _ref.callback;
 
     var domEl = undefined,
         mountPoint = document.querySelector(target),
-        currentHTML = mountPoint.innerHTML;
+        currentHTML = undefined;
+
+    if (!mountPoint) {
+      console.warn('Render, target selector not found', target);
+      return;
+    }
+
+    currentHTML = mountPoint.innerHTML;
 
     if (html) {
       domEl = _nudoruBrowserDOMUtilsJs2['default'].HTMLStrToNode(html);
@@ -3769,6 +3788,10 @@ var _viewRendererJs = require('../view/Renderer.js');
 
 var _viewRendererJs2 = _interopRequireDefault(_viewRendererJs);
 
+var _nudoruBrowserDOMUtilsJs = require('../../nudoru/browser/DOMUtils.js');
+
+var _nudoruBrowserDOMUtilsJs2 = _interopRequireDefault(_nudoruBrowserDOMUtilsJs);
+
 // Lifecycle state constants
 var LS_NO_INIT = 0,
     LS_INITED = 1,
@@ -3788,6 +3811,7 @@ var ViewComponent = function ViewComponent() {
       _lifecycleState = LS_NO_INIT,
       _isMounted = false,
       _children = {},
+      _parent = undefined,
       _id = undefined,
       _templateObjCache = undefined,
       _html = undefined,
@@ -3802,16 +3826,25 @@ var ViewComponent = function ViewComponent() {
   function initializeComponent(initProps) {
     this.setProps(_vendorLodashMinJs2['default'].assign({}, this.getDefaultProps(), initProps));
 
-    _id = _internalProps.id;
-    if (!_id) {
+    if (_internalProps.hasOwnProperty('id')) {
+      _id = _internalProps.id;
+    } else {
       throw new Error('Cannot initialize Component without an ID');
     }
 
-    _mountPoint = _internalProps.mountPoint;
+    if (_internalProps.hasOwnProperty('mountPoint')) {
+      _mountPoint = _internalProps.mountPoint;
+    } else {
+      throw new Error('Cannot initialize Component without a mount selector');
+    }
+
+    if (_internalProps.hasOwnProperty('parent')) {
+      _parent = _internalProps.parent;
+    }
+
     _children = this.defineChildren();
 
     this.setState(this.getDefaultState());
-    //this.setEvents(this.getDOMEvents());
 
     this.$initializeChildren();
 
@@ -4035,6 +4068,7 @@ var ViewComponent = function ViewComponent() {
     _lifecycleState = LS_MOUNTED;
 
     _DOMElement = _viewRendererJs2['default'].render({
+      key: this.key,
       target: _mountPoint,
       html: _html
     });
@@ -4103,11 +4137,7 @@ var ViewComponent = function ViewComponent() {
       this.undelegateEvents(this.getDOMEvents());
     }
 
-    // Just clear the contents
-    _viewRendererJs2['default'].render({
-      target: _mountPoint,
-      html: ''
-    });
+    _nudoruBrowserDOMUtilsJs2['default'].removeAllElements(document.querySelector(_mountPoint));
 
     _html = '';
     _DOMElement = null;
@@ -4145,8 +4175,10 @@ var ViewComponent = function ViewComponent() {
   }
 
   function $initializeChildren() {
+    var _this = this;
+
     getChildIDs().forEach(function (region) {
-      _children[region].initialize();
+      _children[region].initialize({ parent: _this });
     });
   }
 
@@ -4264,7 +4296,7 @@ var ViewComponent = function ViewComponent() {
 exports['default'] = ViewComponent;
 module.exports = exports['default'];
 
-},{"../../vendor/lodash.min.js":48,"../view/Renderer.js":31,"../view/Templating.js":32}],34:[function(require,module,exports){
+},{"../../nudoru/browser/DOMUtils.js":35,"../../vendor/lodash.min.js":48,"../view/Renderer.js":31,"../view/Templating.js":32}],34:[function(require,module,exports){
 Object.defineProperty(exports, "__esModule", {
   value: true
 });

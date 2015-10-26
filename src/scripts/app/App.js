@@ -32,7 +32,9 @@ let App = Nori.createClass({
     _appView.initialize();
     _appStore.initialize();
     _appStore.subscribe(this.reactToStoreMutation.bind(this));
-    this.fetchQuestions(); // will call runapp on load
+
+    // will call runapp on load
+    this.fetchQuestions();
   },
 
   /**
@@ -95,11 +97,8 @@ let App = Nori.createClass({
   // Handle FROM store
   //----------------------------------------------------------------------------
 
-  reactToStoreMutation() {
-    var appState = _appStore.getState(),
-        type     = appState.lastActionType;
-
-    console.log('APP, handle after action: ', type);
+  reactToStoreMutation({type, state}) {
+    console.log('APP, store mut: ', type);
 
     if (type === _appActionConstants.SET_LOCAL_PLAYER_PROPS) {
       this.handleLocalPlayerPropsUpdate();
@@ -115,7 +114,7 @@ let App = Nori.createClass({
       this.handleGameReset();
     }
 
-    if (this.shouldGameEnd(appState)) {
+    if (this.shouldGameEnd(state)) {
       console.log('app, game should end');
       this.doGameOver();
     }
@@ -227,7 +226,8 @@ let App = Nori.createClass({
     let setSessionID = _appActions.setSessionProps({socketIOID: socketID}),
         setLocalID   = _appActions.setLocalPlayerProps({id: socketID});
 
-    _appStore.apply([setSessionID, setLocalID]);
+    _appStore.apply(setSessionID);
+    _appStore.apply(setLocalID);
   },
 
   handleJoinNewlyCreatedRoom(roomID) {
@@ -235,7 +235,8 @@ let App = Nori.createClass({
         setRoom               = _appActions.setSessionProps({roomID: roomID}),
         setWaitingScreenState = _noriActions.changeStoreState({currentState: appState.gameStates[2]});
 
-    _appStore.apply([setRoom, setWaitingScreenState]);
+    _appStore.apply(setRoom);
+    _appStore.apply(setWaitingScreenState);
   },
 
   handleGameStart(payload) {
@@ -245,7 +246,9 @@ let App = Nori.createClass({
         setGameState       = _noriActions.changeStoreState({currentState: appState.gameStates[3]}),
         setCurrentQuestion = _appActions.setCurrentQuestion(null);
 
-    _appStore.apply([setRemotePlayer, setGameState, setCurrentQuestion]);
+    _appStore.apply(setRemotePlayer);
+    _appStore.apply(setGameState);
+    _appStore.apply(setCurrentQuestion);
   },
 
   pluckRemotePlayer(playersArry) {
@@ -287,7 +290,8 @@ let App = Nori.createClass({
       applyRisk = _appActions.applyRisk(0);
     }
 
-    _appStore.apply([opponentAnswered, applyRisk]);
+    _appStore.apply(opponentAnswered);
+    _appStore.apply(applyRisk);
   },
 
   //----------------------------------------------------------------------------
